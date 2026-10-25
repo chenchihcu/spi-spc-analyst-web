@@ -18,5 +18,6 @@
 ## 未完成或未驗證
 
 - `not verified`：正式 D1 的 `0007_controlled_coordinate_import.sql` 仍待套用；正式 Worker 目前為回退版本，新受控匯入尚未在線上開放。正式 `INITIAL_ADMIN_USER` 需在切換新版前，以使用者指定的既有登入帳號設於 Worker 執行環境，不將帳號名稱寫入 Git。
-- `not verified`：上述備份只代表 22:10 的正式資料狀態；真正切換前若資料改變，必須再比對／更新備份。正式 D1 `migrations list --remote` 仍列出待套用 `0007`，Worker `deployments status` 仍為 100% 回退版本。後續須在核定的切換窗口設定正式初始管理者、套用 migration、合併 PR 觸發自動部署，並於精確公開 URL 登入後驗證。
+- `verified`（2026-10-25 12:20 UTC+8）：切換當下重新匯出正式 D1（8522 bytes，SHA-256 與 22:10 備份相同，資料未變）並下載 5 個 R2 原檔核對；記錄 Time Travel 書籤後套用 `0007`，`migrations list --remote` 讀回 `No migrations to apply`，正式 D1 讀回 5 筆紀錄（`legacy/legacy`）、8 筆稽核與 3 張新表。
+- `not verified`：合併 PR 觸發自動部署、設定正式 `INITIAL_ADMIN_USER`，以及於精確公開 URL 登入後驗證，於切換完成後補記。
 - `not verified`：staging 只驗收合成資料與上述檔案大小，未測實體 iPhone、完整 4 MiB 以下各種壓縮比或正式資料的真實負載。此紀錄不是正式上線驗收。
