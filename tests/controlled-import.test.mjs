@@ -54,6 +54,20 @@ test('通用格式沿用既有 PanelId、FigureId 與 PinNo 欄名並以子板�
   assert.deepEqual(result.missing, []);
 });
 
+test('量測值全空白的列與前端 buildRows 一樣不計入板數、焊墊數與量測點', () => {
+  const place = validatePlacement(parseCsv('RefDes,X,Y,Layer\nU1,1,2,L1-TOP\n'), { side: 'TOP', unit: 'mm' });
+  const generic = validateMeasurement(parseCsv('Board,RefDes,Pad,Volume\nB1,U1,1,100\nB2,U1,2,\nB3,R9,1,\n'), 'TOP', place);
+  assert.deepEqual([generic.boards, generic.pads, generic.points], [1, 1, 1]);
+  assert.deepEqual(generic.missing, [], '只有空白量測的位號不列為無座標');
+  const units = validateMeasurement(parseCsv('Board,RefDes,Pad,Height(µm),Offset X\nB1,U1,1,,\nB2,U1,1,,0.1\n'), 'TOP', place);
+  assert.deepEqual([units.boards, units.points], [1, 1], '含單位與偏移欄名的量測欄也要辨識');
+  const head = 'Component ID,PAD ID,Height(%)1,Volume(%)1,Area(%)1,Result1,Height(%)2,Volume(%)2,Area(%)2,Result2\n';
+  const wide = validateWideMeasurement(parseCsv(head + 'U1_1,1,101,99,98,PASS,,,,\nU1_2,2,,,,,,,,\n'), 'TOP', place);
+  assert.deepEqual([wide.boards, wide.pads, wide.points], [1, 1, 1]);
+  const allEmpty = validateMeasurement(parseCsv('Board,RefDes,Pad,Volume\nB1,U1,1,\n'), 'TOP', place);
+  assert.equal(allEmpty.code, 'empty');
+});
+
 test('立榮錯位列只在第一板高度為焊墊號且量測欄空白時回收 PAD ID', () => {
   const place = validatePlacement(parseCsv('RefDes,X,Y,Layer\nG9,1,2,TOP\n'), { side: 'TOP', unit: 'mm' });
   const head = 'Component ID,Height(%)1,Volume(%)1,Area(%)1,PAD ID,Result1,Height(%)2,Volume(%)2,Area(%)2,Result2\n';
