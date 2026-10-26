@@ -1,38 +1,51 @@
 # Release Readiness Report
 
 **Project:** SPI·SPC 分析台
-**Version:** v9.11.0
-**Date:** 2026-10-18 09:36:37（UTC+8）
-**Overall Status:** READY
+**Version:** v10.3.3
+**Date:** 2026-10-27（UTC+8）
+**Branch:** `work/final-release-debug`（未合併；合併 main 即自動部署正式站）
+**Overall Status:** READY（本機關卡）；正式站驗收待合併後進行
 
 ## Summary
 
-本報告依據 `validate-production-release` 發布前檢查體系（以 `tools/release-check.js` 執行同等檢查），全面稽核 SPI·SPC 分析台在 Cloudflare Workers (D1 + R2) 雲端原生架構、iPhone 行動版 Web UI/UX、步驟 8~14 強化特性及 RFC-SPI-2026-001 五大進階分析特性下的發布就緒狀態。全套 31 個測試檔、259 項單元與整合測試全數通過（`Overall: READY`）。
+最終發布前於 Windows 本機重跑全部關卡，並以 build 產物逐頁巡檢 UI。巡檢發現 6 項缺陷，皆已修正並補回歸測試；修正後全部關卡再跑一次通過。
 
-## Checks
+## Checks（verified：本次實際執行）
 
-| Category | 初檢 v8 | 複檢 v9.0.0 | 現況 v9.11.0 | Findings | Next Action |
-|----------|:-------:|:-----------:|:------------:|----------|-------------|
-| **Version & Packaging** | ⚠️ | ✅ | ✅ | FACT：主頁 `#appVer`、`lib/version.mjs`、`CHANGELOG.md` 與 `package.json` 四處版本號完全對齊為 `v9.11.0`（更新時間 `2026-10-16 22:45:00`）。 | 後續每次發布遵守單一來源更新流程 |
-| **Changelog** | ❌ | ✅ | ✅ | FACT：`CHANGELOG.md` 最新條目 `v9.11.0` 與主頁版本一致，完整記錄 iPhone UI 改版、五大進階分析特性 (RFC-SPI-2026-001) 與步驟 8~14 之更新細節。 | 每次發版維持記錄 |
-| **Debug Artifacts** | ✅ | ✅ | ✅ | FACT：主程式碼無未授權之 console 輸出、debugger、alert、TODO/FIXME 或本機位址殘留。 | 維持防護 |
-| **Documentation** | ❌ | ✅ | ✅ | FACT：`README.md` 含快速開始、14 個工作流頁籤、五大進階分析特性、Cloudflare 部署指南與發版流程；並附有 `docs/cutover-runbook.md`、`docs/netlify-teardown.md` 與 `docs/spec-advanced-features-rfc.md`。 | 保持隨代碼同步 |
-| **Dependencies** | ✅ | ✅ | ✅ | FACT：Chart.js 4.4.1、three.js r128、jsPDF 4.2.1 與 npm 套件皆鎖定精確版本；`wrangler.jsonc` 的 `LOGIN_LIMIT` (10 reqs/60s) 符合免費方案速率限制規範。 | 升級核心庫時重新跑回歸測試 |
-| **Tests** | ❌ | ✅ (15項) | ✅ (259項) | FACT：31 個測試檔共 259 項單元與整合測試 100% 通過（0 失敗、0 略過），涵蓋統計核心、進階形貌、空間自相關、管制圖、Cloudflare API 與行動版排版。 | 每次提交前執行 `npm test` |
-| **Secrets & API** | ✅ | ✅ | ✅ | FACT：掃描 96 個追蹤原始碼檔案，未發現硬編碼 API 金鑰或密碼雜湊；AI Gateway 金鑰由執行環境提供。 | 維持環境變數隔離 |
-| **Accessibility (附加)** | ⚠️ | ✅ | ✅ | FACT：85 個靜態控制項皆有標籤或包在 label 內；符合 iOS Safari HIG（≥44×44 觸控目標、無障礙 Bottom Sheet、ARIA 頁籤導覽）。 | 保持無障礙驗證 |
+| 關卡 | 指令 | 結果 |
+|---|---|---|
+| 單元與整合測試 | `npm test` | 335／335 通過（修正前基線 334／334） |
+| 判定模擬 | `npm run test:slow` | 修正前基線 5／5 通過（seed 1–200）；本次修正未改偵測邏輯，修正後未重跑 |
+| 發布檢查 | `npm run release-check` | `Overall: READY`，八類（version、changelog、debug、docs、deps、tests、secrets、a11y）皆 PASS |
+| Cloudflare build | `npm run build:cloudflare` | exit 0，產物僅 `index.html`、`vendor/`、`_headers` |
+| Worker 設定 | `npx wrangler deploy --dry-run` | exit 0 |
+| D1 migration | — | 本次無新增 migration，合併不需先套用 |
 
-## Blockers
+## UI 巡檢（verified：內建瀏覽器，本次 build 產物）
 
-無。
+範圍：14 個分頁、4 個資料子分頁、「更多」選單、設定面板、6 個對話框（共 25 個畫面）× 寬度 1440／820／390／320 × 明亮／深色。每頁檢查整頁橫向溢出、元素超出畫面、觸控熱區 ≥ 44px（390／320 觸控模擬）、文字對比 ≥ 3。
+
+| 缺陷 | 修正 | 證據 |
+|---|---|---|
+| LISA 圖每次進入進階分析頁放大 dpr 倍（1200 → 2400 → 4800px） | 畫布固定 CSS 尺寸 | 進出 3 次維持 405px；測試 8a |
+| 320px 製程能力頁、匯入頁橫向溢出 29–59px | `.panel`／`.vendor` 欄寬 `minmax(0,1fr)`、`select{max-width:100%}` | 320px 無溢出；測試 8b |
+| 深色模式報告判定框對比 1.2 | 報告紙張範圍固定明亮 token | 深色截圖可讀；測試 8d |
+| 3D 剖面圖例文字對比 2.1–2.5 | 文字用一般字色，系列色只在符號 | 測試 8e |
+| 核取方塊 label 觸控熱區 30px | `label.row:has(>input[type=checkbox])` 44px | 390／320 無 < 44px；測試 8c |
+| 稽核紀錄指紋顯示 `undefined…`（2026-10-25 正式唯讀驗收 not pass） | 缺值顯示「舊紀錄未記錄」 | `tests/part-spec-ui.test.mjs` |
+
+修正後 4 寬度 × 2 主題全數無溢出、無熱區不足、無低對比文字。剩餘標記為 3D 剖面圖例的線條符號（非文字，需與圖上線色一致），接受。
+
+## Not verified / NOT TESTED
+
+- **820px 觸控**：內建瀏覽器只在 < 768px 模擬觸控；820 僅測滑鼠模式，觸控規則由靜態 CSS 測試涵蓋。
+- **對話框內容**：以移除 `hidden` 檢查版面，未填入實際資料流程。
+- **稽核指紋欄畫面**：本機無缺指紋的稽核資料，僅以 jsdom 測試驗證輸出。
+- **iPhone 真機**：未實測。
+- **正式站**：合併後需依 `AGENTS.md`「部署驗證要走過資料庫路徑」確認登入後資料庫頁；正式站瀏覽器原檔下載與重新載入分析仍未核對（沿用 2026-10-25 驗收紀錄的 not verified）。
+- **CI**：runner 改為 `windows-latest`，首次結果以本 PR 的 GitHub Actions 為準。
 
 ## Warnings
 
-- **[Model Calibration]** INFERENCE：問題偵測門檻以範例資料及蒙地卡羅模擬（60 組無異常、10 組埋入異常）校正完成。實際試產資料若雜訊結構不同，可透過機台設定檔或自訂規格微調門檻。
-- **[Cloud Architecture]** FACT：量測資料庫 100% 依賴 Cloudflare Workers（D1 + R2），不設在地 IndexedDB 或沙盒降級備援分支。未登入或離線環境存取時維持 Fail-Closed 阻擋存取。
-
-## Recommendations — Next Best Step
-
-1. **Cloudflare 站點巡檢**：依 `docs/cutover-runbook.md` 檢查正式 Worker 站點的 D1 資料庫、R2 儲存與 Cloudflare AI Gateway 運作狀態。
-2. **iPhone Safari 真機體驗確認**：在 iPhone 16 Pro Max 及各尺寸 iOS 裝置上確認底部導航欄、摘要晶片與 Bottom Sheet 的單手操作流暢度。
-3. **發布前例行檢查**：每次改動合併至 main 前執行 `npm test` 與 `node tools/release-check.js`，確認 Overall 維持 `READY`。
+- INFERENCE：問題偵測門檻以模擬資料校正（v10.2.2、v10.2.3 已改小樣本校準與置換檢定）；真實試產資料雜訊結構不同時，誤報率可能偏離名目值。
+- FACT：新紀錄只寫入 Cloudflare D1＋R2，未登入時建立紀錄直接拒絕；既有本機 IndexedDB 舊資料只供查閱。

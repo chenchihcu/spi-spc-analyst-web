@@ -147,7 +147,7 @@ details[open].iss-card>summary{border-bottom:1px solid var(--line);border-radius
 .subtab[aria-selected="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
 .recrow input{min-width:160px}
 .rec-act{display:flex;gap:6px;flex-wrap:wrap}.rec-act button{min-height:30px;padding:3px 10px;font-size:12.5px}.rec-ok{color:var(--ok)}.rec-bad{color:var(--ng)}
-.vendor{display:grid;gap:8px;padding:10px 12px;margin-bottom:10px;border-radius:8px;background:var(--surface2)}
+.vendor{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding:10px 12px;margin-bottom:10px;border-radius:8px;background:var(--surface2)}
 #zoneMap{max-height:420px;width:auto;max-width:100%;margin:0 auto;display:block}
 /* 長表格：預設 10 列，可展開；表頭固定 */
 tr.more-row{display:none}
@@ -175,7 +175,7 @@ table.show-all tr.more-row{display:table-row}
   .report-preview{max-width:100%!important;padding:0!important;box-shadow:none!important;border-radius:0!important}
 }
 .report-preview-wrap{display:flex;justify-content:center;background:var(--surface2);padding:20px 10px;border-radius:var(--r);overflow-x:auto}
-.report-preview{width:100%;max-width:820px;background:#ffffff;color:#1a1a1a;padding:36px 40px;box-shadow:0 4px 20px rgba(0,0,0,0.12);border-radius:4px;font-family:var(--f-sans);line-height:1.6}
+.report-preview{--surface:#FFFFFF;--surface2:#E8ECE6;--ink:#18201B;--muted:#58625B;--line:#D2D8D1;--ok:#2C7A4C;--ok-soft:#DDEFE3;--warn:#9B650E;--warn-soft:#F6E9CF;--ng:#B83A2C;--ng-soft:#F7DDD9;color-scheme:light;width:100%;max-width:820px;background:#ffffff;color:#1a1a1a;padding:36px 40px;box-shadow:0 4px 20px rgba(0,0,0,0.12);border-radius:4px;font-family:var(--f-sans);line-height:1.6}
 @media (max-width:768px){.report-preview-wrap{padding:10px 0;background:transparent}.report-preview{padding:16px 12px;box-shadow:none;border-radius:0}}
 #busy{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--surface);padding:9px 16px;border-radius:999px;font-size:13.5px;box-shadow:0 4px 18px rgba(0,0,0,.18)}#busy[hidden]{display:none}
 .spin{width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(1turn)}}
@@ -242,6 +242,7 @@ table.show-all tr.more-row{display:table-row}
 @media (max-width:720px){.vsep{display:none}}
 .field{display:flex;flex-direction:column;gap:3px;min-width:0}
 .field label{font-size:11px;color:var(--muted);letter-spacing:.06em}
+select{max-width:100%}
 select,input[type=number],input[type=text],textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:6px 9px;min-height:34px;scroll-margin-top:calc(var(--navbar-h) + var(--safe-t) + 16px);scroll-margin-bottom:calc(var(--tabbar-h) + var(--safe-b) + 16px)}
 #p-report label, #p-mail label{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:4px 6px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 input[type=number]{width:88px;font-family:var(--f-mono)}
@@ -269,13 +270,14 @@ button:disabled{opacity:.5;cursor:default}
   .card .cbtn, .toc button, .how summary, details.fm>summary{min-height:44px;min-width:44px;display:inline-flex;align-items:center;padding:0 12px}
   .pmap-cells button{min-height:44px;min-width:28px}
   input[type=checkbox],input[type=radio]{width:24px;height:24px;min-width:24px;min-height:24px}
+  label.row:has(>input[type=checkbox]),label.row:has(>input[type=radio]){min-height:44px}
   input[type=range]{min-height:44px}
   #zoneMap{touch-action:none}
   .linkbtn{min-height:44px;min-width:44px;display:inline-flex;align-items:center}
   .rec-act button{min-height:44px;min-width:44px}
   #toast .toast-close{min-width:44px;min-height:44px}
 }
-.panel{padding-top:18px;display:grid;gap:16px}
+.panel{padding-top:18px;display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:16px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
 .card h3{font-size:15px;display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:10px}
@@ -672,7 +674,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   <div class="brand">
     <h1>SPI·SPC 分析台</h1>
     <span class="tag">錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.3.2</b> · 更新 <b class="num" id="appBuilt">2026-10-24 13:52:21</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.3.3</b> · 更新 <b class="num" id="appBuilt">2026-10-26 06:17:53</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -994,7 +996,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
         <span><i class="sq" style="background:#f97316"></i>HL 空間離群</span>
         <span><i class="sq" style="background:#94a3b8"></i>NS 無顯著</span>
       </div>
-      <div class="chartbox" style="height:320px;position:relative"><canvas id="cLISA" role="img" aria-label="LISA 空間聚類分佈圖"></canvas></div>
+      <div class="chartbox" style="height:320px;position:relative"><canvas id="cLISA" role="img" aria-label="LISA 空間聚類分佈圖" style="display:block;width:100%;height:100%"></canvas></div>
     </div>
   </div>
 </section>
@@ -6458,7 +6460,7 @@ function renderBoard2D(){
     +(S.step.on?S.step.zones.map((z,i)=>`<span><i class="sq" style="background:${ZCOL[i%ZCOL.length]};opacity:.6"></i>${z.name} ${z.t} µm</span>`).join(""):"");
 
   if($("#csLegend")){
-    $("#csLegend").innerHTML=`<span style="color:#10b981;font-weight:500">── 實測截面</span><span style="color:#9ca3af;border-bottom:1px dashed #9ca3af">--- 標稱開孔</span><span style="color:#b87333">■ 銅箔基底</span><span style="color:#f59e0b;border-bottom:1px dashed #f59e0b">--- 規格 LSL/USL</span>`;
+    $("#csLegend").innerHTML=`<span><b style="color:#10b981">──</b> 實測截面</span><span><b style="color:#9ca3af">---</b> 標稱開孔</span><span><b style="color:#b87333">■</b> 銅箔基底</span><span><b style="color:#f59e0b">---</b> 規格 LSL/USL</span>`;
   }
   if(!S.selectedPad||S.selectedPad.board!==S.board){
     S.selectedPad=defs[0]||rows[0]||null;
@@ -7773,11 +7775,16 @@ async function renderRecSpecs(list,hit,fp){const tb=$("#recSpec");if(!tb)return;
     <td><div class="rec-act">${applied===r.id?'<span class="pill ok">目前套用</span>':(r.part===cur&&S.specSrc!=="sample"?`<button data-ract="suse" data-id="${esc(r.id)}">套用到目前回合</button>`:"")}${r.isDefault?"":`<button data-ract="sdef" data-id="${esc(r.id)}">設為預設</button>`}<button data-ract="dl" data-id="${esc(r.id)}">下載 JSON</button><button data-ract="ver" data-id="${esc(r.id)}">驗證</button></div></td></tr>`).join("")+"</tbody>"
     :`<tbody><tr><td class="note">${q?"沒有符合的料號規格":parts.length?"這些料號都還沒有規格版本。在「規格設定」填好規格後按「儲存為新版本」。":"尚無料號。匯入量測紀錄後，可在「規格設定」為該料號儲存規格。"}</td></tr></tbody>`}
 /* 稽核頁：把紀錄 id 換成看得懂的版本（料號規格 v<n>、座標檔版本＋面別）；已刪除或不在清單內的顯示代碼前 6 碼 */
+function auditFp(e){
+  // 舊「設為預設」紀錄沒有 sha256；用語與 auditSwitch 的「舊紀錄未記錄」一致
+  if(!e.sha256)return'<td class="note" style="color:var(--muted)">舊紀錄未記錄</td>';
+  return`<td class="mono" title="${esc(e.sha256)}">${esc(String(e.sha256).slice(0,10))}…</td>`;
+}
 function auditVer(id){if(!id)return"—";const sp=REC_SPECS[id];if(sp)return`v${sp.ver}`;const r=(RecDB.cache||[]).find(x=>x.id===id);if(r)return r.kind==="place"?`${r.rev}${r.side?" "+r.side:""}`:r.lot;return id.slice(0,6)+"…"}
 function auditSwitch(e){const from=Array.isArray(e.from)?(e.from.length?e.from.map(auditVer).join("、"):"無"):"舊紀錄未記錄";
   return`<div class="note" style="white-space:nowrap">前一版：${esc(from)} → 新版：${esc(auditVer(e.to||e.target_id||e.id))}</div>`}
 async function renderAudit(){const box=$("#recAudit");try{const es=await RecDB.audit();box.innerHTML=es.length?`<table><thead><tr><th>時間</th><th>動作</th><th>類型</th><th>批號</th><th>產品料號</th><th>版本</th><th>原始檔</th><th>執行者</th><th>檔案指紋</th></tr></thead><tbody>`+es.map(e=>{const isDef=e.action==="set_default_spec"||e.action==="set_default_place",kind=e.kind||(e.action==="set_default_place"?"place":e.action==="set_default_spec"?"spec":"");
-    let act=e.action==="delete"?'<span class="pill ng">刪除</span>':e.action==="migrate_exclude"?'<span class="pill warn">遷移時排除</span>':isDef?'<span class="pill na">設為預設</span>'+auditSwitch(e):e.action==="update_meta"?'<span class="pill na">修改</span>':'<span class="pill ok">新增</span>';let st="";if(e.ok===false||(e.detail&&e.detail.done===false)||e.done===false){st=' <span class="pill warn" title="動作前已記錄，但未完成（已撤回）">未完成</span>'}else if(e.target_type==="record"&&e.status&&e.status.includes("目標已不在本站")){st=' <span class="note" style="color:var(--c-sub)" title="目標已不在本站（見較新的刪除或遷移排除紀錄）">目標已不在本站</span>'}return `<tr><td class="mono" style="white-space:nowrap">${esc(fmtTime(e.at))}</td><td>${act}${st}</td><td>${kind==="place"?"座標檔":kind==="spec"?"料號規格":"量測紀錄"}</td><td>${esc(e.lot||"—")}</td><td>${esc(e.part)}</td><td>${esc(kind==="spec"?auditVer(e.to||e.target_id||e.id):(e.rev||"—"))}</td><td>${esc(e.name)}</td><td>${esc(e.by)}</td><td class="mono" title="${esc(e.sha256)}">${esc(String(e.sha256).slice(0,10))}…</td></tr>`}).join("")+"</tbody></table>":'<p class="note">尚無紀錄</p>'}catch(e){box.innerHTML=`<p class="err">無法讀取稽核紀錄：${esc(e.message)}</p>`}}
+    let act=e.action==="delete"?'<span class="pill ng">刪除</span>':e.action==="migrate_exclude"?'<span class="pill warn">遷移時排除</span>':isDef?'<span class="pill na">設為預設</span>'+auditSwitch(e):e.action==="update_meta"?'<span class="pill na">修改</span>':'<span class="pill ok">新增</span>';let st="";if(e.ok===false||(e.detail&&e.detail.done===false)||e.done===false){st=' <span class="pill warn" title="動作前已記錄，但未完成（已撤回）">未完成</span>'}else if(e.target_type==="record"&&e.status&&e.status.includes("目標已不在本站")){st=' <span class="note" style="color:var(--c-sub)" title="目標已不在本站（見較新的刪除或遷移排除紀錄）">目標已不在本站</span>'}return `<tr><td class="mono" style="white-space:nowrap">${esc(fmtTime(e.at))}</td><td>${act}${st}</td><td>${kind==="place"?"座標檔":kind==="spec"?"料號規格":"量測紀錄"}</td><td>${esc(e.lot||"—")}</td><td>${esc(e.part)}</td><td>${esc(kind==="spec"?auditVer(e.to||e.target_id||e.id):(e.rev||"—"))}</td><td>${esc(e.name)}</td><td>${esc(e.by)}</td>${auditFp(e)}</tr>`}).join("")+"</tbody></table>":'<p class="note">尚無紀錄</p>'}catch(e){box.innerHTML=`<p class="err">無法讀取稽核紀錄：${esc(e.message)}</p>`}}
 async function recFind(id,fresh){
   if(RecDB.mode==="cloud"){
     try{
@@ -9686,7 +9693,7 @@ if($("#mBtnTheme"))$("#mBtnTheme").onclick=()=>{if(typeof moreSheetCtrl!=="undef
 setupRecPicker();
 updateStartupDbBanner();
 /* 測試用：只有測試在載入前設定 window.SPI_TEST_HOOK 時才公開內部函式 */
-if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,issueList,addRun,LocalRec,sha256js,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart});
+if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart});
 const initHash=(location.hash||"").slice(1);
 if(ALL_TABS.includes(initHash))setTab(initHash,true);
 })();

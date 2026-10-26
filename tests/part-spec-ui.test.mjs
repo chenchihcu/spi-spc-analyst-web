@@ -201,6 +201,11 @@ test("流程：鋼板厚度必填 → 未定義規格時鎖定 → 驗證與草�
   assert.match(auditTxt[0], /設為預設前一版：v2 → 新版：v1料號規格.*NEW-1v1/);
   assert.ok(auditTxt.some((t) => /設為預設前一版：v1 → 新版：v2/.test(t)), "版本清單的切換也有記錄");
   assert.ok(auditTxt.some((t) => /設為預設前一版：無 → 新版：v1/.test(t)), "第一版存檔即設為預設");
+  // 舊「設為預設」紀錄沒有 sha256：指紋欄不可顯示 "undefined…"（2026-10-25 正式站唯讀驗收 not pass）
+  assert.doesNotMatch(w.SPI_TEST_HOOK.auditFp({}), /undefined/, "缺指紋時不可出現 undefined");
+  assert.match(w.SPI_TEST_HOOK.auditFp({}), /舊紀錄未記錄/, "缺指紋時標示舊紀錄未記錄");
+  assert.match(w.SPI_TEST_HOOK.auditFp({ sha256: "0123456789abcdef" }), /title="0123456789abcdef">0123456789…</, "有指紋時沿用前 10 碼");
+  assert.ok(auditTxt.every((t) => !/undefined/.test(t)), "稽核清單不可出現 undefined");
   w.SPI_TEST_HOOK.beforePrint(); w.SPI_TEST_HOOK.afterPrint();
   assert.match($("#printHead").textContent, /規格來源：料號規格 NEW-1 v1（SHA-256 [0-9a-f]{12}）/);
   const csv = w.eval("SPI_TEST_HOOK.issuesCsv(S.F)").split("\n");
