@@ -230,3 +230,28 @@ test('7. 版面回歸：同權重 CSS 的先後順序、flex 壓縮與行內高�
   const rev = htmlSource.match(/<input[^>]*id="placeRev"[^>]*>/)[0];
   assert.doesNotMatch(rev, /flex:/, '#placeRev 不可設定 flex（會變成 90px 高）');
 });
+
+test('8. 版面回歸：最終發布巡檢（1440／820／390／320 × 明亮／深色）找到的問題', () => {
+  // a. LISA 畫布的 CSS 尺寸須固定為容器大小；否則依 getBoundingClientRect 設 width×dpr 會每次進頁面放大 dpr 倍
+  const lisa = htmlSource.match(/<canvas[^>]*id="cLISA"[^>]*>/)[0];
+  assert.match(lisa, /width:100%/, '#cLISA 需有 CSS width:100%');
+  assert.match(lisa, /height:100%/, '#cLISA 需有 CSS height:100%');
+
+  // b. 下拉選單不可因最長選項撐寬欄位（320px 時製程能力與匯入頁橫向溢出）
+  assert.match(htmlSource, /\nselect\{max-width:100%\}/, 'select 需有 max-width:100%');
+  // 隱式 auto 欄會被內容最小寬度撐開，max-width 單獨無效：分頁與格式說明的 grid 欄寬需為 minmax(0,1fr)
+  assert.match(htmlSource, /\n\.panel\{[^}]*grid-template-columns:minmax\(0,1fr\)/, '.panel 欄寬需為 minmax(0,1fr)');
+  assert.match(htmlSource, /\n\.vendor\{[^}]*grid-template-columns:minmax\(0,1fr\)/, '.vendor 欄寬需為 minmax(0,1fr)');
+
+  // c. 觸控時，包住核取方塊／單選鈕的 label.row 熱區需 44px（核取方塊本身只有 24px）
+  assert.match(htmlSource, /label\.row:has\(>input\[type=checkbox\]\),label\.row:has\(>input\[type=radio\]\)\{min-height:44px\}/, '核取方塊 label 需有 44px 觸控高度');
+
+  // d. 報告預覽固定白紙：行內 var(--ng-soft) 等 token 須在紙張範圍固定為明亮值，深色模式才不會變成深字壓深底
+  const paper = htmlSource.match(/\n\.report-preview\{--[^}]*\}/);
+  assert.ok(paper, '.report-preview 需在範圍內重新宣告 token');
+  for (const t of ['--ink', '--muted', '--line', '--ok-soft', '--warn-soft', '--ng-soft']) assert.match(paper[0], new RegExp(`${t}:#`), `.report-preview 需固定 ${t}`);
+
+  // e. 剖面圖例文字用一般字色，系列色只放在符號上（文字直接用系列色時白底對比僅 2.1–2.5）
+  const leg = htmlSource.match(/\$\("#csLegend"\)\.innerHTML=`[^`]*`/)[0];
+  assert.doesNotMatch(leg, /<span style="color:/, '圖例文字不可直接套系列色');
+});
