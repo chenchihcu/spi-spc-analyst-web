@@ -102,7 +102,11 @@ test("TV-ADV-05: 空間自相關 Moran's I 與局部 LISA 聚類檢驗", () => {
   assert.equal(sa.valid, true);
   assert.ok(sa.moranI > 0.3, `全局 Moran's I 應顯著為正，實際 ${sa.moranI}`);
   assert.equal(sa.isSignificant, true);
-  assert.ok(sa.counts.HH >= 8, `局部熱區 HH 應檢出至少 8 處，實際 ${sa.counts.HH}`);
+  // v10.4.0 改用條件置換＋FDR：3×3 熱區的中心與四個邊中點（≥ 4 個熱鄰居）必須檢出；
+  // 四個角落只有 3/6 個熱鄰居，p 約 0.03–0.07，FDR 下不顯著屬正確結果（舊版 li/√(1/k) 過寬鬆，i.i.d. 也有約 5% 顯著）
+  const hot = sa.lisa.filter((x) => x.quad === "HH").map((x) => x.pad);
+  for (const pad of ["P_3_3", "P_2_3", "P_3_2", "P_3_4", "P_4_3"]) assert.ok(hot.includes(pad), `熱區 ${pad} 應判為 HH，實際 HH：${hot.join(",")}`);
+  assert.ok(hot.every((pad) => { const [, r, cc] = pad.split("_").map(Number); return r >= 2 && r <= 4 && cc >= 2 && cc <= 4; }), `熱區外不應有 HH，實際 ${hot.join(",")}`);
 });
 
 test("TV-ADV-05b: Moran's I 在 i.i.d. 資料上誤報回到名目（舊版 √(1/(nk)) 近似使 Z 標準差 1.56、Z>2.58 誤報 6.2%）", () => {
