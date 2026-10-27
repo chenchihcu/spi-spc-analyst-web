@@ -269,6 +269,9 @@ button:disabled{opacity:.5;cursor:default}
   #bannerRecentRuns{min-height:44px}
   .card .cbtn, .toc button, .how summary, details.fm>summary{min-height:44px;min-width:44px;display:inline-flex;align-items:center;padding:0 12px}
   .pmap-cells button{min-height:44px;min-width:28px}
+  /* 板號格：觸控時 44×44 方格自動換行，板數多也不必橫捲找板（群組列維持橫捲，群組可達數百個） */
+  .pmap-cells.pmap-boards{grid-auto-flow:row;grid-template-columns:repeat(auto-fill,minmax(44px,1fr))}
+  .pmap-boards button{min-width:44px}
   input[type=checkbox],input[type=radio]{width:24px;height:24px;min-width:24px;min-height:24px}
   label.row:has(>input[type=checkbox]),label.row:has(>input[type=radio]){min-height:44px;min-width:44px}
   input[type=range]{min-height:44px}
@@ -554,6 +557,8 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 @media (max-width:720px){
   .pmap-cells{display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
   .pmap-cells button{min-width:28px!important;min-height:44px!important;height:44px!important;flex:0 0 auto;font-size:12px!important}
+  .pmap-cells.pmap-boards{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:4px;overflow-x:visible}
+  .pmap-boards button{min-width:44px!important}
 }
 
 /* ---------- 資料庫選取中樞 Modal (跨裝置 Desktop & Mobile) ---------- */
@@ -676,7 +681,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   <div class="brand">
     <h1>SPI·SPC 分析台</h1>
     <span class="tag">錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.4.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.4.2</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -5252,7 +5257,7 @@ function renderPmap(){const B=[...new Set(S.rows.map(r=>r.board))],G=[...new Set
   /* 一次走過全部問題，分到各板／各群組（問題數上千、群組數百時不必每格重掃全部問題） */
   const byB=new Map(B.map(b=>[b,[]])),byG=new Map(G.map(g=>["g:"+g,[]]));
   for(const x of S.F){for(const b of issueBoards(x)){const a=byB.get(b);if(a)a.push({x,lv:lvOn(x,"b:"+b)})}for(const e of x.ents){const a=byG.get(e);if(a&&(!a.length||a[a.length-1].x!==x))a.push({x,lv:lvOn(x,e)})}}
-  $("#pmap").innerHTML=`<div class="pmap-row"><span class="pmap-lab">各板（依印刷順序）</span><div class="pmap-cells">${B.map(b=>cell("b:"+b,b,byB.get(b))).join("")}</div></div>
+  $("#pmap").innerHTML=`<div class="pmap-row"><span class="pmap-lab">各板（依印刷順序）</span><div class="pmap-cells pmap-boards">${B.map(b=>cell("b:"+b,b,byB.get(b))).join("")}</div></div>
     <div class="pmap-row"><span class="pmap-lab">元件群組</span><div class="pmap-cells">${G.map(g=>`<button data-ent="g:${esc(g)}" class="${worst(byG.get("g:"+g))||""}" aria-pressed="${S.issEnt==="g:"+g}" title="${esc(g)}：${esc(tip(g,byG.get("g:"+g),"群組"))}" style="font-size:11px">${esc(g)}</button>`).join("")}</div></div>
     ${sys.length?`<p class="note" style="margin:0">另有 ${sys.length} 項不屬特定板或群組的整體性問題（${[...new Set(sys.map(x=>x.cat))].join("、")}）。</p>`:""}
     ${S.issEnt?`<p style="margin:0"><span class="pill warn">只顯示 ${esc(S.issEnt.slice(S.issEnt.indexOf(":")+1))} 相關的問題</span> <button class="linkbtn" id="pmapClear">顯示全部</button></p>`:""}`;
