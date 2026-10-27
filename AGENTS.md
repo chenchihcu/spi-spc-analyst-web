@@ -12,7 +12,7 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
   - 檢查：驗收紀錄寫明走過的頁面或 API 與 HTTP 狀態。
   - 出處：同上事故；當時只看登入頁版本即回報成功。
 - **合併失敗先自行修復再重試，不等使用者要求**：已核准合併的 PR，`gh pr merge` 失敗時先讀錯誤輸出，依下列分類修正，再重跑本 PR 原本通過的關卡（`npm test`、`npm run release-check`、CI）。全部通過就仍在原核准範圍內，直接重試合併，不需要再問。
-  - 與 main 衝突（`gh pr view --json mergeStateStatus` 為 `DIRTY`）：在工作分支 `git merge origin/main`。版本檔（`package.json`、`package-lock.json`、`lib/version.mjs`、`spi-spc.html` 的 `#appVer`／`#appBuilt`、`CHANGELOG.md`）先採 main 的內容，再把本 PR 的版本改成 main 版本的下一號，保留本 PR 的 CHANGELOG 條目；`npm test` 通過後 push，再合併。
+  - 與 main 衝突（`gh pr view --json mergeStateStatus` 為 `DIRTY`）：在工作分支 `git merge origin/main`。版本檔（`package.json`、`package-lock.json`、`lib/version.mjs`、`spi-spc.html` 的 `#appVer`、`CHANGELOG.md`；`#appBuilt` 固定為預設值，由 build 注入）先採 main 的內容，再把本 PR 的版本改成 main 版本的下一號，保留本 PR 的 CHANGELOG 條目；`npm test` 通過後 push，再合併。
   - `--match-head-commit` 一律用 `gh pr view --json headRefOid` 的完整 40 碼 SHA（短 SHA 會被 GraphQL 拒絕）。
   - 遠端已合併、只有本機收尾失敗（worktree 刪除 Permission denied、main 被其他 worktree 佔用、本機分支刪不掉）：以 `gh pr view --json state` 確認 `MERGED` 後繼續部署驗證，收尾失敗只在報告列出殘留路徑。
   - 重試前先確認 `git status` 沒有 `UU`；不在未解決的合併上再開新的合併。

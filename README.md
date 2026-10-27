@@ -99,11 +99,13 @@ npm run test:slow      # 執行蒙地卡羅慢速整體判定模擬測試
 
 ## 發版流程（每次改版必做）
 
-1. **版本一致性**：更新版本號與更新時間（UTC+8，`YYYY-MM-DD HH:mm:ss`），確保以下單一來源完全一致：
-   - `spi-spc.html` 內的 `#appVer` 與 `#appBuilt`
-   - `lib/version.mjs` 的 `APP_VERSION` 與 `APP_BUILT`
+1. **版本一致性**：依 SemVer 更新版本號，確保以下各處一致：
+   - `spi-spc.html` 內的 `#appVer`
+   - `lib/version.mjs` 的 `APP_VERSION`
    - `CHANGELOG.md` 最上方條目
    - `package.json` 的 `version`
+
+   主頁 `#appBuilt` 與 `lib/version.mjs` 的 `APP_BUILT` 固定為預設值 `0000-00-00 00:00:00`，不要手改；`npm run build:cloudflare` 會把 build 當下的時間（UTC+8，`YYYY-MM-DD HH:mm:ss`）寫入 `dist/index.html` 與 `.build/build-info.mjs`，登入頁由後者讀取。
 2. **本機驗證閘門**：
    - 執行 `npm test`（31 個測試檔、259 項測試必須 100% 通過）
    - 執行 `node tools/release-check.js`（狀態必須為 `Overall: READY`）

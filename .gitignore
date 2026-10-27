@@ -6,3 +6,4 @@ dist/
 .wrangler/
 .wrangler-dry-run/
 spi-spc-analyst-spec-*.md
+.build/

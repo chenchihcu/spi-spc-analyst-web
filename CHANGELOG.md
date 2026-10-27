@@ -2,6 +2,12 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.3.6 — 2026-10-27 18:00:00（主頁與登入頁的更新時間改為 build 時自動注入）
+
+- **更新時間改由 build 寫入**：主頁標題右側與登入頁的「更新」時間，原本在每次提交時手動寫入，常與實際上線時間不符。現在 `npm run build:cloudflare` 以 build 當下的台北時間（UTC+8）寫入 `dist/index.html` 的 `#appBuilt`，並產生 `.build/build-info.mjs` 供 Worker 的登入頁使用，兩處顯示同一個時間。
+- 原始碼的 `spi-spc.html` 與 `lib/version.mjs` 只保留預設值 `0000-00-00 00:00:00`，提交時不再修改；直接開啟未經 build 的原始檔會看到這個預設值。版本號仍由 `package.json` 決定，提交時遞增。
+- 開發流程：`lib/auth-handler.mjs` 改從 `#build-info` 匯入版本與時間（`package.json` 的 `imports`：Worker 打包時的 `workerd` 條件指向 build 產物，Node 測試指向 `lib/version.mjs`）。部署前必須先執行 `npm run build:cloudflare`，否則 `wrangler deploy` 找不到 build 產物而中止。新增 `tests/build-info.test.mjs` 檢查 build 時間、時區換算與登入頁和主頁一致。舊 Netlify 部署不經 build，仍顯示預設值。
+
 ## v10.3.4 — 2026-10-27 14:55:52（桌機分析設定列恢復顯示、錯誤提示紅字）
 
 - **桌機與平板看不到分析設定列**：寬度大於手機版時，頁面頂端原本應該直接列出「試產回合、量測項目、元件群組、管制圖」選單，但自 v9.11.0 起整列被隱藏（選單寬度 0），桌機無法切換回合或量測項目。原因是手機收合用的 `hidden` 屬性被全域隱藏規則套用到桌機版。現在桌機與平板恢復顯示，手機仍收合成頂端的設定鈕。
