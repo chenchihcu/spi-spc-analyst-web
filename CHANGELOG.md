@@ -2,6 +2,12 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.3.9 — 2026-10-27 23:00:00（3D 錫膏模擬空白時顯示原因）
+
+- **3D 畫面空白且沒有任何提示**：正式站 3D 頁 HUD 正常、模型區整塊空白，拖曳或切換著色都不出現，Console 也沒有錯誤。原本只有 three.js 載入失敗、建立 WebGL 失敗或 context lost 會顯示備援文字，其他失敗都是靜默空白。現在每次重建 3D 場景後，在同一幀讀回畫面中心並檢查畫布掛載、尺寸、context 與繪製次數；畫不出東西時改顯示原因，並建議改看 2D 圖表或開啟瀏覽器硬體加速。無法量測的項目視為正常，不覆蓋正常畫面。
+- **側欄錯誤不再擋住 3D**：`renderBoard2D()` 是 `render3D` 與 `build3D` 的第一步，出錯時 3D 初始化永遠不會執行。改為出錯時在 HUD 標示錯誤並寫入 Console，3D 照常建立。
+- 畫布若被移出頁面，重新進入 3D 頁時會重新掛回。
+
 ## v10.3.8 — 2026-10-27 22:00:00（release-check 與註解移除過時的 Netlify 字樣）
 
 - **移除過時的 Netlify 字樣**：`npm run release-check` 機密掃描通過時的說明與 `spi-spc.html` 的 3 處註解仍寫 Netlify，改為現行的 Cloudflare Workers（D1＋R2）。`netlify/` 目錄、`netlify.toml` 與相關測試留待 `docs/netlify-teardown.md` 的下線流程處理。

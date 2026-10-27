@@ -225,3 +225,34 @@ test("R-PDF 與 M-01：分析報告頁籤、10 個章節勾選、生成多頁 PD
   assert.ok(rareRes.missingGlyphs.includes("𪚥"), "缺字清單應捕捉到 𪚥");
   H.S.source = origSource;
 });
+
+test("3D 空白自我檢查：diag3D 依序判定、量不到視為正常", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const dom = createPage();
+  await tick(80);
+  const H = dom.window.SPI_TEST_HOOK;
+  const ok = { connected: true, w: 800, h: 400, lost: false, calls: 12, alpha: 255, meshes: 100 };
+  assert.equal(H.diag3D(ok), null, "正常畫面不報錯");
+  assert.equal(H.diag3D({ ...ok, calls: -1, alpha: -1 }), null, "量不到（-1）視為正常");
+  assert.match(H.diag3D({ ...ok, connected: false, alpha: 0 }), /未掛載/, "結構問題優先於空白");
+  assert.match(H.diag3D({ ...ok, w: 0 }), /尺寸為 0/);
+  assert.match(H.diag3D({ ...ok, lost: true }), /context lost/);
+  assert.match(H.diag3D({ ...ok, calls: 0 }), /未執行任何繪製/);
+  assert.match(H.diag3D({ ...ok, alpha: 0 }), /畫面空白/);
+  assert.match(H.diag3D({ ...ok, alpha: 0, meshes: 0 }), /畫面空白/, "空板仍會畫底板，alpha=0 仍算失敗");
+});
+
+test("3D 側欄出錯不擋 3D 初始化：safeBoard2D 標示錯誤並回傳 false", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const dom = createPage();
+  await tick(80);
+  const w = dom.window, H = w.SPI_TEST_HOOK;
+  const errs = [];
+  w.console.error = (...a) => errs.push(a);
+  const S = H.S, saved = S.A;
+  S.A = { byBoard: null, defRows: [] };  // 讓 renderBoard2D 在寫完 HUD 前後拋錯
+  S.board = S.board || "B01";
+  let r;
+  try { r = H.safeBoard2D(); } finally { S.A = saved; }
+  assert.equal(r, false, "renderBoard2D 拋錯時回傳 false 而非往上拋");
+  assert.ok(errs.length >= 1, "錯誤寫入 console.error，不吞錯");
+  assert.match(w.document.querySelector("#hud").innerHTML, /側欄圖表更新失敗/);
+});
