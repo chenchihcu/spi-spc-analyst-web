@@ -244,7 +244,7 @@ test('8. 版面回歸：最終發布巡檢（1440／820／390／320 × 明亮／
   assert.match(htmlSource, /\n\.vendor\{[^}]*grid-template-columns:minmax\(0,1fr\)/, '.vendor 欄寬需為 minmax(0,1fr)');
 
   // c. 觸控時，包住核取方塊／單選鈕的 label.row 熱區需 44px（核取方塊本身只有 24px）
-  assert.match(htmlSource, /label\.row:has\(>input\[type=checkbox\]\),label\.row:has\(>input\[type=radio\]\)\{min-height:44px\}/, '核取方塊 label 需有 44px 觸控高度');
+  assert.match(htmlSource, /label\.row:has\(>input\[type=checkbox\]\),label\.row:has\(>input\[type=radio\]\)\{min-height:44px;min-width:44px\}/, '核取方塊 label 需有 44px 觸控高度與寬度');
 
   // d. 報告預覽固定白紙：行內 var(--ng-soft) 等 token 須在紙張範圍固定為明亮值，深色模式才不會變成深字壓深底
   const paper = htmlSource.match(/\n\.report-preview\{--[^}]*\}/);
@@ -254,4 +254,25 @@ test('8. 版面回歸：最終發布巡檢（1440／820／390／320 × 明亮／
   // e. 剖面圖例文字用一般字色，系列色只放在符號上（文字直接用系列色時白底對比僅 2.1–2.5）
   const leg = htmlSource.match(/\$\("#csLegend"\)\.innerHTML=`[^`]*`/)[0];
   assert.doesNotMatch(leg, /<span style="color:/, '圖例文字不可直接套系列色');
+});
+
+test('9. 版面回歸：code review（v10.3.3）找到的問題', () => {
+  const at = (s) => { const i = htmlSource.indexOf(s); assert.ok(i >= 0, `找不到 CSS：${s}`); return i; };
+
+  // a. 桌機／平板的分析設定列：#railSheet 帶 hidden，全域 [hidden]{display:none!important} 會蓋過不帶 !important 的
+  //    display:contents，1440／1024／820 時試產回合、量測項目、元件群組、管制圖選單全部寬度 0（v9.11.0 起）
+  assert.match(htmlSource, /<div class="rail-sheet-modal" id="railSheet"[^>]*\shidden>/, '#railSheet 仍以 hidden 供手機收合');
+  const desk = at('.rail-sheet-modal,.rail-sheet-modal[hidden]{display:contents!important}');
+  const phone = at('@media (max-width:600px), (pointer:coarse) and (max-height:500px){');
+  assert.ok(at('[hidden]{display:none!important}') < desk, '桌機 rail 規則需排在全域 [hidden] 之後');
+  assert.ok(desk < phone, '桌機 rail 規則需在手機 media 區塊之外');
+  assert.ok(at('.rail-sheet-modal:not(.open){display:none!important}') > phone, '手機收合規則需在手機 media 區塊內、排在桌機規則之後');
+
+  // b. 未定義且無 fallback 的 CSS 變數整條宣告無效（錯誤提示與階梯未涵蓋警示不顯示紅色）
+  const used = new Set([...htmlSource.matchAll(/var\((--[\w-]+)\)/g)].map((m) => m[1]));
+  const defined = new Set([...htmlSource.matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1]));
+  assert.deepEqual([...used].filter((v) => !defined.has(v)), [], '每個 var(--x) 都需有定義');
+
+  // c. 階梯鋼板區域表的選取單選鈕觸控時只有 24px：包進 label.row 取得 44px 熱區
+  assert.match(htmlSource, /<td><label class="row"><input type="radio" name="selZone"/, '區域選取單選鈕需包在 label.row 內');
 });

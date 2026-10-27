@@ -175,7 +175,7 @@ table.show-all tr.more-row{display:table-row}
   .report-preview{max-width:100%!important;padding:0!important;box-shadow:none!important;border-radius:0!important}
 }
 .report-preview-wrap{display:flex;justify-content:center;background:var(--surface2);padding:20px 10px;border-radius:var(--r);overflow-x:auto}
-.report-preview{--surface:#FFFFFF;--surface2:#E8ECE6;--ink:#18201B;--muted:#58625B;--line:#D2D8D1;--ok:#2C7A4C;--ok-soft:#DDEFE3;--warn:#9B650E;--warn-soft:#F6E9CF;--ng:#B83A2C;--ng-soft:#F7DDD9;color-scheme:light;width:100%;max-width:820px;background:#ffffff;color:#1a1a1a;padding:36px 40px;box-shadow:0 4px 20px rgba(0,0,0,0.12);border-radius:4px;font-family:var(--f-sans);line-height:1.6}
+.report-preview{--surface:#FFFFFF;--surface2:#E8ECE6;--ink:#18201B;--muted:#58625B;--line:#D2D8D1;--ok:#2C7A4C;--ok-soft:#DDEFE3;--warn:#9B650E;--warn-soft:#F6E9CF;--ng:#B83A2C;--ng-soft:#F7DDD9;color-scheme:light;width:100%;max-width:820px;background:#ffffff;color:#1a1a1a;padding:36px 40px;box-shadow:0 4px 20px rgba(0,0,0,0.12);border-radius:4px;font-family:var(--f-body);line-height:1.6}
 @media (max-width:768px){.report-preview-wrap{padding:10px 0;background:transparent}.report-preview{padding:16px 12px;box-shadow:none;border-radius:0}}
 #busy{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--surface);padding:9px 16px;border-radius:999px;font-size:13.5px;box-shadow:0 4px 18px rgba(0,0,0,.18)}#busy[hidden]{display:none}
 .spin{width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(1turn)}}
@@ -270,7 +270,7 @@ button:disabled{opacity:.5;cursor:default}
   .card .cbtn, .toc button, .how summary, details.fm>summary{min-height:44px;min-width:44px;display:inline-flex;align-items:center;padding:0 12px}
   .pmap-cells button{min-height:44px;min-width:28px}
   input[type=checkbox],input[type=radio]{width:24px;height:24px;min-width:24px;min-height:24px}
-  label.row:has(>input[type=checkbox]),label.row:has(>input[type=radio]){min-height:44px}
+  label.row:has(>input[type=checkbox]),label.row:has(>input[type=radio]){min-height:44px;min-width:44px}
   input[type=range]{min-height:44px}
   #zoneMap{touch-action:none}
   .linkbtn{min-height:44px;min-width:44px;display:inline-flex;align-items:center}
@@ -348,7 +348,9 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 .mtab{display:none}
 .sheet-modal{display:none}
 .rail-chip{display:none}
-.rail-sheet-modal{display:contents}
+/* 桌機／平板：分析設定直接排在 rail 上。#railSheet 帶 hidden（手機收合用，close() 每次會重設），
+   全域 [hidden]{display:none!important} 會蓋過不帶 !important 的規則；手機版的 :not(.open) 權重較高且在後，仍可收合 */
+.rail-sheet-modal,.rail-sheet-modal[hidden]{display:contents!important}
 .rail-sheet-modal .sheet-backdrop,.rail-sheet-modal .sheet-handle,.rail-sheet-modal .sheet-head{display:none}
 .rail-fields{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:flex-end}
 
@@ -674,7 +676,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   <div class="brand">
     <h1>SPI·SPC 分析台</h1>
     <span class="tag">錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.3.3</b> · 更新 <b class="num" id="appBuilt">2026-10-26 06:17:53</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.3.4</b> · 更新 <b class="num" id="appBuilt">2026-10-27 14:55:52</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -789,7 +791,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <div class="row" style="gap:8px;margin:0;align-items:center">
       <button type="button" class="primary" id="btnBannerLoadDb" style="padding:6px 14px;font-size:13px">📂 從資料庫載入記錄</button>
       <button type="button" id="btnBannerGoImport" style="padding:6px 14px;font-size:13px">匯入新檔案</button>
-      <button type="button" id="btnBannerDismiss" title="略過提示並維持範例資料" style="padding:6px 10px;font-size:12.5px;background:transparent;border:none;cursor:pointer;color:var(--c-sub)">✕ 略過</button>
+      <button type="button" id="btnBannerDismiss" title="略過提示並維持範例資料" style="padding:6px 10px;font-size:12.5px;background:transparent;border:none;cursor:pointer;color:var(--muted)">✕ 略過</button>
     </div>
   </div>
   <div class="iss-top">
@@ -1345,12 +1347,12 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
       <div style="flex:1;min-width:240px">
         <label for="mailTo" class="lbl" style="font-weight:600">收件人 (To)：</label>
         <input type="text" id="mailTo" placeholder="選填，多筆以半形逗號或分號分隔 (只用於 mailto)" style="width:100%;box-sizing:border-box;margin-top:4px">
-        <span class="note" id="mailToErr" style="color:var(--bad);display:none;font-size:12px">收件人 Email 格式不正確</span>
+        <span class="note" id="mailToErr" style="color:var(--ng);display:none;font-size:12px">收件人 Email 格式不正確</span>
       </div>
       <div style="flex:1;min-width:240px">
         <label for="mailCc" class="lbl" style="font-weight:600">副本 (Cc)：</label>
         <input type="text" id="mailCc" placeholder="選填，多筆以半形逗號或分號分隔" style="width:100%;box-sizing:border-box;margin-top:4px">
-        <span class="note" id="mailCcErr" style="color:var(--bad);display:none;font-size:12px">副本 Email 格式不正確</span>
+        <span class="note" id="mailCcErr" style="color:var(--ng);display:none;font-size:12px">副本 Email 格式不正確</span>
       </div>
     </div>
 
@@ -1371,7 +1373,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
       </div>
     </div>
 
-    <div style="margin:16px 0;padding:12px;background:var(--card-sub);border-radius:6px;border:1px solid var(--border)">
+    <div style="margin:16px 0;padding:12px;background:var(--surface2);border-radius:6px;border:1px solid var(--line)">
       <div class="lbl" style="font-weight:600;margin-bottom:8px">包含章節：</div>
       <div class="row" style="gap:12px;flex-wrap:wrap">
         <label><input type="checkbox" id="chkMailRep1" checked> 封面</label>
@@ -1394,7 +1396,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <div class="row" style="gap:12px;align-items:center;flex-wrap:wrap;margin-top:16px">
       <button type="button" class="primary" id="btnSharePdf" disabled>分享 PDF 到郵件…</button>
       <button type="button" id="btnSharePdfWithSummary" disabled>連同摘要分享</button>
-      <span class="note" id="lblAppleNote" style="font-size:12px;color:var(--dim);display:none">（部分 iPhone 版本此方式不會出現「儲存到檔案」）</span>
+      <span class="note" id="lblAppleNote" style="font-size:12px;color:var(--muted);display:none">（部分 iPhone 版本此方式不會出現「儲存到檔案」）</span>
       <button type="button" id="btnMailDlPdf" disabled>下載 PDF</button>
       <button type="button" id="btnMailOpenMailto">開啟郵件 (mailto)</button>
     </div>
@@ -4941,13 +4943,13 @@ function zoneCounts(){const b0=S.rows[0]&&S.rows[0].board,c={},base={n:0};for(co
 function zonesChanged(){persist();syncControls();recompute()}
 function renderZones(){const groups=[...new Set(S.rows.map(r=>r.group))],{c,base}=zoneCounts();
   $("#zoneTbl").innerHTML=`<thead><tr><th>框選</th><th>名稱</th><th>範圍方式</th><th>位置</th><th>厚度 µm</th><th class="num">焊墊數</th><th></th></tr></thead><tbody>`+S.step.zones.map((z,i)=>`<tr>
-    <td><input type="radio" name="selZone" data-i="${i}" ${S.selZone===z.id?"checked":""} aria-label="選取 ${z.name} 以框選位置"> <i class="sq" style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${ZCOL[i%ZCOL.length]}"></i></td>
+    <td><label class="row"><input type="radio" name="selZone" data-i="${i}" ${S.selZone===z.id?"checked":""} aria-label="選取 ${z.name} 以框選位置"><i class="sq" style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${ZCOL[i%ZCOL.length]}"></i></label></td>
     <td><input type="text" id="zn-${z.id}" data-i="${i}" data-f="name" value="${z.name.replace(/"/g,"&quot;")}" style="width:120px"></td>
     <td><select id="zm-${z.id}" data-i="${i}" data-f="mode"><option value="group" ${z.mode==="group"?"selected":""}>元件群組</option><option value="rect" ${z.mode==="rect"?"selected":""}>座標區域</option></select></td>
-    <td style="white-space:nowrap">${z.mode==="group"?`<select id="zg-${z.id}" data-i="${i}" data-f="group">${!groups.includes(z.group)?`<option value="${esc(z.group)}" selected>（資料中沒有：${esc(z.group)}）</option>`:""}${groups.map(g=>`<option value="${esc(g)}" ${g===z.group?"selected":""}>${esc(g)}</option>`).join("")}</select>${!groups.includes(z.group)?'<div class="note" style="color:var(--bad)">⚠️ 目前資料無此群組</div>':""}`
+    <td style="white-space:nowrap">${z.mode==="group"?`<select id="zg-${z.id}" data-i="${i}" data-f="group">${!groups.includes(z.group)?`<option value="${esc(z.group)}" selected>（資料中沒有：${esc(z.group)}）</option>`:""}${groups.map(g=>`<option value="${esc(g)}" ${g===z.group?"selected":""}>${esc(g)}</option>`).join("")}</select>${!groups.includes(z.group)?'<div class="note" style="color:var(--ng)">⚠️ 目前資料無此群組</div>':""}`
       :["x0","y0","x1","y1"].map(k=>`<input type="number" step="0.1" id="z${k}-${z.id}" data-i="${i}" data-f="${k}" value="${f(z[k],1)}" style="width:68px" aria-label="${k.toUpperCase()}">`).join(" ")}</td>
     <td><input type="number" id="zt-${z.id}" data-i="${i}" data-f="t" value="${z.t}" min="30" max="300" step="1" list="stencilList"></td>
-    <td class="num mono">${c[z.id]||0}${c[z.id]===0?' <span class="note" style="color:var(--bad)" title="階梯區域未涵蓋任何焊墊">⚠️ 0</span>':""}</td>
+    <td class="num mono">${c[z.id]||0}${c[z.id]===0?' <span class="note" style="color:var(--ng)" title="階梯區域未涵蓋任何焊墊">⚠️ 0</span>':""}</td>
     <td><button data-del="${i}" aria-label="刪除 ${z.name}">刪除</button></td></tr>`).join("")
     +`<tr><td></td><td class="note" colspan="3">其餘焊墊（基礎厚度）</td><td class="mono">${S.stencil}</td><td class="num mono">${base}</td><td></td></tr></tbody>`;
   $("#zoneSum").textContent=S.step.on?"":"目前關閉，設定會保留，勾選後才套用到判定";
@@ -7784,7 +7786,7 @@ function auditVer(id){if(!id)return"—";const sp=REC_SPECS[id];if(sp)return`v${
 function auditSwitch(e){const from=Array.isArray(e.from)?(e.from.length?e.from.map(auditVer).join("、"):"無"):"舊紀錄未記錄";
   return`<div class="note" style="white-space:nowrap">前一版：${esc(from)} → 新版：${esc(auditVer(e.to||e.target_id||e.id))}</div>`}
 async function renderAudit(){const box=$("#recAudit");try{const es=await RecDB.audit();box.innerHTML=es.length?`<table><thead><tr><th>時間</th><th>動作</th><th>類型</th><th>批號</th><th>產品料號</th><th>版本</th><th>原始檔</th><th>執行者</th><th>檔案指紋</th></tr></thead><tbody>`+es.map(e=>{const isDef=e.action==="set_default_spec"||e.action==="set_default_place",kind=e.kind||(e.action==="set_default_place"?"place":e.action==="set_default_spec"?"spec":"");
-    let act=e.action==="delete"?'<span class="pill ng">刪除</span>':e.action==="migrate_exclude"?'<span class="pill warn">遷移時排除</span>':isDef?'<span class="pill na">設為預設</span>'+auditSwitch(e):e.action==="update_meta"?'<span class="pill na">修改</span>':'<span class="pill ok">新增</span>';let st="";if(e.ok===false||(e.detail&&e.detail.done===false)||e.done===false){st=' <span class="pill warn" title="動作前已記錄，但未完成（已撤回）">未完成</span>'}else if(e.target_type==="record"&&e.status&&e.status.includes("目標已不在本站")){st=' <span class="note" style="color:var(--c-sub)" title="目標已不在本站（見較新的刪除或遷移排除紀錄）">目標已不在本站</span>'}return `<tr><td class="mono" style="white-space:nowrap">${esc(fmtTime(e.at))}</td><td>${act}${st}</td><td>${kind==="place"?"座標檔":kind==="spec"?"料號規格":"量測紀錄"}</td><td>${esc(e.lot||"—")}</td><td>${esc(e.part)}</td><td>${esc(kind==="spec"?auditVer(e.to||e.target_id||e.id):(e.rev||"—"))}</td><td>${esc(e.name)}</td><td>${esc(e.by)}</td>${auditFp(e)}</tr>`}).join("")+"</tbody></table>":'<p class="note">尚無紀錄</p>'}catch(e){box.innerHTML=`<p class="err">無法讀取稽核紀錄：${esc(e.message)}</p>`}}
+    let act=e.action==="delete"?'<span class="pill ng">刪除</span>':e.action==="migrate_exclude"?'<span class="pill warn">遷移時排除</span>':isDef?'<span class="pill na">設為預設</span>'+auditSwitch(e):e.action==="update_meta"?'<span class="pill na">修改</span>':'<span class="pill ok">新增</span>';let st="";if(e.ok===false||(e.detail&&e.detail.done===false)||e.done===false){st=' <span class="pill warn" title="動作前已記錄，但未完成（已撤回）">未完成</span>'}else if(e.target_type==="record"&&e.status&&e.status.includes("目標已不在本站")){st=' <span class="note" style="color:var(--muted)" title="目標已不在本站（見較新的刪除或遷移排除紀錄）">目標已不在本站</span>'}return `<tr><td class="mono" style="white-space:nowrap">${esc(fmtTime(e.at))}</td><td>${act}${st}</td><td>${kind==="place"?"座標檔":kind==="spec"?"料號規格":"量測紀錄"}</td><td>${esc(e.lot||"—")}</td><td>${esc(e.part)}</td><td>${esc(kind==="spec"?auditVer(e.to||e.target_id||e.id):(e.rev||"—"))}</td><td>${esc(e.name)}</td><td>${esc(e.by)}</td>${auditFp(e)}</tr>`}).join("")+"</tbody></table>":'<p class="note">尚無紀錄</p>'}catch(e){box.innerHTML=`<p class="err">無法讀取稽核紀錄：${esc(e.message)}</p>`}}
 async function recFind(id,fresh){
   if(RecDB.mode==="cloud"){
     try{
@@ -8054,7 +8056,7 @@ async function renderRecPicker(force) {
         <div class="note" style="font-size:12px;margin:8px 0;line-height:1.4">
           工單: ${wo}<br>
           上傳: ${esc(fmtTime(r.created))} · ${esc(r.user)}
-          ${r.note ? `<br><span style="color:var(--text)">備註: ${esc(r.note)}</span>` : ""}
+          ${r.note ? `<br><span style="color:var(--ink)">備註: ${esc(r.note)}</span>` : ""}
         </div>
         <div class="rec-card-actions" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
           ${!["pending_review","superseded"].includes(r.lifecycle)?`<button class="primary" data-pact="load" data-id="${esc(r.id)}" style="flex:1 1 120px;min-height:44px;font-size:14px;font-weight:600">載入分析</button>`:""}
@@ -8125,7 +8127,7 @@ async function renderRecPicker(force) {
         <div class="note" style="font-size:12px;margin:8px 0">
           元件數: ${r.comps || "—"} · 單位: ${esc(r.unit || "未確認")}<br>
           上傳: ${esc(fmtTime(r.created))} · ${esc(r.user)}
-          ${r.note ? `<br><span style="color:var(--text)">備註: ${esc(r.note)}</span>` : ""}
+          ${r.note ? `<br><span style="color:var(--ink)">備註: ${esc(r.note)}</span>` : ""}
         </div>
         <div class="rec-card-actions" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
           ${isCur ? '<button class="primary" disabled style="flex:1 1 120px;min-height:44px;font-size:14px">目前已選取</button>' : selectable?`<button class="primary" data-pact="use-place" data-id="${esc(r.id)}" style="flex:1 1 120px;min-height:44px;font-size:14px">選取此座標檔</button>`:""}
@@ -8741,7 +8743,7 @@ function renderReport(){
   F.forEach(x=>cStat[x.lv]++);
   const zCnt=S.step&&S.step.on?zoneCounts():null;
   const stepCovered=zCnt?Object.values(zCnt.c).reduce((a,b)=>a+b,0):0;
-  const stepHtml=S.step&&S.step.on?`（階梯 ${S.step.zones.length} 區，涵蓋 ${stepCovered} 焊墊${stepCovered===0?' · <span style="color:var(--bad)">⚠️ 階梯區域未涵蓋任何焊墊</span>':""}）`:"";
+  const stepHtml=S.step&&S.step.on?`（階梯 ${S.step.zones.length} 區，涵蓋 ${stepCovered} 焊墊${stepCovered===0?' · <span style="color:var(--ng)">⚠️ 階梯區域未涵蓋任何焊墊</span>':""}）`:"";
 
   const s1=`<div class="rep-sec" id="repSec1">
     <div style="border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:20px">
@@ -9406,7 +9408,7 @@ function syncMailLength(){
   const url=buildMailtoUrl(to,cc,sub,body);
   if($("#mailUrlLen")){
     $("#mailUrlLen").textContent=`mailto 網址長度：${url.length} / 1800 字元`;
-    $("#mailUrlLen").style.color=url.length>1800?"var(--bad)":"var(--dim)";
+    $("#mailUrlLen").style.color=url.length>1800?"var(--ng)":"var(--muted)";
   }
   if($("#mailToErr")){
     const okTo=validateEmailList(to);
