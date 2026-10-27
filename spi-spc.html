@@ -676,7 +676,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   <div class="brand">
     <h1>SPI·SPC 分析台</h1>
     <span class="tag">錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.3.4</b> · 更新 <b class="num" id="appBuilt">2026-10-27 14:55:52</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.3.5</b> · 更新 <b class="num" id="appBuilt">2026-10-27 17:36:18</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -2917,6 +2917,16 @@ const robZThr=n=>Math.max(3.5,robZq(n,2)),robZBig=(n,floor=5.5)=>Math.max(floor,
 /* 校準後的單次檢定尾機率（i.i.d. 穩定製程下 |z| 至少這麼大的機率）：α 格點之間對 log α 線性內插；超出最小 α 回傳 0（顯示「< 1e-6」） */
 function robZp(n,z){const a=Math.abs(z);let lo=robZq(n,0);if(a<lo)return null;
   for(let j=1;j<ROBZ_A.length;j++){const hi=robZq(n,j);if(a<hi){const t=(a-lo)/(hi-lo);return Math.exp(Math.log(ROBZ_A[j-1])+(Math.log(ROBZ_A[j])-Math.log(ROBZ_A[j-1]))*t)}lo=hi}return 0}
+/* D-47 Nelson 規則 1（X̄ 圖每板平均超出 CL ± 3σ̂）卡片的嚴重度：回傳 "ng"／"warn"／"info"
+   zMax：命中板中最大的 |z|（每點 3σ，未做多重比較校正；穩定製程 20 板 × 5 項目時本規則合計約 20% 會出現）
+   zFW：族系門檻（Bonferroni：所有板 × 量測項目合計誤報 5%）
+   hasOos：命中板上「該量測項目」有任何超規焊墊（焊墊上千時幾乎恆真）
+   lowCpk：「該量測項目」最差元件群組 Cpk < 1.33（整個項目的性質，與命中哪片板無關） */
+function nelson1Level({zMax,zFW,hasOos,lowCpk}){
+  // 嚴重需通過族系門檻：單一 3σ 點本身就常見，不可只因板上有超規焊墊或整個項目 Cpk 偏低就升為嚴重
+  if(zMax>=zFW)return hasOos?"ng":"warn";
+  return hasOos&&lowCpk?"warn":"info";
+}
 const robZpTxt=(n,z)=>{const p=robZp(n,z);return p==null?"> 0.01":p===0?"< 1e-6":p.toExponential(1)};
 function fastMcd2D(points,seed=42){
   const n=points.length;if(n<30)return null;const p=2,h=Math.min(n,Math.ceil(0.75*n));
@@ -4182,8 +4192,7 @@ function detectIssues(st,onStage){
         if(r.id===1){
           const hasOos=hitB.some(b=>boardRows(b).some(row=>{const rsp=specFor(row,k,st),v=row[k];return v!=null&&rsp&&((isFinite(rsp.lsl)&&v<rsp.lsl)||(isFinite(rsp.usl)&&v>rsp.usl))}));
           const lowCpk=!!(wCap&&wCap.cpk<1.33);
-          if(hasOos||lowCpk)lv="ng";
-          else if(Math.max(...zHits.map(Math.abs))>=zFW)lv="warn";
+          lv=nelson1Level({zMax:Math.max(...zHits.map(Math.abs)),zFW,hasOos,lowCpk});
         }
         const faSingle=gr&&gr.nelson_single_rule_rates?gr.nelson_single_rule_rates[r.id]:null;
         const faAll=gr&&gr.nelson_rule_rates?gr.nelson_rule_rates[r.id]:null;
@@ -4893,7 +4902,7 @@ function issuesXlsx(F){
   ]);
 }
 
-if(typeof module!=="undefined")module.exports={rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,areaRatio,maxThkForAR,detectIssues,overallVerdict,compareRuns,dfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp};
+if(typeof module!=="undefined")module.exports={rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,areaRatio,maxThkForAR,detectIssues,overallVerdict,compareRuns,dfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level};
 </script>
 <script>
 "use strict";

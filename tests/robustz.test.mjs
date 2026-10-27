@@ -45,3 +45,12 @@ test('i.i.d. 常態 20 板：|z| ≥ robZThr 的每次誤報接近名目（舊�
   assert.ok(hit > exp * 0.6 && hit < exp * 1.5, `校準後 ${hit} 次（名目 ${exp.toFixed(0)}）`);
   assert.ok(old > exp * 8, `固定 3.5 ${old} 次（名目 ${exp.toFixed(0)}），確認本測試量得到舊問題`);
 });
+
+test('D-47 Nelson 規則 1 嚴重度：嚴重需通過族系門檻且有超規焊墊；整個項目 Cpk 偏低不單獨升為嚴重', () => {
+  const L = (o) => c.nelson1Level({ zMax: 3.2, zFW: 3.9, hasOos: false, lowCpk: false, ...o });
+  assert.equal(L({ zMax: 4.2, hasOos: true }), 'ng');
+  assert.equal(L({ zMax: 4.2 }), 'warn');
+  assert.equal(L({ hasOos: true }), 'info', '每點 3σ 未過族系門檻：超規焊墊本身不升級');
+  assert.equal(L({ lowCpk: true }), 'info', 'Cpk 偏低是整個項目的性質');
+  assert.equal(L({ hasOos: true, lowCpk: true }), 'warn');
+});
