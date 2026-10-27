@@ -73,3 +73,9 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
   - 出處：步驟 6 除錯紀錄（2026-10-17）。
 - **build 產物守衛**：`dist/` 只能有 `tools/build-cloudflare.mjs` 允許的檔案，暫存腳本不要放進 `dist/`。
   - 檢查：`npm run build:cloudflare` 不出現 `Unexpected deploy asset`。
+
+<!-- BEGIN ui-ux-universal (auto-synced; edit C:/Dropbox/AI_Coding_Agent_Governance/Institution/06-ui-ux-universal.md) -->
+> UI/UX work: read C:/Dropbox/AI_Coding_Agent_Governance/Institution/06-ui-ux-universal.md.
+> Core Git and publication authority: read C:/Dropbox/AI_Coding_Agent_Governance/Institution/00-core-rules.md.
+> Auto-deploy applies only to an explicitly authorized project, environment and site after required gates pass.
+<!-- END ui-ux-universal -->
