@@ -119,11 +119,12 @@ test('效能：4.7 萬筆時切換管制圖／焊墊與回到看過的量測項�
   const c = loadCore(), st = baseState(c, { rows: bigRows(c, 24, 1986) });
   c.analyze(st);
   // 取 5 次最小值：單次量測會混入 CI 共用主機的負載雜訊（release-check 重跑時曾超過門檻）。
-  // 重複呼叫做的事相同：analyze 的量測層快取只以量測項目／群組為 key，每次都重算管制圖與焊墊視圖
-  const T = (fn, n = 5) => { let best = Infinity; for (let i = 0; i < n; i++) { const t = performance.now(); fn(); best = Math.min(best, performance.now() - t); } return best; };
-  st.chart = 'imr'; const tChart = T(() => c.analyze(st));
-  st.pad = st.rows[10].pad; const tPad = T(() => c.analyze(st));
-  st.metric = 'area'; c.analyze(st); st.metric = 'volume'; const tBack = T(() => c.analyze(st));
+  // 每輪計時前先跑 setup，把狀態恢復成「剛切換」：只量切換後的第一次呼叫，第 2 次以後的快取命中不可遮蔽第一次的未命中
+  const T = (fn, setup, n = 5) => { let best = Infinity; for (let i = 0; i < n; i++) { if (setup) setup(); const t = performance.now(); fn(); best = Math.min(best, performance.now() - t); } return best; };
+  const an = () => c.analyze(st);
+  const tChart = T(an, () => { st.chart = 'xbars'; c.analyze(st); st.chart = 'imr'; });
+  const tPad = T(an, () => { st.pad = null; c.analyze(st); st.pad = st.rows[10].pad; });
+  const tBack = T(an, () => { st.metric = 'area'; c.analyze(st); st.metric = 'volume'; });
   st.A = c.analyze(st); c.buildStatsData(st); const tStats = T(() => c.buildStatsData(st));
   assert.ok(tChart < 80, `切換管制圖 ${tChart.toFixed(0)} ms`);
   assert.ok(tPad < 80, `切換焊墊 ${tPad.toFixed(0)} ms`);

@@ -1,51 +1,61 @@
 # Release Readiness Report
 
 **Project:** SPI·SPC 分析台
-**Version:** v10.3.3
+**Version:** v10.3.4
 **Date:** 2026-10-27（UTC+8）
-**Branch:** `work/final-release-debug`（未合併；合併 main 即自動部署正式站）
-**Overall Status:** READY（本機關卡）；正式站驗收待合併後進行
+**Branch:** `work/desktop-rail-fix`（合併 main 即自動部署正式站）
+**Overall Status:** READY（本機關卡）；正式站驗收於合併後記錄在下一版
 
 ## Summary
 
-最終發布前於 Windows 本機重跑全部關卡，並以 build 產物逐頁巡檢 UI。巡檢發現 6 項缺陷，皆已修正並補回歸測試；修正後全部關卡再跑一次通過。
+修正 v10.3.3 code review 找到的介面問題：桌機與平板看不到分析設定列（v9.11.0 起）、未定義的 CSS 變數讓錯誤提示失去紅色、階梯鋼板區域表的選取單選鈕觸控熱區 24px，以及會遮蔽快取未命中的效能測試寫法。偵測邏輯未改動（單板異常誤報校準在下一版處理）。
+
+## 前一版狀態
+
+- v10.3.3（#57）已合併並自動部署；正式站登入頁顯示 v10.3.3（code review 時以 curl 確認）。
+- 登入後的資料庫路徑：repo 內沒有 v10.3.3 的驗收紀錄，屬**未驗證**。
+- main CI：#58 因計時測試失敗；#59 改計時方式後通過。
 
 ## Checks（verified：本次實際執行）
 
 | 關卡 | 指令 | 結果 |
 |---|---|---|
-| 單元與整合測試 | `npm test` | 335／335 通過（修正前基線 334／334） |
-| 判定模擬 | `npm run test:slow` | 修正前基線 5／5 通過（seed 1–200）；本次修正未改偵測邏輯，修正後未重跑 |
-| 發布檢查 | `npm run release-check` | `Overall: READY`，八類（version、changelog、debug、docs、deps、tests、secrets、a11y）皆 PASS |
+| 單元與整合測試 | `npm test` | 336／336 通過（基線 335） |
+| 判定模擬 | `npm run test:slow` | 未跑：本版未改偵測邏輯 |
+| 發布檢查 | `npm run release-check` | `Overall: READY`，八類皆 PASS |
 | Cloudflare build | `npm run build:cloudflare` | exit 0，產物僅 `index.html`、`vendor/`、`_headers` |
 | Worker 設定 | `npx wrangler deploy --dry-run` | exit 0 |
-| D1 migration | — | 本次無新增 migration，合併不需先套用 |
+| D1 migration | — | 本次無新增 migration |
 
-## UI 巡檢（verified：內建瀏覽器，本次 build 產物）
+## UI 巡檢（verified：內建瀏覽器，本次 build 產物，devicePixelRatio 2）
 
-範圍：14 個分頁、4 個資料子分頁、「更多」選單、設定面板、6 個對話框（共 25 個畫面）× 寬度 1440／820／390／320 × 明亮／深色。每頁檢查整頁橫向溢出、元素超出畫面、觸控熱區 ≥ 44px（390／320 觸控模擬）、文字對比 ≥ 3。
+範圍：14 個分頁 × 2 次進出 + 4 個資料子分頁、「更多」選單／底部 sheet、分析設定（桌機 rail／手機 sheet）、5 個資料庫對話框。檢查整頁橫向溢出、元素超出畫面、觸控熱區 ≥ 44px（390／320 觸控模擬）、文字對比 ≥ 3。
+
+| 寬度 | 明亮 | 深色 | 分析設定列 |
+|---|---|---|---|
+| 1440 | 無溢出、無低對比文字 | 同左 | 四個選單寬 241／137／96／230px |
+| 1024 | 無溢出（僅明亮） | NOT TESTED | 同上；手機開關 sheet 後放大到 1024 仍顯示 |
+| 820 | 無溢出、無低對比文字 | 同左 | 同上，分兩行 |
+| 390 | 無溢出、熱區皆 ≥ 44px | 同左 | 收合為設定鈕；開啟為 flex、焦點在關閉鈕；關閉後隱藏 |
+| 320 | 同 390 | 同左 | 同 390 |
 
 | 缺陷 | 修正 | 證據 |
 |---|---|---|
-| LISA 圖每次進入進階分析頁放大 dpr 倍（1200 → 2400 → 4800px） | 畫布固定 CSS 尺寸 | 進出 3 次維持 405px；測試 8a |
-| 320px 製程能力頁、匯入頁橫向溢出 29–59px | `.panel`／`.vendor` 欄寬 `minmax(0,1fr)`、`select{max-width:100%}` | 320px 無溢出；測試 8b |
-| 深色模式報告判定框對比 1.2 | 報告紙張範圍固定明亮 token | 深色截圖可讀；測試 8d |
-| 3D 剖面圖例文字對比 2.1–2.5 | 文字用一般字色，系列色只在符號 | 測試 8e |
-| 核取方塊 label 觸控熱區 30px | `label.row:has(>input[type=checkbox])` 44px | 390／320 無 < 44px；測試 8c |
-| 稽核紀錄指紋顯示 `undefined…`（2026-10-25 正式唯讀驗收 not pass） | 缺值顯示「舊紀錄未記錄」 | `tests/part-spec-ui.test.mjs` |
+| 桌機／平板分析設定列寬度 0 | `.rail-sheet-modal,.rail-sheet-modal[hidden]{display:contents!important}` | 上表；測試 9a |
+| 錯誤提示、階梯「⚠️ 0」不顯示紅色（`var(--bad)` 等未定義） | 改用既有 token | 收件人錯誤提示顏色 = `--ng`（#B83A2C）；測試 9b |
+| 階梯區域選取單選鈕觸控熱區 24px | 包進 `label.row`（觸控 44×44） | 390 下 44×45，點色塊可選取；測試 9c |
 
-修正後 4 寬度 × 2 主題全數無溢出、無熱區不足、無低對比文字。剩餘標記為 3D 剖面圖例的線條符號（非文字，需與圖上線色一致），接受。
+剩餘標記：3D 剖面圖例的線條符號「──」「---」（非文字，需與圖上線色一致），沿用 v10.3.3 判定接受。
 
 ## Not verified / NOT TESTED
 
-- **820px 觸控**：內建瀏覽器只在 < 768px 模擬觸控；820 僅測滑鼠模式，觸控規則由靜態 CSS 測試涵蓋。
+- **820px 觸控**：內建瀏覽器只在 < 768px 模擬觸控；820 僅測滑鼠模式。
 - **對話框內容**：以移除 `hidden` 檢查版面，未填入實際資料流程。
-- **稽核指紋欄畫面**：本機無缺指紋的稽核資料，僅以 jsdom 測試驗證輸出。
 - **iPhone 真機**：未實測。
-- **正式站**：合併後需依 `AGENTS.md`「部署驗證要走過資料庫路徑」確認登入後資料庫頁；正式站瀏覽器原檔下載與重新載入分析仍未核對（沿用 2026-10-25 驗收紀錄的 not verified）。
-- **CI**：runner 改為 `windows-latest`，首次結果以本 PR 的 GitHub Actions 為準。
+- **正式站**：合併後確認登入頁版本；登入後資料庫路徑需登入，無登入狀態時標記未驗證。
 
 ## Warnings
 
-- INFERENCE：問題偵測門檻以模擬資料校正（v10.2.2、v10.2.3 已改小樣本校準與置換檢定）；真實試產資料雜訊結構不同時，誤報率可能偏離名目值。
+- FACT：單板異常的 |z| ≥ 3.5 門檻在板數少時誤報偏高（i.i.d. 模擬：20 板約名目 14 倍、10 板約 36 倍），問題偵測頁「預期約 N 次誤報」低估；下一版改為依板數校準。
+- FACT：主頁與登入頁的「更新」時間仍於提交時寫入，未於 build 時自動注入（06-ui-ux-universal §9），另案處理。
 - FACT：新紀錄只寫入 Cloudflare D1＋R2，未登入時建立紀錄直接拒絕；既有本機 IndexedDB 舊資料只供查閱。
