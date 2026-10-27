@@ -129,8 +129,10 @@ test("A1–A3 報告：直方圖有資料、管制圖為 X̄ 界限、能力表�
     w.Chart = class { constructor(cv, cfg) { charts.push(cfg); } destroy() {} static register() {} };
     w.SPI_TEST_HOOK = {};
   } });
-  await tick(80);
   const w = dom.window;
+  // 等頁面初始化完成（測試掛鉤與範例分析結果就緒），帶逾時的條件輪詢，不用固定休眠
+  for (let i = 0; i < 200 && !(w.SPI_TEST_HOOK.renderReport && w.eval("typeof S!=='undefined'&&!!S.A")); i++) await tick(20);
+  assert.ok(w.SPI_TEST_HOOK.renderReport && w.eval("!!S.A"), "頁面初始化逾時（4 秒）");
   charts.length = 0;
   w.SPI_TEST_HOOK.renderReport();
   const A = JSON.parse(w.eval("JSON.stringify({cl:S.A.xs.cl,ucl:S.A.xs.pts.map(p=>p.ucl),v:S.A.xs.pts.map(p=>p.v),n:S.A.N})"));
