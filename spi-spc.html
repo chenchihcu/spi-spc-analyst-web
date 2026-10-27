@@ -4314,23 +4314,24 @@ function detectIssues(st,onStage){
   // D-29 佐證與同一現象：只有來自不同證據族（FAMILY）且非衍生關係的發現才互相佐證；
   // 同期間、同量測項目的 Nelson 卡與趨勢／單板／孤立極端焊墊卡，或同族／衍生關係（MC.derived 為真時的 volume 與 hpct/area）列為 same_phenomenon
   /* 每張卡的涉及板與量測項目只算一次（兩兩比對時問題數上千，不可每對重建） */
-  const cbC=new Map(),cbCoreC=new Map(),cmC=new Map();
-  /* 卡片直接指名的板；漂移卡另含起點之後的整段板（cardBoards），只在兩張卡有共同量測項目時才用整段比對，
-     否則某項目從第 3 片開始漂移，會和後段每片板上無關項目的單板卡都「互相佐證」 */
-  const cardBoardsCore=x=>{let s=cbCoreC.get(x);if(s)return s;s=new Set();cbCoreC.set(x,s);if(!x.sig)return s;
+  const cbC=new Map(),cmC=new Map();
+  const cardBoards=x=>{let s=cbC.get(x);if(s)return s;s=new Set();cbC.set(x,s);if(!x.sig)return s;
     if(x.sig.b)s.add(x.sig.b);
     if(x.sig.bs)x.sig.bs.forEach(b=>s.add(b));
     if(x.sig.boards)x.sig.boards.forEach(b=>s.add(b));
+    if(x.sig.t==="drift"&&x.sig.s0!=null)for(let i=x.sig.s0;i<nb;i++)s.add(boards[i]);
     return s};
-  const cardBoards=x=>{let s=cbC.get(x);if(s)return s;s=cardBoardsCore(x);
-    if(x.sig&&x.sig.t==="drift"&&x.sig.s0!=null){s=new Set(s);for(let i=x.sig.s0;i<nb;i++)s.add(boards[i])}
-    cbC.set(x,s);return s};
   const cardMetrics=x=>{let m=cmC.get(x);if(!m){m=!x.sig?[]:x.sig.ks?x.sig.ks:x.sig.k?[x.sig.k]:[];cmC.set(x,m)}return m};
   const isDerivedPair=(a,b)=>{if(!(MC&&MC.derived))return false;const dSet=new Set(["volume","hpct","area"]);
     const ma=cardMetrics(a),mb=cardMetrics(b);if(!ma.length||!mb.length)return false;
     return ma.every(k=>dSet.has(k))&&mb.every(k=>dSet.has(k))&&ma.some(k=>!mb.includes(k))};
-  const shareEnt=(a,b,sameM)=>{if(b.ents.some(e=>a.ents.includes(e)))return true;
-    const cb=sameM?cardBoards:cardBoardsCore,ba=cb(a),bb=cb(b);for(const x of ba)if(bb.has(x))return true;return false};
+  /* 不同證據族的互相佐證需同一（或衍生關係的）量測項目；同族或衍生關係照舊列為同一現象。兩張卡都有量測項目卻沒有共同項目時：否則 offx 的漂移或 Nelson 規則 2／6／8 卡
+     （涵蓋整段板、ents 為 b:各板）會和每片板上無關項目（例如體積）的單板卡都「互相佐證」，灌高佐證數與排序 */
+  const dSet=new Set(["volume","hpct","area"]);
+  const relatedM=(a,b,sameM)=>{const ma=cardMetrics(a),mb=cardMetrics(b);if(!ma.length||!mb.length||sameM)return true;
+    return !!(MC&&MC.derived)&&ma.some(k=>dSet.has(k))&&mb.some(k=>dSet.has(k))};
+  const shareEnt=(a,b)=>{if(b.ents.some(e=>a.ents.includes(e)))return true;
+    const ba=cardBoards(a),bb=cardBoards(b);for(const x of ba)if(bb.has(x))return true;return false};
   F.forEach(a=>{a.corrob=[];a.same_phenomenon=[];a._sameTitles=[]});
   for(let i=0;i<F.length;i++)for(let j=i+1;j<F.length;j++){const a=F[i],b=F[j];
     const fa=a.sig&&FAMILY[a.sig.t],fb=b.sig&&FAMILY[b.sig.t];
@@ -4342,9 +4343,9 @@ function detectIssues(st,onStage){
     if(nelPair&&sameM&&overlapB){
       a.same_phenomenon.push(b.id);b.same_phenomenon.push(a.id);
       a._sameTitles.push(b.title);b._sameTitles.push(a.title);continue}
-    if(!shareEnt(a,b,sameM))continue;
+    if(!shareEnt(a,b))continue;
     if(fa&&fb&&fa!==fb&&!isDerivedPair(a,b)){
-      a.corrob.push(b.id);b.corrob.push(a.id);
+      if(relatedM(a,b,sameM)){a.corrob.push(b.id);b.corrob.push(a.id)}
     }else{
       a.same_phenomenon.push(b.id);b.same_phenomenon.push(a.id);
       a._sameTitles.push(b.title);b._sameTitles.push(a.title);
@@ -4375,7 +4376,7 @@ function detectIssues(st,onStage){
   const verdictLabel={ok:"正常",warn:"警示",ng:"異常"}[vLevel];
   // 多重比較揭露：單板異常每個「板 × 元件群組 × 量測項目」各做一次檢定；門檻已依板數校準（M-19），每次檢定誤報為 2(1−Φ(3.5))；全無異常時的預期誤報數（另有效果量與不良數門檻，實際更少）
   const alpha=ROBZ_A1;
-  F.meta={tests:nT1,alpha,expFA:nT1*alpha,verdict:{level:vLevel,label:verdictLabel,worstCap:wAll,reasons},modes:failureModes(st,F,{R,boards,groups,MS,MC,nb,boardMeans,idx,gIdx})};
+  F.meta={tests:nT1,hits:hits.length,alpha,expFA:nT1*alpha,verdict:{level:vLevel,label:verdictLabel,worstCap:wAll,reasons},modes:failureModes(st,F,{R,boards,groups,MS,MC,nb,boardMeans,idx,gIdx})};
   return F}
 /* ============ 失效模式交叉比對 ============
    錫膏印刷的失效通常是多因素的：每個候選失效模式列出「支持」與「矛盾」的證據，證據分屬六個獨立面向
@@ -4892,7 +4893,7 @@ function issuesXlsx(F){
   ]);
 }
 
-if(typeof module!=="undefined")module.exports={rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,areaRatio,maxThkForAR,detectIssues,overallVerdict,compareRuns,dfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust};
+if(typeof module!=="undefined")module.exports={rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,areaRatio,maxThkForAR,detectIssues,overallVerdict,compareRuns,dfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp};
 </script>
 <script>
 "use strict";
@@ -5270,7 +5271,7 @@ function renderFM(){const Me=S.F&&S.F.meta,box=$("#fmCard");if(!box)return;box.h
   $$("#fmTbl [data-fmjump]").forEach(b=>b.onclick=()=>{setTab("issues");setTimeout(()=>flashIssue(+b.dataset.fmjump),60)})}
 function issuesMd(){return`# SPI 問題偵測清單\n\n- 版本：${APP.ver} · 系統更新 ${APP.built} · 產生時間：${fmtNowUtc8()}\n- 資料來源：${S.source}；鋼板 ${S.stencil} µm${S.step.on?"（階梯）":""}\n\n`+S.F.map(x=>`## #${x.no}［${x.level}］${x.title}\n\n- 面向：${x.category}｜規則：${x.rule_id}（${x.rule_name}）｜量測項目：${x.metric}\n- 板號：${x.boards}｜子板：${x.subboard}｜元件群組：${x.group}｜元件位號：${x.refdes}｜焊墊：${x.pads}\n- 觀測值：${x.observed}｜界限／規格：${x.limit}｜z：${x.z}｜p：${x.p}\n- 事實：\n${x.facts.map(t=>"  - "+t).join("\n")}\n- 推論（信心 ${x.confidence}）：${x.inference}\n- 建議動作：${x.action}\n- 跨面向佐證：${x.corroborated_by.length?x.corroborated_by.map(i=>"#"+i).join("、"):"無"}${x.same_phenomenon.length?`；同一現象：${x.same_phenomenon.map(i=>"#"+i).join("、")}`:""}${x.explained_pads.length?`；已解釋焊墊：${x.explained_pads.join("；")}`:""}\n`).join("\n")+fmMd()}
 function fmMd(){const Me=S.F&&S.F.meta;if(!Me||!Me.modes)return"";
-  return`\n## 失效模式交叉比對\n\n規則：至少兩個獨立面向支持、含必要面向且無矛盾，才判「可能」。單板異常共 ${Me.tests} 次檢定，全無異常時預期約 ${f(Me.expFA,1)} 次誤報。\n\n| 候選失效模式 | 判讀 | 支持面向 | 證據與製程知識庫規則 |\n|---|---|---|---|\n`+Me.modes.map(m=>`| ${m.name} | ${m.verdict} | ${m.dims.join("、")||"—"} | ${[m.need||"",...m.sup.map(e=>"✓ "+e.d+"："+e.txt),...m.con.map(e=>"✗ "+e.d+"："+e.txt),...(m.rules&&m.rules.length?[`規則來源：${m.rules.join("、")}`]:[])].filter(Boolean).join("<br>").replace(/\|/g,"／")} |`).join("\n")+"\n"}
+  return`\n## 失效模式交叉比對\n\n規則：至少兩個獨立面向支持、含必要面向且無矛盾，才判「可能」。單板異常共 ${Me.tests} 次檢定（門檻依板數校準），全無異常時預期約 ${f(Me.expFA,1)} 次誤報；此數字只涵蓋單板異常。\n\n| 候選失效模式 | 判讀 | 支持面向 | 證據與製程知識庫規則 |\n|---|---|---|---|\n`+Me.modes.map(m=>`| ${m.name} | ${m.verdict} | ${m.dims.join("、")||"—"} | ${[m.need||"",...m.sup.map(e=>"✓ "+e.d+"："+e.txt),...m.con.map(e=>"✗ "+e.d+"："+e.txt),...(m.rules&&m.rules.length?[`規則來源：${m.rules.join("、")}`]:[])].filter(Boolean).join("<br>").replace(/\|/g,"／")} |`).join("\n")+"\n"}
 $("#btnIssMd").onclick=()=>save("spi-issues.md",issuesMd());
 $("#btnIssCsv").onclick=()=>save("spi-issues.csv",issuesCsv(S.F));
 if($("#btnIssXlsx"))$("#btnIssXlsx").onclick=()=>save("spi-issues.xlsx",issuesXlsx(S.F));
@@ -7278,7 +7279,7 @@ function capInfo(A){const c=A.cap;if(!c)return null;const ci=x=>`${f(x.ci[0])}�
     逐群組:c.mixed?c.groups.slice(0,15).map(g=>({群組:g.g,n:g.n,規格:`${f(g.lsl,0)}–${f(g.usl,0)}`,Cpk:+f(g.cpk),Cpk95信賴區間:ci(g),Ppk:+f(g.ppk)})):undefined}}
 function ctrlInfo(A){const N=A.nelX||A.nel;return{依據:"X̄ 圖（每板平均，8 條 Nelson 規則）",製程穩定:A.stable,觸發規則:N.rules.filter(r=>r.idx.length).map(r=>({規則:r.name,板:r.idx.map(i=>A.xs.pts[i].lab).join(" ")})),Pprime_sigmaZ:+f(A.pc.sigZ,2)}}
 function fmInfo(){const Me=S.F&&S.F.meta;if(!Me||!Me.modes)return[];return Me.modes.map(m=>({模式:m.name,判讀:m.verdict,支持面向:m.dims.join("、"),必要面向:m.key||"",支持證據:m.sup.map(e=>e.d+"："+e.txt),矛盾證據:m.con.map(e=>e.d+"："+e.txt),資料不足:m.need||""}))}
-function mcInfo(){const Me=S.F&&S.F.meta;return Me&&Me.tests?{單板異常檢定次數:Me.tests,每次誤報率:+Me.alpha.toExponential(2),預期誤報數:+f(Me.expFA,2)}:null}
+function mcInfo(){const Me=S.F&&S.F.meta;return Me&&Me.tests?{單板異常檢定次數:Me.tests,每次誤報率:+Me.alpha.toExponential(2),預期誤報數:+f(Me.expFA,2),門檻:"依板數校準（i.i.d. 穩定製程模擬）",涵蓋範圍:"僅單板異常；其他偵測各有誤報率"}:null}
 /* 與伺服器端 lib/analyze-core.mjs 的 SYSTEM_PROMPT 相同的證據規則（測試會核對兩邊一致） */
 const AI_EVIDENCE_RULE="錫膏印刷的失效通常是多因素的：「失效模式交叉比對」是系統依形狀、時間、空間、設計、對位、量測六個獨立面向整理的支持與矛盾證據。判斷根因時，至少兩個獨立面向一致且沒有矛盾證據才可列為「可能原因」；只有單一現象者只能列為「待確認」並說明還缺哪個面向的證據。「管制狀態」顯示製程未穩定時，能力指標只能作參考。「多重比較」為大量檢定下的預期誤報數，單一發現請據此評估是否為假訊號。";
 function aiPayload(){const A=S.A;return{試產回合:curRun()?curRun().name:"",量測項目:METRICS[A.m].label,單位:METRICS[A.m].unit,元件群組:S.group==="ALL"?"全部":S.group,管制圖:chartName(),規格:A.sp,鋼板厚度µm:S.stencil,階梯鋼板:S.step.on?S.step.zones.map(z=>({區域:z.name,厚度µm:z.t,範圍:z.mode==="group"?"元件群組 "+z.group:`X ${z.x0}~${z.x1} mm, Y ${z.y0}~${z.y1} mm`})):"未啟用",高度規格佔厚度:`${S.htol.lo}%–${S.htol.hi}%`,樣本數:A.N,板數:A.boards.length,

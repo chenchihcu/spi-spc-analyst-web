@@ -141,3 +141,16 @@ test('[slow] 6.1 整體判定模擬：seed 1–200 蒙地卡羅驗收（25/50 �
     }
   }
 });
+
+test('[slow] M-19 單板異常：穩定製程 10／25 板、實際群組大小下，每次檢定誤報不超過名目 2(1−Φ(3.5))', () => {
+  const A1 = 2 * (1 - 0.99976737), maxSeed = isSlow ? 40 : 2;
+  for (const nb of [10, 25]) {
+    let T = 0, H = 0;
+    for (let s = 1; s <= maxSeed; s++) {
+      const iss = core.detectIssues(baseState(core, { rows: generateStableData({ nb, seed: s }), metrics: ['volume', 'hpct', 'area', 'offx', 'offy'], metric: 'volume', group: 'ALL' }));
+      T += iss.meta.tests; H += iss.meta.hits;
+    }
+    const exp = T * A1;
+    assert.ok(H <= Math.ceil(exp + 3 * Math.sqrt(exp)), `${nb} 板 ${maxSeed} 個 seed：命中 ${H} / ${T} 次檢定（名目上限約 ${exp.toFixed(1)}）`);
+  }
+});
