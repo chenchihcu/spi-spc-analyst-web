@@ -32,7 +32,7 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
   - 檢查：`npm run test:slow` 通過；更新 `tests/verdict-sim-expected.json` 時逐 seed 說明變動原因。
   - 出處：v9.2.0、v9.13.2（1784 項中 1716 張自我參照 Cpk 誤報）、v10.2.0、v10.2.2（FastMCD χ² 小樣本誤報 25–50 倍）、v10.2.3（Moran's I 標準誤低估約 1.5 倍）。
 - **效能重構須結果逐位元相同**：只替換實作（迴圈、緩衝、快取），不改公式、門檻與加總順序。萬筆以上資料避免在巢狀迴圈中建立中間陣列（`.map().filter().reduce()`），改用單趟累加或預先索引；Bootstrap／Monte Carlo 前先過顯著性門檻，非必要時延遲計算。
-  - 檢查：`tests/golden.test.mjs`、`npm run test:slow` 不變；`node --test tests/core.test.js` 5 萬筆偵測維持 1 秒內。
+  - 檢查：`tests/golden.test.mjs`、`npm run test:slow` 不變；`node --test tests/core.test.js` 與 `node tools/bench-large.mjs` 下 5 萬筆級 `analyze`、`detectIssues` 各 **<3 秒**（硬門檻）；本機優化目標 **<1 秒**。
   - 出處：v9.13.0、`docs/spec-perf-large-dataset-rfc.md`、步驟 6 效能除錯紀錄（2026-10-17）。
 
 ## 版面與 CSS
