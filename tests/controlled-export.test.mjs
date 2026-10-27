@@ -26,8 +26,8 @@ test('正式匯出以伺服器目前生命週期為準，讀取失敗時停止',
   const w = dom.window;
   await new Promise(resolve => setTimeout(resolve, 50));
   assert.deepEqual(errors, []);
-  let downloads = 0;
-  w.claude = { use: async () => ({ save: async () => { downloads++; } }) };
+  let downloads = 0, lastName = '';
+  w.claude = { use: async () => ({ save: async ({ filename }) => { downloads++; lastName = filename; } }) };
   const hook = w.SPI_TEST_HOOK;
   hook.RecDB.mode = 'cloud';
   hook.curRun().info = { src: { id: 'source-1', lifecycle: 'active', part: 'P1', name: 'measurement.csv', unmatchedRefs: ['L87', 'R737', 'R738'] } };
@@ -44,21 +44,36 @@ test('正式匯出以伺服器目前生命週期為準，讀取失敗時停止',
 
   w.__lifecycle = 'superseded';
   hook.RecDB.jfetch = async () => ({ record: { lifecycle: w.__lifecycle } });
+  let confirms = 0;
+  w.confirm = () => { confirms++; return false; };
   w.document.querySelector('#btnExpMd').click();
   await new Promise(resolve => setTimeout(resolve, 100));
   assert.equal(downloads, 0);
+  assert.equal(confirms, 1);
   assert.equal(hook.curRun().info.src.lifecycle, 'superseded');
-  assert.match(w.document.querySelector('#expState').textContent, /歷史或待判定/);
+  assert.match(w.document.querySelector('#expState').textContent, /歷史修正前版本.*已取消匯出/);
+  // 匯出鈕在其他分頁時 #expState 看不到，結果也要出現在 toast
+  assert.match(w.document.querySelector('#toast').textContent, /已取消匯出/);
 
-  w.__lifecycle = 'active';
-  w.document.querySelector('#btnExpMd').click();
+  // 確認後可匯出，檔名加註紀錄狀態
+  w.confirm = () => { confirms++; return true; };
+  w.document.querySelector('#btnIssCsv').click();
   await new Promise(resolve => setTimeout(resolve, 100));
   assert.equal(downloads, 1);
+  assert.equal(lastName, 'spi-issues-歷史修正前版本.csv');
+
+  w.__lifecycle = 'active';
+  confirms = 0;
+  w.document.querySelector('#btnExpMd').click();
+  await new Promise(resolve => setTimeout(resolve, 100));
+  assert.equal(downloads, 2);
+  assert.equal(confirms, 0);
+  assert.equal(lastName, 'spi-spc-report.md');
 
   hook.RecDB.jfetch = async () => { throw new Error('offline'); };
   w.document.querySelector('#btnExpMd').click();
   await new Promise(resolve => setTimeout(resolve, 100));
-  assert.equal(downloads, 1);
+  assert.equal(downloads, 2);
   assert.equal(hook.curRun().info.src.lifecycle, 'unavailable');
   assert.match(w.document.querySelector('#expState').textContent, /已停止匯出/);
   dom.window.close();
