@@ -676,7 +676,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   <div class="brand">
     <h1>SPI·SPC 分析台</h1>
     <span class="tag">錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.3.8</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.3.9</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -6534,7 +6534,8 @@ function dispose3D(){
   }
   T.renderer=null;T.scene=null;T.cam=null;T.root=null;T.ok=false;
 }
-function init3D(){if(T.ok)return true;const el=$("#view3d");
+function init3D(){const el=$("#view3d");
+  if(T.ok){if(el&&T.renderer&&!T.renderer.domElement.isConnected)el.prepend(T.renderer.domElement);return true}
   if(!window.THREE){T.ok=false;set3DCtrls(false);show3DFallback("此裝置或瀏覽器無法啟用 WebGL 3D 檢視，請改看下方「本板 vs 全體」與「全板熱圖」。");return false}
   try{
     T.renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
@@ -6575,7 +6576,33 @@ function init3D(){if(T.ok)return true;const el=$("#view3d");
   }
   T.ok=true;size3();return true}
 function size3(){const el=$("#view3d");if(!T.ok||!T.renderer||!el||!el.clientWidth)return;T.renderer.setSize(el.clientWidth,el.clientHeight);T.cam.aspect=el.clientWidth/el.clientHeight;T.cam.updateProjectionMatrix();draw3()}
-function draw3(){if(!T.ok||!T.renderer)return;if(T.raf)return;T.raf=requestAnimationFrame(()=>{T.raf=0;if(!T.ok||!T.renderer)return;const c=T.cam;c.position.set(T.tx+T.rad*Math.sin(T.phi)*Math.sin(T.theta),T.rad*Math.cos(T.phi),T.tz+T.rad*Math.sin(T.phi)*Math.cos(T.theta));c.lookAt(T.tx,0,T.tz);T.renderer.render(T.scene,c)})}
+function draw3(){if(!T.ok||!T.renderer)return;if(T.raf)return;T.raf=requestAnimationFrame(()=>{T.raf=0;if(!T.ok||!T.renderer)return;const c=T.cam;c.position.set(T.tx+T.rad*Math.sin(T.phi)*Math.sin(T.theta),T.rad*Math.cos(T.phi),T.tz+T.rad*Math.sin(T.phi)*Math.cos(T.theta));c.lookAt(T.tx,0,T.tz);T.renderer.render(T.scene,c);if(T.check){T.check=false;check3DRender()}})}
+/* 3D 畫面自我檢查：渲染後同一幀讀回畫面，WebGL 靜默畫不出東西時改顯示原因，不留空白 */
+const DIAG3D_TIP="請改看下方「本板 vs 全體」與「全板熱圖」；若要使用 3D，請確認瀏覽器已開啟硬體加速後重新整理。";
+/* 保守判定：-1 代表量不到，視為正常，避免蓋住正常畫面；底板一定會畫，所以空板 alpha=0 仍算失敗 */
+function diag3D(d){
+  if(!d)return null;
+  if(!d.connected)return"3D 畫布未掛載到頁面。";
+  if(!(d.w>0&&d.h>0))return"3D 畫布尺寸為 0，無法繪製。";
+  if(d.lost)return"WebGL 繪圖內容已遺失（context lost）。";
+  if(d.calls===0)return"WebGL 未執行任何繪製。";
+  if(d.alpha===0)return"WebGL 已執行但畫面空白（可能是顯示卡驅動或硬體加速未開啟）。";
+  return null;
+}
+function check3DRender(){
+  const r=T.renderer,cvs=r&&r.domElement;if(!cvs)return;
+  let gl=null,lost=false,alpha=-1;
+  try{gl=r.getContext();lost=!!(gl&&gl.isContextLost&&gl.isContextLost())}catch(e){}
+  if(gl&&!lost&&cvs.width>0&&cvs.height>0){
+    try{const n=8,px=new Uint8Array(n*n*4);gl.readPixels(Math.max(0,(cvs.width>>1)-n/2),Math.max(0,(cvs.height>>1)-n/2),n,n,gl.RGBA,gl.UNSIGNED_BYTE,px);alpha=0;for(let i=3;i<px.length;i+=4)if(px[i]>alpha)alpha=px[i]}catch(e){alpha=-1}
+  }
+  const d={connected:!!cvs.isConnected,w:cvs.width,h:cvs.height,lost,calls:r.info&&r.info.render?r.info.render.calls:-1,alpha,meshes:(T.meshes||[]).length};
+  const why=diag3D(d);
+  if(why){console.warn("3D 錫膏模擬未繪出畫面：",why,d);show3DFallback(why+DIAG3D_TIP)}
+  else if($("#view3d .webgl-fallback[data-diag]"))clear3DFallback();
+  const fb=$("#view3d .webgl-fallback");if(fb&&why)fb.dataset.diag="1";
+  return why;
+}
 function statusCol(r){const d=classify(r,S.specs,S);if(!d.length)return css("--ok");return d.some(c=>c==="INS"||c==="BRG"||c==="EXC")?css("--ng"):css("--warn")}
 function createSolderPasteGeometry(w,h,d,r,ex,shape){
   const pkMicron=(r&&r.peaking!=null)?Math.max(0,r.peaking):0;
@@ -6664,7 +6691,7 @@ function createSolderPasteGeometry(w,h,d,r,ex,shape){
   if(typeof geo.computeVertexNormals==="function")geo.computeVertexNormals();
   return geo;
 }
-function build3D(){renderBoard2D();if(!T.ok||!window.THREE||!T||!T.root||!T.root.children)return;const A=S.A;while(T.root.children.length){const o=T.root.children.pop();o.geometry&&o.geometry.dispose();o.material&&o.material.dispose()}
+function build3D(){safeBoard2D();if(!T.ok||!window.THREE||!T||!T.root||!T.root.children)return;const A=S.A;while(T.root.children.length){const o=T.root.children.pop();o.geometry&&o.geometry.dispose();o.material&&o.material.dispose()}
   const all=S.rows;let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
   for(let i=0;i<all.length;i++){const rx=all[i].x,ry=all[i].y;if(rx<x0)x0=rx;if(rx>x1)x1=rx;if(ry<y0)y0=ry;if(ry>y1)y1=ry}
   x0-=4;x1+=4;y0-=4;y1+=4;const cx=(x0+x1)/2,cy=(y0+y1)/2;
@@ -6696,14 +6723,16 @@ function build3D(){renderBoard2D();if(!T.ok||!window.THREE||!T||!T.root||!T.root
   if(S.step.on)S.step.zones.forEach((z,i)=>{const R=zoneRect(z);if(!R)return;const w=R.x1-R.x0,d=R.y1-R.y0,col=new THREE.Color(ZCOL[i%ZCOL.length]);
     const pl=new THREE.Mesh(new THREE.BoxGeometry(w,0.02,d),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.22,depthWrite:false}));pl.position.set((R.x0+R.x1)/2-cx,0.012,cy-(R.y0+R.y1)/2);T.root.add(pl);
     const eg=new THREE.EdgesGeometry(new THREE.BoxGeometry(w,0.02,d)),ln=new THREE.LineSegments(eg,new THREE.LineBasicMaterial({color:col}));ln.position.copy(pl.position);T.root.add(ln)});
-  draw3();
+  T.check=true;draw3();
 }
 function pick(e){if(!T.ok||!window.THREE||!T.cam)return;const el=$("#view3d"),rc=el.getBoundingClientRect(),v=new THREE.Vector2((e.clientX-rc.left)/rc.width*2-1,-(e.clientY-rc.top)/rc.height*2+1),ray=new THREE.Raycaster();ray.setFromCamera(v,T.cam);const hit=ray.intersectObjects(T.meshes||[])[0];if(!hit)return;const r=hit.object.userData;selectPadForProfile(r)}
 /* three.js 只在第一次開啟 3D 頁籤時載入（約 600 KB），先用網站自帶檔，沒有才用 CDN */
 let threeP=null;
 function loadScript(src){return new Promise((ok,no)=>{const s=document.createElement("script");s.src=src;let done=false;const tm=setTimeout(()=>{if(done)return;done=true;s.remove();no(new Error("載入腳本逾時: "+src))},2500);s.onload=()=>{if(done)return;done=true;clearTimeout(tm);ok()};s.onerror=()=>{if(done)return;done=true;clearTimeout(tm);s.remove();no(new Error(src))};document.head.appendChild(s)})}
 function ensureThree(){if(window.THREE)return Promise.resolve();return threeP||(threeP=loadScript("vendor/three-r128.min.js").catch(()=>loadScript("https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js")).catch(e=>{threeP=null;throw e}))}
-async function render3D(){renderBoard2D();if(!window.THREE){$("#hud").textContent="載入 3D 元件中…";try{await ensureThree()}catch(e){}if(S.tab!=="sim3d")return}if(!init3D()){renderBoard2D();return}size3();build3D()}
+/* 側欄 2D（HUD、不良表、比較圖、剖面）出錯時只標示錯誤，不可擋住 3D 初始化 */
+function safeBoard2D(){try{renderBoard2D();return true}catch(e){console.error("3D 頁側欄更新失敗：",e);const h=$("#hud");if(h)h.insertAdjacentHTML("beforeend",`<br><span style="color:var(--ng)">側欄圖表更新失敗：${esc(e&&e.message||String(e))}</span>`);return false}}
+async function render3D(){safeBoard2D();if(!window.THREE){$("#hud").textContent="載入 3D 元件中…";try{await ensureThree()}catch(e){}if(S.tab!=="sim3d")return}if(!init3D()){safeBoard2D();return}size3();build3D()}
 $("#selBoard").onchange=e=>{S.board=e.target.value;if(!T.ok){renderBoard2D();return}build3D()};
 $("#btnWorst").onclick=()=>{if(S.A.worst){S.board=S.A.worst.board;$("#selBoard").value=S.board;if(!T.ok){renderBoard2D();return}build3D()}};
 let playT=0;function stopPlay(){clearInterval(playT);playT=0;$("#btnPlay").setAttribute("aria-pressed","false");$("#btnPlay").textContent="逐板播放"}
@@ -9749,7 +9778,7 @@ if($("#mBtnTheme"))$("#mBtnTheme").onclick=()=>{if(typeof moreSheetCtrl!=="undef
 setupRecPicker();
 updateStartupDbBanner();
 /* 測試用：只有測試在載入前設定 window.SPI_TEST_HOOK 時才公開內部函式 */
-if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart});
+if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart});
 const initHash=(location.hash||"").slice(1);
 if(ALL_TABS.includes(initHash))setTab(initHash,true);
 })();
