@@ -18,7 +18,7 @@ const put = (k, status, messages) => (out[k] = { status, messages });
   else if (!/^v\d+\.\d+\.\d+$/.test(ver)) { st = "fail"; m.push(`FACT: 版本號 ${ver} 不是語意化版本 vMAJOR.MINOR.PATCH`); }
   else m.push(`FACT: 主頁版本 ${ver}`);
   if (!built || !/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(built)) { st = "fail"; m.push(`FACT: 更新時間「${built}」不是 YYYY-MM-DD HH:MM:SS`); }
-  else m.push(`FACT: 主頁更新時間 ${built}`);
+  else m.push(`FACT: 主頁更新時間預設值 ${built}（實際時間於 build 時注入）`);
   const hard = (html.match(/版本：v\d+|系統版本：v\d+/g) || []);
   if (hard.length) { st = st === "fail" ? st : "warn"; m.push(`FACT: 報告中仍有 ${hard.length} 處寫死的版本字串，應改讀主頁版本`); }
   put("version", st, m);
