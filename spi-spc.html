@@ -2902,6 +2902,32 @@ function mcdThr(n){
   let i=1;while(N[i]<n)i++;
   return T[i-1]+(T[i]-T[i-1])*Math.log(n/N[i-1])/Math.log(N[i]/N[i-1]);
 }
+/* M-19 單板異常穩健 z 小樣本校準（tools/robustz-table.json 的內嵌副本，tests 核對兩者一致；產生器 tools/gen-robustz-table.mjs）
+   z =（板平均 − 中位數）/（1.4826 × MAD），中位數與 MAD 由同一 cell 全部 n 片板計算。固定 |z| ≥ 3.5 依常態尾機率只在 n 很大時成立：
+   板數少時 MAD 本身晃動、尾巴很厚（i.i.d. 模擬 20 板約名目 14 倍、10 板約 36 倍）。表列 i.i.d. 常態下 |z| 在各尾機率 α 的分位數 */
+const ROBZ_A=[0.01,0.001,0.000465258158071,0.0001,0.00001,0.000001];
+const ROBZ_N=[5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,70,75,80,90,100,125,150,200,300];
+const ROBZ_Q=[[8.947,29.382,43.269,93.221,297.603,908.859],[5.722,13.295,17.367,29.552,64.998,143.856],[5.722,13.295,17.367,29.552,64.998,143.856],[4.634,9.11,11.238,16.914,31.153,56.224],[4.634,9.11,11.238,16.914,31.153,55.363],[4.094,7.321,8.738,12.334,20.121,32.55],[4.094,7.321,8.738,12.334,20.121,32.55],[3.777,6.355,7.431,10.061,15.415,23.571],[3.777,6.355,7.431,10.061,15.415,22.631],[3.571,5.758,6.634,8.666,12.737,18.324],[3.571,5.758,6.634,8.666,12.737,18.324],[3.424,5.344,6.09,7.809,11.003,15.458],[3.424,5.344,6.09,7.809,11.003,15.458],[3.314,5.05,5.704,7.18,9.851,13.309],[3.314,5.05,5.704,7.165,9.851,13.309],[3.23,4.838,5.429,6.746,9.033,11.793],[3.23,4.838,5.429,6.746,9.033,11.738],[3.162,4.661,5.207,6.388,8.465,10.982],[3.162,4.661,5.207,6.388,8.404,10.932],[3.109,4.521,5.031,6.123,8.071,10.292],[3.109,4.521,5.031,6.123,8.071,10.292],[3.062,4.413,4.892,5.906,7.632,9.579],[3.062,4.407,4.882,5.894,7.615,9.579],[3.024,4.317,4.767,5.734,7.369,9.167],[3.024,4.317,4.767,5.734,7.369,9.167],[2.992,4.237,4.664,5.562,7.034,8.654],[2.992,4.237,4.664,5.555,7.034,8.654],[2.963,4.171,4.586,5.445,6.851,8.455],[2.963,4.166,4.577,5.434,6.851,8.402],[2.938,4.113,4.511,5.333,6.646,8.151],[2.938,4.113,4.511,5.333,6.646,8.151],[2.917,4.059,4.443,5.237,6.542,7.875],[2.917,4.059,4.443,5.237,6.542,7.875],[2.897,4.011,4.384,5.158,6.383,7.742],[2.897,4.011,4.384,5.158,6.383,7.742],[2.88,3.974,4.336,5.074,6.257,7.55],[2.88,3.97,4.333,5.068,6.257,7.41],[2.865,3.939,4.295,5.016,6.175,7.317],[2.865,3.937,4.291,5.007,6.175,7.309],[2.851,3.905,4.253,4.956,6.052,7.198],[2.851,3.904,4.249,4.955,6.036,7.198],[2.837,3.873,4.213,4.903,6.003,7.179],[2.837,3.873,4.211,4.898,5.988,7.11],[2.827,3.849,4.184,4.86,5.909,7.036],[2.827,3.847,4.178,4.85,5.876,6.927],[2.816,3.824,4.152,4.813,5.826,6.927],[2.816,3.824,4.152,4.813,5.826,6.927],[2.806,3.801,4.122,4.766,5.751,6.855],[2.806,3.8,4.122,4.766,5.751,6.855],[2.798,3.779,4.095,4.736,5.684,6.713],[2.798,3.778,4.095,4.73,5.682,6.713],[2.79,3.764,4.075,4.699,5.627,6.641],[2.79,3.764,4.075,4.699,5.627,6.597],[2.782,3.745,4.051,4.667,5.596,6.574],[2.782,3.744,4.051,4.667,5.596,6.559],[2.773,3.727,4.031,4.636,5.565,6.539],[2.745,3.661,3.952,4.521,5.379,6.215],[2.736,3.64,3.927,4.488,5.326,6.118],[2.723,3.613,3.89,4.432,5.212,6.002],[2.706,3.575,3.847,4.371,5.147,5.924],[2.694,3.546,3.811,4.32,5.053,5.827],[2.67,3.495,3.748,4.23,4.919,5.634],[2.653,3.457,3.702,4.169,4.83,5.479],[2.634,3.415,3.65,4.1,4.722,5.284],[2.615,3.373,3.599,4.028,4.627,5.186]];
+const ROBZ_A1=2*(1-Phi(3.5));
+/* n 片板時 |z| 的 1−ROBZ_A[j] 分位數：5–60 板逐一校準（奇偶板數尾巴不同，不可在格點間內插），之後的格點間對 log n 線性內插（非格點以 holdout 抽查），表已做成隨 n 單調不增，超出表格取最後一格（偏保守） */
+function robZq(n,j){const N=ROBZ_N,k=N.length-1;if(!(n>N[0]))return ROBZ_Q[0][j];if(n>=N[k])return ROBZ_Q[k][j];
+  let i=1;while(N[i]<n)i++;return ROBZ_Q[i-1][j]+(ROBZ_Q[i][j]-ROBZ_Q[i-1][j])*Math.log(n/N[i-1])/Math.log(N[i]/N[i-1])}
+/* 單板異常門檻：每次檢定誤報 2(1−Φ(3.5))；大效果門檻每次 1e-6，且不低於原本的漸近值（floor） */
+const robZThr=n=>Math.max(3.5,robZq(n,2)),robZBig=(n,floor=5.5)=>Math.max(floor,robZq(n,5));
+/* 校準後的單次檢定尾機率（i.i.d. 穩定製程下 |z| 至少這麼大的機率）：α 格點之間對 log α 線性內插；超出最小 α 回傳 0（顯示「< 1e-6」） */
+function robZp(n,z){const a=Math.abs(z);let lo=robZq(n,0);if(a<lo)return null;
+  for(let j=1;j<ROBZ_A.length;j++){const hi=robZq(n,j);if(a<hi){const t=(a-lo)/(hi-lo);return Math.exp(Math.log(ROBZ_A[j-1])+(Math.log(ROBZ_A[j])-Math.log(ROBZ_A[j-1]))*t)}lo=hi}return 0}
+/* D-47 Nelson 規則 1（X̄ 圖每板平均超出 CL ± 3σ̂）卡片的嚴重度：回傳 "ng"／"warn"／"info"
+   zMax：命中板中最大的 |z|（每點 3σ，未做多重比較校正；穩定製程 20 板 × 5 項目時本規則合計約 20% 會出現）
+   zFW：族系門檻（Bonferroni：所有板 × 量測項目合計誤報 5%）
+   hasOos：命中板上「該量測項目」有任何超規焊墊（焊墊上千時幾乎恆真）
+   lowCpk：「該量測項目」最差元件群組 Cpk < 1.33（整個項目的性質，與命中哪片板無關） */
+function nelson1Level({zMax,zFW,hasOos,lowCpk}){
+  // 嚴重需通過族系門檻：單一 3σ 點本身就常見，不可只因板上有超規焊墊或整個項目 Cpk 偏低就升為嚴重
+  if(zMax>=zFW)return hasOos?"ng":"warn";
+  return hasOos&&lowCpk?"warn":"info";
+}
+const robZpTxt=(n,z)=>{const p=robZp(n,z);return p==null?"> 0.01":p===0?"< 1e-6":p.toExponential(1)};
 function fastMcd2D(points,seed=42){
   const n=points.length;if(n<30)return null;const p=2,h=Math.min(n,Math.ceil(0.75*n));
   let s=seed;const rnd=()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296};
@@ -3769,9 +3795,10 @@ function detectIssues(st,onStage){
   for(const k of MS)for(const g of groups){
     const bm=boards.map(b=>{if(isOff(k)&&alB.has(b))return NaN;const rs=(idx[b]||{})[g]||[],v=rs.map(r=>r[k]).filter(v=>v!=null);if(!v.length)return NaN;const fa=figAdj[k]&&rs[0]&&rs[0].figure!=null?figAdj[k][rs[0].figure]||0:0;return mean(v)-fa});
     (gBm[k]=gBm[k]||{})[g]=bm;
-    const vals=bm.filter(isFinite);if(vals.length<5)continue;const{m,s}=robust(vals),sp=spanOf(k);
+    // 門檻依該 cell 的有效板數校準（M-19）：每次檢定誤報 2(1−Φ(3.5))，大效果門檻每次 1e-6
+    const vals=bm.filter(isFinite);if(vals.length<5)continue;const{m,s}=robust(vals),sp=spanOf(k),n=vals.length,zT=robZThr(n),zB=robZBig(n);
     bm.forEach((v,i)=>{if(!isFinite(v))return;nT1++;const z=(v-m)/s,d=v-m,ex=excess(g,boards[i]);
-      if(Math.abs(z)>=3.5&&(!isFinite(sp)||Math.abs(d)>=sp*.08)&&(Math.abs(z)>=5.5||ex>=3))hits.push({k,g,b:boards[i],z,d,v,m,ex})})}
+      if(Math.abs(z)>=zT&&(!isFinite(sp)||Math.abs(d)>=sp*.08)&&(Math.abs(z)>=zB||ex>=3))hits.push({k,g,b:boards[i],z,d,v,m,ex,n})})}
   // D-30 孤立極端焊墊：候選掃描與 (a) 板級現象排除（先於單板卡組裝：≤2 個候選移除該值重判，>2 個一律視為板級現象）
   const ISO={cells:[],cands:[],explained:[],left:[]};
   {for(const k of MS){const s=isoScan(R,st,k,gIdx);ISO.cells.push(...s.cells);ISO.cands.push(...s.cands)}
@@ -3780,9 +3807,9 @@ function detectIssues(st,onStage){
       let rs=(idx[b]||{})[g]||[];if(excl.size)rs=rs.filter(r=>!excl.has(r));const rv=rs.map(r=>r[k]).filter(v=>v!=null);
       const fa=figAdj[k]&&rs[0]&&rs[0].figure!=null?figAdj[k][rs[0].figure]||0:0;
       bmv[bi]=rv.length?mean(rv)-fa:NaN;
-      const vals=bmv.filter(isFinite);if(vals.length<5)return null;const{m,s}=robust(vals),sp=spanOf(k),v=bmv[bi];if(!isFinite(v))return null;
+      const vals=bmv.filter(isFinite);if(vals.length<5)return null;const{m,s}=robust(vals),sp=spanOf(k),v=bmv[bi],n=vals.length;if(!isFinite(v))return null;
       const z=(v-m)/s,d=v-m,dgv=dg[g].slice();dgv[bi]=rs.filter(bad).length;const ex=dgv[bi]-med(dgv);
-      return(Math.abs(z)>=3.5&&(!isFinite(sp)||Math.abs(d)>=sp*.08)&&(Math.abs(z)>=5.5||ex>=3))?{k,g,b,z,d,v,m,ex}:null};
+      return(Math.abs(z)>=robZThr(n)&&(!isFinite(sp)||Math.abs(d)>=sp*.08)&&(Math.abs(z)>=robZBig(n)||ex>=3))?{k,g,b,z,d,v,m,ex,n}:null};
     const grp=new Map();for(const c of ISO.cands){const key=c.r.board+"\u0001"+c.g+"\u0001"+c.k;let a=grp.get(key);if(!a)grp.set(key,a=[]);a.push(c)}
     for(const Cs of grp.values()){const b=Cs[0].r.board,g=Cs[0].g,k=Cs[0].k,hi=hits.findIndex(h=>h.b===b&&h.g===g&&h.k===k),wh=wholeOf(b,k);
       if(hi<0&&!wh){ISO.left.push(...Cs);continue}
@@ -3808,14 +3835,16 @@ function detectIssues(st,onStage){
       const oos=oosPadsInfo(bRs,ks),expP=ISO.explained.filter(e=>e.b===b&&whole.has(e.k)).map(e=>`${e.b}/${e.c.r.pad}`);
       const padList=oos.length?topList([...new Set(oos.map(o=>o.pad))],10):`整板焊墊（${bRs.length} 個，無單點超規）`;
       const obsList=oos.length?topList(oos.map(o=>`${o.pad} ${ks.length>1?lab(o.k)+" ":""}${f(o.x,1)}`),10):ks.map(k=>{const x=hk.filter(h=>h.k===k);return`${lab(k)}平均差 ${sgn(mean(x.map(h=>h.d)))}${f(mean(x.map(h=>h.d)),1)} ${u(k)}`}).join("; ");
-      const limList=oos.length?topList([...new Set(oos.map(o=>`${ks.length>1?lab(o.k)+" ":""}${o.lim} ${u(o.k)}`))],10):ks.map(k=>{const sp=st.specs[k];return sp?`${lab(k)} 規格 ${f(sp.lsl,0)}–${f(sp.usl,0)} ${u(k)}`:"穩健 |z| ≥ 3.5"}).join("; ");
+      const limList=oos.length?topList([...new Set(oos.map(o=>`${ks.length>1?lab(o.k)+" ":""}${o.lim} ${u(o.k)}`))],10):ks.map(k=>{const sp=st.specs[k];return sp?`${lab(k)} 規格 ${f(sp.lsl,0)}–${f(sp.usl,0)} ${u(k)}`:"穩健 |z| ≥ 校準門檻"}).join("; ");
       const oosFact=oos.length?[`超規焊墊：${oos.slice(0,10).map(o=>`${o.pad}（${f(o.x,1)} vs ${o.lim} ${u(o.k)}）`).join("、")}${oos.length>10?` 等另 ${oos.length-10} 個`:""}`]:[];
-      add({lv:nd?"ng":"warn",cat:"單板異常", /* 嚴重需有超規焊墊；規格內的整板偏移不論 z 多大都只到警示 */sig:{t:"board",b,ks,off,nd,d:Object.fromEntries(ks.map(k=>[k,mean(hk.filter(h=>h.k===k).map(h=>h.d))]))},title:`${b} 整片板${ks.map(lab).join("、")}偏移`,ents:["b:"+b],score:zmax+nd*.3,
-        rule_id:"穩健 z≥3.5（整板異常）",rule_name:"≥60% 元件群組同向偏離其他板中位數（|z|≥3.5 且差 ≥8% 規格寬；本板有超規焊墊才判嚴重）",metric:ks.map(lab).join("; "),
+      /* 嚴重只看偏移的量測項目（ks）的超規焊墊：板上其他項目或其他位置的不良與這次偏移無關，不可把整板卡升為嚴重 */
+      const noos=new Set(oos.map(o=>o.r)).size,hz=hk.reduce((a,h)=>Math.abs(h.z)>Math.abs(a.z)?h:a);
+      add({lv:noos?"ng":"warn",cat:"單板異常", /* 規格內的整板偏移不論 z 多大都只到警示 */sig:{t:"board",b,ks,off,nd,noos,d:Object.fromEntries(ks.map(k=>[k,mean(hk.filter(h=>h.k===k).map(h=>h.d))]))},title:`${b} 整片板${ks.map(lab).join("、")}偏移`,ents:["b:"+b],score:zmax+noos*.3,
+        rule_id:"穩健 z 校準門檻（整板異常）",rule_name:`≥60% 元件群組同向偏離其他板中位數（|z| ≥ ${f(robZThr(hz.n),2)}（${hz.n} 板校準）且差 ≥8% 規格寬；偏移的量測項目有超規焊墊才判嚴重）`,metric:ks.map(lab).join("; "),
         boards:b,subboard:subOf(bRs),group:[...new Set(hk.map(h=>h.g))].join("; "),refdes:refOf(oos.length?oos.map(o=>o.r):bRs),
-        pads:padList,observed:obsList,limit:limList,z:`最大 |z| = ${f(zmax,2)}`,p:`${ f(2*(1-Phi(zmax)),4)}`,
+        pads:padList,observed:obsList,limit:limList,z:`最大 |z| = ${f(zmax,2)}`,p:`${robZpTxt(hz.n,hz.z)}（${hz.n} 板校準，單次檢定）`,
         explained_pads:[...new Set(expP)],
-        facts:ks.map(k=>{const x=hk.filter(h=>h.k===k),d=mean(x.map(h=>h.d));return`${lab(k)}：${x.length} 個元件群組同向偏移，平均差 ${sgn(d)}${f(d,1)} ${u(k)}（穩健 z 最大 ${f(Math.max(...x.map(h=>Math.abs(h.z))),1)}）`}).concat([`本板不良焊墊 ${nd} 個${pOut.has(b)?"，P′ 圖越界":""}`],oosFact),
+        facts:ks.map(k=>{const x=hk.filter(h=>h.k===k),d=mean(x.map(h=>h.d));return`${lab(k)}：${x.length} 個元件群組同向偏移，平均差 ${sgn(d)}${f(d,1)} ${u(k)}（穩健 z 最大 ${f(Math.max(...x.map(h=>Math.abs(h.z))),1)}）`}).concat([`本板不良焊墊 ${nd} 個（全部量測項目），其中${ks.map(lab).join("、")}超規 ${noos} 個${pOut.has(b)?"，P′ 圖越界":""}`],oosFact),
         cause:off?"PCB 定位、Mark 點辨識或印刷機對位補償異常（整板平移）":"該板印刷條件與其他板不同：換錫膏、停機後首片、擦拭後首片或支撐異常",conf:off?"高":"中",action:off?ACT.board_off:ACT.board_sh,
         ev:evSeries(ks[0],null,[b]),go:{tab:"sim3d",board:b,metric:ks[0],group:"ALL"}})}
     const loc={};hs.filter(h=>!whole.has(h.k)).forEach(h=>(loc[h.g]=loc[h.g]||[]).push(h));
@@ -3824,17 +3853,19 @@ function detectIssues(st,onStage){
       const oos=oosPadsInfo(rs,ks),expP=ISO.explained.filter(e=>e.b===b&&e.g===g&&ks.includes(e.k)).map(e=>`${e.b}/${e.c.r.pad}`);
       const padList=oos.length?topList([...new Set(oos.map(o=>o.pad))],10):topList(rs.map(r=>r.pad),10);
       const obsList=oos.length?topList(oos.map(o=>`${o.pad} ${ks.length>1?lab(o.k)+" ":""}${f(o.x,1)}`),10):hk.map(h=>`${lab(h.k)}平均 ${f(h.v,1)} ${u(h.k)}`).join("; ");
-      const limList=oos.length?topList([...new Set(oos.map(o=>`${ks.length>1?lab(o.k)+" ":""}${o.lim}`))],10):hk.map(h=>{const sp=specOfGroup(st,g,h.k);return sp?`${lab(h.k)} 規格 ${f(sp.lsl,0)}–${f(sp.usl,0)} ${u(h.k)}`:"穩健 |z| ≥ 3.5"}).join("; ");
+      const limList=oos.length?topList([...new Set(oos.map(o=>`${ks.length>1?lab(o.k)+" ":""}${o.lim}`))],10):hk.map(h=>{const sp=specOfGroup(st,g,h.k);return sp?`${lab(h.k)} 規格 ${f(sp.lsl,0)}–${f(sp.usl,0)} ${u(h.k)}`:`穩健 |z| ≥ ${f(robZThr(h.n),2)}（${h.n} 板校準）`}).join("; ");
       const oosFact=oos.length?[`超規焊墊：${oos.slice(0,10).map(o=>`${o.pad}（${f(o.x,1)} vs ${o.lim} ${u(o.k)}）`).join("、")}${oos.length>10?` 等另 ${oos.length-10} 個`:""}`]:[];
-      /* 嚴重需有超規焊墊：|z| 再大，該區焊墊都在規格內就只到警示（需要追蹤，非立即處置） */
-      const lvLocal=(nd>=2&&hk.some(h=>h.ex>=3))||(zmax>=6&&nd>=1)?"ng":"warn";
-      add({lv:lvLocal,cat:"單板異常",sig:{t:"local",b,g,ks,low,high,off,nd,d:Object.fromEntries(hk.map(h=>[h.k,h.d]))},title:`${b} 的 ${g}：${hk.map(h=>lab(h.k)+(h.d<0?"偏低":"偏高")).join("、")}`,ents:["b:"+b,"g:"+g],score:zmax+nd*.3,
-        rule_id:"穩健 z≥3.5（單板異常）",rule_name:"單板×元件群組平均偏離其他板中位數（|z|≥3.5、差 ≥8% 規格寬，且 |z|≥5.5 或超額不良 ≥3；該區有超規焊墊才判嚴重）",metric:ks.map(lab).join("; "),
+      /* 嚴重需有偏移量測項目（ks）的超規焊墊：|z| 再大，該區這些項目都在規格內就只到警示；同區其他項目的不良與這次偏移無關。
+         原本的 |z| ≥ 6 同樣是常態漸近值，改用校準後的大效果門檻（不低於 6） */
+      const noos=new Set(oos.map(o=>o.r)).size,hz=hk.reduce((a,h)=>Math.abs(h.z)>Math.abs(a.z)?h:a);
+      const lvLocal=(noos>=2&&hk.some(h=>h.ex>=3))||(noos>=1&&hk.some(h=>Math.abs(h.z)>=robZBig(h.n,6)))?"ng":"warn";
+      add({lv:lvLocal,cat:"單板異常",sig:{t:"local",b,g,ks,low,high,off,nd,noos,d:Object.fromEntries(hk.map(h=>[h.k,h.d]))},title:`${b} 的 ${g}：${hk.map(h=>lab(h.k)+(h.d<0?"偏低":"偏高")).join("、")}`,ents:["b:"+b,"g:"+g],score:zmax+noos*.3,
+        rule_id:"穩健 z 校準門檻（單板異常）",rule_name:`單板×元件群組平均偏離其他板中位數（|z| ≥ ${f(robZThr(hz.n),2)}（${hz.n} 板校準）、差 ≥8% 規格寬，且 |z| ≥ ${f(robZBig(hz.n),2)} 或超額不良 ≥3；偏移的量測項目有超規焊墊才判嚴重）`,metric:ks.map(lab).join("; "),
         boards:b,subboard:subOf(rs),group:g,refdes:refOf(oos.length?oos.map(o=>o.r):rs),
-        pads:padList,observed:obsList,limit:limList,z:hk.map(h=>`${lab(h.k)} z=${f(h.z,2)}`).join("; "),p:`${f(2*(1-Phi(zmax)),4)}`,
+        pads:padList,observed:obsList,limit:limList,z:hk.map(h=>`${lab(h.k)} z=${f(h.z,2)}`).join("; "),p:`${robZpTxt(hz.n,hz.z)}（${hz.n} 板校準，單次檢定）`,
         explained_pads:[...new Set(expP)],
-        facts:hk.map(h=>`${lab(h.k)} 平均 ${f(h.v,1)} ${u(h.k)}，其他板中位數 ${f(h.m,1)}（差 ${sgn(h.d)}${f(h.d,1)}，穩健 z = ${f(h.z,1)}）`).concat([`該區不良焊墊 ${nd} / ${rs.length} 個${pOut.has(b)?"；本板 P′ 圖越界":""}`],oosFact),
-        cause:off?"局部 PCB 漲縮或鋼板開孔位置偏差":low?"該區開孔堵塞、鋼板底面殘錫或擦拭不足；只出現在這片板，屬突發":high?"鋼板與 PCB 局部密合不良（支撐不足、鋼板變形）造成溢錫":"刮刀局部壓力或錫膏滾動異常",conf:low&&nd?"中":"低",action:off?ACT.local_off:low?ACT.local_low:high?ACT.local_high:ACT.local_other,
+        facts:hk.map(h=>`${lab(h.k)} 平均 ${f(h.v,1)} ${u(h.k)}，其他板中位數 ${f(h.m,1)}（差 ${sgn(h.d)}${f(h.d,1)}，穩健 z = ${f(h.z,1)}）`).concat([`該區不良焊墊 ${nd} / ${rs.length} 個（全部量測項目），其中${ks.map(lab).join("、")}超規 ${noos} 個${pOut.has(b)?"；本板 P′ 圖越界":""}`],oosFact),
+        cause:off?"局部 PCB 漲縮或鋼板開孔位置偏差":low?"該區開孔堵塞、鋼板底面殘錫或擦拭不足；只出現在這片板，屬突發":high?"鋼板與 PCB 局部密合不良（支撐不足、鋼板變形）造成溢錫":"刮刀局部壓力或錫膏滾動異常",conf:low&&noos?"中":"低",action:off?ACT.local_off:low?ACT.local_low:high?ACT.local_high:ACT.local_other,
         ev:evSeries(hk[0].k,g,[b]),go:{tab:"sim3d",board:b,metric:hk[0].k,group:"ALL"}})}}
 
   stage(3,"系統性問題");
@@ -4161,8 +4192,7 @@ function detectIssues(st,onStage){
         if(r.id===1){
           const hasOos=hitB.some(b=>boardRows(b).some(row=>{const rsp=specFor(row,k,st),v=row[k];return v!=null&&rsp&&((isFinite(rsp.lsl)&&v<rsp.lsl)||(isFinite(rsp.usl)&&v>rsp.usl))}));
           const lowCpk=!!(wCap&&wCap.cpk<1.33);
-          if(hasOos||lowCpk)lv="ng";
-          else if(Math.max(...zHits.map(Math.abs))>=zFW)lv="warn";
+          lv=nelson1Level({zMax:Math.max(...zHits.map(Math.abs)),zFW,hasOos,lowCpk});
         }
         const faSingle=gr&&gr.nelson_single_rule_rates?gr.nelson_single_rule_rates[r.id]:null;
         const faAll=gr&&gr.nelson_rule_rates?gr.nelson_rule_rates[r.id]:null;
@@ -4304,6 +4334,11 @@ function detectIssues(st,onStage){
   const isDerivedPair=(a,b)=>{if(!(MC&&MC.derived))return false;const dSet=new Set(["volume","hpct","area"]);
     const ma=cardMetrics(a),mb=cardMetrics(b);if(!ma.length||!mb.length)return false;
     return ma.every(k=>dSet.has(k))&&mb.every(k=>dSet.has(k))&&ma.some(k=>!mb.includes(k))};
+  /* 不同證據族的互相佐證需同一（或衍生關係的）量測項目；同族或衍生關係照舊列為同一現象。兩張卡都有量測項目卻沒有共同項目時：否則 offx 的漂移或 Nelson 規則 2／6／8 卡
+     （涵蓋整段板、ents 為 b:各板）會和每片板上無關項目（例如體積）的單板卡都「互相佐證」，灌高佐證數與排序 */
+  const dSet=new Set(["volume","hpct","area"]);
+  const relatedM=(a,b,sameM)=>{const ma=cardMetrics(a),mb=cardMetrics(b);if(!ma.length||!mb.length||sameM)return true;
+    return !!(MC&&MC.derived)&&ma.some(k=>dSet.has(k))&&mb.some(k=>dSet.has(k))};
   const shareEnt=(a,b)=>{if(b.ents.some(e=>a.ents.includes(e)))return true;
     const ba=cardBoards(a),bb=cardBoards(b);for(const x of ba)if(bb.has(x))return true;return false};
   F.forEach(a=>{a.corrob=[];a.same_phenomenon=[];a._sameTitles=[]});
@@ -4319,7 +4354,7 @@ function detectIssues(st,onStage){
       a._sameTitles.push(b.title);b._sameTitles.push(a.title);continue}
     if(!shareEnt(a,b))continue;
     if(fa&&fb&&fa!==fb&&!isDerivedPair(a,b)){
-      a.corrob.push(b.id);b.corrob.push(a.id);
+      if(relatedM(a,b,sameM)){a.corrob.push(b.id);b.corrob.push(a.id)}
     }else{
       a.same_phenomenon.push(b.id);b.same_phenomenon.push(a.id);
       a._sameTitles.push(b.title);b._sameTitles.push(a.title);
@@ -4348,9 +4383,9 @@ function detectIssues(st,onStage){
   }
   if(!reasons.length)reasons.push(wAll?`無嚴重或警示問題卡，且最差群組 Cpk = ${f(wAll.cpk)} ≥ 1.33（${lab(wAll.k)} · ${wAll.g}，n = ${wAll.n}）`:"無嚴重或警示問題卡");
   const verdictLabel={ok:"正常",warn:"警示",ng:"異常"}[vLevel];
-  // 多重比較揭露：單板異常每個「板 × 元件群組 × 量測項目」各做一次檢定；全無異常時依 |z| ≥ 3.5 門檻預期的誤報數（另有效果量與不良數門檻，實際更少）
-  const alpha=2*(1-Phi(3.5));
-  F.meta={tests:nT1,alpha,expFA:nT1*alpha,verdict:{level:vLevel,label:verdictLabel,worstCap:wAll,reasons},modes:failureModes(st,F,{R,boards,groups,MS,MC,nb,boardMeans,idx,gIdx})};
+  // 多重比較揭露：單板異常每個「板 × 元件群組 × 量測項目」各做一次檢定；門檻已依板數校準（M-19），每次檢定誤報為 2(1−Φ(3.5))；全無異常時的預期誤報數（另有效果量與不良數門檻，實際更少）
+  const alpha=ROBZ_A1;
+  F.meta={tests:nT1,hits:hits.length,alpha,expFA:nT1*alpha,verdict:{level:vLevel,label:verdictLabel,worstCap:wAll,reasons},modes:failureModes(st,F,{R,boards,groups,MS,MC,nb,boardMeans,idx,gIdx})};
   return F}
 /* ============ 失效模式交叉比對 ============
    錫膏印刷的失效通常是多因素的：每個候選失效模式列出「支持」與「矛盾」的證據，證據分屬六個獨立面向
@@ -4867,7 +4902,7 @@ function issuesXlsx(F){
   ]);
 }
 
-if(typeof module!=="undefined")module.exports={rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,areaRatio,maxThkForAR,detectIssues,overallVerdict,compareRuns,dfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed};
+if(typeof module!=="undefined")module.exports={rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,areaRatio,maxThkForAR,detectIssues,overallVerdict,compareRuns,dfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level};
 </script>
 <script>
 "use strict";
@@ -5180,7 +5215,7 @@ function renderIssues(){const F=S.F||[],c={ng:0,warn:0,info:0};F.forEach(x=>c[x.
   const multi=F.filter(x=>x.corrob.length>=2).length;
   const Me=F.meta;
   $("#issSub").textContent=(F.length?`排序：嚴重度 → 佐證數 → 異常強度。${multi} 項有兩個以上其他發現互相佐證，建議優先處理。`:"十個面向皆在正常範圍；仍可至各頁籤檢視細節。")
-    +(Me&&Me.tests?` 單板異常共做 ${Me.tests.toLocaleString()} 次檢定（板 × 元件群組 × 量測項目），即使製程完全正常，依 |z| ≥ 3.5 門檻也預期約 ${f(Me.expFA,1)} 次誤報；另有效果量與不良數門檻，實際誤報更少。單一發現請搭配下一行的失效模式交叉比對判讀。`:"");
+    +(Me&&Me.tests?` 單板異常共做 ${Me.tests.toLocaleString()} 次檢定（板 × 元件群組 × 量測項目），門檻已依板數校準，每次檢定誤報約 ${Me.alpha.toExponential(1)}，即使製程完全正常也預期約 ${f(Me.expFA,1)} 次誤報；另有效果量與不良數門檻，實際更少。這個數字只涵蓋單板異常；Nelson 規則、孤立極端焊墊、多變量離群等其他偵測各有誤報率（Nelson 卡片列出模擬值）。單一發現請搭配下一行的失效模式交叉比對判讀。`:"");
   fmLine();
   renderPmap();
   const cats=[...new Set(F.map(x=>x.cat))];
@@ -5245,7 +5280,7 @@ function renderFM(){const Me=S.F&&S.F.meta,box=$("#fmCard");if(!box)return;box.h
   $$("#fmTbl [data-fmjump]").forEach(b=>b.onclick=()=>{setTab("issues");setTimeout(()=>flashIssue(+b.dataset.fmjump),60)})}
 function issuesMd(){return`# SPI 問題偵測清單\n\n- 版本：${APP.ver} · 系統更新 ${APP.built} · 產生時間：${fmtNowUtc8()}\n- 資料來源：${S.source}；鋼板 ${S.stencil} µm${S.step.on?"（階梯）":""}\n\n`+S.F.map(x=>`## #${x.no}［${x.level}］${x.title}\n\n- 面向：${x.category}｜規則：${x.rule_id}（${x.rule_name}）｜量測項目：${x.metric}\n- 板號：${x.boards}｜子板：${x.subboard}｜元件群組：${x.group}｜元件位號：${x.refdes}｜焊墊：${x.pads}\n- 觀測值：${x.observed}｜界限／規格：${x.limit}｜z：${x.z}｜p：${x.p}\n- 事實：\n${x.facts.map(t=>"  - "+t).join("\n")}\n- 推論（信心 ${x.confidence}）：${x.inference}\n- 建議動作：${x.action}\n- 跨面向佐證：${x.corroborated_by.length?x.corroborated_by.map(i=>"#"+i).join("、"):"無"}${x.same_phenomenon.length?`；同一現象：${x.same_phenomenon.map(i=>"#"+i).join("、")}`:""}${x.explained_pads.length?`；已解釋焊墊：${x.explained_pads.join("；")}`:""}\n`).join("\n")+fmMd()}
 function fmMd(){const Me=S.F&&S.F.meta;if(!Me||!Me.modes)return"";
-  return`\n## 失效模式交叉比對\n\n規則：至少兩個獨立面向支持、含必要面向且無矛盾，才判「可能」。單板異常共 ${Me.tests} 次檢定，全無異常時預期約 ${f(Me.expFA,1)} 次誤報。\n\n| 候選失效模式 | 判讀 | 支持面向 | 證據與製程知識庫規則 |\n|---|---|---|---|\n`+Me.modes.map(m=>`| ${m.name} | ${m.verdict} | ${m.dims.join("、")||"—"} | ${[m.need||"",...m.sup.map(e=>"✓ "+e.d+"："+e.txt),...m.con.map(e=>"✗ "+e.d+"："+e.txt),...(m.rules&&m.rules.length?[`規則來源：${m.rules.join("、")}`]:[])].filter(Boolean).join("<br>").replace(/\|/g,"／")} |`).join("\n")+"\n"}
+  return`\n## 失效模式交叉比對\n\n規則：至少兩個獨立面向支持、含必要面向且無矛盾，才判「可能」。單板異常共 ${Me.tests} 次檢定（門檻依板數校準），全無異常時預期約 ${f(Me.expFA,1)} 次誤報；此數字只涵蓋單板異常。\n\n| 候選失效模式 | 判讀 | 支持面向 | 證據與製程知識庫規則 |\n|---|---|---|---|\n`+Me.modes.map(m=>`| ${m.name} | ${m.verdict} | ${m.dims.join("、")||"—"} | ${[m.need||"",...m.sup.map(e=>"✓ "+e.d+"："+e.txt),...m.con.map(e=>"✗ "+e.d+"："+e.txt),...(m.rules&&m.rules.length?[`規則來源：${m.rules.join("、")}`]:[])].filter(Boolean).join("<br>").replace(/\|/g,"／")} |`).join("\n")+"\n"}
 $("#btnIssMd").onclick=()=>save("spi-issues.md",issuesMd());
 $("#btnIssCsv").onclick=()=>save("spi-issues.csv",issuesCsv(S.F));
 if($("#btnIssXlsx"))$("#btnIssXlsx").onclick=()=>save("spi-issues.xlsx",issuesXlsx(S.F));
@@ -7253,7 +7288,7 @@ function capInfo(A){const c=A.cap;if(!c)return null;const ci=x=>`${f(x.ci[0])}�
     逐群組:c.mixed?c.groups.slice(0,15).map(g=>({群組:g.g,n:g.n,規格:`${f(g.lsl,0)}–${f(g.usl,0)}`,Cpk:+f(g.cpk),Cpk95信賴區間:ci(g),Ppk:+f(g.ppk)})):undefined}}
 function ctrlInfo(A){const N=A.nelX||A.nel;return{依據:"X̄ 圖（每板平均，8 條 Nelson 規則）",製程穩定:A.stable,觸發規則:N.rules.filter(r=>r.idx.length).map(r=>({規則:r.name,板:r.idx.map(i=>A.xs.pts[i].lab).join(" ")})),Pprime_sigmaZ:+f(A.pc.sigZ,2)}}
 function fmInfo(){const Me=S.F&&S.F.meta;if(!Me||!Me.modes)return[];return Me.modes.map(m=>({模式:m.name,判讀:m.verdict,支持面向:m.dims.join("、"),必要面向:m.key||"",支持證據:m.sup.map(e=>e.d+"："+e.txt),矛盾證據:m.con.map(e=>e.d+"："+e.txt),資料不足:m.need||""}))}
-function mcInfo(){const Me=S.F&&S.F.meta;return Me&&Me.tests?{單板異常檢定次數:Me.tests,每次誤報率:+Me.alpha.toExponential(2),預期誤報數:+f(Me.expFA,2)}:null}
+function mcInfo(){const Me=S.F&&S.F.meta;return Me&&Me.tests?{單板異常檢定次數:Me.tests,每次誤報率:+Me.alpha.toExponential(2),預期誤報數:+f(Me.expFA,2),門檻:"依板數校準（i.i.d. 穩定製程模擬）",涵蓋範圍:"僅單板異常；其他偵測各有誤報率"}:null}
 /* 與伺服器端 lib/analyze-core.mjs 的 SYSTEM_PROMPT 相同的證據規則（測試會核對兩邊一致） */
 const AI_EVIDENCE_RULE="錫膏印刷的失效通常是多因素的：「失效模式交叉比對」是系統依形狀、時間、空間、設計、對位、量測六個獨立面向整理的支持與矛盾證據。判斷根因時，至少兩個獨立面向一致且沒有矛盾證據才可列為「可能原因」；只有單一現象者只能列為「待確認」並說明還缺哪個面向的證據。「管制狀態」顯示製程未穩定時，能力指標只能作參考。「多重比較」為大量檢定下的預期誤報數，單一發現請據此評估是否為假訊號。";
 function aiPayload(){const A=S.A;return{試產回合:curRun()?curRun().name:"",量測項目:METRICS[A.m].label,單位:METRICS[A.m].unit,元件群組:S.group==="ALL"?"全部":S.group,管制圖:chartName(),規格:A.sp,鋼板厚度µm:S.stencil,階梯鋼板:S.step.on?S.step.zones.map(z=>({區域:z.name,厚度µm:z.t,範圍:z.mode==="group"?"元件群組 "+z.group:`X ${z.x0}~${z.x1} mm, Y ${z.y0}~${z.y1} mm`})):"未啟用",高度規格佔厚度:`${S.htol.lo}%–${S.htol.hi}%`,樣本數:A.N,板數:A.boards.length,
