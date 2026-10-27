@@ -676,7 +676,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   <div class="brand">
     <h1>SPI·SPC 分析台</h1>
     <span class="tag">錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.3.10</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.4.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -5619,6 +5619,17 @@ function renderControl(){
 /* 排序後的量測值：同一組分析列（量測層快取共用同一陣列）只排序一次；hpct 會被重算覆寫，不快取（唯讀共用） */
 const SORTED=new WeakMap();
 function sortedVals(rows,m){if(m==="hpct")return rows.map(r=>r[m]).sort((a,b)=>a-b);let o=SORTED.get(rows);if(!o)SORTED.set(rows,o={});return o[m]||(o[m]=rows.map(r=>r[m]).sort((a,b)=>a-b))}
+/* 能力頁的 PPM 卡片。混合群組時 cap.ppmExp／ppmObs 是最差 Cpk 群組（cap.worst）自己的值，與旁邊的 Cpk／Ppk 同一母體；
+   全部群組的結果在 cap.ppmExpAll（只算 Cpk 有效的群組，排除 cap.ppmExpAllExcl 個）與 cap.ppmObsAll。
+   kpi(標題, 值, 副標, 等級)；等級沿用 ppmCls：> 2700 為 ng、> 63 為 warn */
+const ppmCls=v=>v>2700?"ng":v>63?"warn":"ok";
+function capPpmCards(cap,specTitle){
+  if(!cap.mixed)return kpi("預估 PPM",fmtPpm(cap.ppmExp),"常態假設下超規",ppmCls(cap.ppmExp))+kpi(`超規 PPM（${specTitle}）`,fmtPpm(cap.ppmObs),"實際超規比例",ppmCls(cap.ppmObs));
+  const w=`最差群組 ${esc(cap.worst)}`,excl=cap.ppmExpAllExcl>0?`；預估排除 ${cap.ppmExpAllExcl} 個無法計算的群組`:"";
+  return kpi("預估 PPM",fmtPpm(cap.ppmExp),`${w} · 常態假設下超規`,ppmCls(cap.ppmExp))
+    +kpi(`超規 PPM（${specTitle}）`,fmtPpm(cap.ppmObs),`${w} · 實際超規比例`,ppmCls(cap.ppmObs))
+    +kpi("全部群組 PPM",`${fmtPpm(cap.ppmExpAll)} / ${fmtPpm(cap.ppmObsAll)}`,`預估（依樣本數加權）/ 實際超規${excl}`,ppmCls(Math.max(isFinite(cap.ppmExpAll)?cap.ppmExpAll:0,cap.ppmObsAll||0)));
+}
 /* 直方圖分箱（Freedman–Diaconis，組數限 8–45）：能力頁與報告共用，兩邊的組距與頻數相同 */
 function histBins(A){const all=sortedVals(A.rows,A.m),n=all.length,iqr=quant(all,.75)-quant(all,.25);
   let bw=2*iqr/Math.cbrt(n)||1;const lo=Math.min(all[0],A.hasSpec?A.sp.lsl:all[0]),hi=Math.max(all[n-1],A.hasSpec?A.sp.usl:all[n-1]);let nb=Math.ceil((all[n-1]-all[0])/bw);if(nb>45){bw=(all[n-1]-all[0])/45;nb=45}if(nb<8){bw=(all[n-1]-all[0])/8||1;nb=8}
@@ -5638,7 +5649,7 @@ function renderCap(){
   const unitWarn = A.unitMismatch ? `<div class="pill warn" style="margin-bottom:8px">⚠️ 疑似單位不符（規格中心距資料平均 >10σ 或 |Cpk|>50）</div>` : "";
   const cpkPpkNotice = (cap && isFinite(cap.sw) && cap.sw > cap.sl) ?   /* 與卡片上的 Cp/Pp 同一群組比較 */ `<div class="note" style="margin-bottom:8px">ℹ️ 組內變異大於整體變異（Cpk < Ppk）：板間差異很小，或子群組內混了不同元件（請確認元件群組欄）。</div>` : "";
   const capCards = cap && isFinite(cap.cpk) ? (
-    kpi("CP",f(cap.cp),pre+"短期潛在能力",capCls(cap.cp))+kpi("CPK",f(cap.cpk),pre+`短期實際能力 · 95% 信賴區間 ${f(cap.ci[0])} – ${f(cap.ci[1])}（以 ${cap.nb} 片板計）`,capCls(cap.cpk))+kpi("PP",f(cap.pp),"長期潛在能力",capCls(cap.pp))+kpi("PPK",f(cap.ppk),"長期實際能力",capCls(cap.ppk))+kpi("預估 PPM",fmtPpm(cap.ppmExp),cap.mixed?"各群組常態預估加權":"常態假設下超規",cap.ppmExp>2700?"ng":cap.ppmExp>63?"warn":"ok")+kpi(`超規 PPM（${specTitle}）`,fmtPpm(cap.ppmObs),"實際超規比例",cap.ppmObs>2700?"ng":cap.ppmObs>63?"warn":"ok")
+    kpi("CP",f(cap.cp),pre+"短期潛在能力",capCls(cap.cp))+kpi("CPK",f(cap.cpk),pre+`短期實際能力 · 95% 信賴區間 ${f(cap.ci[0])} – ${f(cap.ci[1])}（以 ${cap.nb} 片板計）`,capCls(cap.cpk))+kpi("PP",f(cap.pp),"長期潛在能力",capCls(cap.pp))+kpi("PPK",f(cap.ppk),"長期實際能力",capCls(cap.ppk))+capPpmCards(cap,specTitle)
   ) : cap && cap.reason === "無規格" ? (
     kpi("CP","無規格","未設定規格界限")+kpi("CPK","無規格","未設定規格界限")+kpi("PP","無規格","未設定規格界限")+kpi("PPK","無規格","未設定規格界限")+kpi("預估 PPM","無規格","未設定規格界限")+kpi(`超規 PPM（${specTitle}）`,"無規格","未設定規格界限")
   ) : cap && cap.reason ? (
