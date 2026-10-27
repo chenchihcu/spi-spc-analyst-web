@@ -676,7 +676,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   <div class="brand">
     <h1>SPI·SPC 分析台</h1>
     <span class="tag">錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.3.7</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.3.8</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -2814,6 +2814,10 @@ function aperture(r,st){if(r.apL!=null&&r.apW!=null)return{L:r.apL,W:r.apW,shape
 function areaRatio(r,st){const a=aperture(r,st),T=padThk(r,st)/1000;return a.shape==="round"?a.L/(4*T):(a.L*a.W)/(2*(a.L+a.W)*T)}
 function aspectRatio(r,st){const a=aperture(r,st);return Math.min(a.L,a.W)/(padThk(r,st)/1000)}
 function maxThkForAR(r,st,ar=0.66){const a=aperture(r,st);return(a.shape==="round"?a.L/(4*ar):(a.L*a.W)/(2*(a.L+a.W)*ar))*1000}
+/* 開孔幾何是否只是 0.7 mm 預設估算：估算值不可拿來判定面積比合格或不合格 */
+function geomAssumed(r,st){
+  // TODO(human)
+}
 function apVolNL(r,st){const a=aperture(r,st),T=padThk(r,st)/1000;return(a.shape==="round"?Math.PI*a.L*a.L/4:a.L*a.W)*T*1000}
 function solve3(M,b){const A=M.map((r,i)=>[...r,b[i]]);for(let i=0;i<3;i++){let p=i;for(let k=i+1;k<3;k++)if(Math.abs(A[k][i])>Math.abs(A[p][i]))p=k;[A[i],A[p]]=[A[p],A[i]];if(Math.abs(A[i][i])<1e-12)return null;
   for(let k=0;k<3;k++)if(k!==i){const f=A[k][i]/A[i][i];for(let j=i;j<4;j++)A[k][j]-=f*A[i][j]}}return A.map((r,i)=>r[3]/r[i])}
@@ -2858,7 +2862,7 @@ function advAnalyze(st,A){const m=A.m,G=st.rows.filter(r=>st.group==="ALL"||r.gr
   const padCpk=Object.values(bp).filter(p=>p.v.length>=5).map(p=>{const sp=specFor(p.r,m,st),mu=mean(p.v),s=sd(p.v);return{pad:p.pad,group:p.group,n:p.v.length,mean:mu,sd:s,cpk:s?Math.min(sp.usl-mu,mu-sp.lsl)/(3*s):NaN}}).filter(p=>isFinite(p.cpk)).sort((a,b)=>a.cpk-b.cpk);
   // 面積比 × 轉移效率
   const tp={};for(const r of G)if(r.volume!=null)(tp[r.pad]=tp[r.pad]||{pad:r.pad,group:r.group,r,v:[]}).v.push(r.volume);
-  const arPads=Object.values(tp).map(p=>{const a=aperture(p.r,st);return{pad:p.pad,group:p.group,ar:areaRatio(p.r,st),asp:aspectRatio(p.r,st),tmax:maxThkForAR(p.r,st),vol:apVolNL(p.r,st),ap:a,te:mean(p.v),cv:sd(p.v)/mean(p.v)*100,thk:padThk(p.r,st),assumed:!!p.r.dimAssumed&&a.src!=="CSV"&&a.src!=="指定尺寸"}});
+  const arPads=Object.values(tp).map(p=>{const a=aperture(p.r,st);return{pad:p.pad,group:p.group,ar:areaRatio(p.r,st),asp:aspectRatio(p.r,st),tmax:maxThkForAR(p.r,st),vol:apVolNL(p.r,st),ap:a,te:mean(p.v),cv:sd(p.v)/mean(p.v)*100,thk:padThk(p.r,st),assumed:geomAssumed(p.r,st)}});
   const arGroups=[...new Set(arPads.map(p=>p.group))].map(g=>{const ps=arPads.filter(p=>p.group===g);return{g,n:ps.length,ar:mean(ps.map(p=>p.ar)),arMin:Math.min(...ps.map(p=>p.ar)),asp:mean(ps.map(p=>p.asp)),tmax:Math.min(...ps.map(p=>p.tmax)),vol:mean(ps.map(p=>p.vol)),
     te:mean(ps.map(p=>p.te)),cv:mean(ps.map(p=>p.cv)),thk:[...new Set(ps.map(p=>p.thk))].join("/"),src:[...new Set(ps.map(p=>p.ap.src))].join("、"),apL:mean(ps.map(p=>p.ap.L)),apW:mean(ps.map(p=>p.ap.W)),shape:ps[0].ap.shape}});
   // 對位
@@ -3909,7 +3913,7 @@ function detectIssues(st,onStage){
           pads:topList(out.map(p=>p.pad),10),
           observed:topList(out.map(p=>`${p.pad} 中位數 ${f(p.m,1)}（穩健 Cpk ${f(p.cpk)}）`),10),
           limit:limStr,z:topList(out.map(p=>`${p.pad} z=${f((p.m-cm)/cs,1)}`),10),p:"不適用（穩健位置檢定）",
-          facts:out.slice(0,10).map(p=>`${p.pad}（全部板）：中位數 ${f(p.m,1)} ${u(k)}（同群組中位 ${f(cm,1)}，${limStr}），焊墊位置穩健 Cpk ${f(p.cpk)}`),
+          facts:out.slice(0,10).map(p=>`${p.pad}（全部板）：中位數 ${f(p.m,1)} ${u(k)}（同群組中位 ${f(cm,1)}，規格 ${f(sp.lsl,0)}–${f(sp.usl,0)} ${u(k)}），焊墊位置穩健 Cpk ${f(p.cpk)}`),
           cause:"該位置開孔個別問題（孔壁毛邊、局部堵塞、開孔尺寸誤差）或焊墊設計差異，每片板都會重複",conf:"中",action:ACT.pad,
           ev:evBars(`${g} 各焊墊位置${lab(k)}中位數`,P.map(p=>p.pad),P.map(p=>p.m),out.map(o=>P.indexOf(o)),u(k),[cm]),go:{tab:"control",chart:"imr",pad:out[0].pad,metric:k,group:"ALL"}})}}}
 
@@ -4051,7 +4055,6 @@ function detectIssues(st,onStage){
         if(!outItems.length)continue;
         outItems.sort((a,b)=>b.d2-a.d2);
         const cardLv="info";
-        const bList=[...new Set(outItems.map(o=>o.board))].sort();
         const minD2=Math.min(...outItems.map(o=>o.d2)),maxD2=Math.max(...outItems.map(o=>o.d2));
         const thr=res.threshold,thrS=f(thr,2),thrNote=thr>MCD_CHI2+.005?`小樣本校準門檻（n=${validPads.length}），χ² 漸近值 18.42`:"χ²₀.₉₉₉₉(2)";
         add({
@@ -4060,13 +4063,13 @@ function detectIssues(st,onStage){
           ents:outItems.map(o=>"p:"+o.pad),score:2.2+outItems.length*0.15,
           rule_id:"FastMCD 2D 雙變數離群（M-18）",rule_name:`穩健 Mahalanobis 距離 d² > ${thrS}（${thrNote}，每點誤報 10⁻⁴）`,
           metric:`${lab(m1)} / ${lab(m2)}`,
-          boards:bList.join("; "),subboard:subOf(outItems.map(o=>o.r)),
+          boards:`全部板（焊墊位置跨 ${nb} 板平均）`,subboard:subOf(outItems.map(o=>o.r)),
           group:g,refdes:refOf(outItems.map(o=>o.r)),
           pads:topList(outItems.map(o=>o.pad),10),
           observed:topList(outItems.map(o=>`${o.pad} d²=${f(o.d2,1)}`),10),
           limit:`d² ≤ ${thrS}（${thrNote}）`,z:topList(outItems.map(o=>`d²=${f(o.d2,1)}`),10),
           p:"p < 0.0001",
-          facts:outItems.slice(0,10).map(o=>`焊墊 ${o.pad}：${lab(m1)} ${f(o.x[0],1)}、${lab(m2)} ${f(o.x[1],1)}，d² = ${f(o.d2,1)} > ${thrS}（預期誤報數 ${f(validPads.length*0.0001,3)} 個）`),
+          facts:outItems.slice(0,10).map(o=>`焊墊 ${o.pad}（跨 ${nb} 板平均）：${lab(m1)} ${f(o.x[0],1)} ${u(m1)}、${lab(m2)} ${f(o.x[1],1)} ${u(m2)}，d² = ${f(o.d2,1)} > ${thrS}（預期誤報數 ${f(validPads.length*0.0001,3)} 個）`),
           cause:"焊墊各單項測量值均在規格內，但多變數空間組合異常（例如面積偏大伴隨高度偏低，或偏移異常），可能為局部脫模拉扯或鋼網開孔局部損傷",
           conf:"中",action:ACT.mcd,
           ev:evBars(`穩健馬氏距離 d²（前 10 焊墊）`,outItems.slice(0,10).map(o=>o.pad),outItems.slice(0,10).map(o=>o.d2),[0,1,2],"",[thr]),
@@ -4109,7 +4112,7 @@ function detectIssues(st,onStage){
         boards:"全部板",subboard:subOf(R),group:groups.join("; "),refdes:"全部元件",pads:`全部焊墊（${nPads} 個）`,
         observed:`${SK.label[0]}比${SK.label[1]}${t.ma-t.mb>0?"高":"低"} ${f(Math.abs(t.ma-t.mb),2)} ${u(k)}`,
         limit:`校準後 p < ${f(aB,5)}（M=${mShape.length} 項目門檻）`,
-        z:`Welch t = ${f(t.t,2)}；迴歸 t = ${calS&&isFinite(calS.t)?f(calS.t,2):"—"}`,
+        z:`Welch t = ${f(t.t,2)}；迴歸 t = ${calS&&isFinite(calS.t)?f(-calS.t,2):"—"}`,   // strokeCalP 以 cls=1 為指標，取負號使方向與 Welch（cls0 − cls1）一致
         p:`名目 p = ${f(t.p,4)}；校正後 p = ${f(pCal,4)}`,
         facts:[
           `${nb} 片板的板平均（全部焊墊），扣除 4 片移動平均趨勢後，${SK.label[0]} ${n0} 片 vs ${SK.label[1]} ${n1} 片，Welch t：${SK.label[0]}比${SK.label[1]}${t.ma-t.mb>0?"高":"低"} ${f(Math.abs(t.ma-t.mb),2)} ${u(k)}（名目 p = ${f(t.p,4)}，校正後 p = ${f(pCal,4)}，門檻 aB = ${f(aB,4)}）`,
@@ -4143,15 +4146,24 @@ function detectIssues(st,onStage){
 
   stage(8,"設計與量測");
   // 8. 設計（DFM）：面積比、寬厚比、轉移效率
-  for(const g of groups){const grs=gIdx[g]||[],rs=padReps(grs);if(!rs.length)continue;
-    const ar=Math.min(...rs.map(r=>areaRatio(r,st))),asp=Math.min(...rs.map(r=>aspectRatio(r,st))),tmax=Math.min(...rs.map(r=>maxThkForAR(r,st))),thk=Math.max(...rs.map(r=>padThk(r,st)));
-    const tv=grs.filter(r=>r.volume!=null).map(r=>r.volume),te=tv.length?mean(tv):NaN,vt=st.specs.volume.tgt,dimNote=rs.some(r=>r.dimAssumed)?"（焊墊尺寸為估算值）":"";
-    const worstPads=[...rs].sort((a,b)=>areaRatio(a,st)-areaRatio(b,st));
+  for(const g of groups){const grs=gIdx[g]||[],rsAll=padReps(grs);if(!rsAll.length)continue;
+    // 只用有真實尺寸（CSV 開孔、群組指定尺寸或資料焊墊尺寸）的焊墊算幾何；全為估算時面積比無法判定（NaN）
+    const rs=rsAll.filter(r=>!geomAssumed(r,st)),geo=rs.length>0;
+    const ar=geo?Math.min(...rs.map(r=>areaRatio(r,st))):NaN,asp=geo?Math.min(...rs.map(r=>aspectRatio(r,st))):NaN,tmax=geo?Math.min(...rs.map(r=>maxThkForAR(r,st))):NaN,thk=Math.max(...rsAll.map(r=>padThk(r,st)));
+    const tv=grs.filter(r=>r.volume!=null).map(r=>r.volume),te=tv.length?mean(tv):NaN,vt=st.specs.volume.tgt,dimNote=geo&&rs.length<rsAll.length?"（尺寸未知的焊墊已排除）":"";
+    const worstPads=geo?[...rs].sort((a,b)=>areaRatio(a,st)-areaRatio(b,st)):rsAll;
+    if(!geo){if(isFinite(te)&&te<vt*.9)add({lv:"warn",cat:"設計 DFM",sig:{t:"lowte",g,ar,te},title:`${g} 轉移效率偏低（${f(te,1)}%，焊墊尺寸未知，面積比無法判定）`,ents:["g:"+g],score:2.5,
+      rule_id:"轉移效率 <90% 目標",rule_name:"群組平均體積轉移效率 < 0.90 × 目標值（缺焊墊尺寸，未判定面積比）",metric:"體積",
+      boards:"全部板",subboard:subOf(rsAll),group:g,refdes:refOf(rsAll),pads:topList(rsAll.map(r=>r.pad),10),
+      observed:`平均轉移效率 ${f(te,1)}%（面積比：VERIFY，缺焊墊尺寸）`,limit:`目標 ${vt}%（門檻 ≥ ${f(vt*.9,1)}%）`,z:"不適用（群組平均效率）",p:"不適用（群組平均效率）",
+      facts:[`全部板（${g} 焊墊 ${rsAll.slice(0,5).map(r=>r.pad).join("、")}${rsAll.length>5?` 等 ${rsAll.length} 個`:""}）：平均轉移效率 ${f(te,1)}%（目標 ${vt}%，門檻 ${f(vt*.9,1)}%）`,`資料沒有焊墊／開孔尺寸，面積比與最大可用厚度無法計算；請在「設計」頁填寫指定 L × W 後再判讀，目前鋼板 ${thk} µm`],
+      cause:"面積比未知，無法區分開孔幾何（面積比不足）或非幾何因素（孔壁粗糙、錫膏粒徑、開孔殘留）",conf:"低",action:ACT.lowte,go:{tab:"dfm",group:"ALL",metric:"volume"}});
+      continue}
     if(ar<.66||asp<1.5)add({lv:"ng",cat:"設計 DFM",sig:{t:"dfm",g,ar,asp,te},title:`${g} 開孔設計不符 IPC-7525（${ar<.66?"面積比 "+f(ar,2):"寬厚比 "+f(asp,2)}）`,ents:["g:"+g],score:4,
       rule_id:"IPC-7525 開孔幾何（AR<0.66 或 AspR<1.5）",rule_name:"面積比 AR = L·W/(2(L+W)t) ≥ 0.66 且寬厚比 W/t ≥ 1.5",metric:"體積; 面積",
       boards:"全部板",subboard:subOf(rs),group:g,refdes:refOf(rs),pads:topList(worstPads.map(r=>r.pad),10),
       observed:`最小面積比 ${f(ar,2)}、寬厚比 ${f(asp,2)}（目前鋼板 ${thk} µm）`,limit:"IPC-7525 面積比 ≥ 0.66、寬厚比 ≥ 1.5",z:"不適用（幾何設計規則）",p:"不適用（幾何設計規則）",
-      facts:[`全部板（${g} 代表焊墊 ${worstPads.slice(0,5).map(r=>r.pad).join("、")}${worstPads.length>5?` 等 ${worstPads.length} 個`:""}）：最小面積比 ${f(ar,2)}（建議 ≥ 0.66）、寬厚比 ${f(asp,2)}（建議 ≥ 1.5）${dimNote}`,`目前鋼板 ${thk} µm；要達 AR 0.66 需 ≤ ${f(tmax,0)} µm`],cause:"設計因素：開孔過小或鋼板過厚，錫膏脫模困難",conf:"高",action:ACT.dfm,ev:evBars("各元件群組最小面積比",groups,groups.map(x=>{const q=padReps(gIdx[x]||[]);return q.length?Math.min(...q.map(r=>areaRatio(r,st))):NaN}),[groups.indexOf(g)],"",[.66]),go:{tab:"dfm",group:"ALL"}});
+      facts:[`全部板（${g} 代表焊墊 ${worstPads.slice(0,5).map(r=>r.pad).join("、")}${worstPads.length>5?` 等 ${worstPads.length} 個`:""}）：最小面積比 ${f(ar,2)}（建議 ≥ 0.66）、寬厚比 ${f(asp,2)}（建議 ≥ 1.5）${dimNote}`,`目前鋼板 ${thk} µm；要達 AR 0.66 需 ≤ ${f(tmax,0)} µm`],cause:"設計因素：開孔過小或鋼板過厚，錫膏脫模困難",conf:"高",action:ACT.dfm,ev:evBars("各元件群組最小面積比",groups,groups.map(x=>{const q=padReps(gIdx[x]||[]).filter(r=>!geomAssumed(r,st));return q.length?Math.min(...q.map(r=>areaRatio(r,st))):NaN}),[groups.indexOf(g)],"",[.66]),go:{tab:"dfm",group:"ALL"}});
     else if(isFinite(te)&&te<vt*.9)add({lv:"warn",cat:"設計 DFM",sig:{t:"lowte",g,ar,te},title:`${g} 面積比合格但轉移效率偏低（${f(te,1)}%）`,ents:["g:"+g],score:2.5,
       rule_id:"轉移效率 <90% 目標（AR≥0.66）",rule_name:"面積比 ≥ 0.66 且群組平均體積轉移效率 < 0.90 × 目標值",metric:"體積",
       boards:"全部板",subboard:subOf(rs),group:g,refdes:refOf(rs),pads:topList(worstPads.map(r=>r.pad),10),
@@ -4404,7 +4416,7 @@ function failureModes(st,F,c){
   }
   const{R,boards,groups,MS,nb}=c,sg=t=>F.filter(x=>x.sig&&x.sig.t===t).map(x=>({...x.sig,id:x.id})),gRows=g=>(c.gIdx&&c.gIdx[g])||R.filter(r=>r.group===g);
   const tg=st.specs,has=k=>MS.includes(k),hasXY=R.some(realXY),f1=v=>f(v,1),gmed=(g,k)=>{const v=gRows(g).filter(r=>r[k]!=null).map(r=>r[k]);return v.length?med(v):NaN};
-  const ar={};for(const g of groups){const rs=padReps(gRows(g));ar[g]=rs.length?Math.min(...rs.map(r=>areaRatio(r,st))):NaN}
+  const ar={};for(const g of groups){const rs=padReps(gRows(g)).filter(r=>!geomAssumed(r,st));ar[g]=rs.length?Math.min(...rs.map(r=>areaRatio(r,st))):NaN}
   const lowAR=groups.filter(g=>ar[g]<.66),tightAR=groups.filter(g=>ar[g]<.75);
   const GM={};for(const g of groups)GM[g]={v:gmed(g,"volume"),a:gmed(g,"area"),h:gmed(g,"hpct"),n:gRows(g).length};
   const tv=tg.volume?tg.volume.tgt:100,ta=tg.area?tg.area.tgt:100;
@@ -4435,7 +4447,8 @@ function failureModes(st,F,c){
   {const ev=[];if(lowAR.length)ev.push(E("設計",1,`${lowAR.join("、")} 面積比 < 0.66（IPC-7525）`,ids(DFM)));
     const lowV=lowAR.filter(g=>GM[g].v<tv*.9);if(lowV.length)ev.push(E("形狀",1,`${lowV.join("、")} 體積中位 ${lowV.map(g=>f1(GM[g].v)).join("／")}%，低於目標 90%`,ids(SYS.filter(x=>lowV.includes(x.g)))));
     const okV=lowAR.filter(g=>GM[g].v>=tv*.95);if(okV.length)ev.push(E("形狀",-1,`${okV.join("、")} 面積比低但體積正常（${okV.map(g=>f1(GM[g].v)).join("／")}%）`));
-    if(LTE.length)ev.push(E("設計",1,`${LTE.map(x=>x.g).join("、")} 面積比合格但轉移效率偏低（孔壁品質）`,ids(LTE)));
+    const lteAR=LTE.filter(x=>isFinite(x.ar));   // 焊墊尺寸未知的群組不能當成「面積比合格」的設計證據
+    if(lteAR.length)ev.push(E("設計",1,`${lteAR.map(x=>x.g).join("、")} 面積比合格但轉移效率偏低（孔壁品質）`,ids(lteAR)));
     M("開孔設計（面積比／寬厚比不足）","開孔過小或鋼板過厚，脫模不完全",ev,groups.every(g=>!isFinite(ar[g]))?"缺焊墊尺寸，無法計算面積比":null,"設計",["R016","R026"])}
   // 2 堵孔
   {const ev=[],lteG=LTE.map(x=>x.g).filter(g=>!tightAR.includes(g)),cand=[...tightAR,...lteG];if(tightAR.length)ev.push(E("設計",1,`${tightAR.join("、")} 面積比 < 0.75，屬易堵孔開孔`));
@@ -4709,7 +4722,7 @@ function overallVerdict(st,F){
 /* 判定規格來源（報告、PDF、AI 資料與各匯出檔共用同一段文字） */
 function specSrcText(){
   if(S.specSrc==="sample")return"示範規格（範例資料，非使用者定義）";
-  const p=S.partSpec;if(S.specSrc==="part"&&p)return`料號規格 ${p.part} v${p.ver}（SHA-256 ${String(p.sha||"").slice(0,12)}）${p.stencilRef&&p.stencilRef!==S.stencil?`；規格存檔時鋼板厚度 ${p.stencilRef} µm，本回合 ${S.stencil} µm`:""}`;
+  const p=S.partSpec;if(S.specSrc==="part"&&p)return`料號規格 ${p.part} v${p.ver}（SHA-256 ${String(p.sha||"").slice(0,12)}）${p.stencilRef&&p.stencilRef!==S.stencil?`；規格存檔時鋼板厚度 ${p.stencilRef} µm，本回合 ${S.stencil} µm`:""}${(rp=>rp&&rp!==p.part?`；⚠ 規格料號 ${p.part} 與本回合料號 ${rp} 不同`:"")(runPart())}`;
   return"尚未套用料號規格";
 }
 const ISS_CSV_COLS=["no","level","category","title","rule_id","rule_name","metric","boards","subboard","group","refdes","pads","observed","limit","z","p","facts","inference","confidence","action","corroborated_by","same_phenomenon","explained_pads","spec_source"];
@@ -7246,7 +7259,7 @@ function reportMd(){const A=S.A,u=METRICS[A.m].unit,lab={ok:"一致/正常",warn
   const zCnt=S.step&&S.step.on?zoneCounts():null;
   const stepCovered=zCnt?Object.values(zCnt.c).reduce((a,b)=>a+b,0):0;
   return`# SPI·SPC 分析報告\n\n- 產生時間：${fmtNowUtc8()}\n- 資料來源：${S.source}\n- 量測項目：${METRICS[A.m].label}；元件群組：${S.group==="ALL"?"全部":S.group}；管制圖：${chartName()}\n- 整體判定：${vd.label}（${vd.level}）${vd.reasons&&vd.reasons.length?" · 原因："+vd.reasons.join("；"):""}\n- 規格：LSL ${A.sp.lsl} / 目標 ${A.sp.tgt} / USL ${A.sp.usl} ${u}\n- 規格來源：${specSrcText()}\n- 刮刀行程方向：沿 ${S.sqDir||"Y"}；擦拭間隔：每 ${S.wipe} 片\n- 鋼板厚度：${S.stencil} µm（高度規格 ${S.htol.lo}%–${S.htol.hi}% 厚度）\n- 階梯鋼板：${S.step.on?S.step.zones.map(z=>`${z.name} ${z.t} µm（${z.mode==="group"?"群組 "+z.group:`X ${z.x0}–${z.x1}, Y ${z.y0}–${z.y1} mm`}）`).join("；")+`（涵蓋 ${stepCovered} 焊墊${stepCovered===0?" ⚠️ 未涵蓋任何焊墊":""}）`:"未啟用"}\n- 系統版本：${APP.ver} · 系統更新 ${APP.built}\n- 試產回合：${curRun()?curRun().name:""}\n${runSrc(curRun())?`- 資料來源追溯：${srcLine(runSrc(curRun()))}\n- 原始檔 SHA-256：${runSrc(curRun()).sha256}\n`:""}\n## 問題偵測（依嚴重度與佐證排序）\n\n${S.F.map(x=>`- #${x.no}［${x.level}］${x.title}（規則：${x.rule_id} ${x.rule_name}）\n  - 面向：${x.category}；量測項目：${x.metric}；板號：${x.boards}；焊墊：${x.pads}；群組：${x.group}；位號：${x.refdes}\n  - 觀測值：${x.observed}；界限：${x.limit}；z：${x.z}；p：${x.p}\n  - 事實：${x.facts.join("；")}\n  - 推論（信心 ${x.confidence}）：${x.inference}\n  - 建議動作：${x.action}${x.corroborated_by.length?"\n  - 跨面向佐證："+x.corroborated_by.map(i=>"#"+i).join("、"):""}${x.same_phenomenon.length?"\n  - 同一現象："+x.same_phenomenon.map(i=>"#"+i).join("、"):""}${x.explained_pads.length?"\n  - 已解釋焊墊："+x.explained_pads.join("；"):""}`).join("\n")||"- 未偵測到顯著問題"}\n\n## 一、統計結果（事實）\n\n| 指標 | 數值 |\n|---|---|\n| 樣本數 | ${A.N} |\n| 板數 | ${A.boards.length} |\n| 平均 | ${f(A.gMean,2)} ${u} |\n| σ 組內 / 整體 | ${f(A.sigmaW,3)} / ${f(A.overallSd,3)} |\n${A.cap?`| 能力計算方式 | ${A.cap.mixed?`逐元件群組（組內 σ），以最差群組 ${A.cap.worst} 代表`:"組內 σ"}${A.stable?"":"；製程未穩定，僅供參考"} |\n| Cp / Cpk | ${f(A.cap.cp)} / ${f(A.cap.cpk)} |\n| Cpk 95% 信賴區間（以 ${A.cap.nb} 片板計） | ${f(A.cap.ci[0])} – ${f(A.cap.ci[1])} |\n| Pp / Ppk | ${f(A.cap.pp)} / ${f(A.cap.ppk)} |\n| 預估 PPM / 超規 PPM（${mShort}） | ${fmtPpm(A.cap.ppmExp)} / ${fmtPpm(A.cap.ppmObs)} |\n| 不良 PPM（全部判定項目） | ${fmtPpm(defPpm)} |\n`:""}| Anderson-Darling p | ${A.ad.p<.001?"<0.001":f(A.ad.p,3)} |\n${A.sw&&A.sw.valid?`| Shapiro-Wilk W / p | ${f(A.sw.w,4)} / ${A.sw.p<.001?"<0.001":f(A.sw.p,3)} |\n`:""}| 不良焊墊（全部項目） | ${A.defRows.length} |\n\n${A.cap&&A.cap.mixed?`\n### 逐元件群組製程能力\n\n| 元件群組 | n | 平均 | 規格 | Cpk | Cpk 95% 信賴區間 | Ppk | 預估 PPM | 超規 PPM（${mShort}） |\n|---|---|---|---|---|---|---|---|---|\n${A.cap.groups.map(g=>`| ${g.g} | ${g.n} | ${f(g.mu,1)} | ${f(g.lsl,0)}–${f(g.usl,0)} | ${f(g.cpk)} | ${f(g.ci[0])}–${f(g.ci[1])} | ${f(g.ppk)} | ${fmtPpm(g.ppmExp)} | ${fmtPpm(g.ppmObs)} |`).join("\n")}\n`:""}\n## 二、Nelson 規則（X̄ 圖，管制狀態判斷依據）\n\n${(A.nelX||A.nel).rules.map(r=>`- 規則 ${r.name}：${r.idx.length?"觸發（"+r.idx.map(i=>A.xs.pts[i].lab).join(", ")+"）":"通過"}`).join("\n")}${S.chart!=="xbars"?`\n\n目前畫面管制圖（${chartName()}）：${A.nel.rules.filter(r=>!r.na).map(r=>`規則 ${r.id} ${r.idx.length?"觸發":"通過"}`).join("、")}`:""}\n\n## 三、交叉驗證\n\n| 面向 | 來源 | 判定 | 依據 |\n|---|---|---|---|\n${A.xv.rows.map(x=>`| ${x.k} | ${x.src} | ${lab[x.st]} | ${x.ev} |`).join("\n")}\n\n${fmMd().trim()||"## 失效模式交叉比對\n\n- 無資料"}\n\n## 進階分析\n\n${(()=>{const W=advSummary(A);return[`- EWMA 越界：${W.EWMA越界.join(", ")||"無"}；CUSUM 訊號：${W.CUSUM訊號.join(", ")||"無"}`,`- 面積比 / 轉移效率：${W.面積比.map(g=>`${g.群組} AR ${g.AR}、TE ${g.轉移效率}%`).join("；")}`,`- 最差焊墊 Cpk：${W.最差焊墊Cpk.map(p=>`${p.焊墊} ${p.Cpk}`).join("、")}`,`- 對位異常板：${W.對位異常板.map(a=>`${a.板}（平移 ${a.平移X}/${a.平移Y} µm，旋轉 ${a.旋轉度}°）`).join("；")||"無"}`,W.刮刀前後?`- 刮刀前後差：${W.刮刀前後.差值}，p = ${W.刮刀前後.p}`:"",`- 擦拭週期（每 ${W.擦拭週期.每幾片} 片）：斜率 ${W.擦拭週期.每片斜率}/片，p = ${W.擦拭週期.p}`].filter(Boolean).join("\n")})()}\n\n## 四、不良柏拉圖\n\n${Object.entries(A.pareto).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`- ${DEFECTS[k]}：${v}`).join("\n")||"- 無"}\n${S.ai?`\n## 五、Claude AI 分析（含推論，需工程驗證）\n\n${S.ai}\n`:""}\n## 八、資料範圍揭露與未納入證據 (Data Scope & Exclusions)\n\n- 匯入總筆數：${S.rows.length} 筆；納入分析筆數：${S.rows.length} 筆\n- 板號推定狀態：${(S.boardInferred || S.rows.some(r=>r.boardInferred)) ? `板號為推定（每 ${S.boardInferred || Math.round(S.rows.length / (A.boards.length||1))} 筆）` : "板號完整，無推定缺失"}\n- 時間區間篩選：${S.timeFilter ? `${S.timeFilter.start || "—"} ～ ${S.timeFilter.end || "—"}（UTC+8）` : "未設定時間篩選（全時段）"}\n- 部分焊墊板數：${S.partialBoards && S.partialBoards.length ? `${S.partialBoards.length} 片板僅含部分焊墊（${S.partialBoards.join("、")}）` : "無部分板（所有板皆含完整焊墊）"}\n- 刮刀方向狀態：${S.sqDir ? `刮刀方向設定為 ${S.sqDir} 向` : "依板序奇偶推定"}\n- 焊墊座標狀態：${PLACE ? `已套用座標檔：${esc(PLACE.part)} ${esc(PLACE.rev)}` : "未套用獨立座標檔（採用資料內建座標或相對位置）"}\n\n## 九、方法附錄與統計檢驗說明 (Methodology Appendix)\n\n- 判定規格來源：${specSrcText()}\n- 實驗設計 (DOE)：各因子單獨檢定、未調整其他因子與交互作用。\n`}
-/* 下載：在 claude.ai 內用平台下載功能；一般瀏覽器（例如 Netlify 部署）直接下載檔案 */
+/* 下載：在 claude.ai 內用平台下載功能；一般瀏覽器（例如 Cloudflare Workers 正式站）直接下載檔案 */
 function browserDownload(filename,data){const isXlsx=/\.xlsx$/i.test(filename);const type=isXlsx?"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":(/\.csv$/.test(filename)?"text/csv;charset=utf-8":"text/markdown;charset=utf-8"),url=URL.createObjectURL(new Blob(isXlsx?[data]:["\uFEFF"+data],{type})),a=document.createElement("a");a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 /* 匯出鈕分散在各分頁，#expState 只在資料分頁；結果同時用 toast 顯示，避免在其他分頁按了沒反應 */
 const LIFECYCLE_TEXT={pending_review:"待管理者判定",superseded:"歷史修正前版本",legacy:"歷史未驗證",unavailable:"狀態無法確認"};
@@ -7498,14 +7511,14 @@ $("#p-data .subtabs").addEventListener("keydown",e=>{const T=$$("#p-data .subtab
 /* ---------- 啟動 ---------- */
 $(".tabs").addEventListener("scroll",tabFade,{passive:true});addEventListener("resize",tabFade);setTimeout(tabFade,0);setTimeout(()=>{updateMore();updateVars()},0);
 if(!window.Chart)$("#libWarn").hidden=false;
-/* 部署在 Netlify（有登入保護）時顯示登出；claude.ai 與本機檔案不顯示 */
+/* 部署在 Cloudflare Workers（有登入保護）時顯示登出；claude.ai 與本機檔案不顯示 */
 /* 本機開發（沒有登入後端）時也開放分享，方便測試 */
 const HAS_API=/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 /* 是否有登入後端：以 /__me 實際回應判斷（自訂網域也適用），不依網址名稱 */
 const ME_PROBE=typeof fetch==="function"&&/^https?:$/.test(location.protocol)&&!/(^|\.)claude(usercontent)?\.(ai|com)$/.test(location.hostname);
 const meP=ME_PROBE?fetch("/__me",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>j&&j.user?j:null).catch(()=>null):Promise.resolve(null);
 meP.then(j=>{if(!j)return;$("#userName").textContent=j.user;$("#userChip").hidden=false;$("#logoutLink").hidden=false;if(window.CompressionStream){$("#btnShare").hidden=false;$("#btnShare").onclick=createShare}});
-/* ---------- 分享連結：壓縮後上傳到本網站（Netlify Blobs），連結需登入才能開啟，30 天失效 ---------- */
+/* ---------- 分享連結：壓縮後上傳到本網站（Cloudflare D1＋R2），連結需登入才能開啟，30 天失效 ---------- */
 async function gzipJSON(o){return new Uint8Array(await new Response(new Response(JSON.stringify(o)).body.pipeThrough(new CompressionStream("gzip"))).arrayBuffer())}
 const SHARE_MAX=4*1048576,SHARE_RAW_MAX=200*1048576;
 /* 解壓時累計大小，超過上限就中止，避免異常的壓縮資料讓分頁記憶體爆掉 */
