@@ -54,3 +54,17 @@ test('D-47 Nelson 規則 1 嚴重度：嚴重需通過族系門檻且有超規�
   assert.equal(L({ lowCpk: true }), 'info', 'Cpk 偏低是整個項目的性質');
   assert.equal(L({ hasOos: true, lowCpk: true }), 'warn');
 });
+
+test('非格點／奇數板數也維持名目誤報（奇偶板數尾巴不同，曾因格點間內插使 13 板達名目 1.23 倍）', () => {
+  for (const n of [13, 63, 113]) {
+    const N = makeNormal(mulberry32(5000 + n)), runs = Math.ceil(2e6 / n), buf = new Float64Array(n), zt = c.robZThr(n);
+    let hit = 0;
+    for (let k = 0; k < runs; k++) {
+      for (let i = 0; i < n; i++) buf[i] = N();
+      const { m, s } = c.robust(buf);
+      for (let i = 0; i < n; i++) if (Math.abs(buf[i] - m) / s >= zt) hit++;
+    }
+    const ratio = hit / (runs * n * A1);
+    assert.ok(ratio > 0.8 && ratio < 1.2, `${n} 板：每次誤報為名目 ${ratio.toFixed(2)} 倍`);
+  }
+});

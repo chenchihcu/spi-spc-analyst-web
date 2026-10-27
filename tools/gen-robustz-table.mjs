@@ -4,6 +4,7 @@
 // 本工具以 i.i.d. 常態模擬，對核心的 robust()（與偵測同一函式）求 |z| 在各尾機率 α 的分位數，
 // 產出內嵌於 spi-spc.html 的 ROBZ_N／ROBZ_A／ROBZ_Q 表；另以獨立 seed 的 holdout 自檢每次檢定誤報 ≈ α。
 // 用法：node tools/gen-robustz-table.mjs [--points 100000000] [--workers 12] [--output tools/robustz-table.json]
+//       [--ns 13,14,…]（只算這些板數，併入 --output 既有的表）
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -13,7 +14,9 @@ import { mulberry32, makeNormal } from './gen-stable.mjs';
 
 const require = createRequire(import.meta.url);
 
-export const ROBZ_TABLE_N = [5, 6, 7, 8, 9, 10, 11, 12, 15, 20, 25, 30, 40, 50, 75, 100, 150, 200, 300];
+// 小樣本時奇偶板數的尾巴差很多（偶數的中位數與 MAD 各取兩個中間值平均，尾巴較薄），格點之間內插會低估奇數板數的門檻：
+// 5–60 板逐一校準，之後的格點以 holdout 抽查非格點板數（--check）
+export const ROBZ_TABLE_N = [...Array.from({ length: 56 }, (_, i) => i + 5), 70, 75, 80, 90, 100, 125, 150, 200, 300];
 const ALPHA1 = 4.652581580710e-4; // 2(1−Φ(3.5))
 export const ROBZ_TABLE_A = [1e-2, 1e-3, ALPHA1, 1e-4, 1e-5, 1e-6];
 
@@ -51,12 +54,14 @@ if (!isMainThread) {
   const getArg = (name, dflt) => { const i = args.indexOf(name); return i >= 0 && args[i + 1] ? args[i + 1] : dflt; };
   const points = +getArg('--points', 1e8), nW = Math.min(+getArg('--workers', Math.max(1, os.cpus().length - 4)), ROBZ_TABLE_N.length);
   const outPath = getArg('--output', path.join(import.meta.dirname, 'robustz-table.json'));
-  const queue = [...ROBZ_TABLE_N].sort((a, b) => a - b), rows = [];
+  const only = getArg('--ns', '') ? getArg('--ns', '').split(',').map(Number) : null;
+  const queue = (only || [...ROBZ_TABLE_N]).sort((a, b) => a - b);
+  const rows = only && fs.existsSync(outPath) ? JSON.parse(fs.readFileSync(outPath, 'utf8')).rows.filter((r) => !only.includes(r.n)) : [];
   const runOne = () => new Promise((resolve, reject) => {
     const n = queue.shift(); if (n == null) return resolve();
     const w = new Worker(new URL(import.meta.url), { workerData: { n, points } });
     w.once('message', (r) => {
-      rows.push(r);
+      rows.push({ n: r.n, q: r.q });
       console.log(`n=${String(n).padStart(3)} q=[${r.q.map((v) => v.toFixed(2)).join(', ')}] holdout 每次誤報/名目=[${r.holdoutFp.map((f, j) => (f / ROBZ_TABLE_A[j]).toFixed(2)).join(', ')}]（最小 α 尾端 ${r.tailCount} 點）`);
       runOne().then(resolve, reject);
     });
@@ -64,6 +69,8 @@ if (!isMainThread) {
   });
   await Promise.all(Array.from({ length: nW }, runOne));
   rows.sort((a, b) => a.n - b.n);
+  const missing = ROBZ_TABLE_N.filter((n) => !rows.some((r) => r.n === n));
+  if (missing.length) console.log(`尚未校準：${missing.join(',')}（以 --ns 補齊後再內嵌）`);
   // 蒙地卡羅雜訊可能讓相鄰格點不單調：同一 α 的分位數隨 n 增加只會下降
   for (let j = 0; j < ROBZ_TABLE_A.length; j++) for (let i = rows.length - 2; i >= 0; i--) rows[i].q[j] = Math.max(rows[i].q[j], rows[i + 1].q[j]);
   for (const r of rows) r.q = r.q.map((v) => +v.toFixed(3));
