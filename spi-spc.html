@@ -676,7 +676,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   <div class="brand">
     <h1>SPI·SPC 分析台</h1>
     <span class="tag">錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.3.8</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.3.9</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -2816,8 +2816,9 @@ function aspectRatio(r,st){const a=aperture(r,st);return Math.min(a.L,a.W)/(padT
 function maxThkForAR(r,st,ar=0.66){const a=aperture(r,st);return(a.shape==="round"?a.L/(4*ar):(a.L*a.W)/(2*(a.L+a.W)*ar))*1000}
 /* 開孔幾何是否只是 0.7 mm 預設估算：估算值不可拿來判定面積比合格或不合格 */
 function geomAssumed(r,st){
-  // TODO(human)
-}
+  if(!r.dimAssumed)return false;
+  // CSV 開孔與群組指定尺寸是真實值；「同焊墊」「縮減 N%」仍建立在 0.7 mm 估算焊墊上
+  const src=aperture(r,st).src;return src!=="CSV"&&src!=="指定尺寸"}
 function apVolNL(r,st){const a=aperture(r,st),T=padThk(r,st)/1000;return(a.shape==="round"?Math.PI*a.L*a.L/4:a.L*a.W)*T*1000}
 function solve3(M,b){const A=M.map((r,i)=>[...r,b[i]]);for(let i=0;i<3;i++){let p=i;for(let k=i+1;k<3;k++)if(Math.abs(A[k][i])>Math.abs(A[p][i]))p=k;[A[i],A[p]]=[A[p],A[i]];if(Math.abs(A[i][i])<1e-12)return null;
   for(let k=0;k<3;k++)if(k!==i){const f=A[k][i]/A[i][i];for(let j=i;j<4;j++)A[k][j]-=f*A[i][j]}}return A.map((r,i)=>r[3]/r[i])}
@@ -4722,7 +4723,7 @@ function overallVerdict(st,F){
 /* 判定規格來源（報告、PDF、AI 資料與各匯出檔共用同一段文字） */
 function specSrcText(){
   if(S.specSrc==="sample")return"示範規格（範例資料，非使用者定義）";
-  const p=S.partSpec;if(S.specSrc==="part"&&p)return`料號規格 ${p.part} v${p.ver}（SHA-256 ${String(p.sha||"").slice(0,12)}）${p.stencilRef&&p.stencilRef!==S.stencil?`；規格存檔時鋼板厚度 ${p.stencilRef} µm，本回合 ${S.stencil} µm`:""}${(rp=>rp&&rp!==p.part?`；⚠ 規格料號 ${p.part} 與本回合料號 ${rp} 不同`:"")(runPart())}`;
+  const p=S.partSpec;if(S.specSrc==="part"&&p)return`料號規格 ${p.part} v${p.ver}（SHA-256 ${String(p.sha||"").slice(0,12)}）${p.stencilRef&&p.stencilRef!==S.stencil?`；規格存檔時鋼板厚度 ${p.stencilRef} µm，本回合 ${S.stencil} µm`:""}${(rp=>rp&&rp!==p.part?`；⚠ 規格料號 ${p.part} 與本回合料號 ${rp} 不同`:"")(typeof runPart==="function"?runPart():"")}`;   // runPart 屬 UI 區段；核心單獨載入（Worker／測試）時不存在
   return"尚未套用料號規格";
 }
 const ISS_CSV_COLS=["no","level","category","title","rule_id","rule_name","metric","boards","subboard","group","refdes","pads","observed","limit","z","p","facts","inference","confidence","action","corroborated_by","same_phenomenon","explained_pads","spec_source"];
