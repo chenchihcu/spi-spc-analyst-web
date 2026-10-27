@@ -145,7 +145,11 @@ test('D-30 & TV-20 ①, ②, ③: TEST-第三輪-02_lone_extreme.csv 孤立極�
   const issSamp = core.detectIssues(stSamp);
   const isoVolSamp = issSamp.find(x => x.rule_id.includes('孤立極端焊墊') && x.metric === '體積');
   assert.ok(isoVolSamp, '範例資料應有體積孤立極端焊墊卡');
-  assert.equal(isoVolSamp.pads.split('; ').length, 6, 'TV-20 ② 體積孤立極端焊墊卡應包含 6 處焊墊');
+  // v10.3.5 單板異常門檻依板數校準（25 板 |z| ≥ 5.03）：B13 U2 體積的板平均偏移 z = −3.63 不再成立，
+  // 原本由它吸收的 4 個 B13 U2 體積極端焊墊改列在孤立極端焊墊卡（6 → 10），並與 B13 U2 面積偏低卡列為同一現象
+  assert.equal(isoVolSamp.pads.split('; ').length, 10, 'TV-20 ② 體積孤立極端焊墊卡應包含 10 處焊墊');
+  const b13 = issSamp.find(x => x.cat === '單板異常' && x.sig.b === 'B13' && x.sig.g === 'U2 BGA');
+  assert.ok(b13 && isoVolSamp.same_phenomenon.includes(b13.id), 'B13 U2 體積極端焊墊與面積偏低卡列為同一現象');
 
   // TV-20 ③: two extreme pads U1-2 and U1-3 on B07 set to 55.0
   const p3 = core.parseCSV(txt);
