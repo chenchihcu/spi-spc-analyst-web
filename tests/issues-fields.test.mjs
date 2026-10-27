@@ -261,6 +261,49 @@ test('D-64: 刮刀方向與擦拭週期 p 值校準與呈現', () => {
   }
 });
 
+const sampleState = (rows) => baseState(core, {
+  rows, metrics: ['volume', 'height', 'hpct', 'area', 'offx', 'offy'], metric: 'volume', group: 'ALL', chart: 'xbars'
+});
+
+test('v10.3.10: 刮刀方向卡迴歸 t 與 Welch t 同方向（皆為 label[0] − label[1]）', () => {
+  const p = path.join(import.meta.dirname, 'fixtures', 'audit', 'audit3', 'testdata', 'TEST-第三輪-01_groups.csv');
+  const parsed = core.parseCSV(fs.readFileSync(p, 'utf8'));
+  const sets = [core.sampleData(), parsed.rows];
+  let n = 0;
+  for (const rows of sets) {
+    for (const x of core.detectIssues(sampleState(rows)).filter(c => c.category === '刮刀方向')) {
+      const m = x.z.match(/Welch t = (-?[\d.]+)；迴歸 t = (-?[\d.]+)/);
+      if (!m) continue;
+      n++;
+      assert.equal(Math.sign(+m[1]), Math.sign(+m[2]), `卡片 #${x.no}：${x.z}`);
+    }
+  }
+  assert.ok(n > 0, '至少要有一張含迴歸 t 的刮刀方向卡');
+});
+
+test('v10.3.10: 焊墊尺寸為 0.7 mm 估算時，轉移效率卡不宣稱面積比合格', () => {
+  const rows = core.sampleData().map(r => ({ ...r, w: 0.7, d: 0.7, apL: undefined, apW: undefined, dimAssumed: true }));
+  const dfm = core.detectIssues(sampleState(rows)).filter(c => c.category === '設計 DFM');
+  assert.ok(dfm.length > 0, '範例資料應仍有轉移效率偏低卡');
+  for (const x of dfm) {
+    assert.ok(!x.title.includes('面積比合格'), `#${x.no} 標題：${x.title}`);
+    assert.ok(!x.title.includes('開孔設計不符'), `#${x.no} 不應以估算尺寸判 IPC-7525 不符`);
+    assert.ok(!x.facts.join('').includes('最小面積比'), `#${x.no} facts 不應列估算的面積比`);
+    assert.match(x.title, /面積比無法判定/);
+  }
+  // 有實際尺寸時維持原判讀
+  const real = core.detectIssues(sampleState(core.sampleData())).filter(c => c.category === '設計 DFM');
+  assert.ok(real.some(x => x.title.includes('面積比合格')), '有焊墊尺寸時仍應判定面積比');
+});
+
+test('v10.3.10: 多變量離群卡板號、焊墊位置卡事實與規格料號揭露', () => {
+  const html = fs.readFileSync(HTML, 'utf8');
+  assert.ok(!/boards:bList/.test(html), '多變量離群是跨板平均，板號不可取第一列的板');
+  assert.match(html, /boards:`全部板（焊墊位置跨 \$\{nb\} 板平均）`/);
+  assert.ok(!/同群組中位 \$\{f\(cm,1\)\}，\$\{limStr\}/.test(html), '焊墊位置卡 facts 不可重複內嵌 limStr');
+  assert.match(html, /規格料號 \$\{p\.part\} 與本回合料號 \$\{rp\} 不同/);
+});
+
 test('N7-5: TEST-第三輪-PHME_small.csv 焊墊與界限清楚呈現在卡片事實', () => {
   const p = path.join(import.meta.dirname, 'fixtures', 'audit', 'audit3', 'testdata', 'TEST-第三輪-PHME_small.csv');
   const txt = fs.readFileSync(p, 'utf8');
