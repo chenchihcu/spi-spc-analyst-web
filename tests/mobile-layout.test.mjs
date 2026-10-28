@@ -165,8 +165,12 @@ test('5. 觸控修正與無障礙樣式規範 (CSS 規則檢驗)', () => {
   // b. .subtab segmented 樣式 (44px)
   assert.match(htmlSource, /\.subtab\{[^}]*min-height:\s*44px/i, '.subtab 需有 min-height: 44px');
 
-  // c. .pmap-cells 每格 min-width: 28px, min-height: 44px
-  assert.match(htmlSource, /\.pmap-cells\s+button\{[^}]*min-width:\s*28px[^}]*min-height:\s*44px/i, '問題地圖格子需符合 28×44 規格');
+  // c. 問題地圖：群組格高 44（橫捲）；板號格在觸控與 ≤720px 時為 44×44 並自動換行（v10.4.2 由 28×44 放大，IOS-04）
+  assert.match(htmlSource, /\.pmap-cells\s+button\{[^}]*min-height:\s*44px/i, '問題地圖格子高度需 ≥ 44px');
+  assert.match(htmlSource, /class="pmap-cells pmap-boards"/, '板號列需有 pmap-boards');
+  const boardRules = htmlSource.match(/\.pmap-boards button\{[^}]*\}/g) || [];
+  assert.ok(boardRules.length >= 2 && boardRules.every((r) => /min-width:\s*44px/.test(r)), '板號格在觸控與 ≤720px 需 min-width 44px');
+  assert.match(htmlSource, /\.pmap-cells\.pmap-boards\{[^}]*grid-template-columns:repeat\(auto-fill,minmax\(44px,1fr\)\)/, '板號格需自動換行');
 
   // d. 表格與浮動元件避讓
   assert.match(htmlSource, /#toTop,#toast\{[^}]*bottom:\s*calc\(var\(--tabbar-h\)\s*\+\s*var\(--safe-b\)\s*\+\s*12px\)/i, '#toTop 與 #toast 需避讓底欄');
