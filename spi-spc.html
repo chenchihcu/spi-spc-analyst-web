@@ -21,7 +21,7 @@
 /* Layout: instrument console — sticky control rail, tab strip, panels of charts; copper accent on solder-mask neutrals */
 :root{
   --bg:#F2F4F0;--surface:#FFFFFF;--surface2:#E8ECE6;--ink:#18201B;--muted:#58625B;--line:#D2D8D1;
-  --accent:#A3521D;--accent-soft:#F4E4D6;--accent-ink:#6E3410;
+  --accent:#A3521D;--accent-soft:#F4E4D6;--accent-ink:#6E3410;--logo-ink:#04273F;
   --ok:#2C7A4C;--ok-soft:#DDEFE3;--warn:#9B650E;--warn-soft:#F6E9CF;--ng:#B83A2C;--ng-soft:#F7DDD9;
   --series2:#3D6E8F;--grid:rgba(24,32,27,.08);--on-strong:#FFFFFF;
   --f-display:"Barlow Condensed","Microsoft JhengHei","PingFang TC",system-ui,sans-serif;
@@ -43,14 +43,14 @@
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0F1311;--surface:#171C19;--surface2:#212923;--ink:#E4E9E4;--muted:#98A39B;--line:#2D3731;
-  --accent:#DB8A50;--accent-soft:#3A2516;--accent-ink:#F2C6A5;
+  --accent:#DB8A50;--accent-soft:#3A2516;--accent-ink:#F2C6A5;--logo-ink:#E4E9E4;
   --ok:#55BE84;--ok-soft:#173726;--warn:#E3AE50;--warn-soft:#3A2D12;--ng:#EC6F60;--ng-soft:#41201B;
   --series2:#7FB2D4;--grid:rgba(228,233,228,.08);--on-strong:#14100C;color-scheme:dark;
   --c-bar:rgba(15,19,17,.88);--c-hairline:rgba(228,233,228,.10);
   --tbl-sticky-shadow:2px 0 8px rgba(0,0,0,.5)}}
 :root[data-theme="dark"]{
   --bg:#0F1311;--surface:#171C19;--surface2:#212923;--ink:#E4E9E4;--muted:#98A39B;--line:#2D3731;
-  --accent:#DB8A50;--accent-soft:#3A2516;--accent-ink:#F2C6A5;
+  --accent:#DB8A50;--accent-soft:#3A2516;--accent-ink:#F2C6A5;--logo-ink:#E4E9E4;
   --ok:#55BE84;--ok-soft:#173726;--warn:#E3AE50;--warn-soft:#3A2D12;--ng:#EC6F60;--ng-soft:#41201B;
   --series2:#7FB2D4;--grid:rgba(228,233,228,.08);--on-strong:#14100C;color-scheme:dark;
   --c-bar:rgba(15,19,17,.88);--c-hairline:rgba(228,233,228,.10);
@@ -61,9 +61,11 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1
 .wrap{max-width:1280px;margin:0 auto}
 h1,h2,h3{text-wrap:balance;margin:0;font-weight:700}
 .num,.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
-header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding-block:22px 14px}
-.brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
-.brand h1{font-family:var(--f-display);font-size:34px;font-weight:600;letter-spacing:.02em;line-height:1}
+header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding-block:18px 12px}
+.brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.mitcorp-logo{display:block;height:26px;width:auto;color:var(--logo-ink);flex-shrink:0}
+.brand-sep{width:1px;height:22px;background:var(--line);flex-shrink:0}
+.brand h1{font-family:var(--f-display);font-size:32px;font-weight:600;letter-spacing:.02em;line-height:1}
 .brand .tag{font-size:12px;color:var(--muted);letter-spacing:.08em}
 .chipBtn{border:none;min-height:0;cursor:pointer;font:inherit;font-size:12px;color:var(--ink)}.chipBtn:hover{background:var(--line)}
 /* hidden 屬性一律隱藏：避免 .panel{display:grid} 等規則蓋過瀏覽器預設，導致未選取的頁籤也顯示 */
@@ -175,7 +177,7 @@ table.show-all tr.more-row{display:table-row}
   .report-preview{max-width:100%!important;padding:0!important;box-shadow:none!important;border-radius:0!important}
 }
 .report-preview-wrap{display:flex;justify-content:center;background:var(--surface2);padding:20px 10px;border-radius:var(--r);overflow-x:auto}
-.report-preview{--surface:#FFFFFF;--surface2:#E8ECE6;--ink:#18201B;--muted:#58625B;--line:#D2D8D1;--ok:#2C7A4C;--ok-soft:#DDEFE3;--warn:#9B650E;--warn-soft:#F6E9CF;--ng:#B83A2C;--ng-soft:#F7DDD9;color-scheme:light;width:100%;max-width:820px;background:#ffffff;color:#1a1a1a;padding:36px 40px;box-shadow:0 4px 20px rgba(0,0,0,0.12);border-radius:4px;font-family:var(--f-body);line-height:1.6}
+.report-preview{--surface:#FFFFFF;--surface2:#E8ECE6;--ink:#18201B;--muted:#58625B;--line:#D2D8D1;--logo-ink:#04273F;--ok:#2C7A4C;--ok-soft:#DDEFE3;--warn:#9B650E;--warn-soft:#F6E9CF;--ng:#B83A2C;--ng-soft:#F7DDD9;color-scheme:light;width:100%;max-width:820px;background:#ffffff;color:#1a1a1a;padding:36px 40px;box-shadow:0 4px 20px rgba(0,0,0,0.12);border-radius:4px;font-family:var(--f-body);line-height:1.6}
 @media (max-width:768px){.report-preview-wrap{padding:10px 0;background:transparent}.report-preview{padding:16px 12px;box-shadow:none;border-radius:0}}
 #busy{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--surface);padding:9px 16px;border-radius:999px;font-size:13.5px;box-shadow:0 4px 18px rgba(0,0,0,.18)}#busy[hidden]{display:none}
 .spin{width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(1turn)}}
@@ -381,7 +383,9 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     align-items:center;
     justify-content:center;
   }
-  .brand{justify-content:center;width:100%}
+  .brand{justify-content:center;width:100%;gap:8px;flex-wrap:nowrap}
+  .brand .mitcorp-logo{height:16px}
+  .brand .brand-sep{height:14px}
   .brand h1{font-size:17px!important;font-weight:600!important;line-height:44px;margin:0;text-align:center}
 
   .sticky{position:sticky!important;top:calc(var(--navbar-h) + var(--safe-t))!important;z-index:15;background:var(--bg)}
@@ -549,6 +553,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 }
 @media (pointer:coarse) and (max-height:500px){
   header.top{height:calc(36px + var(--safe-t))!important}
+  .brand .mitcorp-logo{height:14px}
   .brand h1{line-height:36px!important}
   .sticky{top:calc(36px + var(--safe-t))!important}
   .rail{padding:3px 0!important}
@@ -679,15 +684,17 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 <div class="printHead" id="printHead" aria-hidden="true"></div>
 <header class="top">
   <div class="brand">
+    <svg class="mitcorp-logo" viewBox="0 0 248 45" width="143" height="26" fill="currentColor" fill-rule="evenodd" role="img" aria-label="Mitcorp"><path d="M13.8,-0.0L28.5,-0.1L29.2,0.0L30.6,1.0L31.5,2.9L34.7,29.0L35.0,29.8L36.2,30.2L37.5,29.8L38.3,28.2L46.9,3.5L48.0,1.5L48.8,0.8L50.5,-0.1L66.3,0.0L67.6,1.0L68.4,3.2L68.4,30.8L68.3,32.2L67.7,33.8L66.0,34.8L62.8,35.0L59.2,34.8L57.7,33.8L57.3,31.5L57.3,5.8L56.7,4.5L55.2,4.0L53.0,4.7L52.0,6.5L43.5,31.5L42.2,33.3L41.2,34.1L38.2,34.8L28.8,34.8L26.0,34.0L24.6,32.5L24.0,29.8L20.9,5.8L20.2,4.5L18.5,4.0L17.0,4.5L16.5,5.2L12.3,26.8L11.3,30.0L10.5,31.5L8.4,33.8L6.3,35.0L2.2,35.7L1.2,35.7L0.0,35.0L0.0,30.2L1.2,29.6L4.5,28.9L5.4,28.0L6.2,26.2L10.7,3.0L11.9,1.0L13.8,-0.0ZM73.2,-0.0L83.8,0.0L84.6,1.3L84.5,4.2L83.8,5.4L82.8,5.7L75.5,5.8L73.2,5.5L72.7,4.8L72.5,2.8L72.6,1.0L73.2,-0.0ZM90.0,1.7L95.5,1.6L97.2,2.1L97.8,2.8L98.2,4.0L98.3,8.5L98.6,9.2L99.3,9.7L109.8,9.8L110.9,10.2L111.4,12.0L110.9,13.2L110.2,13.6L99.8,13.7L98.8,14.1L98.2,15.5L98.3,27.0L99.0,29.8L100.5,30.9L104.2,31.1L112.5,30.9L113.1,31.5L113.2,33.0L113.0,33.8L112.2,34.6L110.5,35.0L104.5,35.3L95.8,35.1L92.0,33.9L89.9,32.2L88.9,30.5L88.4,27.5L88.4,5.5L88.6,3.0L89.2,2.1L90.0,1.7ZM130.5,9.2L135.5,9.3L144.3,10.0L145.5,10.4L146.1,11.0L146.2,13.2L145.7,14.0L145.0,14.3L140.3,13.8L133.0,13.6L129.5,13.9L127.0,14.9L125.1,17.0L124.3,20.0L124.3,24.0L125.1,27.8L127.0,29.8L130.0,30.9L137.5,31.1L145.2,30.4L146.0,31.0L146.3,32.0L146.2,33.5L145.5,34.3L142.5,35.0L135.2,35.4L129.5,35.4L124.0,34.9L120.5,33.9L118.2,32.8L116.1,30.8L115.1,29.2L114.0,25.5L113.9,20.0L115.0,15.8L116.1,14.0L118.2,12.0L120.5,10.8L124.2,9.8L130.5,9.2ZM161.8,9.5L168.5,9.3L174.8,9.9L178.2,10.8L180.2,11.8L182.8,14.0L183.9,15.8L184.7,18.8L184.9,24.5L184.7,26.2L183.8,29.2L181.8,32.0L178.8,33.9L175.5,34.9L166.0,35.7L156.8,34.8L153.8,33.8L152.0,32.9L150.4,31.5L149.2,30.0L148.3,28.0L147.9,25.5L148.0,18.2L149.1,15.0L151.0,12.8L154.0,11.0L158.0,9.8L161.8,9.5ZM203.0,9.5L209.8,9.4L210.7,10.5L210.8,11.8L210.5,12.8L209.5,13.6L201.8,13.9L200.2,14.2L199.2,14.8L198.7,16.0L198.7,31.0L198.3,33.5L197.5,34.5L196.2,34.9L190.5,34.8L189.1,33.8L188.8,32.0L188.7,15.2L189.2,12.5L190.0,11.7L191.9,10.8L197.2,9.8L203.0,9.5ZM224.0,9.5L230.5,9.3L237.9,9.8L242.2,10.9L244.2,12.0L246.2,14.0L247.0,15.2L247.8,17.3L247.8,27.8L246.9,30.0L245.9,31.5L244.8,32.6L242.8,33.8L240.0,34.8L232.2,35.5L223.2,35.4L222.6,36.0L222.4,36.8L222.2,43.5L221.3,44.8L213.5,44.8L212.6,43.5L212.4,41.8L212.6,13.0L213.2,11.7L214.6,10.8L218.5,9.9L224.0,9.5ZM75.5,9.9L79.0,9.8L81.5,10.0L82.8,10.8L83.4,12.0L83.5,32.2L83.0,33.8L81.5,34.8L75.5,34.8L74.1,34.0L73.7,33.2L73.6,12.0L74.0,10.8L75.5,9.9ZM163.2,13.0L160.8,14.0L159.4,15.2L158.3,18.8L158.1,22.5L158.3,26.5L159.2,29.2L160.5,30.8L162.8,31.8L166.0,32.1L169.8,31.8L172.0,30.8L173.0,29.8L173.9,28.2L174.4,25.0L174.4,21.8L173.9,16.5L173.0,15.0L171.9,14.0L168.5,12.9L163.2,13.0ZM226.0,13.0L223.5,13.5L222.7,14.0L222.4,14.5L222.5,30.5L224.0,31.6L227.5,31.9L232.5,31.9L235.0,31.0L236.0,30.1L237.0,28.7L237.7,25.5L237.8,20.8L237.0,16.2L235.3,14.0L233.0,13.1L230.2,12.8L226.0,13.0Z"/></svg>
+    <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
-    <span class="tag">錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.4.3</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.5.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
     <button type="button" class="chip chipBtn load-state" id="statePlace" data-state="idle" title="選取座標檔"><span class="light" aria-hidden="true"></span><span>座標檔：未套用</span></button>
-    <button type="button" class="chip chipBtn" id="btnOpenRecModal" title="開啟量測紀錄與座標檔資料庫，選取歷史檔案載入分析" style="cursor:pointer;font-weight:500;display:inline-flex;align-items:center;gap:6px">📂 載入記錄檔 ▾</button>
-    <span class="chip" title="目前分析的試產回合">回合 <b id="srcName">範例資料</b> · <b id="srcBoards" class="num">—</b> 板 · <b id="srcPads" class="num">—</b> 焊墊</span>
+    <button type="button" class="chip chipBtn" id="btnOpenRecModal" title="開啟量測紀錄與座標檔資料庫，選取歷史檔案載入分析" style="cursor:pointer;font-weight:500;display:inline-flex;align-items:center;gap:6px">📂 記錄庫 ▾</button>
+    <span class="chip" title="目前分析的試產回合" hidden>回合 <b id="srcName">範例資料</b> · <b id="srcBoards" class="num">—</b> 板 · <b id="srcPads" class="num">—</b> 焊墊</span>
     <div class="menuwrap" id="moreWrap" hidden>
       <button class="chip chipBtn" id="btnMore" aria-haspopup="menu" aria-expanded="false" aria-controls="moreMenu">更多 ▾</button>
       <div class="menu" id="moreMenu" role="menu" hidden>
@@ -781,21 +788,21 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 </div>
 
 <section class="panel" id="p-issues" role="tabpanel">
-  <div id="startupDbBanner" class="card" style="margin-bottom:12px;background:var(--accent-soft);border:1px solid var(--accent);display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-radius:var(--r);flex-wrap:wrap;gap:12px">
-    <div style="display:flex;align-items:center;gap:12px;flex:1 1 320px;min-width:0">
-      <span style="font-size:22px">💡</span>
+  <div id="startupDbBanner" class="card" style="margin-bottom:12px;background:var(--accent-soft);border:1px solid var(--accent);display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:var(--r);flex-wrap:wrap;gap:10px">
+    <div style="display:flex;align-items:center;gap:10px;flex:1 1 300px;min-width:0">
+      <span style="font-size:20px" aria-hidden="true">💡</span>
       <div style="min-width:0">
-        <div style="display:flex;align-items:center;gap:8px">
-          <b style="color:var(--accent-ink);font-size:14.5px">目前載入為範例資料</b>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <b style="color:var(--accent-ink);font-size:14px">範例資料預覽</b>
           <span class="pill" style="font-size:11px;background:var(--surface)">試產 1 · 鋼板 V1</span>
+          <span class="note" id="bannerCloudState" style="color:var(--ink);font-size:12px">連線確認中…</span>
         </div>
-        <div class="note" id="bannerCloudState" style="color:var(--ink);font-size:12.5px;margin-top:2px">正在確認雲端資料庫連線…</div>
-        <div id="bannerRecentRuns" style="margin-top:8px;display:flex;flex-wrap:nowrap;overflow-x:auto;gap:6px;align-items:center" hidden></div>
+        <div id="bannerRecentRuns" style="margin-top:6px;display:flex;flex-wrap:nowrap;overflow-x:auto;gap:6px;align-items:center" hidden></div>
       </div>
     </div>
     <div class="row" style="gap:8px;margin:0;align-items:center">
-      <button type="button" class="primary" id="btnBannerLoadDb" style="padding:6px 14px;font-size:13px">📂 從資料庫載入記錄</button>
-      <button type="button" id="btnBannerGoImport" style="padding:6px 14px;font-size:13px">匯入新檔案</button>
+      <button type="button" class="primary" id="btnBannerLoadDb" style="padding:6px 12px;font-size:13px">📂 記錄庫</button>
+      <button type="button" id="btnBannerGoImport" style="padding:6px 12px;font-size:13px">匯入新檔</button>
       <button type="button" id="btnBannerDismiss" title="略過提示並維持範例資料" style="padding:6px 10px;font-size:12.5px;background:transparent;border:none;cursor:pointer;color:var(--muted)">✕ 略過</button>
     </div>
   </div>
@@ -1165,7 +1172,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   </div>
   <div class="grid2" data-sub="import">
     <div class="card">
-      <h3>匯入 SPI 資料 <small>先選加工廠格式，讀取欄位、確認對應與單位，再套用</small></h3>
+      <h3>匯入 SPI 資料 <small>選格式、讀欄位並套用</small></h3>
       <div class="vendor" id="vendorBox">
         <div class="row">
           <div class="field"><label for="selVendor">① 加工廠 SPI 格式</label><select id="selVendor"><option value="generic">通用格式（每列一筆量測）</option><option value="lirong">立榮電子（每列一焊墊、各板橫排）</option><option value="zsf">振順豐（絕對值橫排）</option></select></div>
@@ -1182,7 +1189,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
           <button id="placeClear" hidden>移除座標檔</button>
           <span class="note" id="placeState"></span>
         </div>
-        <p class="note" id="vendorNote" hidden style="margin:0">立榮格式每列是一個焊墊，Height(%)1、Volume(%)1…分別是第 1、2…片板。系統會轉成一列一筆，TOP 與 BOT 各匯入成一個回合。高度 % 依套用時填寫的<b>鋼板厚度（必填）</b>換算成 µm。座標檔（例如 Layout 匯出的 PartType、RefDes、X、Y、Layer）用位號對應，補上焊墊位置，並以封裝（C0402、R0603…）分元件群組。</p>
+        <p class="note" id="vendorNote" hidden style="margin:0">立榮格式每列一焊墊（各板橫排），TOP／BOT 分別匯入；高度 % 依<b>鋼板厚度（必填）</b>換算 µm，並由座標檔對應位置與封裝群組。</p>
       </div>
       <div class="drop" id="drop">拖放 CSV 或 Excel（.xlsx）檔到這裡，或 <label style="color:var(--accent);cursor:pointer;text-decoration:underline"><input type="file" id="fileIn" accept=".csv,.txt,.tsv,.xlsx" class="sr">選擇檔案</label></div>
       <textarea id="pasteIn" aria-label="貼上 CSV 文字" placeholder="或直接貼上 CSV 文字…" style="margin-top:8px"></textarea>
@@ -1271,7 +1278,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   </div>
   <div class="card" data-sub="records" hidden id="recCard">
     <h3>量測紀錄與座標檔資料庫 <small id="recMode"></small></h3>
-    <p class="note" style="margin:0 0 10px;max-width:80ch">正式座標檔依料號、版次、面別受控；原始檔與 SHA-256 保留。量測需選取有效座標，製令工單或量測日期至少填一項。待判定與已被修正的量測不進入預設統計。舊本機資料僅供查閱。</p>
+    <p class="note" style="margin:0 0 10px;max-width:80ch">受控座標依料號、版次、面別納管（SHA-256 驗證）；正式量測需綁定有效座標並填寫工單或量測日期。</p>
     <div class="row"><div class="field"><label for="recQ">搜尋批號、料號、檔名或上傳者</label><input type="text" id="recQ" placeholder="例：L2410 或 301-000100124" style="min-width:min(100%,240px)"></div><button id="recReload">重新整理</button><span class="note" id="recState" role="status"></span></div>
     <h3 style="margin-top:14px">量測紀錄 <small id="recSpiSub"></small></h3>
     <div class="tbl"><table id="recSpi"></table></div>
@@ -1459,7 +1466,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 
       <div class="sheet-sec-title">資料與設定</div>
       <div class="sheet-list">
-        <button type="button" class="sheet-row" id="mBtnOpenRecModal"><span>📂 載入記錄檔</span><span class="sheet-arrow">›</span></button>
+        <button type="button" class="sheet-row" id="mBtnOpenRecModal"><span>📂 記錄庫</span><span class="sheet-arrow">›</span></button>
         <button type="button" class="sheet-row" data-mtab="data"><span>資料與規格</span><span class="sheet-arrow">›</span></button>
       </div>
 
@@ -1473,6 +1480,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
       </div>
 
       <div class="sheet-ver-info">
+        <svg class="mitcorp-logo" viewBox="0 0 248 45" width="99" height="18" fill="currentColor" fill-rule="evenodd" aria-hidden="true" style="margin:0 auto 6px;height:18px"><path d="M13.8,-0.0L28.5,-0.1L29.2,0.0L30.6,1.0L31.5,2.9L34.7,29.0L35.0,29.8L36.2,30.2L37.5,29.8L38.3,28.2L46.9,3.5L48.0,1.5L48.8,0.8L50.5,-0.1L66.3,0.0L67.6,1.0L68.4,3.2L68.4,30.8L68.3,32.2L67.7,33.8L66.0,34.8L62.8,35.0L59.2,34.8L57.7,33.8L57.3,31.5L57.3,5.8L56.7,4.5L55.2,4.0L53.0,4.7L52.0,6.5L43.5,31.5L42.2,33.3L41.2,34.1L38.2,34.8L28.8,34.8L26.0,34.0L24.6,32.5L24.0,29.8L20.9,5.8L20.2,4.5L18.5,4.0L17.0,4.5L16.5,5.2L12.3,26.8L11.3,30.0L10.5,31.5L8.4,33.8L6.3,35.0L2.2,35.7L1.2,35.7L0.0,35.0L0.0,30.2L1.2,29.6L4.5,28.9L5.4,28.0L6.2,26.2L10.7,3.0L11.9,1.0L13.8,-0.0ZM73.2,-0.0L83.8,0.0L84.6,1.3L84.5,4.2L83.8,5.4L82.8,5.7L75.5,5.8L73.2,5.5L72.7,4.8L72.5,2.8L72.6,1.0L73.2,-0.0ZM90.0,1.7L95.5,1.6L97.2,2.1L97.8,2.8L98.2,4.0L98.3,8.5L98.6,9.2L99.3,9.7L109.8,9.8L110.9,10.2L111.4,12.0L110.9,13.2L110.2,13.6L99.8,13.7L98.8,14.1L98.2,15.5L98.3,27.0L99.0,29.8L100.5,30.9L104.2,31.1L112.5,30.9L113.1,31.5L113.2,33.0L113.0,33.8L112.2,34.6L110.5,35.0L104.5,35.3L95.8,35.1L92.0,33.9L89.9,32.2L88.9,30.5L88.4,27.5L88.4,5.5L88.6,3.0L89.2,2.1L90.0,1.7ZM130.5,9.2L135.5,9.3L144.3,10.0L145.5,10.4L146.1,11.0L146.2,13.2L145.7,14.0L145.0,14.3L140.3,13.8L133.0,13.6L129.5,13.9L127.0,14.9L125.1,17.0L124.3,20.0L124.3,24.0L125.1,27.8L127.0,29.8L130.0,30.9L137.5,31.1L145.2,30.4L146.0,31.0L146.3,32.0L146.2,33.5L145.5,34.3L142.5,35.0L135.2,35.4L129.5,35.4L124.0,34.9L120.5,33.9L118.2,32.8L116.1,30.8L115.1,29.2L114.0,25.5L113.9,20.0L115.0,15.8L116.1,14.0L118.2,12.0L120.5,10.8L124.2,9.8L130.5,9.2ZM161.8,9.5L168.5,9.3L174.8,9.9L178.2,10.8L180.2,11.8L182.8,14.0L183.9,15.8L184.7,18.8L184.9,24.5L184.7,26.2L183.8,29.2L181.8,32.0L178.8,33.9L175.5,34.9L166.0,35.7L156.8,34.8L153.8,33.8L152.0,32.9L150.4,31.5L149.2,30.0L148.3,28.0L147.9,25.5L148.0,18.2L149.1,15.0L151.0,12.8L154.0,11.0L158.0,9.8L161.8,9.5ZM203.0,9.5L209.8,9.4L210.7,10.5L210.8,11.8L210.5,12.8L209.5,13.6L201.8,13.9L200.2,14.2L199.2,14.8L198.7,16.0L198.7,31.0L198.3,33.5L197.5,34.5L196.2,34.9L190.5,34.8L189.1,33.8L188.8,32.0L188.7,15.2L189.2,12.5L190.0,11.7L191.9,10.8L197.2,9.8L203.0,9.5ZM224.0,9.5L230.5,9.3L237.9,9.8L242.2,10.9L244.2,12.0L246.2,14.0L247.0,15.2L247.8,17.3L247.8,27.8L246.9,30.0L245.9,31.5L244.8,32.6L242.8,33.8L240.0,34.8L232.2,35.5L223.2,35.4L222.6,36.0L222.4,36.8L222.2,43.5L221.3,44.8L213.5,44.8L212.6,43.5L212.4,41.8L212.6,13.0L213.2,11.7L214.6,10.8L218.5,9.9L224.0,9.5ZM75.5,9.9L79.0,9.8L81.5,10.0L82.8,10.8L83.4,12.0L83.5,32.2L83.0,33.8L81.5,34.8L75.5,34.8L74.1,34.0L73.7,33.2L73.6,12.0L74.0,10.8L75.5,9.9ZM163.2,13.0L160.8,14.0L159.4,15.2L158.3,18.8L158.1,22.5L158.3,26.5L159.2,29.2L160.5,30.8L162.8,31.8L166.0,32.1L169.8,31.8L172.0,30.8L173.0,29.8L173.9,28.2L174.4,25.0L174.4,21.8L173.9,16.5L173.0,15.0L171.9,14.0L168.5,12.9L163.2,13.0ZM226.0,13.0L223.5,13.5L222.7,14.0L222.4,14.5L222.5,30.5L224.0,31.6L227.5,31.9L232.5,31.9L235.0,31.0L236.0,30.1L237.0,28.7L237.7,25.5L237.8,20.8L237.0,16.2L235.3,14.0L233.0,13.1L230.2,12.8L226.0,13.0Z"/></svg>
         <p>SPI·SPC 分析台 <b id="moreAppVer"></b></p>
         <p>最後更新：<span id="moreAppBuilt"></span></p>
       </div>
@@ -1581,9 +1589,9 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
       </div>
     </div>
     <div class="sheet-foot" style="padding:10px 18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:var(--surface2);flex:0 0 auto">
-      <span class="note" style="font-size:12px;min-width:0">安全保證：原始檔案存入後不可修改，以 SHA-256 指紋驗證無篡改</span>
+      <span class="note" style="font-size:12px;min-width:0">原始檔存入後不可修改（SHA-256 驗證）</span>
       <div style="display:flex;gap:8px;flex:none">
-        <button type="button" id="btnRecPickerGoImport" style="font-size:13px">＋ 匯入新檔案</button>
+        <button type="button" id="btnRecPickerGoImport" style="font-size:13px">＋ 匯入新檔</button>
         <button type="button" id="btnRecPickerCloseBottom" class="primary" style="font-size:13px">完成</button>
       </div>
     </div>
@@ -8028,7 +8036,7 @@ function updateStartupDbBanner() {
 
   RecDB.ready.then(async () => {
     const cloudState=$("#bannerCloudState");
-    if(cloudState)cloudState.textContent=RecDB.mode==="cloud"?"已連線產線雲端資料庫，可選取最近記錄載入分析。":"雲端資料庫未連線；本機歷史資料僅供查閱，正式新匯入需登入連線。";
+    if(cloudState)cloudState.textContent=RecDB.mode==="cloud"?"點選最近批號快速載入，或從記錄庫開啟產線資料。":"雲端未連線（僅供查閱本機歷史資料）。";
     if (RecDB.mode !== "cloud") {
       recentBox.hidden = true;
       recentBox.innerHTML = "";
@@ -8661,9 +8669,10 @@ function pdfFileName(){
   const ts=formatUtc8Date(new Date(),"YYYYMMDD-HHmm");
   return `SPI-SPC_${part}_${lot}_${ts}.pdf`;
 }
+const MITCORP_SVG_PATH="M13.8,-0.0L28.5,-0.1L29.2,0.0L30.6,1.0L31.5,2.9L34.7,29.0L35.0,29.8L36.2,30.2L37.5,29.8L38.3,28.2L46.9,3.5L48.0,1.5L48.8,0.8L50.5,-0.1L66.3,0.0L67.6,1.0L68.4,3.2L68.4,30.8L68.3,32.2L67.7,33.8L66.0,34.8L62.8,35.0L59.2,34.8L57.7,33.8L57.3,31.5L57.3,5.8L56.7,4.5L55.2,4.0L53.0,4.7L52.0,6.5L43.5,31.5L42.2,33.3L41.2,34.1L38.2,34.8L28.8,34.8L26.0,34.0L24.6,32.5L24.0,29.8L20.9,5.8L20.2,4.5L18.5,4.0L17.0,4.5L16.5,5.2L12.3,26.8L11.3,30.0L10.5,31.5L8.4,33.8L6.3,35.0L2.2,35.7L1.2,35.7L0.0,35.0L0.0,30.2L1.2,29.6L4.5,28.9L5.4,28.0L6.2,26.2L10.7,3.0L11.9,1.0L13.8,-0.0ZM73.2,-0.0L83.8,0.0L84.6,1.3L84.5,4.2L83.8,5.4L82.8,5.7L75.5,5.8L73.2,5.5L72.7,4.8L72.5,2.8L72.6,1.0L73.2,-0.0ZM90.0,1.7L95.5,1.6L97.2,2.1L97.8,2.8L98.2,4.0L98.3,8.5L98.6,9.2L99.3,9.7L109.8,9.8L110.9,10.2L111.4,12.0L110.9,13.2L110.2,13.6L99.8,13.7L98.8,14.1L98.2,15.5L98.3,27.0L99.0,29.8L100.5,30.9L104.2,31.1L112.5,30.9L113.1,31.5L113.2,33.0L113.0,33.8L112.2,34.6L110.5,35.0L104.5,35.3L95.8,35.1L92.0,33.9L89.9,32.2L88.9,30.5L88.4,27.5L88.4,5.5L88.6,3.0L89.2,2.1L90.0,1.7ZM130.5,9.2L135.5,9.3L144.3,10.0L145.5,10.4L146.1,11.0L146.2,13.2L145.7,14.0L145.0,14.3L140.3,13.8L133.0,13.6L129.5,13.9L127.0,14.9L125.1,17.0L124.3,20.0L124.3,24.0L125.1,27.8L127.0,29.8L130.0,30.9L137.5,31.1L145.2,30.4L146.0,31.0L146.3,32.0L146.2,33.5L145.5,34.3L142.5,35.0L135.2,35.4L129.5,35.4L124.0,34.9L120.5,33.9L118.2,32.8L116.1,30.8L115.1,29.2L114.0,25.5L113.9,20.0L115.0,15.8L116.1,14.0L118.2,12.0L120.5,10.8L124.2,9.8L130.5,9.2ZM161.8,9.5L168.5,9.3L174.8,9.9L178.2,10.8L180.2,11.8L182.8,14.0L183.9,15.8L184.7,18.8L184.9,24.5L184.7,26.2L183.8,29.2L181.8,32.0L178.8,33.9L175.5,34.9L166.0,35.7L156.8,34.8L153.8,33.8L152.0,32.9L150.4,31.5L149.2,30.0L148.3,28.0L147.9,25.5L148.0,18.2L149.1,15.0L151.0,12.8L154.0,11.0L158.0,9.8L161.8,9.5ZM203.0,9.5L209.8,9.4L210.7,10.5L210.8,11.8L210.5,12.8L209.5,13.6L201.8,13.9L200.2,14.2L199.2,14.8L198.7,16.0L198.7,31.0L198.3,33.5L197.5,34.5L196.2,34.9L190.5,34.8L189.1,33.8L188.8,32.0L188.7,15.2L189.2,12.5L190.0,11.7L191.9,10.8L197.2,9.8L203.0,9.5ZM224.0,9.5L230.5,9.3L237.9,9.8L242.2,10.9L244.2,12.0L246.2,14.0L247.0,15.2L247.8,17.3L247.8,27.8L246.9,30.0L245.9,31.5L244.8,32.6L242.8,33.8L240.0,34.8L232.2,35.5L223.2,35.4L222.6,36.0L222.4,36.8L222.2,43.5L221.3,44.8L213.5,44.8L212.6,43.5L212.4,41.8L212.6,13.0L213.2,11.7L214.6,10.8L218.5,9.9L224.0,9.5ZM75.5,9.9L79.0,9.8L81.5,10.0L82.8,10.8L83.4,12.0L83.5,32.2L83.0,33.8L81.5,34.8L75.5,34.8L74.1,34.0L73.7,33.2L73.6,12.0L74.0,10.8L75.5,9.9ZM163.2,13.0L160.8,14.0L159.4,15.2L158.3,18.8L158.1,22.5L158.3,26.5L159.2,29.2L160.5,30.8L162.8,31.8L166.0,32.1L169.8,31.8L172.0,30.8L173.0,29.8L173.9,28.2L174.4,25.0L174.4,21.8L173.9,16.5L173.0,15.0L171.9,14.0L168.5,12.9L163.2,13.0ZM226.0,13.0L223.5,13.5L222.7,14.0L222.4,14.5L222.5,30.5L224.0,31.6L227.5,31.9L232.5,31.9L235.0,31.0L236.0,30.1L237.0,28.7L237.7,25.5L237.8,20.8L237.0,16.2L235.3,14.0L233.0,13.1L230.2,12.8L226.0,13.0Z";
 function buildPrintHeadHtml(tabName){
   const parts=[];
-  parts.push(`<b>SPI·SPC 分析台 · ${esc(tabName)}</b>`);
+  parts.push(`<svg viewBox="0 0 248 45" width="77" height="14" fill="#04273F" fill-rule="evenodd" aria-hidden="true" style="vertical-align:-2px;margin-right:8px"><path d="${MITCORP_SVG_PATH}"/></svg><b>SPI·SPC 分析台 · ${esc(tabName)}</b>`);
   if(S.source)parts.push(`回合：${esc(S.source)}`);
   const metLabel=(METRICS[S.metric]||{}).label||S.metric;
   if(metLabel)parts.push(`量測項目：${esc(metLabel)}`);
@@ -8919,7 +8928,11 @@ function renderReport(){
 
   const s1=`<div class="rep-sec" id="repSec1">
     <div style="border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:20px">
-      <h1 style="font-size:22px;margin:0 0 6px">SPI·SPC 錫膏印刷統計製程管制分析報告</h1>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+        <svg class="mitcorp-logo" viewBox="0 0 248 45" width="121" height="22" fill="currentColor" fill-rule="evenodd" role="img" aria-label="Mitcorp" style="height:22px"><path d="${MITCORP_SVG_PATH}"/></svg>
+        <span style="width:1px;height:20px;background:var(--line)"></span>
+        <h1 style="font-size:22px;margin:0">SPI·SPC 錫膏印刷統計製程管制分析報告</h1>
+      </div>
       <div style="font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 16px">
         <span>產生時間：${nowStr} (UTC+8)</span><span>系統版本：${esc(APP.ver)} · ${esc(APP.built)}</span>
       </div>
