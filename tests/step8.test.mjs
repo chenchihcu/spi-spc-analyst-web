@@ -10,6 +10,11 @@ const require = createRequire(import.meta.url);
 const { JSDOM } = (() => { try { return require("jsdom"); } catch { return {}; } })();
 const { HTML } = require("./_load.js");
 const tick = (ms) => new Promise((r) => setTimeout(r, ms));
+// 帶逾時的條件輪詢（AGENTS.md：非同步測試不用固定休眠）
+async function waitFor(cond, ms = 5000) {
+  const t0 = Date.now();
+  for (;;) { const v = cond(); if (v) return v; if (Date.now() - t0 > ms) throw new Error("waitFor 逾時"); await tick(10); }
+}
 const html = () => fs.readFileSync(HTML, "utf8").replace(/<script src=[^>]+><\/script>/g, "");
 
 function createPage(url = "https://spi.example/", extra = {}) {
@@ -239,6 +244,93 @@ test("3D 空白自我檢查：diag3D 依序判定、量不到視為正常", { sk
   assert.match(H.diag3D({ ...ok, calls: 0 }), /未執行任何繪製/);
   assert.match(H.diag3D({ ...ok, alpha: 0 }), /畫面空白/);
   assert.match(H.diag3D({ ...ok, alpha: 0, meshes: 0 }), /畫面空白/, "空板仍會畫底板，alpha=0 仍算失敗");
+  assert.match(H.diag3D({ ...ok, nan: 3, alpha: 0 }), /NaN.*不是顯示卡/, "NaN 座標要報成資料問題，不可誤報顯示卡");
+});
+
+test("3D 示意位置：受控座標只有元件中心時展開焊墊，不寫回焊墊 X/Y", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const dom = createPage();
+  const H = await waitFor(() => dom.window.SPI_TEST_HOOK?.pos3D && dom.window.SPI_TEST_HOOK);
+  // 2026-10-28 正式站：受控座標檔回合只有 componentX/Y，build3D 讀 r.x 得 NaN，整個 3D 空白
+  const mk = (pad, comp, cx, cy) => ({ board: "B09", pad, comp, componentX: cx, componentY: cy, w: 0.7, d: 0.7 });
+  const rows = [mk("U1-1", "U1", 10, 20), mk("U1-2", "U1", 10, 20), mk("U1-3", "U1", 10, 20), mk("U1-4", "U1", 10, 20),
+    mk("R5-1", "R5", 30, 5), { board: "B09", pad: "X9-1", comp: "X9", w: 0.7, d: 0.7 },
+    { board: "B09", pad: "G1", x: 1, y: 2, gridPos: true, w: 0.7, d: 0.7 }];
+  const P = H.pos3D(rows);
+  assert.equal(P.size, 6, "無任何座標的焊墊不繪出");
+  assert.ok(!P.has(rows[5]));
+  for (const p of P.values()) assert.ok(Number.isFinite(p.x) && Number.isFinite(p.y), "示意位置不可為 NaN");
+  assert.deepEqual({ ...P.get(rows[6]) }, { x: 1, y: 2, est: false }, "既有 x/y（含舊格狀示意）照用");
+  const u1 = rows.slice(0, 4).map(r => P.get(r));
+  assert.ok(u1.every(p => p.est), "元件中心來源要標成示意");
+  assert.equal(new Set(u1.map(p => p.x + "," + p.y)).size, 4, "同元件焊墊展開後不可重疊");
+  const mx = u1.reduce((s, p) => s + p.x, 0) / 4, my = u1.reduce((s, p) => s + p.y, 0) / 4;
+  assert.ok(Math.abs(mx - 10) < 1e-9 && Math.abs(my - 20) < 1e-9, "展開以元件中心為中心");
+  assert.ok(u1.every(p => Math.hypot(p.x - 10, p.y - 20) < 0.7 * 1.4 * 2), "展開不離元件中心太遠");
+  assert.deepEqual({ ...P.get(rows[4]) }, { x: 30, y: 5, est: true }, "單一焊墊元件放在元件中心");
+  assert.ok(rows.every(r => !("x" in r) || r.pad === "G1"), "不可把元件中心寫回 r.x/r.y（統計不使用）");
+});
+
+test("受控座標匯入 → buildRows → 3D 示意位置皆為有限值（使用者實際資料路徑）", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const dom = createPage();
+  const w = dom.window, H = await waitFor(() => w.SPI_TEST_HOOK?.pos3D && w.SPI_TEST_HOOK);
+  // 範例資料與舊本機回合走格狀回退（gridPos），驗不到受控座標路徑；這裡照正式匯入的 o.place.controlled 建列
+  // 兩種實際輸入：沒有 X/Y 欄（x 為 undefined）與廠商格式轉換後 X/Y 欄空白（x 為 null；isFinite(null) 為 true）
+  for (const [label, head, cells] of [["無 X/Y 欄", "", ""], ["X/Y 欄空白", ",X,Y", ",,"]]) {
+    const csv = `Board,Component ID,PAD ID,Volume(%)${head}\n` +
+      ["U1", "U1", "U1", "U1", "R5", "R5", "X9"].map((c, i) => `1,${c},${i + 1},${100 + i}${cells}`).join("\n") + "\n";
+    const table = w.csvTable(csv), map = w.autoMap(table.head);
+    const opts = { ...w.guessOpts(table.head, map), side: "TOP",
+      place: { controlled: true, items: [{ side: "TOP", ref: "U1", x: 10, y: 20 }, { side: "TOP", ref: "R5", x: 30, y: 5 }] } };
+    const { rows } = w.buildRows(table, map, opts);
+    assert.equal(rows.length, 7, label);
+    assert.ok(rows.every(r => r.x == null && r.y == null), `${label}：受控匯入不產生焊墊 X/Y（前提）`);
+    H.T.pos = null;
+    const P = H.pos3D(rows);
+    assert.equal(P.size, 6, `${label}：有元件中心的 6 個焊墊都要畫，無座標的 X9 略過`);
+    for (const p of P.values()) assert.ok(Number.isFinite(p.x) && Number.isFinite(p.y) && p.est, `${label}：3D 座標必須是有限值且標為示意`);
+    assert.equal(new Set([...P.values()].map(p => p.x + "," + p.y)).size, 6, `${label}：焊墊不可疊在同一點`);
+    assert.ok(rows.every(r => !H.realXY(r)), `${label}：統計端不可把空白座標當成 (0,0)`);
+    // HUD 與匯出快照共用的註記
+    const S = H.S, saved = [S.rows, S.board, S.group];
+    try { S.rows = rows; S.board = rows[0].board; S.group = "ALL"; H.T.pos = null;
+      assert.equal(H.pos3DNote(), "元件中心示意，非焊墊實際位置（6 個焊墊） · 1 個焊墊無座標未繪出", label);
+    } finally { [S.rows, S.board, S.group] = saved; H.T.pos = null; }
+  }
+});
+
+test("3D 鏡頭依板面大小對準：範例板不變、大板等比放大、超過 1 公尺提示單位", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const dom = createPage();
+  const w = dom.window, H = await waitFor(() => w.SPI_TEST_HOOK?.fit3D && w.SPI_TEST_HOOK);
+  // 範例板 60 mm：與原本固定值相同（不改既有畫面）
+  assert.deepEqual({ ...H.fit3D(60) }, { rad: 78, min: 20, max: 160, near: 0.1, far: 500 });
+  // 小板（單一元件約 8 mm）不拉近：放大後的錫膏高度不隨板面縮放，拉近會超出畫面（PR #74 審查）
+  assert.deepEqual({ ...H.fit3D(8) }, { ...H.fit3D(60) });
+  // 190 mm 實板：等比放大，整塊板仍在鏡頭內
+  const f = H.fit3D(190);
+  assert.ok(Math.abs(f.rad / 78 - 190 / 60) < 1e-12 && f.far > f.rad + 190, "距離與遠裁切面隨板面放大");
+  // 2026-10-28 正式站 B09：元件中心 55–7486 × 140–4740（疑似 mil 當 mm）
+  const mk = (x, y) => ({ x, y });
+  const P = new Map([[1, mk(55, 140)], [2, mk(7486.22, 4740)], [3, mk(3000, 2000)]]);
+  const E = H.ext3D(P);
+  assert.equal(Math.round(E.w), 7439); assert.equal(Math.round(E.d), 4608); assert.equal(E.span, E.w);
+  assert.match(H.size3DNote(E), /超過 1 公尺.*單位可能有誤/);
+  assert.equal(H.size3DNote(H.ext3D(new Map([[1, mk(0, 0)], [2, mk(190, 120)]]))), "", "正常大小不提示");
+  // pos3DNote（HUD 與匯出快照共用）帶出單位提示
+  const S = H.S, saved = [S.rows, S.board, S.group];
+  try {
+    S.rows = [{ board: "B1", pad: "U1-1", comp: "U1", componentX: 55, componentY: 140, w: 0.7, d: 0.7 },
+      { board: "B1", pad: "U2-1", comp: "U2", componentX: 7486.22, componentY: 4740, w: 0.7, d: 0.7 }];
+    S.board = "B1"; S.group = "ALL"; H.T.pos = null;
+    assert.match(H.pos3DNote(), /元件中心示意.*超過 1 公尺/);
+  } finally { [S.rows, S.board, S.group] = saved; H.T.pos = null; }
+  // 匯出快照的註記斷行：每行不超過寬度、文字不遺失（單位提示在最後，單行會被截掉）
+  const g = { measureText: (t) => ({ width: [...t].length * 18 }) };
+  const note = "⚠ 元件中心示意，非焊墊實際位置（1000 個焊墊） · " + H.size3DNote(E);
+  const lines = H.wrapCanvasText(g, note, 1076);
+  assert.ok(lines.length >= 2, "長註記要斷成多行");
+  assert.ok(lines.every(l => g.measureText(l).width <= 1076), "每行不超過畫布寬度");
+  assert.equal(lines.join("").replace(/\s/g, ""), note.replace(/\s/g, ""), "斷行不遺失文字");
+  assert.match(lines.at(-1), /單位設定/, "改正指引留在快照內");
 });
 
 test("3D 側欄出錯不擋 3D 初始化：safeBoard2D 標示錯誤並回傳 false", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
