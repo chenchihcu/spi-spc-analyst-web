@@ -226,6 +226,21 @@ test("開啟歷史立榮紀錄：無原座標不借用目前座標；有原座�
   assert.deepEqual(errs, []);
 });
 
+test("開啟沒有座標引用的通用格式歷史紀錄：不論加工廠格式都不借用目前座標", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const placeText = "RefDes,X,Y,PartType,Layer\nU1,10,20,C0402,TOP\n";
+  const tab = { head: placeText.trim().split('\n')[0].split(','), data: [placeText.trim().split('\n')[1].split(',')] };
+  const preload = JSON.stringify({ recId: 'currentplace0000000001', part: 'PG', rev: 'V1', name: 'pl.csv', tab, unit: 'mm', side: 'TOP' });
+  const { dom, errs } = page([], null, preload);
+  await tick(50);
+  const w = dom.window, $ = (s) => w.document.querySelector(s);
+  const generic = await seedHistorical(w, { kind: 'spi', part: 'PG', lot: 'LG', side: 'TOP', vendor: 'generic', name: 'g.csv', stencil: 120 }, CSV);
+  assert.match($('#placeState').textContent, /料號 PG 版次 V1/);
+  await w.SPI_TEST_HOOK.openRecord(generic, { autoApply: false });
+  assert.doesNotMatch($('#mapPrev').textContent, /座標檔已套用/, '歷史通用格式紀錄不得借用目前座標');
+  assert.match($('#toast').textContent, /當時沒有使用座標檔/);
+  assert.deepEqual(errs, []);
+});
+
 test("歷史紀錄開啟失敗不污染下一次匯入；原座標缺失時可檢視且不借用其他座標", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const { dom, errs } = page([]);
   await tick(50);

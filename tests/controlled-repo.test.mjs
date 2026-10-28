@@ -123,7 +123,7 @@ test('管理角色只初始化一次，撤權後立即失效，最後一位可�
   assert.equal(await repo.isAdmin('other@example.com'), true);
 });
 
-test('authenticated API enforces admin upload, server validation, unmatched confirmation and pending review', async () => {
+function apiHarness() {
   const db = database(), r2 = bucket();
   const env = { DB: db, BLOBS: r2, ASSETS: { fetch: async () => new Response('ok') },
     AUTH_USERS: JSON.stringify({ 'admin@example.com': `pepper-hmac-sha256$600000$${'a'.repeat(64)}`,
@@ -138,6 +138,13 @@ test('authenticated API enforces admin upload, server validation, unmatched conf
       'x-rec-meta': encodeURIComponent(JSON.stringify(meta)), 'x-raw-bytes': String(raw.length), 'x-raw-sha256': sha,
     }, body: gzipSync(raw) }), env);
   };
+  const linkCheck = async (recordId, user = 'user@example.com') => handleRequest(new Request(
+    `https://spi.test/api/records?link_check=${recordId}`, { headers: { cookie: await cookie(user) } }), env);
+  return { db, r2, env, cookie, upload, linkCheck };
+}
+
+test('authenticated API enforces admin upload, server validation, unmatched confirmation and pending review', async () => {
+  const { db, r2, env, cookie, upload } = apiHarness();
   const placeMeta = { kind: 'place', part: 'P', rev: 'V5', side: 'TOP', unit: 'mm', name: 'p.csv' };
   const placeCsv = 'RefDes,X,Y,Layer\nU1,1,2,L1-TOP\n';
   const nonAdminRoles = await handleRequest(new Request('https://spi.test/api/admin/users', {
@@ -180,4 +187,102 @@ test('authenticated API enforces admin upload, server validation, unmatched conf
   assert.equal(promote.status, 201);
   assert.equal((await new Repo(db, r2).getRecord(old.id)).validation_source, 'legacy');
   assert.equal((await new Repo(db, r2).coordinateScope('P-OLD', 'V1', 'TOP')).validation_source, 'server_verified');
+});
+
+test('對應證明：上傳寫入伺服器快照，link_check 重算指紋、身分與位號', async () => {
+  const { db, r2, upload, linkCheck } = apiHarness();
+  const placeCsv = 'RefDes,X,Y,Layer\nU1,1,2,L1-TOP\nC9,3,4,L1-TOP\nR1,5,6,L1-BOT\n';
+  const placeRecord = (await (await upload('admin@example.com', { kind: 'place', part: 'P', rev: 'V5', side: 'BOTH', unit: 'mm', name: 'p.csv' }, placeCsv)).json()).record;
+  const spiCsv = 'Component ID,PAD ID,Height(%)1,Result1\nU1_1,1,88,PASS\nU1_1,2,89,PASS\nR1_1,1,90,PASS\nQ7_1,1,91,PASS\n';
+  const meta = { kind: 'spi', part: 'P', rev: 'V5', side: 'TOP', placeId: placeRecord.id, workOrder: 'WO-1', name: 'm.csv',
+    unmatchedConfirmed: true, unmatchedRefs: ['Q7', 'R1'],
+    placeProof: { placeId: 'forged_forged_forged00', sha256: 'f'.repeat(64), matchedRefs: 999 } };
+  const created = await upload('user@example.com', meta, spiCsv);
+  assert.equal(created.status, 201);
+  const rec = (await created.json()).record;
+  const proof = JSON.parse((await new Repo(db, r2).getRecord(rec.id)).meta).placeProof;
+  assert.deepEqual({ ...proof, at: undefined }, { placeId: placeRecord.id, sha256: placeRecord.sha256, part: 'P', rev: 'V5', side: 'BOTH',
+    unit: 'mm', measuredSide: 'TOP', measuredRefs: 3, matchedRefs: 1, coordRefsOnSide: 2, at: undefined }, '偽造的快照被伺服器值覆蓋');
+  assert.equal(proof.at, rec.created);
+
+  const ok = await (await linkCheck(rec.id)).json();
+  assert.equal(ok.linked, true);
+  assert.equal(ok.measurement.shaOk, true);
+  assert.equal(ok.place.shaOk, true);
+  assert.deepEqual(ok.identity, { partOk: true, revOk: true, sideOk: true, proofPlaceIdOk: true });
+  assert.deepEqual(ok.snapshot, { present: true, shaOk: true });
+  assert.deepEqual([ok.refs.measured, ok.refs.matched, ok.refs.coordOnSide], [3, 1, 2]);
+  assert.deepEqual(ok.refs.missing, ['Q7', 'R1']);
+  assert.deepEqual(ok.refs.wrongSide, ['R1']);
+  assert.equal(ok.refs.unmatchedConsistent, true);
+
+  // 已確認的無座標位號和重算結果不同：只影響一致性，不影響指紋
+  db.raw.prepare(`UPDATE records SET unmatched_refs = '["Q7"]' WHERE id = ?`).run(rec.id);
+  assert.equal((await (await linkCheck(rec.id)).json()).refs.unmatchedConsistent, false);
+
+  // 竄改 R2 座標原檔
+  r2.objects.set(`records/${placeRecord.id}`, gzipSync(Buffer.from(placeCsv.replace('U1,1,2', 'U1,9,9'))));
+  const tampered = await (await linkCheck(rec.id)).json();
+  assert.equal(tampered.place.shaOk, false);
+  assert.equal(tampered.place.error, '受控座標原始檔指紋不符');
+  assert.equal(tampered.snapshot.shaOk, false);
+  assert.ok(tampered.refs.error);
+
+  // 座標原檔遺失
+  r2.objects.delete(`records/${placeRecord.id}`);
+  const gone = await (await linkCheck(rec.id)).json();
+  assert.deepEqual([gone.place, gone.placeMissing], [null, 'file']);
+
+  assert.equal((await linkCheck(placeRecord.id)).status, 404, '座標檔不是量測紀錄');
+  assert.equal((await linkCheck('record_000000000000404')).status, 404);
+});
+
+test('對應證明：未登入不可呼叫 link_check', async () => {
+  const { env } = apiHarness();
+  const res = await handleRequest(new Request(`https://spi.test/api/records?link_check=${id(1)}`), env);
+  assert.equal(res.status, 401);
+});
+
+test('對應證明：沒有快照的受控紀錄照常重算，指向不存在座標的紀錄回報 place:null', async () => {
+  const { db, r2, linkCheck } = apiHarness();
+  const repo = new Repo(db, r2);
+  const placeRaw = Buffer.from('RefDes,X,Y,Layer\nU1,1,2,L1-TOP\n'), spiRaw = Buffer.from('Component ID,PAD ID,Height(%)1\nU1_1,1,88\n');
+  const sha = b => createHash('sha256').update(b).digest('hex');
+  await repo.createRecord({ ...place(1), sha256: sha(placeRaw), name: 'p.csv' }, gzipSync(placeRaw));
+  await repo.createRecord({ ...spi(2, sha(spiRaw), 'WO-1'), name: 'm.csv' }, gzipSync(spiRaw));
+  const old = await (await linkCheck(id(2))).json();
+  assert.deepEqual(old.snapshot, { present: false, shaOk: null });
+  assert.equal(old.identity.proofPlaceIdOk, null);
+  assert.equal(old.place.shaOk, true);
+  assert.equal(old.refs.matched, 1);
+  assert.equal(old.refs.unmatchedConsistent, true);
+  await repo.createRecord({ ...spi(3, 'x'.repeat(64), 'WO-2'), placeId: 'missingplace0000000000', name: 'm.csv' }, gzipSync(spiRaw));
+  const missing = await (await linkCheck(id(3))).json();
+  assert.deepEqual([missing.place, missing.placeMissing, missing.measurement.shaOk], [null, 'record', false]);
+});
+
+test('重新受控匯入：原檔指紋必須等於舊紀錄，舊紀錄保留並可查到新紀錄', async () => {
+  const { db, r2, upload, linkCheck } = apiHarness();
+  const repo = new Repo(db, r2);
+  const placeRecord = (await (await upload('admin@example.com', { kind: 'place', part: 'P', rev: 'V5', side: 'TOP', unit: 'mm', name: 'p.csv' },
+    'RefDes,X,Y,Layer\nU1,1,2,L1-TOP\n')).json()).record;
+  const spiCsv = 'Component ID,PAD ID,Height(%)1\nU1_1,1,88\n', raw = Buffer.from(spiCsv);
+  const legacy = { id: id(70), kind: 'spi', part: 'P', lot: 'L1', side: 'TOP', name: 'old.csv', user: 'user@example.com', created: 70,
+    sha256: createHash('sha256').update(raw).digest('hex'), bytes: raw.length };
+  await repo.createRecord(legacy, gzipSync(raw));
+  const legacyCheck = await (await linkCheck(legacy.id)).json();
+  assert.deepEqual([legacyCheck.linked, legacyCheck.reimportedAs, legacyCheck.measurement.shaOk], [false, [], true]);
+  const meta = { kind: 'spi', part: 'P', rev: 'V5', side: 'TOP', placeId: placeRecord.id, workOrder: 'WO-9', name: 'old.csv' };
+  const codeOf = async res => [res.status, (await res.json()).code];
+  assert.deepEqual(await codeOf(await upload('user@example.com', { ...meta, sourceLegacyId: id(71) }, spiCsv)), [422, 'legacy_source_missing']);
+  assert.deepEqual(await codeOf(await upload('user@example.com', { ...meta, sourceLegacyId: placeRecord.id }, spiCsv)), [422, 'legacy_source_invalid']);
+  assert.deepEqual(await codeOf(await upload('user@example.com', { ...meta, sourceLegacyId: legacy.id }, spiCsv.replace('88', '87'))), [422, 'legacy_source_mismatch']);
+  const created = await upload('user@example.com', { ...meta, sourceLegacyId: legacy.id }, spiCsv);
+  assert.equal(created.status, 201);
+  const rec = (await created.json()).record;
+  assert.equal(JSON.parse((await repo.getRecord(rec.id)).meta).sourceLegacyId, legacy.id);
+  const after = await repo.getRecord(legacy.id);
+  assert.deepEqual([after.validation_source, after.lifecycle, after.place_id || ''], ['legacy', 'legacy', '']);
+  assert.deepEqual((await (await linkCheck(legacy.id)).json()).reimportedAs.map(r => r.id), [rec.id]);
+  assert.equal((await (await linkCheck(rec.id)).json()).refs.matched, 1);
 });
