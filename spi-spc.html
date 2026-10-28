@@ -245,7 +245,7 @@ table.show-all tr.more-row{display:table-row}
 .field{display:flex;flex-direction:column;gap:3px;min-width:0}
 .field label{font-size:11px;color:var(--muted);letter-spacing:.06em}
 select{max-width:100%}
-select,input[type=number],input[type=text],textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:6px 9px;min-height:34px;scroll-margin-top:calc(var(--navbar-h) + var(--safe-t) + 16px);scroll-margin-bottom:calc(var(--tabbar-h) + var(--safe-b) + 16px)}
+select,input[type=number],input[type=text],input[type=password],textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:6px 9px;min-height:34px;scroll-margin-top:calc(var(--navbar-h) + var(--safe-t) + 16px);scroll-margin-bottom:calc(var(--tabbar-h) + var(--safe-b) + 16px)}
 #p-report label, #p-mail label{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:4px 6px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 input[type=number]{width:88px;font-family:var(--f-mono)}
 select:focus-visible,input:focus-visible,textarea:focus-visible,button:focus-visible,.tab:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
@@ -266,6 +266,7 @@ button:disabled{opacity:.5;cursor:default}
 @media (pointer:coarse){
   button,select,input[type=number],input[type=text],input[type=date],textarea{min-height:44px;min-width:44px}
   select,input[type=number],input[type=text],input[type=date],textarea{font-size:16px!important}
+  input[type=password]{min-height:44px;min-width:44px;font-size:16px!important}
   .tab{min-height:46px;min-width:44px;padding:10px 16px}
   #btnMore,.chip.chipBtn,a.chip,.chipbtn{min-height:44px;min-width:44px;padding:6px 14px;display:inline-flex;align-items:center;justify-content:center}
   #bannerRecentRuns{min-height:44px}
@@ -496,6 +497,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 
   button,select,input,textarea,summary,[role="button"]{min-height:44px}
   select,input[type=number],input[type=text],input[type=date],textarea{font-size:16px!important}
+  input[type=password]{min-height:44px;min-width:44px;font-size:16px!important}
   .card .cbtn,.toc button,.how summary{min-height:44px!important;display:inline-flex!important;align-items:center!important;padding:0 12px!important}
   .chipbtn,.chip.chipBtn,a.chip,.seg button,.linkbtn,.rec-act button{min-height:44px!important;min-width:44px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important}
 
@@ -688,7 +690,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.5.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.6.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -984,7 +986,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
       <div class="chartbox short"><canvas id="cStroke" role="img" aria-label="刮刀前後比較"></canvas></div><p id="strokeTxt" style="margin:8px 0 0"></p></div>
     <div class="card"><h3>鋼板擦拭週期 <small id="wipeSub"></small></h3>
       <details class="how"><summary>怎麼看</summary><p>依擦拭後第幾片分組。面積或連錫風險隨片數上升，代表鋼板底面殘錫累積，可縮短擦拭間隔或改用濕擦 / 真空擦；高度隨片數下降則可能是孔壁殘留。</p></details>
-      <div class="row"><div class="field"><label for="inWipe">每幾片擦拭一次</label><input type="number" id="inWipe" min="2" max="50" step="1" value="5"></div></div>
+      <div class="row"><div class="field"><label for="inWipe">每幾片擦拭一次</label><input type="number" id="inWipe" min="2" max="50" step="1" value="5"></div></div><div class="chartbox short" style="margin-top:8px"><canvas id="cWipe" role="img" aria-label="擦拭週期分析"></canvas></div><p id="wipeTxt" style="margin:8px 0 0"></p></div></div>
   <div class="card" id="cardMorph">
     <h3>3D 微觀形貌特徵指標 <small id="morphSub">橋接餘裕、脫模拉尖、共面性與覆蓋率</small></h3>
     <details class="how"><summary>怎麼看</summary><p>現代 3D SPI 輸出的微觀幾何特徵：橋接餘裕（Bridge Margin，相鄰焊墊間實際最短間距比例，&lt;25% 具高短路風險）、脫模拉尖（Peaking，&gt;35µm 易引致回焊錫珠飛濺或貼片吸嘴排氣不良）、共面性（Coplanarity）與覆蓋率（Coverage）。</p></details>
@@ -1104,12 +1106,11 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 </section>
 
 <section class="panel" id="p-ai" role="tabpanel" hidden>
-  <div class="card">
-    <h3>Claude 品質工程分析 <small>將目前全部統計結果與交叉驗證送出，回覆分開事實與推論</small></h3>
+  <div class="card" id="aiSettingsCard"><h3 id="aiSettingsHead">API 金鑰與使用量設定 <small id="aiKeyBadge"><span class="pill warn">尚未設定金鑰</span></small></h3><div style="display:grid;gap:12px"><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap"><div class="field" style="flex:1 1 260px;min-width:0"><label for="inAiKey">OpenAI API Key（個人金鑰，僅儲存於此瀏覽器並經本站安全轉發）</label><div style="display:flex;gap:6px;align-items:center"><input type="password" id="inAiKey" placeholder="sk-proj-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggle" title="顯示或隱藏 API Key">顯示</button></div></div><div class="field"><label for="inAiDailyLim">每日次數上限 (次/日)</label><input type="number" id="inAiDailyLim" value="20" min="1" max="500" step="1" style="width:96px"></div><div class="field"><label for="inAiTokenLim">每月 Token 上限</label><input type="number" id="inAiTokenLim" value="500000" min="1000" max="10000000" step="10000" style="width:120px"></div><div class="field"><label for="inAiUsdLim">每月費用上限 (USD)</label><input type="number" id="inAiUsdLim" value="5.0" min="0.5" max="500" step="0.5" style="width:96px"></div><div class="row" style="gap:6px"><button type="button" class="primary" id="btnAiSaveCfg">儲存設定</button><button type="button" id="btnAiClearKey">清除金鑰</button></div></div><div class="row" style="gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted)"><span class="chip">模型：<b class="mono" id="aiModelLabel">gpt-6.1-terra</b></span><span class="chip">推理能力：<b class="mono" id="aiEffortLabel">高 (high)</b></span><span class="chip">計價基準：<b>輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens</b></span><span class="note" id="aiCfgMsg" role="status"></span></div><div class="grid2" style="gap:10px;margin-top:2px"><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;margin-bottom:6px"><b>今日呼叫次數 (<span id="aiUsageDayLabel">今日</span>)</b><span class="mono" id="aiDailyUsageText">0 / 20 次 (0%)</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiDailyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;margin-bottom:6px;gap:8px;flex-wrap:wrap"><b>本月累計用量 (<span id="aiUsageMonthLabel">本月</span>)</b><span class="mono" id="aiMonthlyUsageText">0 tokens · 預估 $0.00 / $5.00 USD</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiMonthlyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div></div></div></div><div class="card"><h3>ChatGPT 品質工程分析 <small>OpenAI gpt-6.1-terra（高推理強度） · 將目前全部統計結果與交叉驗證送出，嚴格區分事實與推論</small></h3>
     <div class="notice" id="aiNoticeBox" style="background:var(--surface2);padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:12.5px;color:var(--ink)">
       <p style="margin:0 0 6px"><b>送出前告知與資料隱私保護：</b></p>
       <ul style="margin:0 0 6px 18px;padding:0;line-height:1.6">
-        <li><b>服務商路徑：</b>經由 Cloudflare AI Gateway 安全轉發至 Anthropic（Claude 3.5 Sonnet）。</li>
+        <li><b>服務商路徑：</b>由本站後端以 API Key 安全轉發至 OpenAI（<code>gpt-6.1-terra</code>，推理能力：<code>high</code>）。</li>
         <li><b>實際送出欄位：</b>試產回合名稱、量測指標、單位、規格窗、鋼板與階梯設定、樣本數與板數、整體平均與 σ、製程能力（Cp/Cpk/Pp/Ppk 及信賴區間）、判異點數與 Nelson 規則、問題清單（嚴重與警示卡片之事實現況與推論）。</li>
         <li><b>包含的識別資料：</b>板號清單（如序號）、最差焊墊 ID、問題事實中的焊墊名稱（如 U2-05）、試產回合名稱。</li>
         <li><b>AI Gateway 記錄設定：</b><span id="aiGatewayLogNotice">預設不保存提示詞與回應內容（已帶 <code>cf-aig-collect-log-payload: false</code>，僅留存 token 用量 metadata）。</span></li>
@@ -1122,8 +1123,8 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
         <pre class="mono" id="aiPayloadPre" style="max-height:220px;overflow:auto;background:var(--bg);padding:8px;border-radius:6px;font-size:11.5px;margin-top:6px"></pre>
       </details>
     </div>
-    <div class="row"><button class="primary" id="btnAI">產生分析報告</button><button id="btnAIStop" hidden>停止</button><span class="note" id="aiState"></span></div>
-    <div class="ai-out" id="aiOut" style="margin-top:12px"><p class="note">按下按鈕後，Claude 會審查系統偵測到的問題清單，並產生：結論摘要、逐項同意或存疑、可能漏抓的問題、原因推論與信心、驗證實驗、試產／DFM 建議。</p></div>
+    <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap"><div class="row"><button class="primary" id="btnAI">產生分析報告</button><button id="btnAIStop" hidden>停止</button><span class="note" id="aiState"></span></div><div class="row" id="aiResultTools" hidden><button type="button" id="btnAICopy">複製診斷結果</button><button type="button" id="btnAIMd">匯出 AI 診斷 .md</button></div></div>
+    <div class="ai-out" id="aiOut" style="margin-top:12px"><p class="note">按下按鈕後，gpt-6.1-terra（高推理強度）會審查系統偵測到的問題清單，並產生：結論摘要、逐項同意或存疑、可能漏抓的問題、原因推論與信心、驗證實驗、試產／DFM 建議。</p></div>
   </div>
 </section>
 
@@ -1453,6 +1454,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
         <button type="button" class="sheet-row" data-mtab="sim3d"><span>3D 錫膏模擬</span><span class="sheet-arrow">›</span></button>
         <button type="button" class="sheet-row" data-mtab="cross"><span>交叉驗證</span><span class="sheet-arrow">›</span></button>
         <button type="button" class="sheet-row" data-mtab="adv"><span>進階分析</span><span class="sheet-arrow">›</span></button>
+        <button type="button" class="sheet-row" data-mtab="stats"><span>統計資料</span><span class="sheet-arrow">›</span></button>
       </div>
 
       <div class="sheet-sec-title">改善與驗證</div>
@@ -4637,7 +4639,8 @@ function dfmTable0(st,R,clsF){const b0=R[0].board,groups=[...new Set(R.map(r=>r.
     if(isFinite(te)&&(te>vt*1.05||brg>0)){const k=Math.sqrt(vt/Math.max(te,vt*1.02));acts.push({act:`開孔縮減約 ${pct(1-k)}%${/^(C|R|L)\b/.test(g)?"，或改 Home-plate／倒 U 形":""}`,why:brg?`連錫風險 ${brg} 處`:`錫量 ${f(te,1)}% 偏多`,exp:`預估錫量 → ${vt}%，降低連錫`})}
     if(isFinite(cv)&&cv>12)acts.push({act:"檢查開孔孔壁品質、擦拭頻率與 PCB 支撐",why:`錫量變異 CV ${f(cv,1)}%`,exp:"降低變異"});
     if(!acts.length)acts.push({act:"維持現有設計",why:"各項指標正常",exp:"—"});
-    return{g,ap,thk,ar,asp,tmax,te,cv,cpk,ppm,brg,ins,score,sc,lvl:score>=4?"高":score>=2?"中":"低",acts,n:one.length}}).filter(Boolean).sort((a,b)=>b.score-a.score)}
+    const padDim=one[0].shape==="round"?"Ø"+f(one[0].w,3):f(one[0].w,3)+"×"+f(one[0].d,3),apDim=ap.shape==="round"?"Ø"+f(ap.L,3):f(ap.L,3)+"×"+f(ap.W,3),stLvl=score>=4?"ng":score>=2?"warn":"ok";
+    return{g,group:g,padDim,apDim,st:stLvl,ap,thk,ar,asp,tmax,te,cv,cpk,ppm,brg,ins,score,sc,lvl:score>=4?"高":score>=2?"中":"低",acts,n:one.length}}).filter(Boolean).sort((a,b)=>b.score-a.score)}
 
 /* ============ SPI × 回焊後 AOI / X-ray 關聯 ============ */
 function normPadKey(k){
@@ -7416,7 +7419,7 @@ function reportMd(){const A=S.A,u=METRICS[A.m].unit,lab={ok:"一致/正常",warn
   const vd=(S.F&&S.F.meta&&S.F.meta.verdict)||overallVerdict(S,S.F);
   const zCnt=S.step&&S.step.on?zoneCounts():null;
   const stepCovered=zCnt?Object.values(zCnt.c).reduce((a,b)=>a+b,0):0;
-  return`# SPI·SPC 分析報告\n\n- 產生時間：${fmtNowUtc8()}\n- 資料來源：${S.source}\n- 量測項目：${METRICS[A.m].label}；元件群組：${isAllGrp(S.group)?"全部":S.group}；管制圖：${chartName()}\n- 整體判定：${vd.label}（${vd.level}）${vd.reasons&&vd.reasons.length?" · 原因："+vd.reasons.join("；"):""}\n- 規格：LSL ${A.sp.lsl} / 目標 ${A.sp.tgt} / USL ${A.sp.usl} ${u}\n- 規格來源：${specSrcText()}\n- 刮刀行程方向：沿 ${S.sqDir||"Y"}；擦拭間隔：每 ${S.wipe} 片\n- 鋼板厚度：${S.stencil} µm（高度規格 ${S.htol.lo}%–${S.htol.hi}% 厚度）\n- 階梯鋼板：${S.step.on?S.step.zones.map(z=>`${z.name} ${z.t} µm（${z.mode==="group"?"群組 "+z.group:`X ${z.x0}–${z.x1}, Y ${z.y0}–${z.y1} mm`}）`).join("；")+`（涵蓋 ${stepCovered} 焊墊${stepCovered===0?" ⚠️ 未涵蓋任何焊墊":""}）`:"未啟用"}\n- 系統版本：${APP.ver} · 系統更新 ${APP.built}\n- 試產回合：${curRun()?curRun().name:""}\n${runSrc(curRun())?`- 資料來源追溯：${srcLine(runSrc(curRun()))}\n- 原始檔 SHA-256：${runSrc(curRun()).sha256}\n`:""}\n## 問題偵測（依嚴重度與佐證排序）\n\n${S.F.map(x=>`- #${x.no}［${x.level}］${x.title}（規則：${x.rule_id} ${x.rule_name}）\n  - 面向：${x.category}；量測項目：${x.metric}；板號：${x.boards}；焊墊：${x.pads}；群組：${x.group}；位號：${x.refdes}\n  - 觀測值：${x.observed}；界限：${x.limit}；z：${x.z}；p：${x.p}\n  - 事實：${x.facts.join("；")}\n  - 推論（信心 ${x.confidence}）：${x.inference}\n  - 建議動作：${x.action}${x.corroborated_by.length?"\n  - 跨面向佐證："+x.corroborated_by.map(i=>"#"+i).join("、"):""}${x.same_phenomenon.length?"\n  - 同一現象："+x.same_phenomenon.map(i=>"#"+i).join("、"):""}${x.explained_pads.length?"\n  - 已解釋焊墊："+x.explained_pads.join("；"):""}`).join("\n")||"- 未偵測到顯著問題"}\n\n## 一、統計結果（事實）\n\n| 指標 | 數值 |\n|---|---|\n| 樣本數 | ${A.N} |\n| 板數 | ${A.boards.length} |\n| 平均 | ${f(A.gMean,2)} ${u} |\n| σ 組內 / 整體 | ${f(A.sigmaW,3)} / ${f(A.overallSd,3)} |\n${A.cap?`| 能力計算方式 | ${A.cap.mixed?`逐元件群組（組內 σ），以最差群組 ${A.cap.worst} 代表`:"組內 σ"}${A.stable?"":"；製程未穩定，僅供參考"} |\n| Cp / Cpk | ${f(A.cap.cp)} / ${f(A.cap.cpk)} |\n| Cpk 95% 信賴區間（以 ${A.cap.nb} 片板計） | ${f(A.cap.ci[0])} – ${f(A.cap.ci[1])} |\n| Pp / Ppk | ${f(A.cap.pp)} / ${f(A.cap.ppk)} |\n| 預估 PPM / 超規 PPM（${mShort}${A.cap.mixed?`，最差群組 ${A.cap.worst}`:""}） | ${fmtPpm(A.cap.ppmExp)} / ${fmtPpm(A.cap.ppmObs)} |\n${A.cap.mixed?`| 預估 PPM / 超規 PPM（全部群組） | ${fmtPpm(A.cap.ppmExpAll)} / ${fmtPpm(A.cap.ppmObsAll)} |\n`:""}| 不良 PPM（全部判定項目） | ${fmtPpm(defPpm)} |\n`:""}| Anderson-Darling p | ${A.ad.p<.001?"<0.001":f(A.ad.p,3)} |\n${A.sw&&A.sw.valid?`| Shapiro-Wilk W / p | ${f(A.sw.w,4)} / ${A.sw.p<.001?"<0.001":f(A.sw.p,3)} |\n`:""}| 不良焊墊（全部項目） | ${A.defRows.length} |\n\n${A.cap&&A.cap.mixed?`\n### 逐元件群組製程能力\n\n| 元件群組 | n | 平均 | 規格 | Cpk | Cpk 95% 信賴區間 | Ppk | 預估 PPM | 超規 PPM（${mShort}） |\n|---|---|---|---|---|---|---|---|---|\n${A.cap.groups.map(g=>`| ${g.g} | ${g.n} | ${f(g.mu,1)} | ${f(g.lsl,0)}–${f(g.usl,0)} | ${f(g.cpk)} | ${f(g.ci[0])}–${f(g.ci[1])} | ${f(g.ppk)} | ${fmtPpm(g.ppmExp)} | ${fmtPpm(g.ppmObs)} |`).join("\n")}\n`:""}\n## 二、Nelson 規則（X̄ 圖，管制狀態判斷依據）\n\n${(A.nelX||A.nel).rules.map(r=>`- 規則 ${r.name}：${r.idx.length?"觸發（"+r.idx.map(i=>A.xs.pts[i].lab).join(", ")+"）":"通過"}`).join("\n")}${S.chart!=="xbars"?`\n\n目前畫面管制圖（${chartName()}）：${A.nel.rules.filter(r=>!r.na).map(r=>`規則 ${r.id} ${r.idx.length?"觸發":"通過"}`).join("、")}`:""}\n\n## 三、交叉驗證\n\n| 面向 | 來源 | 判定 | 依據 |\n|---|---|---|---|\n${A.xv.rows.map(x=>`| ${x.k} | ${x.src} | ${lab[x.st]} | ${x.ev} |`).join("\n")}\n\n${fmMd().trim()||"## 失效模式交叉比對\n\n- 無資料"}\n\n## 進階分析\n\n${(()=>{const W=advSummary(A);return[`- EWMA 越界：${W.EWMA越界.join(", ")||"無"}；CUSUM 訊號：${W.CUSUM訊號.join(", ")||"無"}`,`- 面積比 / 轉移效率：${W.面積比.map(g=>`${g.群組} AR ${g.AR}、TE ${g.轉移效率}%`).join("；")}`,`- 最差焊墊 Cpk：${W.最差焊墊Cpk.map(p=>`${p.焊墊} ${p.Cpk}`).join("、")}`,`- 對位異常板：${W.對位異常板.map(a=>`${a.板}（平移 ${a.平移X}/${a.平移Y} µm，旋轉 ${a.旋轉度}°）`).join("；")||"無"}`,W.刮刀前後?`- 刮刀前後差：${W.刮刀前後.差值}，p = ${W.刮刀前後.p}`:"",`- 擦拭週期（每 ${W.擦拭週期.每幾片} 片）：斜率 ${W.擦拭週期.每片斜率}/片，p = ${W.擦拭週期.p}`].filter(Boolean).join("\n")})()}\n\n## 四、不良柏拉圖\n\n${Object.entries(A.pareto).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`- ${DEFECTS[k]}：${v}`).join("\n")||"- 無"}\n${S.ai?`\n## 五、Claude AI 分析（含推論，需工程驗證）\n\n${S.ai}\n`:""}\n## 八、資料範圍揭露與未納入證據 (Data Scope & Exclusions)\n\n- 匯入總筆數：${S.rows.length} 筆；納入分析筆數：${S.rows.length} 筆\n- 板號推定狀態：${(S.boardInferred || S.rows.some(r=>r.boardInferred)) ? `板號為推定（每 ${S.boardInferred || Math.round(S.rows.length / (A.boards.length||1))} 筆）` : "板號完整，無推定缺失"}\n- 時間區間篩選：${S.timeFilter ? `${S.timeFilter.start || "—"} ～ ${S.timeFilter.end || "—"}（UTC+8）` : "未設定時間篩選（全時段）"}\n- 部分焊墊板數：${S.partialBoards && S.partialBoards.length ? `${S.partialBoards.length} 片板僅含部分焊墊（${S.partialBoards.join("、")}）` : "無部分板（所有板皆含完整焊墊）"}\n- 刮刀方向狀態：${S.sqDir ? `刮刀方向設定為 ${S.sqDir} 向` : "依板序奇偶推定"}\n- 焊墊座標狀態：${PLACE ? `已套用座標檔：${esc(PLACE.part)} ${esc(PLACE.rev)}` : "未套用獨立座標檔（採用資料內建座標或相對位置）"}\n\n## 九、方法附錄與統計檢驗說明 (Methodology Appendix)\n\n- 判定規格來源：${specSrcText()}\n- 實驗設計 (DOE)：各因子單獨檢定、未調整其他因子與交互作用。\n`}
+  return`# SPI·SPC 分析報告\n\n- 產生時間：${fmtNowUtc8()}\n- 資料來源：${S.source}\n- 量測項目：${METRICS[A.m].label}；元件群組：${isAllGrp(S.group)?"全部":S.group}；管制圖：${chartName()}\n- 整體判定：${vd.label}（${vd.level}）${vd.reasons&&vd.reasons.length?" · 原因："+vd.reasons.join("；"):""}\n- 規格：LSL ${A.sp.lsl} / 目標 ${A.sp.tgt} / USL ${A.sp.usl} ${u}\n- 規格來源：${specSrcText()}\n- 刮刀行程方向：沿 ${S.sqDir||"Y"}；擦拭間隔：每 ${S.wipe} 片\n- 鋼板厚度：${S.stencil} µm（高度規格 ${S.htol.lo}%–${S.htol.hi}% 厚度）\n- 階梯鋼板：${S.step.on?S.step.zones.map(z=>`${z.name} ${z.t} µm（${z.mode==="group"?"群組 "+z.group:`X ${z.x0}–${z.x1}, Y ${z.y0}–${z.y1} mm`}）`).join("；")+`（涵蓋 ${stepCovered} 焊墊${stepCovered===0?" ⚠️ 未涵蓋任何焊墊":""}）`:"未啟用"}\n- 系統版本：${APP.ver} · 系統更新 ${APP.built}\n- 試產回合：${curRun()?curRun().name:""}\n${runSrc(curRun())?`- 資料來源追溯：${srcLine(runSrc(curRun()))}\n- 原始檔 SHA-256：${runSrc(curRun()).sha256}\n`:""}\n## 問題偵測（依嚴重度與佐證排序）\n\n${S.F.map(x=>`- #${x.no}［${x.level}］${x.title}（規則：${x.rule_id} ${x.rule_name}）\n  - 面向：${x.category}；量測項目：${x.metric}；板號：${x.boards}；焊墊：${x.pads}；群組：${x.group}；位號：${x.refdes}\n  - 觀測值：${x.observed}；界限：${x.limit}；z：${x.z}；p：${x.p}\n  - 事實：${x.facts.join("；")}\n  - 推論（信心 ${x.confidence}）：${x.inference}\n  - 建議動作：${x.action}${x.corroborated_by.length?"\n  - 跨面向佐證："+x.corroborated_by.map(i=>"#"+i).join("、"):""}${x.same_phenomenon.length?"\n  - 同一現象："+x.same_phenomenon.map(i=>"#"+i).join("、"):""}${x.explained_pads.length?"\n  - 已解釋焊墊："+x.explained_pads.join("；"):""}`).join("\n")||"- 未偵測到顯著問題"}\n\n## 一、統計結果（事實）\n\n| 指標 | 數值 |\n|---|---|\n| 樣本數 | ${A.N} |\n| 板數 | ${A.boards.length} |\n| 平均 | ${f(A.gMean,2)} ${u} |\n| σ 組內 / 整體 | ${f(A.sigmaW,3)} / ${f(A.overallSd,3)} |\n${A.cap?`| 能力計算方式 | ${A.cap.mixed?`逐元件群組（組內 σ），以最差群組 ${A.cap.worst} 代表`:"組內 σ"}${A.stable?"":"；製程未穩定，僅供參考"} |\n| Cp / Cpk | ${f(A.cap.cp)} / ${f(A.cap.cpk)} |\n| Cpk 95% 信賴區間（以 ${A.cap.nb} 片板計） | ${f(A.cap.ci[0])} – ${f(A.cap.ci[1])} |\n| Pp / Ppk | ${f(A.cap.pp)} / ${f(A.cap.ppk)} |\n| 預估 PPM / 超規 PPM（${mShort}${A.cap.mixed?`，最差群組 ${A.cap.worst}`:""}） | ${fmtPpm(A.cap.ppmExp)} / ${fmtPpm(A.cap.ppmObs)} |\n${A.cap.mixed?`| 預估 PPM / 超規 PPM（全部群組） | ${fmtPpm(A.cap.ppmExpAll)} / ${fmtPpm(A.cap.ppmObsAll)} |\n`:""}| 不良 PPM（全部判定項目） | ${fmtPpm(defPpm)} |\n`:""}| Anderson-Darling p | ${A.ad.p<.001?"<0.001":f(A.ad.p,3)} |\n${A.sw&&A.sw.valid?`| Shapiro-Wilk W / p | ${f(A.sw.w,4)} / ${A.sw.p<.001?"<0.001":f(A.sw.p,3)} |\n`:""}| 不良焊墊（全部項目） | ${A.defRows.length} |\n\n${A.cap&&A.cap.mixed?`\n### 逐元件群組製程能力\n\n| 元件群組 | n | 平均 | 規格 | Cpk | Cpk 95% 信賴區間 | Ppk | 預估 PPM | 超規 PPM（${mShort}） |\n|---|---|---|---|---|---|---|---|---|\n${A.cap.groups.map(g=>`| ${g.g} | ${g.n} | ${f(g.mu,1)} | ${f(g.lsl,0)}–${f(g.usl,0)} | ${f(g.cpk)} | ${f(g.ci[0])}–${f(g.ci[1])} | ${f(g.ppk)} | ${fmtPpm(g.ppmExp)} | ${fmtPpm(g.ppmObs)} |`).join("\n")}\n`:""}\n## 二、Nelson 規則（X̄ 圖，管制狀態判斷依據）\n\n${(A.nelX||A.nel).rules.map(r=>`- 規則 ${r.name}：${r.idx.length?"觸發（"+r.idx.map(i=>A.xs.pts[i].lab).join(", ")+"）":"通過"}`).join("\n")}${S.chart!=="xbars"?`\n\n目前畫面管制圖（${chartName()}）：${A.nel.rules.filter(r=>!r.na).map(r=>`規則 ${r.id} ${r.idx.length?"觸發":"通過"}`).join("、")}`:""}\n\n## 三、交叉驗證\n\n| 面向 | 來源 | 判定 | 依據 |\n|---|---|---|---|\n${A.xv.rows.map(x=>`| ${x.k} | ${x.src} | ${lab[x.st]} | ${x.ev} |`).join("\n")}\n\n${fmMd().trim()||"## 失效模式交叉比對\n\n- 無資料"}\n\n## 進階分析\n\n${(()=>{const W=advSummary(A);return[`- EWMA 越界：${W.EWMA越界.join(", ")||"無"}；CUSUM 訊號：${W.CUSUM訊號.join(", ")||"無"}`,`- 面積比 / 轉移效率：${W.面積比.map(g=>`${g.群組} AR ${g.AR}、TE ${g.轉移效率}%`).join("；")}`,`- 最差焊墊 Cpk：${W.最差焊墊Cpk.map(p=>`${p.焊墊} ${p.Cpk}`).join("、")}`,`- 對位異常板：${W.對位異常板.map(a=>`${a.板}（平移 ${a.平移X}/${a.平移Y} µm，旋轉 ${a.旋轉度}°）`).join("；")||"無"}`,W.刮刀前後?`- 刮刀前後差：${W.刮刀前後.差值}，p = ${W.刮刀前後.p}`:"",`- 擦拭週期（每 ${W.擦拭週期.每幾片} 片）：斜率 ${W.擦拭週期.每片斜率}/片，p = ${W.擦拭週期.p}`].filter(Boolean).join("\n")})()}\n\n## 四、不良柏拉圖\n\n${Object.entries(A.pareto).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`- ${DEFECTS[k]}：${v}`).join("\n")||"- 無"}\n${S.ai?`\n## 五、AI 品質工程分析（gpt-6.1-terra，含推論，需工程驗證）\n\n${S.ai}\n`:""}\n## 八、資料範圍揭露與未納入證據 (Data Scope & Exclusions)\n\n- 匯入總筆數：${S.rows.length} 筆；納入分析筆數：${S.rows.length} 筆\n- 板號推定狀態：${(S.boardInferred || S.rows.some(r=>r.boardInferred)) ? `板號為推定（每 ${S.boardInferred || Math.round(S.rows.length / (A.boards.length||1))} 筆）` : "板號完整，無推定缺失"}\n- 時間區間篩選：${S.timeFilter ? `${S.timeFilter.start || "—"} ～ ${S.timeFilter.end || "—"}（UTC+8）` : "未設定時間篩選（全時段）"}\n- 部分焊墊板數：${S.partialBoards && S.partialBoards.length ? `${S.partialBoards.length} 片板僅含部分焊墊（${S.partialBoards.join("、")}）` : "無部分板（所有板皆含完整焊墊）"}\n- 刮刀方向狀態：${S.sqDir ? `刮刀方向設定為 ${S.sqDir} 向` : "依板序奇偶推定"}\n- 焊墊座標狀態：${PLACE ? `已套用座標檔：${esc(PLACE.part)} ${esc(PLACE.rev)}` : "未套用獨立座標檔（採用資料內建座標或相對位置）"}\n\n## 九、方法附錄與統計檢驗說明 (Methodology Appendix)\n\n- 判定規格來源：${specSrcText()}\n- 實驗設計 (DOE)：各因子單獨檢定、未調整其他因子與交互作用。\n`}
 /* 下載：在 claude.ai 內用平台下載功能；一般瀏覽器（例如 Cloudflare Workers 正式站）直接下載檔案 */
 function browserDownload(filename,data){const isXlsx=/\.xlsx$/i.test(filename);const type=isXlsx?"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":(/\.csv$/.test(filename)?"text/csv;charset=utf-8":"text/markdown;charset=utf-8"),url=URL.createObjectURL(new Blob(isXlsx?[data]:["\uFEFF"+data],{type})),a=document.createElement("a");a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 /* 匯出鈕分散在各分頁，#expState 只在資料分頁；結果同時用 toast 顯示，避免在其他分頁按了沒反應 */
@@ -7542,13 +7545,85 @@ function deAnonymizeText(text){
   for(const[anonB,realB] of AI_ANON_MAP.boards.entries())s=s.replaceAll(anonB,realB);
   return s;
 }
+const AI_CFG_KEY="spi-ai-config";
+let AI_SERVER_HAS_KEY=false,AI_LAST_USAGE=null;
+function loadAiCfg(){
+  try{
+    const c=JSON.parse(localStorage.getItem(AI_CFG_KEY)||"{}")||{};
+    return{
+      apiKey:typeof c.apiKey==="string"?c.apiKey.trim():"",
+      dailyReqLimit:Number.isFinite(+c.dailyReqLimit)?Math.min(Math.max(Math.round(+c.dailyReqLimit),1),500):20,
+      monthlyTokenLimit:Number.isFinite(+c.monthlyTokenLimit)?Math.min(Math.max(Math.round(+c.monthlyTokenLimit),1000),10000000):500000,
+      monthlyUsdLimit:Number.isFinite(+c.monthlyUsdLimit)?Math.min(Math.max(Math.round(+c.monthlyUsdLimit*100)/100,0.5),500):5.0,
+    };
+  }catch(e){return{apiKey:"",dailyReqLimit:20,monthlyTokenLimit:500000,monthlyUsdLimit:5.0}}
+}
+function saveAiCfg(cfg){
+  try{localStorage.setItem(AI_CFG_KEY,JSON.stringify(cfg))}catch(e){}
+}
+function updateAiKeyBadge(){
+  const cfg=loadAiCfg(),b=$("#aiKeyBadge");if(!b)return;
+  if(cfg.apiKey){
+    const m=cfg.apiKey.length>10?cfg.apiKey.slice(0,6)+"…"+cfg.apiKey.slice(-4):"已填入";
+    b.innerHTML=`<span class="pill ok">已設定個人金鑰 (${esc(m)})</span>`;
+  }else if(AI_SERVER_HAS_KEY){
+    b.innerHTML=`<span class="pill ok">使用伺服器金鑰</span>`;
+  }else{
+    b.innerHTML=`<span class="pill warn">尚未設定金鑰</span>`;
+  }
+}
+function renderAiUsageUI(usage,limits){
+  const cfg=loadAiCfg();
+  const lim=limits||cfg;
+  const dLim=Math.max(1,lim.dailyReqLimit||cfg.dailyReqLimit||20);
+  const tLim=Math.max(1000,lim.monthlyTokenLimit||cfg.monthlyTokenLimit||500000);
+  const uLim=Math.max(0.5,lim.monthlyUsdLimit||cfg.monthlyUsdLimit||5.0);
+  const dUsed=(usage&&usage.dailyRequests)||0;
+  const tUsed=(usage&&usage.monthlyTotalTokens)||0;
+  const uUsed=(usage&&usage.monthlyUsd)||0;
+  const dPct=Math.min(100,Math.round((dUsed/dLim)*100));
+  const mPct=Math.min(100,Math.round(Math.max(tUsed/tLim,uUsed/uLim)*100));
+  if($("#aiUsageDayLabel")&&usage&&usage.day)$("#aiUsageDayLabel").textContent=usage.day;
+  if($("#aiUsageMonthLabel")&&usage&&usage.month)$("#aiUsageMonthLabel").textContent=usage.month;
+  if($("#aiDailyUsageText"))$("#aiDailyUsageText").textContent=`${dUsed} / ${dLim} 次 (${dPct}%)`;
+  if($("#aiMonthlyUsageText"))$("#aiMonthlyUsageText").textContent=`${tUsed.toLocaleString()} / ${tLim.toLocaleString()} tokens · 預估 $${uUsed.toFixed(2)} / $${uLim.toFixed(2)} USD`;
+  const barCol=p=>p>=100?"var(--ng)":p>=80?"var(--warn)":"var(--ok)";
+  if($("#aiDailyBar")){$("#aiDailyBar").style.width=dPct+"%";$("#aiDailyBar").style.background=barCol(dPct)}
+  if($("#aiMonthlyBar")){$("#aiMonthlyBar").style.width=mPct+"%";$("#aiMonthlyBar").style.background=barCol(mPct)}
+}
+function syncAiCfgInputs(){
+  const cfg=loadAiCfg();
+  if($("#inAiKey")&&!$("#inAiKey").value)$("#inAiKey").value=cfg.apiKey||"";
+  if($("#inAiDailyLim"))$("#inAiDailyLim").value=cfg.dailyReqLimit;
+  if($("#inAiTokenLim"))$("#inAiTokenLim").value=cfg.monthlyTokenLimit;
+  if($("#inAiUsdLim"))$("#inAiUsdLim").value=cfg.monthlyUsdLimit;
+  updateAiKeyBadge();
+  renderAiUsageUI(AI_LAST_USAGE,cfg);
+}
 function initAiPage(){
+  syncAiCfgInputs();
   updateAiPreview();
+  if($("#aiResultTools"))$("#aiResultTools").hidden=!S.ai;
   if(typeof fetch==="function"){
     fetch("/api/analyze").then(r=>r.json()).then(j=>{
-      if(!j.ok&&j.error){$("#aiState").textContent=j.error;$("#btnAI").disabled=true}
-      else if(j.logPayload){$("#aiGatewayLogNotice").innerHTML="<b>注意：</b>Cloudflare AI Gateway 已啟用記錄保存。"}
-      else{$("#aiGatewayLogNotice").innerHTML="預設不保存提示詞與回應內容（已帶 <code>cf-aig-collect-log-payload: false</code>，僅留存 token 用量 metadata）。"}
+      if(!j.ok&&j.error){$("#aiState").textContent=j.error;$("#btnAI").disabled=true;return}
+      $("#btnAI").disabled=false;
+      AI_SERVER_HAS_KEY=Boolean(j.hasServerKey);
+      if(j.model&&$("#aiModelLabel"))$("#aiModelLabel").textContent=j.model;
+      if(j.reasoningEffort&&$("#aiEffortLabel"))$("#aiEffortLabel").textContent=`${j.reasoningEffort==="high"?"高":"自訂"} (${j.reasoningEffort})`;
+      if(j.limits){
+        const cfg=loadAiCfg();
+        if(!localStorage.getItem(AI_CFG_KEY)){
+          cfg.dailyReqLimit=j.limits.dailyReqLimit||cfg.dailyReqLimit;
+          cfg.monthlyTokenLimit=j.limits.monthlyTokenLimit||cfg.monthlyTokenLimit;
+          cfg.monthlyUsdLimit=j.limits.monthlyUsdLimit||cfg.monthlyUsdLimit;
+          saveAiCfg(cfg);syncAiCfgInputs();
+        }
+      }
+      if(j.usage){AI_LAST_USAGE=j.usage;renderAiUsageUI(j.usage,loadAiCfg())}
+      updateAiKeyBadge();
+      if(j.logPayload){$("#aiGatewayLogNotice").innerHTML="<b>注意：</b>伺服器已啟用 AI 記錄保存。"}
+      else{$("#aiGatewayLogNotice").innerHTML="預設不保存提示詞與回應內容（已帶 <code>cf-aig-collect-log-payload: false</code>，僅統計呼叫次數與 token 用量）。"}
     }).catch(()=>{});
   }
 }
@@ -7563,15 +7638,69 @@ function apiPayload(){
   return p;
 }
 window.apiPayload=apiPayload;
-async function analyzeViaApi(out,st){const body=JSON.stringify({payload:apiPayload()});
+if($("#btnAiKeyToggle"))$("#btnAiKeyToggle").onclick=()=>{
+  const el=$("#inAiKey");if(!el)return;
+  const isPwd=el.type==="password";
+  el.type=isPwd?"text":"password";
+  $("#btnAiKeyToggle").textContent=isPwd?"隱藏":"顯示";
+};
+if($("#btnAiSaveCfg"))$("#btnAiSaveCfg").onclick=async()=>{
+  const key=($("#inAiKey")?$("#inAiKey").value:"").trim();
+  const dLim=Math.min(Math.max(Math.round(+($("#inAiDailyLim")?.value||20)),1),500);
+  const tLim=Math.min(Math.max(Math.round(+($("#inAiTokenLim")?.value||500000)),1000),10000000);
+  const uLim=Math.min(Math.max(Math.round((+($("#inAiUsdLim")?.value||5))*100)/100,0.5),500);
+  const cfg={apiKey:key,dailyReqLimit:dLim,monthlyTokenLimit:tLim,monthlyUsdLimit:uLim};
+  saveAiCfg(cfg);syncAiCfgInputs();
+  if($("#aiCfgMsg"))$("#aiCfgMsg").textContent="已儲存金鑰與使用量上限設定";
+  toast("已儲存 AI 金鑰與使用量限制");
+  if(typeof fetch==="function"){
+    try{
+      const r=await fetch("/api/analyze",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({limits:{dailyReqLimit:dLim,monthlyTokenLimit:tLim,monthlyUsdLimit:uLim}})});
+      const j=await r.json().catch(()=>({}));
+      if(j.usage){AI_LAST_USAGE=j.usage;renderAiUsageUI(j.usage,cfg)}
+    }catch(e){}
+  }
+};
+if($("#btnAiClearKey"))$("#btnAiClearKey").onclick=()=>{
+  const cfg=loadAiCfg();cfg.apiKey="";saveAiCfg(cfg);
+  if($("#inAiKey"))$("#inAiKey").value="";
+  updateAiKeyBadge();
+  if($("#aiCfgMsg"))$("#aiCfgMsg").textContent="已清除個人 API Key";
+  toast("已清除個人 API Key");
+};
+if($("#btnAICopy"))$("#btnAICopy").onclick=async()=>{
+  if(!S.ai)return;
+  try{await navigator.clipboard.writeText(S.ai);$("#btnAICopy").textContent="已複製"}
+  catch(e){$("#btnAICopy").textContent="已複製"}
+  setTimeout(()=>{$("#btnAICopy").textContent="複製診斷結果"},1800);
+};
+if($("#btnAIMd"))$("#btnAIMd").onclick=()=>{
+  if(!S.ai)return;
+  save("spi-ai-analysis.md",`# SPI·SPC AI 品質工程診斷報告（gpt-6.1-terra）\n\n- 產生時間：${fmtNowUtc8()}\n- 試產回合：${curRun()?curRun().name:S.source}\n\n${S.ai}\n`);
+};
+async function analyzeViaApi(out,st){
+  if($("#inAiKey")&&$("#inAiKey").value.trim()){
+    const cur=loadAiCfg();
+    cur.apiKey=$("#inAiKey").value.trim();
+    if($("#inAiDailyLim"))cur.dailyReqLimit=Math.min(Math.max(Math.round(+$("#inAiDailyLim").value||20),1),500);
+    if($("#inAiTokenLim"))cur.monthlyTokenLimit=Math.min(Math.max(Math.round(+$("#inAiTokenLim").value||500000),1000),10000000);
+    if($("#inAiUsdLim"))cur.monthlyUsdLimit=Math.min(Math.max(Math.round((+$("#inAiUsdLim").value||5)*100)/100,0.5),500);
+    saveAiCfg(cur);updateAiKeyBadge();
+  }
+  const cfg=loadAiCfg();
+  const body=JSON.stringify({payload:apiPayload()});
+  const headers={"Content-Type":"application/json","X-AI-Limits":JSON.stringify({dailyReqLimit:cfg.dailyReqLimit,monthlyTokenLimit:cfg.monthlyTokenLimit,monthlyUsdLimit:cfg.monthlyUsdLimit})};
+  if(cfg.apiKey)headers["X-OpenAI-Key"]=cfg.apiKey;
   aiAbort=new AbortController();$("#btnAI").disabled=true;$("#btnAIStop").hidden=false;out.innerHTML="";
-  st.textContent=`分析中…（送出統計摘要 ${f(new Blob([body]).size/1024,1)} KB，不含原始 SPI 資料）`;let text="";
-  try{const res=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body,signal:aiAbort.signal});
-    if(!res.ok){let msg=res.status===404?"此網站沒有啟用 AI 分析服務（請洽管理員，或在 claude.ai 內開啟）":`伺服器回應 ${res.status}`;try{const j=await res.json();if(j.error)msg=j.error}catch(e){}st.textContent="AI 分析無法使用："+msg;return}
+  st.textContent=`分析中…（使用 gpt-6.1-terra 高推理強度 · 送出統計摘要 ${f(new Blob([body]).size/1024,1)} KB，不含原始 SPI 資料）`;let text="";
+  try{const res=await fetch("/api/analyze",{method:"POST",headers,body,signal:aiAbort.signal});
+    if(!res.ok){let msg=res.status===404?"此網站沒有啟用 AI 分析服務":`伺服器回應 ${res.status}`;try{const j=await res.json();if(j.error)msg=j.error;if(j.usage){AI_LAST_USAGE=j.usage;renderAiUsageUI(j.usage,cfg)}}catch(e){}st.textContent="AI 分析無法使用："+msg;return}
     const rd=res.body.getReader(),dec=new TextDecoder();
     for(;;){const{done,value}=await rd.read();if(done)break;text+=dec.decode(value,{stream:true});out.innerHTML=mdLite(deAnonymizeText(text))}
-    S.ai=deAnonymizeText(text);st.textContent=`完成 · 模型 ${res.headers.get("X-AI-Model")||""} · 可至「資料與規格」匯出含 AI 段落的報告`}
-  catch(e){st.textContent=e&&e.name==="AbortError"?"已停止":"AI 分析失敗："+(e&&e.message||e);if(text){S.ai=deAnonymizeText(text);out.innerHTML=mdLite(deAnonymizeText(text))}}
+    S.ai=deAnonymizeText(text);if($("#aiResultTools"))$("#aiResultTools").hidden=!S.ai;
+    st.textContent=`完成 · 模型 ${res.headers.get("X-AI-Model")||"gpt-6.1-terra"} · 可至「分析報告」或「資料與規格」匯出含 AI 段落的報告`;
+    try{const uHdr=res.headers.get("X-AI-Usage");if(uHdr)AI_LAST_USAGE=JSON.parse(uHdr);if(AI_LAST_USAGE)AI_LAST_USAGE.dailyRequests=(AI_LAST_USAGE.dailyRequests||0)+1;renderAiUsageUI(AI_LAST_USAGE,cfg)}catch(e){}}
+  catch(e){st.textContent=e&&e.name==="AbortError"?"已停止":"AI 分析失敗："+(e&&e.message||e);if(text){S.ai=deAnonymizeText(text);out.innerHTML=mdLite(deAnonymizeText(text));if($("#aiResultTools"))$("#aiResultTools").hidden=!S.ai}}
   finally{$("#btnAI").disabled=false;$("#btnAIStop").hidden=true;aiAbort=null}}
 
 /* ---------- 主題變更重繪 ---------- */
@@ -9040,7 +9169,7 @@ function renderReport(){
     <div class="tbl" style="margin-bottom:16px"><table>
       <thead><tr><th>#</th><th>嚴重度</th><th>問題標題</th><th>核心事實</th><th>推論原因與建議動作</th></tr></thead>
       <tbody>${act5.length?act5.map(x=>`<tr><td class="mono">#${x.id}</td><td><span class="pill ${x.lv}">${LVL[x.lv]}</span></td><td><b>${esc(x.title)}</b><div class="note">${esc(x.cat)}</div></td><td style="font-size:12px">${esc(x.facts[0]||"—")}</td><td style="font-size:12px"><b>推論：</b>${esc(x.cause)}<br><b>動作：</b>${esc(x.action)}</td></tr>`).join(""):'<tr><td colspan="5" class="note">未偵測到需優先處置之問題</td></tr>'}</tbody>
-    </table></div></div>`;
+    </table></div>${S.ai?`<h3 style="font-size:13.5px;margin:12px 0 6px">AI 品質工程診斷摘要（gpt-6.1-terra）</h3><div class="ai-out" style="padding:10px 14px;background:var(--surface2);border-radius:8px;border:1px solid var(--line);margin-bottom:16px">${mdLite(S.ai)}</div>`:""}</div>`;
 
   const s3=`<div class="rep-sec" id="repSec3">
     <h2 style="font-size:17px;border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">二、問題偵測清單（共 ${F.length} 項）</h2>

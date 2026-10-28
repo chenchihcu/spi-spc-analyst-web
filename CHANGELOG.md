@@ -2,6 +2,20 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.6.0 — 2026-10-28 16:00:00（OpenAI gpt-6.1-terra 直連與高推理強度、API 金鑰／雙維度使用量設定介面、全站 UI/UX 修復）
+
+- **OpenAI `gpt-6.1-terra` 直連與高推理強度 (`reasoning_effort: "high"`)**：
+  - 解除原本強制綁定 Cloudflare AI Gateway（`CF_ACCOUNT_ID`／`CF_AI_GATEWAY_ID`）與 Anthropic 之限制，解決未設 Gateway 時回傳 `503 Cloudflare AI Gateway 尚未設定` 的問題。
+  - 後端 `cloudflare/ai.mjs` 改為直連 OpenAI Chat Completions API（`https://api.openai.com/v1/chat/completions`），預設模型為 **`gpt-6.1-terra`**，推理強度固定帶入 **`reasoning_effort: "high"`**，並設 `max_completion_tokens: 16000`、`stream: true`、`stream_options: { include_usage: true }`。
+- **使用者自填 API Key (BYOK) 與雙維度使用量限制介面 (`#p-ai`)**：
+  - 於 AI 診斷頁新增「OpenAI API 與使用量限制設定」面板（`#aiSettingsCard`），支援使用者自行填入 OpenAI API Key（提供顯示／隱藏密碼切換、清除金鑰、本機 `localStorage` 儲存並透過同源 `X-OpenAI-Key` 標頭安全轉發，不落入雲端資料庫；未填時自動回退使用伺服器 `OPENAI_API_KEY`）。
+  - 雙維度使用量限制與即時進度條：支援同時設定並強制檢查 **每日最大呼叫次數上限**（預設 `20` 次／日）與 **每月累計 Token 上限／預估美金費用上限**（預設 `500,000` tokens／`$5.00 USD`，依 `gpt-6.1-terra` 費率 Input `$1.00 / 1M`、Output `$5.00 / 1M` 計算），複用既有 D1 `stats` 與 `system_settings` 表紀錄（零新增 D1 migration），超額時於呼叫前以 `429` 攔截。
+  - 新增 AI 診斷結果「複製診斷結果」與「匯出 AI 報告 (.md)」快捷工具列。
+- **全站 UI/UX 稽核修復**：
+  - **進階分析頁 (`#p-adv`) 卡片巢狀破版與 `#cWipe` 遺失修復 (P0)**：補回擦網週期衰減卡片遺失的 `<canvas id="cWipe">`、`<p id="wipeTxt">` 與閉合標籤，解決 `#cardMorph`、`#cardPause`、`#cardLISA` 三張卡片被包入擦網卡片內並隨其收合消失的問題。
+  - **行動版「更多」選單 (`#moreSheet`) 補齊「統計資料」分頁 (P0)**：於「看證據」區塊加入 `data-mtab="stats"` 入口，使手機版完整涵蓋全部 14 個分頁。
+  - **分析報告 (`#p-report`) 與 PDF 匯出 DFM 欄位對應及 AI 診斷摘要整合 (P1)**：於 `dfmTable0()` 補齊 `group`、`padDim`、`apDim`、`st` 欄位別名，消除報告頁與 PDF 第七節 DFM 表格空白／`undefined`；並於報告預覽執行摘要自動附加 AI 診斷結論。
+
 ## v10.5.0 — 2026-10-28 14:15:00（Mitcorp 商標設計整合與介面文案／操作精簡）
 
 - **Mitcorp 商標設計整合**：將 Mitcorp 品牌識別以單一 `fill-rule="evenodd"` 內嵌向量 `<svg viewBox="0 0 248 45">` 導入系統四處關鍵畫面——（1）登入頁品牌區塊（桌機雙行堆疊 28px 高、手機 `≤720px` 單列緊湊並排 20px 高）、（2）操作主頁頂部標題列 `header.top`（桌機 26px、手機 16px、橫向緊湊 14px，搭配 `.brand-sep` 分隔線）、（3）行動版 `#moreSheet` 底部版本資訊區、（4）分析報告預覽封面（`#repSec1`）與瀏覽器列印頁首（`#printHead`）。

@@ -314,7 +314,7 @@ async function route(req, env) {
   if (path === '/api/records') return handleRecordsApi(req, repo, user, env);
   if (path === '/api/admin/users') return handleAdminApi(req, repo, user, env);
   if (path === '/api/share') return handleShare(req, repo, user, env);
-  if (path === '/api/analyze') return handleAnalyze(req, env);
+  if (path === '/api/analyze') return handleAnalyze(req, env, user);
   if (path.startsWith('/api/')) return Response.json({ error: '找不到 API' }, { status: 404 });
   if (path === '/' || path === '/spi-spc.html' || path === '/index.html') {
     const assetUrl = new URL('/', url);
