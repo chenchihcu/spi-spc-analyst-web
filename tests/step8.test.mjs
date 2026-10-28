@@ -303,6 +303,8 @@ test("3D 鏡頭依板面大小對準：範例板不變、大板等比放大、�
   const w = dom.window, H = await waitFor(() => w.SPI_TEST_HOOK?.fit3D && w.SPI_TEST_HOOK);
   // 範例板 60 mm：與原本固定值相同（不改既有畫面）
   assert.deepEqual({ ...H.fit3D(60) }, { rad: 78, min: 20, max: 160, near: 0.1, far: 500 });
+  // 小板（單一元件約 8 mm）不拉近：放大後的錫膏高度不隨板面縮放，拉近會超出畫面（PR #74 審查）
+  assert.deepEqual({ ...H.fit3D(8) }, { ...H.fit3D(60) });
   // 190 mm 實板：等比放大，整塊板仍在鏡頭內
   const f = H.fit3D(190);
   assert.ok(Math.abs(f.rad / 78 - 190 / 60) < 1e-12 && f.far > f.rad + 190, "距離與遠裁切面隨板面放大");
@@ -321,6 +323,14 @@ test("3D 鏡頭依板面大小對準：範例板不變、大板等比放大、�
     S.board = "B1"; S.group = "ALL"; H.T.pos = null;
     assert.match(H.pos3DNote(), /元件中心示意.*超過 1 公尺/);
   } finally { [S.rows, S.board, S.group] = saved; H.T.pos = null; }
+  // 匯出快照的註記斷行：每行不超過寬度、文字不遺失（單位提示在最後，單行會被截掉）
+  const g = { measureText: (t) => ({ width: [...t].length * 18 }) };
+  const note = "⚠ 元件中心示意，非焊墊實際位置（1000 個焊墊） · " + H.size3DNote(E);
+  const lines = H.wrapCanvasText(g, note, 1076);
+  assert.ok(lines.length >= 2, "長註記要斷成多行");
+  assert.ok(lines.every(l => g.measureText(l).width <= 1076), "每行不超過畫布寬度");
+  assert.equal(lines.join("").replace(/\s/g, ""), note.replace(/\s/g, ""), "斷行不遺失文字");
+  assert.match(lines.at(-1), /單位設定/, "改正指引留在快照內");
 });
 
 test("3D 側欄出錯不擋 3D 初始化：safeBoard2D 標示錯誤並回傳 false", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
