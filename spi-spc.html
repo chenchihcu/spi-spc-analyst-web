@@ -690,7 +690,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.6.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.7.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -1106,7 +1106,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 </section>
 
 <section class="panel" id="p-ai" role="tabpanel" hidden>
-  <div class="card" id="aiSettingsCard"><h3 id="aiSettingsHead">API 金鑰與使用量設定 <small id="aiKeyBadge"><span class="pill warn">尚未設定金鑰</span></small></h3><div style="display:grid;gap:12px"><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap"><div class="field" style="flex:1 1 260px;min-width:0"><label for="inAiKey">OpenAI API Key（個人金鑰，僅儲存於此瀏覽器並經本站安全轉發）</label><div style="display:flex;gap:6px;align-items:center"><input type="password" id="inAiKey" placeholder="sk-proj-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggle" title="顯示或隱藏 API Key">顯示</button></div></div><div class="field"><label for="inAiDailyLim">每日次數上限 (次/日)</label><input type="number" id="inAiDailyLim" value="20" min="1" max="500" step="1" style="width:96px"></div><div class="field"><label for="inAiTokenLim">每月 Token 上限</label><input type="number" id="inAiTokenLim" value="500000" min="1000" max="10000000" step="10000" style="width:120px"></div><div class="field"><label for="inAiUsdLim">每月費用上限 (USD)</label><input type="number" id="inAiUsdLim" value="5.0" min="0.5" max="500" step="0.5" style="width:96px"></div><div class="row" style="gap:6px"><button type="button" class="primary" id="btnAiSaveCfg">儲存設定</button><button type="button" id="btnAiClearKey">清除金鑰</button></div></div><div class="row" style="gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted)"><span class="chip">模型：<b class="mono" id="aiModelLabel">gpt-6.1-terra</b></span><span class="chip">推理能力：<b class="mono" id="aiEffortLabel">高 (high)</b></span><span class="chip">計價基準：<b>輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens</b></span><span class="note" id="aiCfgMsg" role="status"></span></div><div class="grid2" style="gap:10px;margin-top:2px"><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;margin-bottom:6px"><b>今日呼叫次數 (<span id="aiUsageDayLabel">今日</span>)</b><span class="mono" id="aiDailyUsageText">0 / 20 次 (0%)</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiDailyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;margin-bottom:6px;gap:8px;flex-wrap:wrap"><b>本月累計用量 (<span id="aiUsageMonthLabel">本月</span>)</b><span class="mono" id="aiMonthlyUsageText">0 tokens · 預估 $0.00 / $5.00 USD</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiMonthlyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div></div></div></div><div class="card"><h3>ChatGPT 品質工程分析 <small>OpenAI gpt-6.1-terra（高推理強度） · 將目前全部統計結果與交叉驗證送出，嚴格區分事實與推論</small></h3>
+  <div class="card" id="aiSettingsCard"><h3 id="aiSettingsHead">API 金鑰、模型／推理強度與獨立配額設定 <small id="aiKeyBadge"><span class="pill warn">尚未設定金鑰</span></small></h3><div style="display:grid;gap:12px"><div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:13px;font-weight:600">啟用服務商：</span><div class="seg" id="aiProviderSeg" role="group" aria-label="選擇 AI 服務商" style="display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden"><button type="button" data-ai-prov="openai" aria-pressed="true">OpenAI</button><button type="button" data-ai-prov="antigravity" aria-pressed="false">Antigravity</button><button type="button" data-ai-prov="cursor" aria-pressed="false">Cursor</button></div></div><div id="aiAllProvidersSummary" class="row" style="gap:6px;flex-wrap:wrap;font-size:12px"></div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px"><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKey" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>OpenAI API Key</b></span><span id="aiBadgeOpenai" class="pill warn" style="font-size:11px;padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKey" placeholder="sk-proj-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggle" title="顯示或隱藏 OpenAI API Key">顯示</button></div></div><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKeyAntigravity" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>Antigravity API Key</b></span><span id="aiBadgeAntigravity" class="pill warn" style="font-size:11px;padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKeyAntigravity" placeholder="AIza... / agy-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggleAntigravity" title="顯示或隱藏 Antigravity API Key">顯示</button></div></div><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKeyCursor" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>Cursor API Key</b></span><span id="aiBadgeCursor" class="pill warn" style="font-size:11px;padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKeyCursor" placeholder="crsr_... / key-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggleCursor" title="顯示或隱藏 Cursor API Key">顯示</button></div></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap"><div class="field" style="flex:1 1 220px;min-width:0"><label for="selAiModel">模型選擇 (<span id="aiModelProvName">OpenAI</span>)</label><select id="selAiModel" style="width:100%"><option value="gpt-6.1-terra" selected>gpt-6.1-terra（旗艦深度推理 · 推薦）</option><option value="gpt-6.1-terra-mini">gpt-6.1-terra-mini（高速輕量推理）</option><option value="o4-mini">o4-mini（精準數理推理）</option><option value="gpt-5.4">gpt-5.4（通用旗艦）</option><option value="custom">自訂模型名稱…</option></select></div><div class="field" id="aiCustomModelField" hidden style="flex:1 1 180px;min-width:0"><label for="inAiCustomModel">自訂模型名稱</label><input type="text" id="inAiCustomModel" placeholder="例：gpt-6.1-terra" style="width:100%;font-family:var(--f-mono)"></div><div class="field" style="flex:1 1 200px;min-width:0"><label for="selAiEffort">推理強度 (Reasoning Effort)</label><select id="selAiEffort" style="width:100%"><option value="high" selected>高 (high) — 深度工程根因推理（推薦）</option><option value="medium">中 (medium) — 均衡推理深度與速度</option><option value="low">低 (low) — 快速重點摘要</option></select></div><div class="field" style="flex:1 1 220px;min-width:0"><label for="inAiCustomEndpoint">自訂 API 端點 (選填 https://)</label><input type="text" id="inAiCustomEndpoint" placeholder="預設使用官方端點" spellcheck="false" style="width:100%;font-family:var(--f-mono)"></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap;padding-top:4px;border-top:1px dashed var(--line)"><div style="font-size:12.5px;font-weight:600;color:var(--accent-ink);min-width:140px" id="aiLimitProvTitle">OpenAI 獨立配額上限：</div><div class="field"><label for="inAiDailyLim">每日次數上限 (次/日)</label><input type="number" id="inAiDailyLim" value="20" min="1" max="500" step="1" style="width:96px"></div><div class="field"><label for="inAiTokenLim">每月 Token 上限</label><input type="number" id="inAiTokenLim" value="500000" min="1000" max="10000000" step="10000" style="width:120px"></div><div class="field"><label for="inAiUsdLim">每月費用上限 (USD)</label><input type="number" id="inAiUsdLim" value="5.0" min="0.5" max="500" step="0.5" style="width:96px"></div><div class="row" style="gap:6px"><button type="button" class="primary" id="btnAiSaveCfg">儲存設定</button><button type="button" id="btnAiClearKey" title="清除目前所選服務商的金鑰">清除當前金鑰</button></div></div><div class="row" style="gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted)"><span class="chip">目前服務商：<b id="aiProviderLabel">OpenAI</b></span><span class="chip">模型：<b class="mono" id="aiModelLabel">gpt-6.1-terra</b></span><span class="chip">推理強度：<b class="mono" id="aiEffortLabel">高 (high)</b></span><span class="chip">計價基準：<b id="aiPriceLabel">輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens</b></span><span class="note" id="aiCfgMsg" role="status"></span></div><div class="grid2" style="gap:10px;margin-top:2px"><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;margin-bottom:6px"><b><span id="aiDailyBarProv">OpenAI</span> 今日呼叫次數 (<span id="aiUsageDayLabel">今日</span>)</b><span class="mono" id="aiDailyUsageText">0 / 20 次 (0%)</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiDailyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;margin-bottom:6px;gap:8px;flex-wrap:wrap"><b><span id="aiMonthlyBarProv">OpenAI</span> 本月累計用量 (<span id="aiUsageMonthLabel">本月</span>)</b><span class="mono" id="aiMonthlyUsageText">0 tokens · 預估 $0.00 / $5.00 USD</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiMonthlyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div></div></div></div><div class="card"><h3>AI 品質工程分析 <small id="aiCardSub">OpenAI gpt-6.1-terra（高推理強度） · 將目前全部統計結果與交叉驗證送出，嚴格區分事實與推論</small></h3>
     <div class="notice" id="aiNoticeBox" style="background:var(--surface2);padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:12.5px;color:var(--ink)">
       <p style="margin:0 0 6px"><b>送出前告知與資料隱私保護：</b></p>
       <ul style="margin:0 0 6px 18px;padding:0;line-height:1.6">
@@ -7546,43 +7546,165 @@ function deAnonymizeText(text){
   return s;
 }
 const AI_CFG_KEY="spi-ai-config";
+const AI_PROVIDERS_META={
+  openai:{
+    id:"openai",label:"OpenAI",defaultModel:"gpt-6.1-terra",
+    models:[["gpt-6.1-terra","gpt-6.1-terra（旗艦深度推理 · 推薦）"],["gpt-6.1-terra-mini","gpt-6.1-terra-mini（高速輕量推理）"],["o4-mini","o4-mini（精準數理推理）"],["gpt-5.4","gpt-5.4（通用旗艦）"],["custom","自訂模型名稱…"]],
+    defaultEndpoint:"https://api.openai.com/v1/chat/completions",
+    priceText:"輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens",
+    headerName:"X-OpenAI-Key",inputId:"inAiKey",toggleId:"btnAiKeyToggle",badgeId:"aiBadgeOpenai"
+  },
+  antigravity:{
+    id:"antigravity",label:"Antigravity",defaultModel:"gemini-3.1-pro-preview",
+    models:[["gemini-3.1-pro-preview","gemini-3.1-pro-preview（AGY 深度推理 · 推薦）"],["gemini-3.0-flash","gemini-3.0-flash（高速工程診斷）"],["gpt-6.1-terra","gpt-6.1-terra（經 Antigravity 路由）"],["custom","自訂模型名稱…"]],
+    defaultEndpoint:"https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+    priceText:"輸入 $1.25 / 1M · 輸出 $5.00 / 1M tokens",
+    headerName:"X-Antigravity-Key",inputId:"inAiKeyAntigravity",toggleId:"btnAiKeyToggleAntigravity",badgeId:"aiBadgeAntigravity"
+  },
+  cursor:{
+    id:"cursor",label:"Cursor",defaultModel:"gpt-6.1-terra",
+    models:[["gpt-6.1-terra","gpt-6.1-terra（Cursor 旗艦推理 · 推薦）"],["claude-opus-5-5","claude-opus-5-5（Claude 旗艦深度推理）"],["claude-sonnet-5-5","claude-sonnet-5-5（Claude 均衡高速）"],["gemini-3.1-pro-preview","gemini-3.1-pro-preview（Gemini 深度推理）"],["custom","自訂模型名稱…"]],
+    defaultEndpoint:"https://api.cursor.com/v1/chat/completions",
+    priceText:"輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens",
+    headerName:"X-Cursor-Key",inputId:"inAiKeyCursor",toggleId:"btnAiKeyToggleCursor",badgeId:"aiBadgeCursor"
+  }
+};
+const AI_EFFORT_LABELS={high:"高 (high)",medium:"中 (medium)",low:"低 (low)"};
 let AI_SERVER_HAS_KEY=false,AI_LAST_USAGE=null;
+const AI_SERVER_META={
+  openai:{hasServerKey:false,usage:null,limits:null},
+  antigravity:{hasServerKey:false,usage:null,limits:null},
+  cursor:{hasServerKey:false,usage:null,limits:null}
+};
+function normAiProvCfg(raw={},provId="openai"){
+  const meta=AI_PROVIDERS_META[provId]||AI_PROVIDERS_META.openai;
+  const validModels=meta.models.map(x=>x[0]);
+  const m=typeof raw.model==="string"&&raw.model.trim()?raw.model.trim():meta.defaultModel;
+  const isPreset=validModels.includes(m)&&m!=="custom";
+  const eff=["high","medium","low"].includes(raw.effort)?raw.effort:"high";
+  return{
+    apiKey:typeof raw.apiKey==="string"?raw.apiKey.trim():"",
+    model:isPreset?m:(m==="custom"||raw.customModel?"custom":meta.defaultModel),
+    customModel:typeof raw.customModel==="string"?raw.customModel.trim():(!isPreset&&m!=="custom"?m:""),
+    effort:eff,
+    endpoint:typeof raw.endpoint==="string"?raw.endpoint.trim():"",
+    dailyReqLimit:Number.isFinite(+raw.dailyReqLimit)?Math.min(Math.max(Math.round(+raw.dailyReqLimit),1),500):20,
+    monthlyTokenLimit:Number.isFinite(+raw.monthlyTokenLimit)?Math.min(Math.max(Math.round(+raw.monthlyTokenLimit),1000),10000000):500000,
+    monthlyUsdLimit:Number.isFinite(+raw.monthlyUsdLimit)?Math.min(Math.max(Math.round(+raw.monthlyUsdLimit*100)/100,0.5),500):5.0
+  };
+}
 function loadAiCfg(){
   try{
     const c=JSON.parse(localStorage.getItem(AI_CFG_KEY)||"{}")||{};
-    return{
-      apiKey:typeof c.apiKey==="string"?c.apiKey.trim():"",
-      dailyReqLimit:Number.isFinite(+c.dailyReqLimit)?Math.min(Math.max(Math.round(+c.dailyReqLimit),1),500):20,
-      monthlyTokenLimit:Number.isFinite(+c.monthlyTokenLimit)?Math.min(Math.max(Math.round(+c.monthlyTokenLimit),1000),10000000):500000,
-      monthlyUsdLimit:Number.isFinite(+c.monthlyUsdLimit)?Math.min(Math.max(Math.round(+c.monthlyUsdLimit*100)/100,0.5),500):5.0,
+    const activeProvider=AI_PROVIDERS_META[c.activeProvider]?c.activeProvider:"openai";
+    const pRaw=c.providers&&typeof c.providers==="object"?c.providers:{};
+    const openaiSeed=pRaw.openai||{apiKey:c.apiKey,dailyReqLimit:c.dailyReqLimit,monthlyTokenLimit:c.monthlyTokenLimit,monthlyUsdLimit:c.monthlyUsdLimit};
+    const providers={
+      openai:normAiProvCfg(openaiSeed,"openai"),
+      antigravity:normAiProvCfg(pRaw.antigravity||{},"antigravity"),
+      cursor:normAiProvCfg(pRaw.cursor||{},"cursor")
     };
-  }catch(e){return{apiKey:"",dailyReqLimit:20,monthlyTokenLimit:500000,monthlyUsdLimit:5.0}}
-}
-function saveAiCfg(cfg){
-  try{localStorage.setItem(AI_CFG_KEY,JSON.stringify(cfg))}catch(e){}
-}
-function updateAiKeyBadge(){
-  const cfg=loadAiCfg(),b=$("#aiKeyBadge");if(!b)return;
-  if(cfg.apiKey){
-    const m=cfg.apiKey.length>10?cfg.apiKey.slice(0,6)+"…"+cfg.apiKey.slice(-4):"已填入";
-    b.innerHTML=`<span class="pill ok">已設定個人金鑰 (${esc(m)})</span>`;
-  }else if(AI_SERVER_HAS_KEY){
-    b.innerHTML=`<span class="pill ok">使用伺服器金鑰</span>`;
-  }else{
-    b.innerHTML=`<span class="pill warn">尚未設定金鑰</span>`;
+    const cur=providers[activeProvider];
+    return{
+      activeProvider,
+      providers,
+      apiKey:cur.apiKey,
+      dailyReqLimit:cur.dailyReqLimit,
+      monthlyTokenLimit:cur.monthlyTokenLimit,
+      monthlyUsdLimit:cur.monthlyUsdLimit
+    };
+  }catch(e){
+    const defOpenai=normAiProvCfg({},"openai");
+    return{
+      activeProvider:"openai",
+      providers:{openai:defOpenai,antigravity:normAiProvCfg({},"antigravity"),cursor:normAiProvCfg({},"cursor")},
+      apiKey:"",dailyReqLimit:20,monthlyTokenLimit:500000,monthlyUsdLimit:5.0
+    };
   }
 }
-function renderAiUsageUI(usage,limits){
+function saveAiCfg(cfg){
+  try{
+    const activeProvider=AI_PROVIDERS_META[cfg.activeProvider]?cfg.activeProvider:"openai";
+    const cur=(cfg.providers&&cfg.providers[activeProvider])||normAiProvCfg(cfg,activeProvider);
+    cfg.apiKey=cur.apiKey;
+    cfg.dailyReqLimit=cur.dailyReqLimit;
+    cfg.monthlyTokenLimit=cur.monthlyTokenLimit;
+    cfg.monthlyUsdLimit=cur.monthlyUsdLimit;
+    localStorage.setItem(AI_CFG_KEY,JSON.stringify(cfg));
+  }catch(e){}
+}
+function effectiveModelOf(pCfg,provId){
+  const meta=AI_PROVIDERS_META[provId]||AI_PROVIDERS_META.openai;
+  if(!pCfg)return meta.defaultModel;
+  if(pCfg.model==="custom")return(pCfg.customModel||"").trim()||meta.defaultModel;
+  return pCfg.model||meta.defaultModel;
+}
+function snapshotAiInputsToCfg(cfg){
+  const c=cfg||loadAiCfg();
+  if($("#inAiKey"))c.providers.openai.apiKey=$("#inAiKey").value.trim();
+  if($("#inAiKeyAntigravity"))c.providers.antigravity.apiKey=$("#inAiKeyAntigravity").value.trim();
+  if($("#inAiKeyCursor"))c.providers.cursor.apiKey=$("#inAiKeyCursor").value.trim();
+  const p=c.activeProvider;
+  const pCfg=c.providers[p];
+  if($("#selAiModel"))pCfg.model=$("#selAiModel").value;
+  if($("#inAiCustomModel"))pCfg.customModel=$("#inAiCustomModel").value.trim();
+  if($("#selAiEffort")&&["high","medium","low"].includes($("#selAiEffort").value))pCfg.effort=$("#selAiEffort").value;
+  if($("#inAiCustomEndpoint"))pCfg.endpoint=$("#inAiCustomEndpoint").value.trim();
+  if($("#inAiDailyLim"))pCfg.dailyReqLimit=Math.min(Math.max(Math.round(+$("#inAiDailyLim").value||20),1),500);
+  if($("#inAiTokenLim"))pCfg.monthlyTokenLimit=Math.min(Math.max(Math.round(+$("#inAiTokenLim").value||500000),1000),10000000);
+  if($("#inAiUsdLim"))pCfg.monthlyUsdLimit=Math.min(Math.max(Math.round((+$("#inAiUsdLim").value||5)*100)/100,0.5),500);
+  return c;
+}
+function updateAiKeyBadge(){
   const cfg=loadAiCfg();
-  const lim=limits||cfg;
-  const dLim=Math.max(1,lim.dailyReqLimit||cfg.dailyReqLimit||20);
-  const tLim=Math.max(1000,lim.monthlyTokenLimit||cfg.monthlyTokenLimit||500000);
-  const uLim=Math.max(0.5,lim.monthlyUsdLimit||cfg.monthlyUsdLimit||5.0);
+  let configuredCount=0;
+  for(const [pId,meta] of Object.entries(AI_PROVIDERS_META)){
+    const pCfg=cfg.providers[pId];
+    const srvHas=AI_SERVER_META[pId]&&AI_SERVER_META[pId].hasServerKey;
+    const badgeEl=$("#"+meta.badgeId);
+    if(pCfg&&pCfg.apiKey){
+      configuredCount++;
+      const m=pCfg.apiKey.length>10?pCfg.apiKey.slice(0,5)+"…"+pCfg.apiKey.slice(-3):"已設定";
+      if(badgeEl){badgeEl.className="pill ok";badgeEl.textContent="已設定 ("+m+")";}
+    }else if(srvHas){
+      configuredCount++;
+      if(badgeEl){badgeEl.className="pill ok";badgeEl.textContent="伺服器金鑰";}
+    }else{
+      if(badgeEl){badgeEl.className="pill warn";badgeEl.textContent="未設定";}
+    }
+  }
+  const b=$("#aiKeyBadge");if(!b)return;
+  const act=cfg.activeProvider,actMeta=AI_PROVIDERS_META[act],actCfg=cfg.providers[act];
+  const actSrv=AI_SERVER_META[act]&&AI_SERVER_META[act].hasServerKey;
+  if(actCfg&&actCfg.apiKey){
+    const m=actCfg.apiKey.length>10?actCfg.apiKey.slice(0,6)+"…"+actCfg.apiKey.slice(-4):"已填入";
+    b.innerHTML=`<span class="pill ok">${esc(actMeta.label)} 金鑰已就緒 (${esc(m)}) · 共 ${configuredCount}/3 組可用</span>`;
+  }else if(actSrv||AI_SERVER_HAS_KEY){
+    b.innerHTML=`<span class="pill ok">${esc(actMeta.label)} 使用伺服器金鑰</span>`;
+  }else if(configuredCount>0){
+    b.innerHTML=`<span class="pill warn">${esc(actMeta.label)} 未填金鑰（將自動備援其他已設定服務商）</span>`;
+  }else{
+    b.innerHTML=`<span class="pill warn">尚未設定任何 API Key</span>`;
+  }
+}
+function renderAiUsageUI(usageArg,limitsArg,provArg){
+  const cfg=loadAiCfg();
+  const act=provArg||cfg.activeProvider;
+  const meta=AI_PROVIDERS_META[act]||AI_PROVIDERS_META.openai;
+  const pCfg=cfg.providers[act]||cfg.providers.openai;
+  const srvMeta=AI_SERVER_META[act]||{};
+  const usage=usageArg||srvMeta.usage||(act==="openai"?AI_LAST_USAGE:null);
+  const lim=limitsArg||pCfg;
+  const dLim=Math.max(1,lim.dailyReqLimit||pCfg.dailyReqLimit||20);
+  const tLim=Math.max(1000,lim.monthlyTokenLimit||pCfg.monthlyTokenLimit||500000);
+  const uLim=Math.max(0.5,lim.monthlyUsdLimit||pCfg.monthlyUsdLimit||5.0);
   const dUsed=(usage&&usage.dailyRequests)||0;
   const tUsed=(usage&&usage.monthlyTotalTokens)||0;
   const uUsed=(usage&&usage.monthlyUsd)||0;
   const dPct=Math.min(100,Math.round((dUsed/dLim)*100));
   const mPct=Math.min(100,Math.round(Math.max(tUsed/tLim,uUsed/uLim)*100));
+  if($("#aiDailyBarProv"))$("#aiDailyBarProv").textContent=meta.label;
+  if($("#aiMonthlyBarProv"))$("#aiMonthlyBarProv").textContent=meta.label;
   if($("#aiUsageDayLabel")&&usage&&usage.day)$("#aiUsageDayLabel").textContent=usage.day;
   if($("#aiUsageMonthLabel")&&usage&&usage.month)$("#aiUsageMonthLabel").textContent=usage.month;
   if($("#aiDailyUsageText"))$("#aiDailyUsageText").textContent=`${dUsed} / ${dLim} 次 (${dPct}%)`;
@@ -7590,38 +7712,94 @@ function renderAiUsageUI(usage,limits){
   const barCol=p=>p>=100?"var(--ng)":p>=80?"var(--warn)":"var(--ok)";
   if($("#aiDailyBar")){$("#aiDailyBar").style.width=dPct+"%";$("#aiDailyBar").style.background=barCol(dPct)}
   if($("#aiMonthlyBar")){$("#aiMonthlyBar").style.width=mPct+"%";$("#aiMonthlyBar").style.background=barCol(mPct)}
+  const sumEl=$("#aiAllProvidersSummary");
+  if(sumEl){
+    sumEl.innerHTML=Object.entries(AI_PROVIDERS_META).map(([pId,m])=>{
+      const pc=cfg.providers[pId];
+      const u=(AI_SERVER_META[pId]&&AI_SERVER_META[pId].usage)||null;
+      const du=(u&&u.dailyRequests)||0;
+      const dl=pc?pc.dailyReqLimit:20;
+      const isAct=pId===act;
+      return `<span class="chip" style="${isAct?"border-color:var(--accent);font-weight:600":""}">${esc(m.label)}: <b class="mono">${du}/${dl}</b> 次/日</span>`;
+    }).join("");
+  }
+}
+function updateAiStatusLabels(cfgArg){
+  const cfg=cfgArg||loadAiCfg();
+  const act=cfg.activeProvider,meta=AI_PROVIDERS_META[act]||AI_PROVIDERS_META.openai,pCfg=cfg.providers[act];
+  const effModel=effectiveModelOf(pCfg,act);
+  const effLabel=AI_EFFORT_LABELS[pCfg.effort]||"高 (high)";
+  if($("#aiProviderLabel"))$("#aiProviderLabel").textContent=meta.label;
+  if($("#aiModelProvName"))$("#aiModelProvName").textContent=meta.label;
+  if($("#aiLimitProvTitle"))$("#aiLimitProvTitle").textContent=meta.label+" 獨立配額上限：";
+  if($("#aiModelLabel"))$("#aiModelLabel").textContent=effModel;
+  if($("#aiEffortLabel"))$("#aiEffortLabel").textContent=effLabel;
+  if($("#aiPriceLabel"))$("#aiPriceLabel").textContent=meta.priceText;
+  if($("#aiCardSub"))$("#aiCardSub").textContent=`${meta.label} ${effModel}（推理強度：${effLabel}） · 將目前全部統計結果與交叉驗證送出，嚴格區分事實與推論`;
 }
 function syncAiCfgInputs(){
   const cfg=loadAiCfg();
-  if($("#inAiKey")&&!$("#inAiKey").value)$("#inAiKey").value=cfg.apiKey||"";
-  if($("#inAiDailyLim"))$("#inAiDailyLim").value=cfg.dailyReqLimit;
-  if($("#inAiTokenLim"))$("#inAiTokenLim").value=cfg.monthlyTokenLimit;
-  if($("#inAiUsdLim"))$("#inAiUsdLim").value=cfg.monthlyUsdLimit;
+  const act=cfg.activeProvider,meta=AI_PROVIDERS_META[act]||AI_PROVIDERS_META.openai,pCfg=cfg.providers[act];
+  if($("#inAiKey"))$("#inAiKey").value=cfg.providers.openai.apiKey||"";
+  if($("#inAiKeyAntigravity"))$("#inAiKeyAntigravity").value=cfg.providers.antigravity.apiKey||"";
+  if($("#inAiKeyCursor"))$("#inAiKeyCursor").value=cfg.providers.cursor.apiKey||"";
+  $$("#aiProviderSeg [data-ai-prov]").forEach(btn=>{
+    const on=btn.dataset.aiProv===act;
+    btn.setAttribute("aria-pressed",on?"true":"false");
+    btn.classList.toggle("active",on);
+  });
+  const selM=$("#selAiModel");
+  if(selM){
+    selM.innerHTML=meta.models.map(([val,txt])=>`<option value="${esc(val)}">${esc(txt)}</option>`).join("");
+    const validVals=meta.models.map(x=>x[0]);
+    selM.value=validVals.includes(pCfg.model)?pCfg.model:meta.defaultModel;
+  }
+  if($("#aiCustomModelField"))$("#aiCustomModelField").hidden=(pCfg.model!=="custom");
+  if($("#inAiCustomModel"))$("#inAiCustomModel").value=pCfg.customModel||"";
+  if($("#selAiEffort"))$("#selAiEffort").value=pCfg.effort||"high";
+  if($("#inAiCustomEndpoint")){
+    $("#inAiCustomEndpoint").value=pCfg.endpoint||"";
+    $("#inAiCustomEndpoint").placeholder="預設："+meta.defaultEndpoint;
+  }
+  if($("#inAiDailyLim"))$("#inAiDailyLim").value=pCfg.dailyReqLimit;
+  if($("#inAiTokenLim"))$("#inAiTokenLim").value=pCfg.monthlyTokenLimit;
+  if($("#inAiUsdLim"))$("#inAiUsdLim").value=pCfg.monthlyUsdLimit;
   updateAiKeyBadge();
-  renderAiUsageUI(AI_LAST_USAGE,cfg);
+  updateAiStatusLabels(cfg);
+  renderAiUsageUI(null,pCfg,act);
 }
 function initAiPage(){
   syncAiCfgInputs();
   updateAiPreview();
   if($("#aiResultTools"))$("#aiResultTools").hidden=!S.ai;
   if(typeof fetch==="function"){
-    fetch("/api/analyze").then(r=>r.json()).then(j=>{
+    const cfg=loadAiCfg();
+    fetch("/api/analyze?provider="+encodeURIComponent(cfg.activeProvider)).then(r=>r.json()).then(j=>{
       if(!j.ok&&j.error){$("#aiState").textContent=j.error;$("#btnAI").disabled=true;return}
       $("#btnAI").disabled=false;
       AI_SERVER_HAS_KEY=Boolean(j.hasServerKey);
-      if(j.model&&$("#aiModelLabel"))$("#aiModelLabel").textContent=j.model;
-      if(j.reasoningEffort&&$("#aiEffortLabel"))$("#aiEffortLabel").textContent=`${j.reasoningEffort==="high"?"高":"自訂"} (${j.reasoningEffort})`;
-      if(j.limits){
-        const cfg=loadAiCfg();
-        if(!localStorage.getItem(AI_CFG_KEY)){
-          cfg.dailyReqLimit=j.limits.dailyReqLimit||cfg.dailyReqLimit;
-          cfg.monthlyTokenLimit=j.limits.monthlyTokenLimit||cfg.monthlyTokenLimit;
-          cfg.monthlyUsdLimit=j.limits.monthlyUsdLimit||cfg.monthlyUsdLimit;
-          saveAiCfg(cfg);syncAiCfgInputs();
+      if(j.providers&&typeof j.providers==="object"){
+        const hasLocal=Boolean(localStorage.getItem(AI_CFG_KEY));
+        const curCfg=loadAiCfg();
+        for(const [pId,pInfo] of Object.entries(j.providers)){
+          if(!AI_SERVER_META[pId])continue;
+          AI_SERVER_META[pId].hasServerKey=Boolean(pInfo.hasServerKey);
+          AI_SERVER_META[pId].usage=pInfo.usage||null;
+          AI_SERVER_META[pId].limits=pInfo.limits||null;
+          if(!hasLocal&&pInfo.limits&&curCfg.providers[pId]){
+            curCfg.providers[pId].dailyReqLimit=pInfo.limits.dailyReqLimit||curCfg.providers[pId].dailyReqLimit;
+            curCfg.providers[pId].monthlyTokenLimit=pInfo.limits.monthlyTokenLimit||curCfg.providers[pId].monthlyTokenLimit;
+            curCfg.providers[pId].monthlyUsdLimit=pInfo.limits.monthlyUsdLimit||curCfg.providers[pId].monthlyUsdLimit;
+          }
         }
+        if(!hasLocal)saveAiCfg(curCfg);
       }
-      if(j.usage){AI_LAST_USAGE=j.usage;renderAiUsageUI(j.usage,loadAiCfg())}
-      updateAiKeyBadge();
+      if(j.usage){
+        AI_LAST_USAGE=j.usage;
+        const act=loadAiCfg().activeProvider;
+        if(AI_SERVER_META[act])AI_SERVER_META[act].usage=j.usage;
+      }
+      syncAiCfgInputs();
       if(j.logPayload){$("#aiGatewayLogNotice").innerHTML="<b>注意：</b>伺服器已啟用 AI 記錄保存。"}
       else{$("#aiGatewayLogNotice").innerHTML="預設不保存提示詞與回應內容（已帶 <code>cf-aig-collect-log-payload: false</code>，僅統計呼叫次數與 token 用量）。"}
     }).catch(()=>{});
@@ -7638,35 +7816,93 @@ function apiPayload(){
   return p;
 }
 window.apiPayload=apiPayload;
-if($("#btnAiKeyToggle"))$("#btnAiKeyToggle").onclick=()=>{
-  const el=$("#inAiKey");if(!el)return;
-  const isPwd=el.type==="password";
-  el.type=isPwd?"text":"password";
-  $("#btnAiKeyToggle").textContent=isPwd?"隱藏":"顯示";
-};
+if($("#aiProviderSeg")){
+  $("#aiProviderSeg").addEventListener("click",e=>{
+    const btn=e.target.closest("[data-ai-prov]");
+    if(!btn)return;
+    const nextProv=btn.dataset.aiProv;
+    if(!AI_PROVIDERS_META[nextProv])return;
+    const cfg=snapshotAiInputsToCfg(loadAiCfg());
+    cfg.activeProvider=nextProv;
+    saveAiCfg(cfg);
+    syncAiCfgInputs();
+    if($("#aiCfgMsg"))$("#aiCfgMsg").textContent="已切換至 "+AI_PROVIDERS_META[nextProv].label+" 設定與獨立配額";
+  });
+}
+if($("#selAiModel")){
+  $("#selAiModel").addEventListener("change",()=>{
+    const isCustom=$("#selAiModel").value==="custom";
+    if($("#aiCustomModelField"))$("#aiCustomModelField").hidden=!isCustom;
+    const cfg=snapshotAiInputsToCfg(loadAiCfg());
+    saveAiCfg(cfg);
+    updateAiStatusLabels(cfg);
+  });
+}
+if($("#inAiCustomModel")){
+  $("#inAiCustomModel").addEventListener("input",()=>{
+    const cfg=snapshotAiInputsToCfg(loadAiCfg());
+    saveAiCfg(cfg);
+    updateAiStatusLabels(cfg);
+  });
+}
+if($("#selAiEffort")){
+  $("#selAiEffort").addEventListener("change",()=>{
+    const cfg=snapshotAiInputsToCfg(loadAiCfg());
+    saveAiCfg(cfg);
+    updateAiStatusLabels(cfg);
+  });
+}
+[
+  ["btnAiKeyToggle","inAiKey"],
+  ["btnAiKeyToggleAntigravity","inAiKeyAntigravity"],
+  ["btnAiKeyToggleCursor","inAiKeyCursor"]
+].forEach(([btnId,inId])=>{
+  const b=$("#"+btnId);
+  if(b)b.onclick=()=>{
+    const el=$("#"+inId);if(!el)return;
+    const isPwd=el.type==="password";
+    el.type=isPwd?"text":"password";
+    b.textContent=isPwd?"隱藏":"顯示";
+  };
+});
 if($("#btnAiSaveCfg"))$("#btnAiSaveCfg").onclick=async()=>{
-  const key=($("#inAiKey")?$("#inAiKey").value:"").trim();
-  const dLim=Math.min(Math.max(Math.round(+($("#inAiDailyLim")?.value||20)),1),500);
-  const tLim=Math.min(Math.max(Math.round(+($("#inAiTokenLim")?.value||500000)),1000),10000000);
-  const uLim=Math.min(Math.max(Math.round((+($("#inAiUsdLim")?.value||5))*100)/100,0.5),500);
-  const cfg={apiKey:key,dailyReqLimit:dLim,monthlyTokenLimit:tLim,monthlyUsdLimit:uLim};
+  const cfg=snapshotAiInputsToCfg(loadAiCfg());
   saveAiCfg(cfg);syncAiCfgInputs();
-  if($("#aiCfgMsg"))$("#aiCfgMsg").textContent="已儲存金鑰與使用量上限設定";
-  toast("已儲存 AI 金鑰與使用量限制");
+  const actMeta=AI_PROVIDERS_META[cfg.activeProvider]||AI_PROVIDERS_META.openai;
+  if($("#aiCfgMsg"))$("#aiCfgMsg").textContent=`已儲存三組金鑰、模型／推理強度與 ${actMeta.label} 配額設定`;
+  toast("已儲存 AI 金鑰、模型與使用量限制");
   if(typeof fetch==="function"){
     try{
-      const r=await fetch("/api/analyze",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({limits:{dailyReqLimit:dLim,monthlyTokenLimit:tLim,monthlyUsdLimit:uLim}})});
+      const pCfg=cfg.providers[cfg.activeProvider];
+      const payload={
+        provider:cfg.activeProvider,
+        limits:{dailyReqLimit:pCfg.dailyReqLimit,monthlyTokenLimit:pCfg.monthlyTokenLimit,monthlyUsdLimit:pCfg.monthlyUsdLimit},
+        providers:{
+          openai:{limits:cfg.providers.openai},
+          antigravity:{limits:cfg.providers.antigravity},
+          cursor:{limits:cfg.providers.cursor}
+        }
+      };
+      const r=await fetch("/api/analyze",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
       const j=await r.json().catch(()=>({}));
-      if(j.usage){AI_LAST_USAGE=j.usage;renderAiUsageUI(j.usage,cfg)}
+      if(j.providers){
+        for(const [pId,pInfo] of Object.entries(j.providers)){
+          if(AI_SERVER_META[pId]&&pInfo.usage)AI_SERVER_META[pId].usage=pInfo.usage;
+        }
+      }
+      if(j.usage){AI_LAST_USAGE=j.usage;renderAiUsageUI(j.usage,pCfg,cfg.activeProvider)}
     }catch(e){}
   }
 };
 if($("#btnAiClearKey"))$("#btnAiClearKey").onclick=()=>{
-  const cfg=loadAiCfg();cfg.apiKey="";saveAiCfg(cfg);
-  if($("#inAiKey"))$("#inAiKey").value="";
+  const cfg=snapshotAiInputsToCfg(loadAiCfg());
+  const act=cfg.activeProvider,meta=AI_PROVIDERS_META[act]||AI_PROVIDERS_META.openai;
+  cfg.providers[act].apiKey="";
+  saveAiCfg(cfg);
+  if($("#"+meta.inputId))$("#"+meta.inputId).value="";
   updateAiKeyBadge();
-  if($("#aiCfgMsg"))$("#aiCfgMsg").textContent="已清除個人 API Key";
-  toast("已清除個人 API Key");
+  if($("#aiCfgMsg"))$("#aiCfgMsg").textContent=`已清除 ${meta.label} API Key`;
+  toast(`已清除 ${meta.label} API Key`);
 };
 if($("#btnAICopy"))$("#btnAICopy").onclick=async()=>{
   if(!S.ai)return;
@@ -7676,30 +7912,50 @@ if($("#btnAICopy"))$("#btnAICopy").onclick=async()=>{
 };
 if($("#btnAIMd"))$("#btnAIMd").onclick=()=>{
   if(!S.ai)return;
-  save("spi-ai-analysis.md",`# SPI·SPC AI 品質工程診斷報告（gpt-6.1-terra）\n\n- 產生時間：${fmtNowUtc8()}\n- 試產回合：${curRun()?curRun().name:S.source}\n\n${S.ai}\n`);
+  const cfg=loadAiCfg(),act=cfg.activeProvider,effM=effectiveModelOf(cfg.providers[act],act);
+  save("spi-ai-analysis.md",`# SPI·SPC AI 品質工程診斷報告（${effM}）\n\n- 產生時間：${fmtNowUtc8()}\n- 試產回合：${curRun()?curRun().name:S.source}\n\n${S.ai}\n`);
 };
 async function analyzeViaApi(out,st){
-  if($("#inAiKey")&&$("#inAiKey").value.trim()){
-    const cur=loadAiCfg();
-    cur.apiKey=$("#inAiKey").value.trim();
-    if($("#inAiDailyLim"))cur.dailyReqLimit=Math.min(Math.max(Math.round(+$("#inAiDailyLim").value||20),1),500);
-    if($("#inAiTokenLim"))cur.monthlyTokenLimit=Math.min(Math.max(Math.round(+$("#inAiTokenLim").value||500000),1000),10000000);
-    if($("#inAiUsdLim"))cur.monthlyUsdLimit=Math.min(Math.max(Math.round((+$("#inAiUsdLim").value||5)*100)/100,0.5),500);
-    saveAiCfg(cur);updateAiKeyBadge();
+  const cfg=snapshotAiInputsToCfg(loadAiCfg());
+  saveAiCfg(cfg);updateAiKeyBadge();
+  let usedProv=cfg.activeProvider;
+  let fallbackNotice="";
+  const hasKeyFor=p=>Boolean((cfg.providers[p]&&cfg.providers[p].apiKey)||(AI_SERVER_META[p]&&AI_SERVER_META[p].hasServerKey));
+  if(!hasKeyFor(usedProv)){
+    const alt=["openai","antigravity","cursor"].find(p=>p!==usedProv&&hasKeyFor(p));
+    if(alt){
+      fallbackNotice=`（${AI_PROVIDERS_META[usedProv].label} 未填金鑰，已自動備援使用 ${AI_PROVIDERS_META[alt].label}）`;
+      usedProv=alt;
+    }
   }
-  const cfg=loadAiCfg();
+  const meta=AI_PROVIDERS_META[usedProv]||AI_PROVIDERS_META.openai;
+  const pCfg=cfg.providers[usedProv]||cfg.providers.openai;
+  const effModel=effectiveModelOf(pCfg,usedProv);
+  const effEffort=pCfg.effort||"high";
   const body=JSON.stringify({payload:apiPayload()});
-  const headers={"Content-Type":"application/json","X-AI-Limits":JSON.stringify({dailyReqLimit:cfg.dailyReqLimit,monthlyTokenLimit:cfg.monthlyTokenLimit,monthlyUsdLimit:cfg.monthlyUsdLimit})};
-  if(cfg.apiKey)headers["X-OpenAI-Key"]=cfg.apiKey;
+  const headers={
+    "Content-Type":"application/json",
+    "X-AI-Provider":usedProv,
+    "X-AI-Model":effModel,
+    "X-AI-Reasoning-Effort":effEffort,
+    "X-AI-Limits":JSON.stringify({dailyReqLimit:pCfg.dailyReqLimit,monthlyTokenLimit:pCfg.monthlyTokenLimit,monthlyUsdLimit:pCfg.monthlyUsdLimit})
+  };
+  if(pCfg.endpoint)headers["X-AI-Endpoint"]=pCfg.endpoint;
+  if(pCfg.apiKey){
+    headers[meta.headerName]=pCfg.apiKey;
+    headers["X-AI-Key"]=pCfg.apiKey;
+  }
   aiAbort=new AbortController();$("#btnAI").disabled=true;$("#btnAIStop").hidden=false;out.innerHTML="";
-  st.textContent=`分析中…（使用 gpt-6.1-terra 高推理強度 · 送出統計摘要 ${f(new Blob([body]).size/1024,1)} KB，不含原始 SPI 資料）`;let text="";
+  st.textContent=`分析中…（使用 ${meta.label} · ${effModel} · 推理強度 ${effEffort}${fallbackNotice} · 送出統計摘要 ${f(new Blob([body]).size/1024,1)} KB，不含原始 SPI 資料）`;let text="";
   try{const res=await fetch("/api/analyze",{method:"POST",headers,body,signal:aiAbort.signal});
-    if(!res.ok){let msg=res.status===404?"此網站沒有啟用 AI 分析服務":`伺服器回應 ${res.status}`;try{const j=await res.json();if(j.error)msg=j.error;if(j.usage){AI_LAST_USAGE=j.usage;renderAiUsageUI(j.usage,cfg)}}catch(e){}st.textContent="AI 分析無法使用："+msg;return}
+    if(!res.ok){let msg=res.status===404?"此網站沒有啟用 AI 分析服務":`伺服器回應 ${res.status}`;try{const j=await res.json();if(j.error)msg=j.error;if(j.usage){AI_LAST_USAGE=j.usage;if(AI_SERVER_META[usedProv])AI_SERVER_META[usedProv].usage=j.usage;renderAiUsageUI(j.usage,pCfg,usedProv)}}catch(e){}st.textContent="AI 分析無法使用："+msg;return}
     const rd=res.body.getReader(),dec=new TextDecoder();
     for(;;){const{done,value}=await rd.read();if(done)break;text+=dec.decode(value,{stream:true});out.innerHTML=mdLite(deAnonymizeText(text))}
     S.ai=deAnonymizeText(text);if($("#aiResultTools"))$("#aiResultTools").hidden=!S.ai;
-    st.textContent=`完成 · 模型 ${res.headers.get("X-AI-Model")||"gpt-6.1-terra"} · 可至「分析報告」或「資料與規格」匯出含 AI 段落的報告`;
-    try{const uHdr=res.headers.get("X-AI-Usage");if(uHdr)AI_LAST_USAGE=JSON.parse(uHdr);if(AI_LAST_USAGE)AI_LAST_USAGE.dailyRequests=(AI_LAST_USAGE.dailyRequests||0)+1;renderAiUsageUI(AI_LAST_USAGE,cfg)}catch(e){}}
+    const usedModelHdr=res.headers.get("X-AI-Model")||effModel;
+    const usedEffortHdr=res.headers.get("X-AI-Reasoning-Effort")||effEffort;
+    st.textContent=`完成 · ${meta.label} · 模型 ${usedModelHdr}（推理強度 ${usedEffortHdr}）${fallbackNotice} · 可至「分析報告」或「資料與規格」匯出含 AI 段落的報告`;
+    try{const uHdr=res.headers.get("X-AI-Usage");if(uHdr){const uObj=JSON.parse(uHdr);uObj.dailyRequests=(uObj.dailyRequests||0)+1;AI_LAST_USAGE=uObj;if(AI_SERVER_META[usedProv])AI_SERVER_META[usedProv].usage=uObj;renderAiUsageUI(uObj,pCfg,usedProv)}}catch(e){}}
   catch(e){st.textContent=e&&e.name==="AbortError"?"已停止":"AI 分析失敗："+(e&&e.message||e);if(text){S.ai=deAnonymizeText(text);out.innerHTML=mdLite(deAnonymizeText(text));if($("#aiResultTools"))$("#aiResultTools").hidden=!S.ai}}
   finally{$("#btnAI").disabled=false;$("#btnAIStop").hidden=true;aiAbort=null}}
 

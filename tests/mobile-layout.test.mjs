@@ -291,4 +291,7 @@ test('9. 版面回歸：code review（v10.3.3）找到的問題', () => {
   assert.match(htmlSource, /<td><label class="row"><input type="radio" name="selZone"/, '區域選取單選鈕需包在 label.row 內');
   assert.match(htmlSource, /input\[type=password\]\{min-height:44px;min-width:44px;font-size:16px!important\}/, '密碼欄位需在觸控 44px 與 16px 防縮放規則內');
   assert.match(htmlSource, /return\{g,group:g,padDim,apDim,st:stLvl/, 'dfmTable0 需提供報告頁所需欄位別名');
+  for (const id of ['aiProviderSeg', 'inAiKey', 'inAiKeyAntigravity', 'inAiKeyCursor', 'selAiModel', 'inAiCustomModel', 'selAiEffort', 'inAiCustomEndpoint']) {
+    assert.match(htmlSource, new RegExp('id="' + id + '"'), 'AI 設定介面需有 #' + id);
+  }
 });
