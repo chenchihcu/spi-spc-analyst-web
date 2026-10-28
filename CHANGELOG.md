@@ -2,6 +2,18 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.8.0 — 2026-10-28 17:10:00（OpenAI／Antigravity／Cursor 多平台 API Key 並列設定、模型與推理強度下拉選單、各平台獨立使用量配額）
+
+- **OpenAI／Antigravity／Cursor 三組獨立 API Key 並列設定與即時平台切換 (`#aiSettingsCard`)**：
+  - 於 AI 診斷頁設定面板同時呈現三組獨立 API Key 輸入欄：**OpenAI API Key**（`#inAiKey`）、**Antigravity API Key**（`#inAiKeyAntigravity`）、**Cursor API Key**（`#inAiKeyCursor`），每欄皆附獨立「顯示／隱藏」切換鈕與設定狀態徽章（`#aiBadgeOpenai`、`#aiBadgeAntigravity`、`#aiBadgeCursor`），並提供「儲存全部設定」與「清除當前平台金鑰」。
+  - 新增平台切換分段按鈕（`#aiProviderSeg`：`OpenAI`／`Antigravity`／`Cursor`），若選取之平台未填本機金鑰且無伺服器金鑰時，自動回退至其他已填寫金鑰之平台。
+- **模型選單 (`#selAiModel`)、推理強度選單 (`#selAiEffort`) 與自訂 Endpoint (`#inAiCustomEndpoint`)**：
+  - **模型選單 (`#selAiModel`)**：依所選平台動態載入推薦模型清單（OpenAI 預設 `gpt-6.1-terra`、另有 `gpt-6.1-terra-mini`、`o4-mini`、`gpt-5.4`；Antigravity 預設 `gemini-3.1-pro-preview`、另有 `gemini-3.0-flash`、`gpt-6.1-terra`；Cursor 預設 `gpt-6.1-terra`、另有 `claude-opus-5-5`、`claude-sonnet-5-5`、`gemini-3.1-pro-preview`），並支援「`自訂模型名稱…`」展開自訂文字欄（`#inAiCustomModel`）。
+  - **推理強度選單 (`#selAiEffort`)**：提供 `高 (high) — 深度工程根因推理（推薦）`（預設）、`中 (medium) — 均衡推理深度與速度`、`低 (low) — 快速重點摘要` 三段選單，前後端透過 `X-AI-Reasoning-Effort` 與 `X-AI-Model` 同步傳遞。
+  - **自訂 API Endpoint (`#inAiCustomEndpoint`)**：支援為各平台選填自訂相容 HTTPS 端點覆寫，後端 `cloudflare/ai.mjs` 內建 SSRF 防護（阻擋非 `https://`、`localhost` 及內網私有 IP）。
+- **各平台獨立雙維度使用量配額與計數**：
+  - `OpenAI`、`Antigravity`、`Cursor` 三個平台各自擁有獨立的每日呼叫次數上限、每月累計 Token 上限、每月預估美金費用上限與 D1 計數器（零新增 D1 migration），並於面板頂部顯示三平台今日已用次數總覽（`#aiAllProvidersSummary`）。單一平台達 `429` 限額時，切換至其他平台即可繼續執行診斷。
+
 ## v10.7.0 — 2026-10-28 16:40:00（量測記錄與座標檔的對應證明；舊紀錄一鍵重新受控匯入）
 
 規格：`docs/spec-record-place-proof-rfc.md`（RFC-SPI-PROOF-20261028）。
@@ -35,6 +47,7 @@
   - `tests/controlled-import.test.mjs`：量測位號數
   - `tests/record-proof-ui.test.mjs`：證明對話框、重新匯入、相近料號與「剛存入」
   - `tests/records-ui.test.mjs`：通用格式歷史紀錄不借用座標
+
 ## v10.6.0 — 2026-10-28 16:00:00（OpenAI gpt-6.1-terra 直連與高推理強度、API 金鑰／雙維度使用量設定介面、全站 UI/UX 修復）
 
 - **OpenAI `gpt-6.1-terra` 直連與高推理強度 (`reasoning_effort: "high"`)**：
