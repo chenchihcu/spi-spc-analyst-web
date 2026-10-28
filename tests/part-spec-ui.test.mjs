@@ -67,7 +67,7 @@ test("核心：料號規格 → 分析狀態（高度 µm＝鋼板厚度 × 高�
 test("流程：鋼板厚度必填 → 未定義規格時鎖定 → 驗證與草稿 → 存 v1 預設解鎖 → 同料號自動套用 → 群組覆寫 v2 → 版本清單 → 放棄草稿需確認", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const cloud = await createCloudHarness();
   await cloud.upload({ kind: 'place', part: 'NEW-1', rev: 'V1', side: 'TOP', unit: 'mm', name: 'NEW-1-V1-TOP.csv' },
-    'RefDes,X,Y,Layer\nU1,1,2,TOP\nU2,3,4,TOP\n');
+    'RefDes,X,Y,Layer\nU1,10,20,TOP\nU2,30,40,TOP\n');
   const { dom, errs } = page(cloud);
   await tick(60);
   const w = dom.window, d = w.document, $ = (s) => d.querySelector(s);

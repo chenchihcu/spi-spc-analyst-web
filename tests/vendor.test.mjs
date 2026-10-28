@@ -59,7 +59,7 @@ function setImportFields(d, part, rev, lot) {
 async function controlledVendorPage(part) {
   const cloud = await createCloudHarness();
   await cloud.upload({ kind: 'place', part, rev: 'V1', side: 'TOP', unit: 'mm', name: `${part}-TOP.csv` },
-    'RefDes,X,Y,Layer\nC1,1,2,TOP\nR2,3,4,TOP\nG9,5,6,TOP\n');
+    'RefDes,X,Y,Layer\nC1,10,20,TOP\nR2,30,40,TOP\nG9,50,60,TOP\n');
   const result = page(cloud), w = result.dom.window, d = w.document;
   await w.SPI_TEST_HOOK.RecDB.ready;
   await w.SPI_TEST_HOOK.RecDB.list();

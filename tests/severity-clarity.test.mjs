@@ -107,7 +107,7 @@ const WIDE = [head, row("C1_1", 1, 100), row("C1_1", 2, 102), row("R2_1", 1, 95)
 test("同名回合：舊版高度 % 警示與重新匯入按鈕附上列序，試產比較標明 A／B", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const cloud = await createCloudHarness();
   await cloud.upload({ kind: 'place', part: 'DEMO-05', rev: 'V1', side: 'TOP', unit: 'mm', name: 'controlled.csv' },
-    'RefDes,X,Y,Layer\nC1,1,2,TOP\nR2,3,4,TOP\n');
+    'RefDes,X,Y,Layer\nC1,10,20,TOP\nR2,30,40,TOP\n');
   const { dom, errs } = page(cloud);
   await tick(60);
   const w = dom.window, d = w.document;

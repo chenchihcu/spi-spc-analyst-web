@@ -7,7 +7,7 @@ import { handleAnalyze } from './ai.mjs';
 import { handleShare } from '../lib/share-core.mjs';
 import { createHash, randomBytes } from 'node:crypto';
 import { gunzipSync } from 'node:zlib';
-import { parseCsv, validatePlacement, validateMeasurement } from '../lib/controlled-import.mjs';
+import { parseCsv, validatePlacement, validateMeasurement, placementSizeError } from '../lib/controlled-import.mjs';
 import { parseXlsx } from '../lib/xlsx-table.mjs';
 
 const sourceTable = (bytes, name) => /\.xlsx$/i.test(name || '') ? parseXlsx(bytes) : parseCsv(bytes);
@@ -255,6 +255,8 @@ async function handleRecordsApi(req, repo, user, env) {
         if (!chk.meta.side || !chk.meta.unit) return json({ error: '請選擇面別與單位' }, 422);
         verified = validatePlacement(table, chk.meta);
         if (verified.error) return json(verified, 422);
+        const sizeErr = placementSizeError(verified.items, chk.meta.unit);
+        if (sizeErr) return json(sizeErr, 422);
       } else {
         if (!chk.meta.rev || !chk.meta.side || !chk.meta.placeId || (!chk.meta.workOrder && !chk.meta.measuredDate))
           return json({ error: '請選擇正式料號、版次、面別與受控座標，並填寫製令工單或量測日期' }, 422);
@@ -354,6 +356,8 @@ async function handleRecordsApi(req, repo, user, env) {
         return json({ error: '歷史座標原始檔指紋不符' }, 409);
       const verified = validatePlacement(table, chk.meta);
       if (verified.error) return json(verified, 422);
+      const sizeErr = placementSizeError(verified.items, chk.meta.unit);
+      if (sizeErr) return json(sizeErr, 422);
       const rec = { id: randomBytes(16).toString('base64url'), ...chk.meta, isDefault: false,
         comps: verified.items.length, sides: verified.sides, factor: verified.factor, formatVersion: verified.formatVersion,
         bytes: raw.length, gz_bytes: gz.length, sha256: legacy.sha256, user, created: Date.now(),

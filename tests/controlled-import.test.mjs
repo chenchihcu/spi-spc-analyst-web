@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { parseCsv, validatePlacement, validateWideMeasurement, validateMeasurement } from '../lib/controlled-import.mjs';
+import { parseCsv, validatePlacement, validateWideMeasurement, validateMeasurement, placementSizeError } from '../lib/controlled-import.mjs';
 
 const fixtureRoot = 'C:/Users/user/Documents/x3000 spidata';
 const samplePlace = `${fixtureRoot}/X3000 V5座標檔.csv`;
@@ -92,4 +92,27 @@ test('樣本座標與 TOP 量測：20 板、7 個無座標位號、座標多出 
   assert.equal(measured.measuredRefs, measuredRefs.size, '對應證明的量測位號數');
   assert.equal(measured.coordRefsOnSide, 728);
   assert.equal(measured.measuredRefs - measured.missing.length, 728 - 79, '有座標的量測位號＝座標此面位號扣掉未量測的');
+});
+
+test('新登錄座標檔：換算後板面超過 1000 mm 或小於 5 mm 時拒絕，單一元件不檢查', () => {
+  const place = (rows, unit) => validatePlacement(parseCsv('RefDes,X,Y,Layer\n' + rows), { side: 'TOP', unit });
+  // mil 檔誤選 mm：X 7431 → 7431 mm
+  const milAsMm = place('U1,0,0,L1-TOP\nU2,7431,4761,L1-TOP\n', 'mm');
+  assert.equal(placementSizeError(milAsMm.items, 'mm').code, 'unit_size');
+  assert.match(placementSizeError(milAsMm.items, 'mm').error, /超過 1000 mm/);
+  // 同一份數值選 mil：188.7 × 120.9 mm，通過
+  assert.equal(placementSizeError(place('U1,0,0,L1-TOP\nU2,7431,4761,L1-TOP\n', 'mil').items, 'mil'), null);
+  // inch 檔誤選 mm：3 × 2 inch 的板只剩 3 × 2 mm，小於 5 mm 拒絕；選 inch 則為 76 × 51 mm，通過
+  assert.match(placementSizeError(place('U1,0,0,L1-TOP\nU2,3,2,L1-TOP\n', 'mm').items, 'mm').error, /小於 5 mm/);
+  assert.equal(placementSizeError(place('U1,0,0,L1-TOP\nU2,3,2,L1-TOP\n', 'inch').items, 'inch'), null);
+  // 單一元件無法判斷板面，不阻擋
+  assert.equal(placementSizeError(place('U1,7431,4761,L1-TOP\n', 'mm').items, 'mm'), null);
+});
+
+test('樣本座標檔（X3000 V5）實際單位為 mil：mm 與 inch 被擋，mil 通過', { skip: !fs.existsSync(samplePlace) }, () => {
+  const table = parseCsv(fs.readFileSync(samplePlace));
+  const check = unit => placementSizeError(validatePlacement(table, { side: 'BOTH', unit }).items, unit);
+  assert.equal(check('mm').code, 'unit_size');
+  assert.equal(check('inch').code, 'unit_size');
+  assert.equal(check('mil'), null);
 });

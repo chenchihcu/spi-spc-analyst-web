@@ -711,7 +711,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.8.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.8.1</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -7128,6 +7128,12 @@ const PLACE_MAX_MM=1000;
 function placeUnitWarn(items,unit){if(unit!=="mm"||!items.length)return"";let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
   for(const p of items){if(p.x<x0)x0=p.x;if(p.x>x1)x1=p.x;if(p.y<y0)y0=p.y;if(p.y>y1)y1=p.y}
   const w=x1-x0,h=y1-y0;return Math.max(w,h)>PLACE_MAX_MM?`座標分布 ${w.toFixed(0)} × ${h.toFixed(0)} mm 超過 ${PLACE_MAX_MM} mm，疑似實際單位為 mil（換算約 ${(w*.0254).toFixed(0)} × ${(h*.0254).toFixed(0)} mm），請確認座標單位`:""}
+/* 新登錄座標檔的板面尺寸守衛（只在登錄時阻擋；讀取既有紀錄仍只用上面的提示）。門檻與 lib/controlled-import.mjs 的 placementSizeError 相同 */
+const PLACE_SPAN_MIN_MM=5;
+function placeSizeErr(items,unit){if(!items||items.length<2)return"";let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+  for(const p of items){if(p.x<x0)x0=p.x;if(p.x>x1)x1=p.x;if(p.y<y0)y0=p.y;if(p.y>y1)y1=p.y}
+  const w=x1-x0,h=y1-y0,span=Math.max(w,h);
+  return span>PLACE_MAX_MM||span<PLACE_SPAN_MIN_MM?`座標分布 ${w.toFixed(1)} × ${h.toFixed(1)} mm（依所選單位 ${unit} 換算），${span>PLACE_MAX_MM?`超過 ${PLACE_MAX_MM}`:`小於 ${PLACE_SPAN_MIN_MM}`} mm，座標單位可能選錯，請確認後重新選擇單位`:""}
 function r0(v){return typeof v==="number"&&isFinite(v)}
 /* 橫排轉一列一筆。o：{side, place（parsePlacement 結果）, stencil（µm，高度 % 換算用）, st, apertures} */
 function unpivotWide(tab,o={}){const w=wideCols(tab.head),R={};
@@ -7280,6 +7286,7 @@ async function saveControlledPlacement(fl,part,rev,side,unit){
   if(!part||!rev||!side||!unit)throw new Error("請填寫正式料號與版次，並選擇面別與單位");
   if(!/\.csv$/i.test(fl.name))throw new Error("目前受控上傳只接受 CSV 原始檔");
   const u8=new Uint8Array(await readBuf(fl)),tab=csvTable(decodeBytes(u8)),res=parsePlacement(tab,unit,side);
+  const sizeErr=placeSizeErr(res.items,unit);if(sizeErr)throw new Error(sizeErr);
   const rec=await RecDB.create({kind:"place",part,rev,side,unit,name:safeId(fl.name),comps:res.items.length},u8);
   return{rec,tab,res,u8};
 }
@@ -10601,7 +10608,7 @@ if($("#mBtnTheme"))$("#mBtnTheme").onclick=()=>{if(typeof moreSheetCtrl!=="undef
 setupRecPicker();
 updateStartupDbBanner();
 /* 測試用：只有測試在載入前設定 window.SPI_TEST_HOOK 時才公開內部函式 */
-if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart});
+if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,placeSizeErr,placeUnitWarn,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart});
 const initHash=(location.hash||"").slice(1);
 if(ALL_TABS.includes(initHash))setTab(initHash,true);
 })();

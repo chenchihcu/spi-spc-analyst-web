@@ -191,7 +191,7 @@ test('authenticated API enforces admin upload, server validation, unmatched conf
 
 test('對應證明：上傳寫入伺服器快照，link_check 重算指紋、身分與位號', async () => {
   const { db, r2, upload, linkCheck } = apiHarness();
-  const placeCsv = 'RefDes,X,Y,Layer\nU1,1,2,L1-TOP\nC9,3,4,L1-TOP\nR1,5,6,L1-BOT\n';
+  const placeCsv = 'RefDes,X,Y,Layer\nU1,10,20,L1-TOP\nC9,30,40,L1-TOP\nR1,50,60,L1-BOT\n';
   const placeRecord = (await (await upload('admin@example.com', { kind: 'place', part: 'P', rev: 'V5', side: 'BOTH', unit: 'mm', name: 'p.csv' }, placeCsv)).json()).record;
   const spiCsv = 'Component ID,PAD ID,Height(%)1,Result1\nU1_1,1,88,PASS\nU1_1,2,89,PASS\nR1_1,1,90,PASS\nQ7_1,1,91,PASS\n';
   const meta = { kind: 'spi', part: 'P', rev: 'V5', side: 'TOP', placeId: placeRecord.id, workOrder: 'WO-1', name: 'm.csv',
@@ -221,7 +221,7 @@ test('對應證明：上傳寫入伺服器快照，link_check 重算指紋、身
   assert.equal((await (await linkCheck(rec.id)).json()).refs.unmatchedConsistent, false);
 
   // 竄改 R2 座標原檔
-  r2.objects.set(`records/${placeRecord.id}`, gzipSync(Buffer.from(placeCsv.replace('U1,1,2', 'U1,9,9'))));
+  r2.objects.set(`records/${placeRecord.id}`, gzipSync(Buffer.from(placeCsv.replace('U1,10,20', 'U1,90,90'))));
   const tampered = await (await linkCheck(rec.id)).json();
   assert.equal(tampered.place.shaOk, false);
   assert.equal(tampered.place.error, '受控座標原始檔指紋不符');
