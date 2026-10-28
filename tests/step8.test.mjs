@@ -298,6 +298,31 @@ test("受控座標匯入 → buildRows → 3D 示意位置皆為有限值（使�
   }
 });
 
+test("3D 鏡頭依板面大小對準：範例板不變、大板等比放大、超過 1 公尺提示單位", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const dom = createPage();
+  const w = dom.window, H = await waitFor(() => w.SPI_TEST_HOOK?.fit3D && w.SPI_TEST_HOOK);
+  // 範例板 60 mm：與原本固定值相同（不改既有畫面）
+  assert.deepEqual({ ...H.fit3D(60) }, { rad: 78, min: 20, max: 160, near: 0.1, far: 500 });
+  // 190 mm 實板：等比放大，整塊板仍在鏡頭內
+  const f = H.fit3D(190);
+  assert.ok(Math.abs(f.rad / 78 - 190 / 60) < 1e-12 && f.far > f.rad + 190, "距離與遠裁切面隨板面放大");
+  // 2026-10-28 正式站 B09：元件中心 55–7486 × 140–4740（疑似 mil 當 mm）
+  const mk = (x, y) => ({ x, y });
+  const P = new Map([[1, mk(55, 140)], [2, mk(7486.22, 4740)], [3, mk(3000, 2000)]]);
+  const E = H.ext3D(P);
+  assert.equal(Math.round(E.w), 7439); assert.equal(Math.round(E.d), 4608); assert.equal(E.span, E.w);
+  assert.match(H.size3DNote(E), /超過 1 公尺.*單位可能有誤/);
+  assert.equal(H.size3DNote(H.ext3D(new Map([[1, mk(0, 0)], [2, mk(190, 120)]]))), "", "正常大小不提示");
+  // pos3DNote（HUD 與匯出快照共用）帶出單位提示
+  const S = H.S, saved = [S.rows, S.board, S.group];
+  try {
+    S.rows = [{ board: "B1", pad: "U1-1", comp: "U1", componentX: 55, componentY: 140, w: 0.7, d: 0.7 },
+      { board: "B1", pad: "U2-1", comp: "U2", componentX: 7486.22, componentY: 4740, w: 0.7, d: 0.7 }];
+    S.board = "B1"; S.group = "ALL"; H.T.pos = null;
+    assert.match(H.pos3DNote(), /元件中心示意.*超過 1 公尺/);
+  } finally { [S.rows, S.board, S.group] = saved; H.T.pos = null; }
+});
+
 test("3D 側欄出錯不擋 3D 初始化：safeBoard2D 標示錯誤並回傳 false", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const dom = createPage();
   await tick(80);
