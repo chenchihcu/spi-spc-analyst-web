@@ -348,3 +348,25 @@ test("3D 側欄出錯不擋 3D 初始化：safeBoard2D 標示錯誤並回傳 fal
   assert.ok(errs.length >= 1, "錯誤寫入 console.error，不吞錯");
   assert.match(w.document.querySelector("#hud").innerHTML, /側欄圖表更新失敗/);
 });
+
+test("前端座標檔登錄守衛 placeSizeErr 與伺服器 placementSizeError 門檻一致", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { placementSizeError } = await import("../lib/controlled-import.mjs");
+  const dom = createPage();
+  await tick(80);
+  const H = dom.window.SPI_TEST_HOOK;
+  const cases = [
+    [[{ x: 0, y: 0 }, { x: 7431, y: 4761 }], "mm"],
+    [[{ x: 0, y: 0 }, { x: 188.7, y: 120.9 }], "mil"],
+    [[{ x: 0, y: 0 }, { x: 3, y: 2 }], "mm"],
+    [[{ x: 0, y: 0 }, { x: 1000, y: 10 }], "mm"],
+    [[{ x: 0, y: 0 }, { x: 5, y: 1 }], "mm"],
+    [[{ x: 7431, y: 4761 }], "mm"],
+  ];
+  for (const [items, unit] of cases) {
+    const srv = placementSizeError(items, unit), cli = H.placeSizeErr(items, unit);
+    assert.equal(Boolean(cli), Boolean(srv), `${JSON.stringify(items)} 前後端判定一致`);
+    if (srv) assert.equal(cli, srv.error, "錯誤訊息一致");
+  }
+  // 讀取既有紀錄仍只提示、不阻擋（parsePlacement 不拋錯）
+  assert.match(H.placeUnitWarn([{ x: 0, y: 0 }, { x: 7431, y: 4761 }], "mm"), /疑似實際單位為 mil/);
+});
