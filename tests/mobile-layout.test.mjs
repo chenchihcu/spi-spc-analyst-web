@@ -130,7 +130,7 @@ test('4. 行動版 DOM 結構與分頁控制 (JSDOM 驗證)', { skip: !JSDOM && 
 
   // c. 更多 Sheet 內涵蓋全部次要分頁（共 4+9=13 個分頁）
   const subTabs = $$('#moreSheet [data-mtab]').map(b => b.dataset.mtab);
-  assert.deepEqual(subTabs, ['sim3d', 'cross', 'adv', 'compare', 'dfm', 'lab', 'ai', 'report', 'data'], '需涵蓋其餘 9 個分頁');
+  assert.deepEqual(subTabs, ['sim3d', 'cross', 'adv', 'stats', 'compare', 'dfm', 'lab', 'ai', 'report', 'data'], '需涵蓋其餘 10 個分頁');
 
   // d. 更多 Sheet 內涵蓋操作與帳號
   assert.ok($('#mBtnTheme'), '需有行動版主題切換鈕');
@@ -158,6 +158,12 @@ test('4. 行動版 DOM 結構與分頁控制 (JSDOM 驗證)', { skip: !JSDOM && 
   // 當前分頁不在前四項時，mtabMore 應標記為 selected
   const mtabMore = $('#mtabMore');
   assert.equal(mtabMore.getAttribute('aria-selected'), 'true', '在次級分頁時更多按鈕需顯示 active/selected');
+  assert.ok($('#cWipe'), '需存在 #cWipe 畫布');
+  assert.equal($('#cardMorph')?.parentElement?.id, 'p-adv', '#cardMorph 的直接父層必須是 #p-adv');
+  assert.equal($$('#p-adv .card .card').length, 0, '#p-adv 內不可有 .card 巢狀包覆 .card');
+  for (const id of ['aiSettingsCard', 'inAiKey', 'btnAiKeyToggle', 'inAiDailyLim', 'inAiTokenLim', 'inAiUsdLim', 'btnAiSaveCfg', 'btnAiClearKey', 'aiDailyBar', 'aiMonthlyBar', 'btnAICopy', 'btnAIMd']) {
+    assert.ok($(`#${id}`), `AI 分析頁需存在 #${id}`);
+  }
 });
 
 test('5. 觸控修正與無障礙樣式規範 (CSS 規則檢驗)', () => {
@@ -283,4 +289,6 @@ test('9. 版面回歸：code review（v10.3.3）找到的問題', () => {
 
   // c. 階梯鋼板區域表的選取單選鈕觸控時只有 24px：包進 label.row 取得 44px 熱區
   assert.match(htmlSource, /<td><label class="row"><input type="radio" name="selZone"/, '區域選取單選鈕需包在 label.row 內');
+  assert.match(htmlSource, /input\[type=password\]\{min-height:44px;min-width:44px;font-size:16px!important\}/, '密碼欄位需在觸控 44px 與 16px 防縮放規則內');
+  assert.match(htmlSource, /return\{g,group:g,padDim,apDim,st:stLvl/, 'dfmTable0 需提供報告頁所需欄位別名');
 });
