@@ -6792,8 +6792,9 @@ function pos3D(rows){
 function ext3D(P){let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
   for(const p of P.values()){if(p.x<x0)x0=p.x;if(p.x>x1)x1=p.x;if(p.y<y0)y0=p.y;if(p.y>y1)y1=p.y}
   x0-=4;x1+=4;y0-=4;y1+=4;return{x0,x1,y0,y1,w:x1-x0,d:y1-y0,span:Math.max(x1-x0,y1-y0)}}
-/* 鏡頭依板面大小縮放：範例板 60 mm 時與原本固定值（距離 78、縮放 20–160、近遠 0.1–500）相同 */
-function fit3D(span){const k=Math.max(span,1)/60;return{rad:78*k,min:20*k,max:160*k,near:0.1*k,far:500*k}}
+/* 鏡頭依板面大小縮放：60 mm 以下維持原本固定值（距離 78、縮放 20–160、近遠 0.1–500），
+   小板不拉近，避免放大後的錫膏高度（不隨板面縮放）超出畫面；大板等比放大 */
+function fit3D(span){const k=Math.max(span,60)/60;return{rad:78*k,min:20*k,max:160*k,near:0.1*k,far:500*k}}
 /* 板面超過 1 公尺多半是座標單位錯（例如 mil 當成 mm） */
 function size3DNote(e){return e&&e.span>1000?`板面 ${Math.round(e.w)} × ${Math.round(e.d)} mm，超過 1 公尺，座標單位可能有誤（例如 mil 被當成 mm），請檢查座標檔的單位設定`:""}
 /* 本板 3D 位置註記：元件中心示意與未繪出焊墊數；HUD 與匯出快照共用 */
@@ -8778,6 +8779,12 @@ function afterPrint(){
 addEventListener("beforeprint",beforePrint);
 addEventListener("afterprint",afterPrint);
 
+/* 依畫布寬度斷行（中文逐字、英數不拆字）；註記可能同時含示意與單位提示，單行會被截掉 */
+function wrapCanvasText(g,text,maxW){
+  const tokens=text.match(/[A-Za-z0-9.,%×()（）\-]+|\s+|./gu)||[],lines=[];let cur="";
+  for(const t of tokens){const next=cur+t;if(cur&&g.measureText(next).width>maxW){lines.push(cur.trimEnd());cur=t.trimStart()}else cur=next}
+  if(cur.trim())lines.push(cur.trimEnd());return lines;
+}
 /* 匯出快照（PNG、列印、PDF）把示意註記畫進圖內，不只留在互動 HUD */
 async function capture3DImage(){
   const res=await capture3DRaw();
@@ -8785,9 +8792,11 @@ async function capture3DImage(){
   if(!note)return res;
   try{
     const img=await new Promise((ok,no)=>{const im=new Image();const tm=setTimeout(()=>no(new Error("timeout")),3000);im.onload=()=>{clearTimeout(tm);ok(im)};im.onerror=()=>{clearTimeout(tm);no(new Error("image"))};im.src=res.dataUrl});
-    const cv=document.createElement("canvas"),bar=34;cv.width=img.width;cv.height=img.height+bar;
+    const cv=document.createElement("canvas"),font="bold 18px 'Microsoft JhengHei','Noto Sans TC',sans-serif",lh=26,pad=8;
+    const mg=cv.getContext("2d");mg.font=font;const lines=wrapCanvasText(mg,"⚠ "+note,img.width-24),bar=lines.length*lh+pad*2;
+    cv.width=img.width;cv.height=img.height+bar;
     const g=cv.getContext("2d");g.fillStyle="#ffffff";g.fillRect(0,0,cv.width,cv.height);g.drawImage(img,0,0);
-    g.fillStyle="#7a2e0e";g.font="bold 18px 'Microsoft JhengHei','Noto Sans TC',sans-serif";g.textBaseline="middle";g.fillText("⚠ "+note,12,img.height+bar/2);
+    g.fillStyle="#7a2e0e";g.font=font;g.textBaseline="middle";lines.forEach((ln,i)=>g.fillText(ln,12,img.height+pad+lh*i+lh/2));
     return{ok:true,dataUrl:cv.toDataURL("image/png"),note};
   }catch(e){return{...res,note}}
 }
@@ -9897,7 +9906,7 @@ if($("#mBtnTheme"))$("#mBtnTheme").onclick=()=>{if(typeof moreSheetCtrl!=="undef
 setupRecPicker();
 updateStartupDbBanner();
 /* 測試用：只有測試在載入前設定 window.SPI_TEST_HOOK 時才公開內部函式 */
-if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart});
+if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart});
 const initHash=(location.hash||"").slice(1);
 if(ALL_TABS.includes(initHash))setTab(initHash,true);
 })();
