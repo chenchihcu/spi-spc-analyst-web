@@ -35,10 +35,13 @@ async function cloudPage() {
 const PLACE_CSV = "RefDes,X,Y,Layer\nC1,10,20,TOP\n";
 const WIDE = "Component ID,Height(%)1,Volume(%)1,Area(%)1,PAD ID,Result1,Height(%)2,Volume(%)2,Area(%)2,Result2\nC1_1,100,101,99,1,PASS,102,103,98,PASS\nC1_1,100,101,99,2,PASS,102,103,98,PASS\n";
 const rowOf = (d, sel, text) => [...d.querySelectorAll(`${sel} tbody tr`)].find(tr => tr.textContent.includes(text));
+// 等選取的分頁實際渲染完成（表格已產生、品質篩選依分頁顯示或隱藏），不用固定休眠
 async function openPicker(t, tab = "spi") {
   t.$("#btnOpenRecModal").click();
   t.$(tab === "place" ? "#btnPickPlace" : "#btnPickSpi").click();
-  await tick(30);
+  const box = tab === "place" ? "#boxPickPlace" : "#boxPickSpi", tbl = tab === "place" ? "#tblPickPlace" : "#tblPickSpi";
+  assert.ok(await until(() => !t.$("#recPickerModal").hidden && !t.$(box).hidden && t.$(`${tbl} tbody`)
+    && (t.$("#pickQualitySeg").style.display === "none") === (tab === "place")), `資料庫 ${tab} 分頁應完成渲染`);
 }
 async function seedLegacy(cloud, rec, source) {
   const raw = Buffer.from(source);
@@ -162,8 +165,7 @@ test("座標登錄：相近料號要再按一次才存入；存入後篩選切�
   Object.defineProperty(inp, "files", { configurable: true, value: [new w.File([Buffer.from(PLACE_CSV)], "typo.csv")] });
   inp.dispatchEvent(new w.Event("change"));
   $("#btnSubmitPlace").click();
-  await tick(50);
-  assert.equal($("#btnSubmitPlace").textContent, "確認是新料號並存入", "第一次只提醒");
+  assert.ok(await until(() => $("#btnSubmitPlace").textContent === "確認是新料號並存入"), "第一次只提醒");
   assert.equal((await w.SPI_TEST_HOOK.RecDB.list()).filter(r => r.kind === "place").length, 1, "尚未存入");
   $("#btnSubmitPlace").click();
   assert.ok(await until(() => /已存入座標檔 301-001100123 v1（TOP，1 個元件）/.test($("#upPlaceState").textContent)), $("#upPlaceState").textContent, $("#recPickerModal").hidden, $("#recPickerNotice").textContent, (await w.SPI_TEST_HOOK.RecDB.list()).filter(r=>r.kind==="place").map(r=>r.part).join(","));
