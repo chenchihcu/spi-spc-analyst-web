@@ -25,6 +25,9 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
 - 新的量測、座標與規格紀錄只寫入 Cloudflare D1＋R2。未登入或離線時 `RecDB.create` 直接拋錯（fail-closed），不得重新引入本機寫入回退。既有的瀏覽器 IndexedDB 舊資料（`LocalRec`）只供查閱。
   - 檢查：`RecDB.create` 在 `mode!=="cloud"` 時拋錯；`tests/records.test.mjs` 通過。
   - 出處：v10.3.0；原 GEMINI.md 寫「不設在地 IndexedDB」與現況不符，2026-10-26 依程式更正。
+- **改變列欄位語意（改名、不再填值）時，同一個 PR 更新所有讀取端**：先 grep 該欄位的全部讀取處（統計、3D、報表 3D、匯出），沒有更新的讀取端要有 fail-visible 處理，不可靜默算出 NaN。
+  - 檢查：該匯入路徑有一條測試串過 `buildRows` 到各讀取端（例：`tests/step8.test.mjs`「受控座標匯入 → buildRows → 3D 示意位置皆為有限值」）。
+  - 出處：PR #53（座標改寫 `componentX/Y`，3D 仍讀 `r.x/r.y`）→ 2026-10-28 正式站 3D 空白。
 
 ## 統計與問題偵測
 
@@ -55,6 +58,9 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
 - **UI 改動的驗證矩陣**：以 build 產物（非 dev server）在 1440／820／390／320 四種寬度，各跑明亮與深色，涵蓋 14 個分頁、4 個資料子分頁、「更多」選單、設定面板與全部對話框。每頁檢查整頁橫向溢出（以當下的 `clientWidth` 比較）、觸控熱區 ≥ 44px（含包住核取方塊的 label）、文字對比；在 devicePixelRatio > 1 下同一頁至少進出兩次，抓累積狀態的錯誤。
   - 檢查：驗收紀錄列出每個寬度 × 主題的結果；無法模擬的項目（例如 ≥768px 的觸控）標 `NOT TESTED`。
   - 出處：v10.3.1 巡檢只看單次進入、單一 dpr，漏掉 v10.3.3 修正的 LISA 放大、320px 溢出、核取方塊熱區與深色報告對比。
+- **重現或驗收使用者回報的問題時，用與使用者相同來源的資料**：同名回合不代表同一份資料。從雲端紀錄重新開啟，或用同一種匯入路徑（受控座標／一般格式）重建；只用範例資料或另一個瀏覽器的本機回合，只能證明那份資料沒問題。
+  - 檢查：驗收紀錄寫明資料來源（紀錄 ID 或匯入方式），並附資料特徵比對（有限 x/y 列數、`gridPos` 列數、`componentX` 列數）與使用者環境一致。
+  - 出處：2026-10-28 3D 空白（PR #65 用內建瀏覽器本機 `gridPos` 回合驗證；使用者為受控座標回合，x/y 全空）。
 - 完成開發不等於完成 iPhone 真機驗收；未實測標記 `NOT TESTED`。
 
 ## 測試環境

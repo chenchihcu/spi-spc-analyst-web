@@ -239,6 +239,50 @@ test("3D 空白自我檢查：diag3D 依序判定、量不到視為正常", { sk
   assert.match(H.diag3D({ ...ok, calls: 0 }), /未執行任何繪製/);
   assert.match(H.diag3D({ ...ok, alpha: 0 }), /畫面空白/);
   assert.match(H.diag3D({ ...ok, alpha: 0, meshes: 0 }), /畫面空白/, "空板仍會畫底板，alpha=0 仍算失敗");
+  assert.match(H.diag3D({ ...ok, nan: 3, alpha: 0 }), /NaN.*不是顯示卡/, "NaN 座標要報成資料問題，不可誤報顯示卡");
+});
+
+test("3D 示意位置：受控座標只有元件中心時展開焊墊，不寫回焊墊 X/Y", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const dom = createPage();
+  await tick(80);
+  const H = dom.window.SPI_TEST_HOOK;
+  // 2026-10-28 正式站：受控座標檔回合只有 componentX/Y，build3D 讀 r.x 得 NaN，整個 3D 空白
+  const mk = (pad, comp, cx, cy) => ({ board: "B09", pad, comp, componentX: cx, componentY: cy, w: 0.7, d: 0.7 });
+  const rows = [mk("U1-1", "U1", 10, 20), mk("U1-2", "U1", 10, 20), mk("U1-3", "U1", 10, 20), mk("U1-4", "U1", 10, 20),
+    mk("R5-1", "R5", 30, 5), { board: "B09", pad: "X9-1", comp: "X9", w: 0.7, d: 0.7 },
+    { board: "B09", pad: "G1", x: 1, y: 2, gridPos: true, w: 0.7, d: 0.7 }];
+  const P = H.pos3D(rows);
+  assert.equal(P.size, 6, "無任何座標的焊墊不繪出");
+  assert.ok(!P.has(rows[5]));
+  for (const p of P.values()) assert.ok(Number.isFinite(p.x) && Number.isFinite(p.y), "示意位置不可為 NaN");
+  assert.deepEqual({ ...P.get(rows[6]) }, { x: 1, y: 2, est: false }, "既有 x/y（含舊格狀示意）照用");
+  const u1 = rows.slice(0, 4).map(r => P.get(r));
+  assert.ok(u1.every(p => p.est), "元件中心來源要標成示意");
+  assert.equal(new Set(u1.map(p => p.x + "," + p.y)).size, 4, "同元件焊墊展開後不可重疊");
+  const mx = u1.reduce((s, p) => s + p.x, 0) / 4, my = u1.reduce((s, p) => s + p.y, 0) / 4;
+  assert.ok(Math.abs(mx - 10) < 1e-9 && Math.abs(my - 20) < 1e-9, "展開以元件中心為中心");
+  assert.ok(u1.every(p => Math.hypot(p.x - 10, p.y - 20) < 0.7 * 1.4 * 2), "展開不離元件中心太遠");
+  assert.deepEqual({ ...P.get(rows[4]) }, { x: 30, y: 5, est: true }, "單一焊墊元件放在元件中心");
+  assert.ok(rows.every(r => !("x" in r) || r.pad === "G1"), "不可把元件中心寫回 r.x/r.y（統計不使用）");
+});
+
+test("受控座標匯入 → buildRows → 3D 示意位置皆為有限值（使用者實際資料路徑）", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const dom = createPage();
+  await tick(80);
+  const w = dom.window, H = w.SPI_TEST_HOOK;
+  // 範例資料與舊本機回合走格狀回退（gridPos），驗不到受控座標路徑；這裡照正式匯入的 o.place.controlled 建列
+  const csv = "Board,Component ID,PAD ID,Volume(%)\n" +
+    ["U1", "U1", "U1", "U1", "R5", "R5", "X9"].map((c, i) => `1,${c},${i + 1},${100 + i}`).join("\n") + "\n";
+  const table = w.csvTable(csv), map = w.autoMap(table.head);
+  const opts = { ...w.guessOpts(table.head, map), side: "TOP",
+    place: { controlled: true, items: [{ side: "TOP", ref: "U1", x: 10, y: 20 }, { side: "TOP", ref: "R5", x: 30, y: 5 }] } };
+  const { rows } = w.buildRows(table, map, opts);
+  assert.equal(rows.length, 7);
+  assert.ok(rows.every(r => r.x == null && r.y == null), "受控匯入不產生焊墊 X/Y（前提）");
+  const P = H.pos3D(rows);
+  assert.equal(P.size, 6, "有元件中心的 6 個焊墊都要畫，無座標的 X9 略過");
+  for (const p of P.values()) assert.ok(Number.isFinite(p.x) && Number.isFinite(p.y) && p.est, "3D 座標必須是有限值");
+  assert.equal(new Set([...P.values()].map(p => p.x + "," + p.y)).size, 6, "焊墊不可疊在同一點");
 });
 
 test("3D 側欄出錯不擋 3D 初始化：safeBoard2D 標示錯誤並回傳 false", { skip: !JSDOM && "未安裝 jsdom" }, async () => {

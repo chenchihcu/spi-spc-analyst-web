@@ -681,7 +681,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   <div class="brand">
     <h1>SPI·SPC 分析台</h1>
     <span class="tag">錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.4.3</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.4.4</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -6653,6 +6653,7 @@ function diag3D(d){
   if(!d.connected)return"3D 畫布未掛載到頁面。";
   if(!(d.w>0&&d.h>0))return"3D 畫布尺寸為 0，無法繪製。";
   if(d.lost)return"WebGL 繪圖內容已遺失（context lost）。";
+  if(d.nan>0)return`3D 場景有 ${d.nan} 個物件座標無效（NaN），是資料座標問題，不是顯示卡問題。`;
   if(d.calls===0)return"WebGL 未執行任何繪製。";
   if(d.alpha===0)return"WebGL 已執行但畫面空白（可能是顯示卡驅動或硬體加速未開啟）。";
   return null;
@@ -6664,7 +6665,9 @@ function check3DRender(){
   if(gl&&!lost&&cvs.width>0&&cvs.height>0){
     try{const n=8,px=new Uint8Array(n*n*4);gl.readPixels(Math.max(0,(cvs.width>>1)-n/2),Math.max(0,(cvs.height>>1)-n/2),n,n,gl.RGBA,gl.UNSIGNED_BYTE,px);alpha=0;for(let i=3;i<px.length;i+=4)if(px[i]>alpha)alpha=px[i]}catch(e){alpha=-1}
   }
-  const d={connected:!!cvs.isConnected,w:cvs.width,h:cvs.height,lost,calls:r.info&&r.info.render?r.info.render.calls:-1,alpha,meshes:(T.meshes||[]).length};
+  let nan=0;
+  for(const o of (T.root&&T.root.children)||[]){const p=o.position,bs=o.geometry&&o.geometry.boundingSphere;if(!(isFinite(p.x)&&isFinite(p.y)&&isFinite(p.z))||(bs&&!isFinite(bs.radius)))nan++}
+  const d={connected:!!cvs.isConnected,w:cvs.width,h:cvs.height,lost,nan,calls:r.info&&r.info.render?r.info.render.calls:-1,alpha,meshes:(T.meshes||[]).length};
   const why=diag3D(d);
   if(why){console.warn("3D 錫膏模擬未繪出畫面：",why,d);show3DFallback(why+DIAG3D_TIP)}
   else if($("#view3d .webgl-fallback[data-diag]"))clear3DFallback();
@@ -6759,17 +6762,45 @@ function createSolderPasteGeometry(w,h,d,r,ex,shape){
   if(typeof geo.computeVertexNormals==="function")geo.computeVertexNormals();
   return geo;
 }
+/* 同一元件的第 i 個焊墊（共 n 個）相對元件中心的示意偏移 [dx,dy]（mm），pitch 為建議間距 */
+function spreadOffset(i,n,pitch){
+  if(!(n>1))return[0,0];
+  /* 置中方格：每列左右置中；最後一列不滿時整體上下平移，讓平均落在元件中心 */
+  const c=Math.ceil(Math.sqrt(n)),R=Math.ceil(n/c),last=n-c*(R-1),row=Math.floor(i/c),col=i%c,cnt=row===R-1?last:c;
+  const yMean=(last-c)*((R-1)/2)/n;
+  return[(col-(cnt-1)/2)*pitch,(row-(R-1)/2-yMean)*pitch];
+}
+/* 3D 示意位置：受控座標檔只給元件中心（componentX/Y，不可寫回焊墊 X/Y），
+   3D 只為顯示在元件中心附近展開同元件焊墊；統計與回合資料都不使用這些位置 */
+function pos3D(rows){
+  if(T.pos&&T.pos.rows===rows)return T.pos.map;
+  const map=new Map(),byComp=new Map();
+  for(const r of rows){
+    if(isFinite(r.x)&&isFinite(r.y)){map.set(r,{x:r.x,y:r.y,est:false});continue}
+    if(!(isFinite(r.componentX)&&isFinite(r.componentY)))continue;
+    const k=r.board+"\0"+(r.comp||r.pad);let g=byComp.get(k);if(!g)byComp.set(k,g=[]);g.push(r);
+  }
+  for(const g of byComp.values()){
+    const pads=[...new Set(g.map(r=>r.pad))].sort(),idx=new Map(pads.map((p,i)=>[p,i]));
+    const pitch=Math.max(...g.map(r=>Math.max(r.w||0.7,r.d||0.7)))*1.4;
+    for(const r of g){const[dx,dy]=spreadOffset(idx.get(r.pad),pads.length,pitch);map.set(r,{x:r.componentX+dx,y:r.componentY+dy,est:true})}
+  }
+  T.pos={rows,map};return map;
+}
 function build3D(){safeBoard2D();if(!T.ok||!window.THREE||!T||!T.root||!T.root.children)return;const A=S.A;while(T.root.children.length){const o=T.root.children.pop();o.geometry&&o.geometry.dispose();o.material&&o.material.dispose()}
-  const all=S.rows;let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
-  for(let i=0;i<all.length;i++){const rx=all[i].x,ry=all[i].y;if(rx<x0)x0=rx;if(rx>x1)x1=rx;if(ry<y0)y0=ry;if(ry>y1)y1=ry}
+  const all=S.rows,P=pos3D(all);let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+  for(const p of P.values()){if(p.x<x0)x0=p.x;if(p.x>x1)x1=p.x;if(p.y<y0)y0=p.y;if(p.y>y1)y1=p.y}
+  if(!P.size){T.meshes=[];draw3();show3DFallback("此回合沒有焊墊座標，也沒有可對應的元件中心座標，無法繪製 3D。請改看下方「本板 vs 全體」。");$("#view3d .webgl-fallback").dataset.diag="1";return}
   x0-=4;x1+=4;y0-=4;y1+=4;const cx=(x0+x1)/2,cy=(y0+y1)/2;
   const brd=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,1.2,y1-y0),new THREE.MeshStandardMaterial({color:0x1f4a3a,roughness:.75}));brd.position.y=-0.6;T.root.add(brd);
-  const rows=S.rows.filter(r=>r.board===S.board&&(isAllGrp(S.group)||r.group===S.group)),ex=S.exag/1000;T.meshes=[];
+  const bRows=S.rows.filter(r=>r.board===S.board&&(isAllGrp(S.group)||r.group===S.group)),rows=bRows.filter(r=>P.has(r)),ex=S.exag/1000;T.meshes=[];
+  const nEst=rows.filter(r=>P.get(r).est).length,nSkip=bRows.length-rows.length,hud=$("#hud");
+  if(hud&&(nEst||nSkip))hud.insertAdjacentHTML("beforeend",`<br><span class="note">${nEst?`元件中心示意，非焊墊實際位置（${nEst} 個焊墊）`:""}${nEst&&nSkip?" · ":""}${nSkip?`${nSkip} 個焊墊無座標未繪出`:""}</span>`);
   const cuMat=new THREE.MeshStandardMaterial({color:0xb87333,metalness:.6,roughness:.35});
   const hs=S.specs.height,vs=S.specs.volume;
   const pasteMats=new Map();
   const getPasteMat=colStr=>{let m=pasteMats.get(colStr);if(!m)pasteMats.set(colStr,m=new THREE.MeshStandardMaterial({color:new THREE.Color(colStr),roughness:.55,metalness:.15}));return m;};
-  for(const r of rows){const ap=aperture(r,S),k=Math.sqrt(Math.max((r.area??100)/100,.05)),w=ap.L*k,d=ap.W*k,h=Math.max((r.height??hs.tgt)*ex,0.05),x=r.x-cx,z=cy-r.y,dx=(r.offx||0)/1000,dz=-(r.offy||0)/1000;
+  for(const r of rows){const ap=aperture(r,S),k=Math.sqrt(Math.max((r.area??100)/100,.05)),w=ap.L*k,d=ap.W*k,h=Math.max((r.height??hs.tgt)*ex,0.05),x=P.get(r).x-cx,z=cy-P.get(r).y,dx=(r.offx||0)/1000,dz=-(r.offy||0)/1000;
     const cu=new THREE.Mesh(r.shape==="round"?new THREE.CylinderGeometry(r.w/2,r.w/2,0.06,20):new THREE.BoxGeometry(r.w,0.06,r.d),cuMat);cu.position.set(x,0.03,z);T.root.add(cu);
     const thk=S.step.on?padThk(r,S):hs.tgt,half=S.step.on?thk*(S.htol.hi-S.htol.lo)/200:(hs.usl-hs.lsl)/2;
     let col;if(S.colorMode==="status")col=statusCol(r);else if(S.colorMode==="height")col=divColor(((r.height??thk)-thk)/half);else col=divColor(((r.volume??vs.tgt)-vs.tgt)/((vs.usl-vs.lsl)/2));
@@ -6781,7 +6812,7 @@ function build3D(){safeBoard2D();if(!T.ok||!window.THREE||!T||!T.root||!T.root.c
     for(const r of rows){
       const isBrgRisk=(r.bridgemargin!=null&&r.bridgemargin<25)||(r.bridgegap!=null&&r.bridgegap<40)||(classify(r,S.specs,S).includes("BRG"));
       if(isBrgRisk){
-        const ap=aperture(r,S),k=Math.sqrt(Math.max((r.area??100)/100,.05)),w=ap.L*k,d=ap.W*k,x=r.x-cx,z=cy-r.y,dx=(r.offx||0)/1000,dz=-(r.offy||0)/1000;
+        const ap=aperture(r,S),k=Math.sqrt(Math.max((r.area??100)/100,.05)),w=ap.L*k,d=ap.W*k,x=P.get(r).x-cx,z=cy-P.get(r).y,dx=(r.offx||0)/1000,dz=-(r.offy||0)/1000;
         const rad=Math.max(w,d)/2+0.08;
         const ring=new THREE.Mesh(new THREE.RingGeometry(rad*0.85,rad*1.15,20),warnMat);
         ring.rotation.x=Math.PI/2;ring.position.set(x+dx,0.04,z+dz);T.root.add(ring);
@@ -8773,19 +8804,19 @@ async function capture3DImage(){
     offScene.add(new THREE.HemisphereLight(0xffffff,0x334433,0.85));
     const dl=new THREE.DirectionalLight(0xffffff,0.85);dl.position.set(-30,60,40);offScene.add(dl);
     const root=new THREE.Group();offScene.add(root);
-    const all=S.rows;
-    if(all&&all.length){
-      const xs=all.map(r=>r.x),ys=all.map(r=>r.y);
+    const all=S.rows,P=all&&all.length?pos3D(all):new Map();
+    if(P.size){
+      const xs=[...P.values()].map(p=>p.x),ys=[...P.values()].map(p=>p.y);
       const x0=Math.min(...xs)-4,x1=Math.max(...xs)+4,y0=Math.min(...ys)-4,y1=Math.max(...ys)+4,cx=(x0+x1)/2,cy=(y0+y1)/2;
       const brd=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,1.2,y1-y0),new THREE.MeshStandardMaterial({color:0x1f4a3a,roughness:.75}));
       brd.position.y=-0.6;root.add(brd);
       const brdId=S.board||(all[0]&&all[0].board);
-      const rows=all.filter(r=>r.board===brdId&&(isAllGrp(S.group)||r.group===S.group));
+      const rows=all.filter(r=>r.board===brdId&&(isAllGrp(S.group)||r.group===S.group)&&P.has(r));
       const ex=(S.exag||20)/1000;
       const cuMat=new THREE.MeshStandardMaterial({color:0xb87333,metalness:.6,roughness:.35});
       const hs=S.specs.height,vs=S.specs.volume;
       for(const r of rows){
-        const ap=aperture(r,S),k=Math.sqrt(Math.max((r.area??100)/100,.05)),w=ap.L*k,d=ap.W*k,h=Math.max((r.height??hs.tgt)*ex,0.05),x=r.x-cx,z=cy-r.y,dx=(r.offx||0)/1000,dz=-(r.offy||0)/1000;
+        const ap=aperture(r,S),k=Math.sqrt(Math.max((r.area??100)/100,.05)),w=ap.L*k,d=ap.W*k,h=Math.max((r.height??hs.tgt)*ex,0.05),x=P.get(r).x-cx,z=cy-P.get(r).y,dx=(r.offx||0)/1000,dz=-(r.offy||0)/1000;
         const cu=new THREE.Mesh(r.shape==="round"?new THREE.CylinderGeometry(r.w/2,r.w/2,0.06,16):new THREE.BoxGeometry(r.w,0.06,r.d),cuMat.clone());
         cu.position.set(x,0.03,z);root.add(cu);
         let col=statusCol(r);
@@ -9838,7 +9869,7 @@ if($("#mBtnTheme"))$("#mBtnTheme").onclick=()=>{if(typeof moreSheetCtrl!=="undef
 setupRecPicker();
 updateStartupDbBanner();
 /* 測試用：只有測試在載入前設定 window.SPI_TEST_HOOK 時才公開內部函式 */
-if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart});
+if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,pos3D,spreadOffset,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart});
 const initHash=(location.hash||"").slice(1);
 if(ALL_TABS.includes(initHash))setTab(initHash,true);
 })();
