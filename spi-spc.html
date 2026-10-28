@@ -676,7 +676,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   <div class="brand">
     <h1>SPI·SPC 分析台</h1>
     <span class="tag">錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.4.1</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.4.3</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -3587,10 +3587,12 @@ function calcMoranAndLISA(points, k = 6) {
   }
 
   /* LISA 顯著性：條件置換檢定（Anselin 1995）——固定焊墊 i 的值，從其餘焊墊隨機抽 k 個值套同一組權重，
-     看 I_i 同方向至少一樣極端的比例；再以 Benjamini–Hochberg 控制 n 個焊墊同時檢定的偽發現率。
-     原本 li/√(1/k) 不是 I_i 的標準誤，i.i.d. 資料約 5% 焊墊被標成 HH/LL。
+     看 I_i 同方向至少一樣極端的比例，乘 2 為雙尾 p；p < LISA_ALPHA 的焊墊標示象限。
+     地圖只負責「標出位置」，不做多重比較校正（i.i.d. 資料每個焊墊約 5% 會被標示，屬名目水準）；
+     整體是否有空間群聚只以全域 Moran's I（Cliff–Ord＋置換檢定）判定，問題卡也只依它出卡。
+     原本 li/√(1/k) 不是 I_i 的標準誤。
      序列蒙地卡羅（Besag–Clifford）：同向極端達 LISA_H 次即停，不顯著的焊墊通常幾十次就結束；固定種子確保同資料同結果。 */
-  const LISA_PERM = 9999, LISA_H = 10, LISA_Q = 0.05;
+  const LISA_PERM = 999, LISA_H = 10, LISA_ALPHA = 0.05;   // 只需判斷 p < 0.05，999 次置換的解析度足夠
   const lags = new Float64Array(n), pLoc = new Float64Array(n);
   /* 預先抽一組 LISA_PERM × k 的不重複索引（取自 0..n−2），所有焊墊共用；焊墊 i 使用時把 ≥ i 的索引加 1 以跳過自己（同 PySAL esda 的 rids）。
      熱迴圈不再產生亂數與檢查重複，5 萬筆偵測回到原本耗時 */
@@ -3617,17 +3619,13 @@ function calcMoranAndLISA(points, k = 6) {
       for (let q = 0; q < nw.length; q++) { const j = rids[base + q]; lp += nw[q] * z[j >= i ? j + 1 : j]; }
       if (sgn * zi * lp >= sgn * iObs - tol && ++ge >= LISA_H) break;
     }
-    // 依觀測值正負只數同側尾，須乘 2 成為雙尾 p，BH 才能控制全虛無下的偽發現率
+    // 依觀測值正負只數同側尾，乘 2 成為雙尾 p，名目水準才是 LISA_ALPHA
     pLoc[i] = Math.min(1, 2 * (ge >= LISA_H ? ge / r : (ge + 1) / (LISA_PERM + 1)));
   }
-  // Benjamini–Hochberg：最大的 r 使 p_(r) ≤ r·q/n，p ≤ p_(r) 者為顯著
-  const ord = Array.from({ length: n }, (_, i) => i).sort((x, y) => pLoc[x] - pLoc[y]);
-  let pCut = -1;
-  for (let r = n; r >= 1; r--) if (pLoc[ord[r - 1]] <= r * LISA_Q / n) { pCut = pLoc[ord[r - 1]]; break; }
   const lisa = [];
   for (let i = 0; i < n; i++) {
     const lag = lags[i];
-    const isSig = pLoc[i] <= pCut;
+    const isSig = pLoc[i] < LISA_ALPHA;
     let quad = "NS";
     if (isSig) {
       if (z[i] > 0 && lag > 0) quad = "HH";
@@ -4366,7 +4364,7 @@ function detectIssues(st,onStage){
     }
     if(padPoints.length>=10){
       const sa=calcMoranAndLISA(padPoints,6);
-      if(sa.valid&&sa.isSignificant&&(sa.counts.HH>=3||sa.counts.LL>=3)){
+      if(sa.valid&&sa.isSignificant){   // 只依全域 Moran's I 出卡；LISA 象限只用來標出位置（未校正，個別焊墊約 5% 隨機標示）
         add({lv:"warn",cat:"空間群聚",sig:{t:"spatial",k:"volume"},
           title:`焊墊呈現顯著空間群聚效應（Moran's I = ${sa.moranI}，Z = ${sa.zScore}）`,
           ents:[],score:2.5,
@@ -6138,7 +6136,7 @@ function renderLISAUI(){
   const isSig = sa.isSignificant;
   if (subEl) subEl.textContent = `Moran's I = ${sa.moranI} · Z = ${sa.zScore}${sa.pPerm != null ? ` · 置換 p = ${sa.pPerm}` : ""} · ${isSig ? "空間顯著群聚" : "空間隨機分佈"}`;
   msgEl.innerHTML = `<span class="pill ${isSig ? 'warn' : 'ok'}">${isSig ? `顯著空間群聚 (Z=${sa.zScore})` : '空間隨機無群聚'}</span> `
-    + `<span class="note">熱點 (HH): ${sa.counts.HH} 處 · 冷點 (LL): ${sa.counts.LL} 處 · 空間離群: ${sa.counts.LH + sa.counts.HL} 處</span>`;
+    + `<span class="note">熱點 (HH): ${sa.counts.HH} 處 · 冷點 (LL): ${sa.counts.LL} 處 · 空間離群: ${sa.counts.LH + sa.counts.HL} 處（各焊墊雙尾 p &lt; 0.05，未做多重比較校正，只標示位置${isSig ? "" : "；整體未達顯著，標示點可能為隨機變異"}）</span>`;
 
   const ctx = cv.getContext("2d");
   if (!ctx) return;

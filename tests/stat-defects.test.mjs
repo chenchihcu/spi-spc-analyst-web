@@ -94,17 +94,26 @@ test("C1 Johnson SU／SL：以已知參數的合成資料配適，轉換後回�
   }
 });
 
-test("C2 LISA：i.i.d. 資料的顯著焊墊比例受 FDR 控制（舊版 li/√(1/k) 約 5%）", () => {
+test("C2 LISA（方案 B）：地圖標示為各焊墊名目 5%，空間群聚卡只依全域 Moran；真熱區仍檢出", () => {
   const r = mulberry32(11), nrm = normal(r);
-  let sig = 0, tot = 0, gate = 0;
-  for (let t = 0; t < 20; t++) {
+  let sig = 0, tot = 0, card = 0;
+  for (let t = 0; t < 40; t++) {
     const pts = Array.from({ length: 300 }, (_, i) => ({ pad: "p" + i, x: r() * 200, y: r() * 120, val: nrm() }));
     const sa = c.calcMoranAndLISA(pts, 6);
     sig += sa.lisa.filter((x) => x.isSig).length; tot += sa.n;
-    if (sa.counts.HH >= 3 || sa.counts.LL >= 3) gate++;
+    if (sa.isSignificant) card++;
   }
-  assert.ok(sig / tot < 0.005, `顯著比例應遠低於 5%，實際 ${(sig / tot * 100).toFixed(2)}%`);
-  assert.equal(gate, 0, "i.i.d. 資料不應達到空間群聚卡的 HH/LL ≥ 3 閘門");
+  // 雙尾 p < 0.05、不做多重比較校正：i.i.d. 每焊墊約 5%（舊版 li/√(1/k) 不是 I_i 的標準誤；v10.4.0 單尾未乘 2 會偏高）
+  assert.ok(sig / tot > 0.03 && sig / tot < 0.07, `每焊墊標示率應接近名目 5%，實際 ${(sig / tot * 100).toFixed(2)}%`);
+  assert.ok(card <= 1, `i.i.d. 資料的全域 Moran 不應顯著（出卡），實際 ${card}/40`);
+  // 3×3 熱區 +8（約 2.7σ）：FDR 校正版平均只檢出 2.6/9，方案 B 應明顯較多
+  let hot = 0;
+  for (let t = 0; t < 40; t++) {
+    const pts = [];
+    for (let i = 0; i < 10; i++) for (let j = 0; j < 10; j++) pts.push({ pad: `P${i}_${j}`, x: j * 2, y: i * 2, val: 100 + nrm() * 3 + (i >= 3 && i <= 5 && j >= 3 && j <= 5 ? 8 : 0) });
+    hot += c.calcMoranAndLISA(pts, 6).lisa.filter((x) => x.quad === "HH" && /^P[345]_[345]$/.test(x.pad)).length;
+  }
+  assert.ok(hot / 40 >= 5, `熱區 9 個焊墊平均應檢出 ≥ 5 個，實際 ${(hot / 40).toFixed(1)}`);
 });
 
 test("C3 Hotelling T² Phase II：新板不影響基準（平均向量與共變異只用 Phase I 板）", () => {
