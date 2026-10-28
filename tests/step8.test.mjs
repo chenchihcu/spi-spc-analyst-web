@@ -10,6 +10,11 @@ const require = createRequire(import.meta.url);
 const { JSDOM } = (() => { try { return require("jsdom"); } catch { return {}; } })();
 const { HTML } = require("./_load.js");
 const tick = (ms) => new Promise((r) => setTimeout(r, ms));
+// 帶逾時的條件輪詢（AGENTS.md：非同步測試不用固定休眠）
+async function waitFor(cond, ms = 5000) {
+  const t0 = Date.now();
+  for (;;) { const v = cond(); if (v) return v; if (Date.now() - t0 > ms) throw new Error("waitFor 逾時"); await tick(10); }
+}
 const html = () => fs.readFileSync(HTML, "utf8").replace(/<script src=[^>]+><\/script>/g, "");
 
 function createPage(url = "https://spi.example/", extra = {}) {
@@ -244,8 +249,7 @@ test("3D 空白自我檢查：diag3D 依序判定、量不到視為正常", { sk
 
 test("3D 示意位置：受控座標只有元件中心時展開焊墊，不寫回焊墊 X/Y", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const dom = createPage();
-  await tick(80);
-  const H = dom.window.SPI_TEST_HOOK;
+  const H = await waitFor(() => dom.window.SPI_TEST_HOOK?.pos3D && dom.window.SPI_TEST_HOOK);
   // 2026-10-28 正式站：受控座標檔回合只有 componentX/Y，build3D 讀 r.x 得 NaN，整個 3D 空白
   const mk = (pad, comp, cx, cy) => ({ board: "B09", pad, comp, componentX: cx, componentY: cy, w: 0.7, d: 0.7 });
   const rows = [mk("U1-1", "U1", 10, 20), mk("U1-2", "U1", 10, 20), mk("U1-3", "U1", 10, 20), mk("U1-4", "U1", 10, 20),
@@ -268,21 +272,30 @@ test("3D 示意位置：受控座標只有元件中心時展開焊墊，不寫�
 
 test("受控座標匯入 → buildRows → 3D 示意位置皆為有限值（使用者實際資料路徑）", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const dom = createPage();
-  await tick(80);
-  const w = dom.window, H = w.SPI_TEST_HOOK;
+  const w = dom.window, H = await waitFor(() => w.SPI_TEST_HOOK?.pos3D && w.SPI_TEST_HOOK);
   // 範例資料與舊本機回合走格狀回退（gridPos），驗不到受控座標路徑；這裡照正式匯入的 o.place.controlled 建列
-  const csv = "Board,Component ID,PAD ID,Volume(%)\n" +
-    ["U1", "U1", "U1", "U1", "R5", "R5", "X9"].map((c, i) => `1,${c},${i + 1},${100 + i}`).join("\n") + "\n";
-  const table = w.csvTable(csv), map = w.autoMap(table.head);
-  const opts = { ...w.guessOpts(table.head, map), side: "TOP",
-    place: { controlled: true, items: [{ side: "TOP", ref: "U1", x: 10, y: 20 }, { side: "TOP", ref: "R5", x: 30, y: 5 }] } };
-  const { rows } = w.buildRows(table, map, opts);
-  assert.equal(rows.length, 7);
-  assert.ok(rows.every(r => r.x == null && r.y == null), "受控匯入不產生焊墊 X/Y（前提）");
-  const P = H.pos3D(rows);
-  assert.equal(P.size, 6, "有元件中心的 6 個焊墊都要畫，無座標的 X9 略過");
-  for (const p of P.values()) assert.ok(Number.isFinite(p.x) && Number.isFinite(p.y) && p.est, "3D 座標必須是有限值");
-  assert.equal(new Set([...P.values()].map(p => p.x + "," + p.y)).size, 6, "焊墊不可疊在同一點");
+  // 兩種實際輸入：沒有 X/Y 欄（x 為 undefined）與廠商格式轉換後 X/Y 欄空白（x 為 null；isFinite(null) 為 true）
+  for (const [label, head, cells] of [["無 X/Y 欄", "", ""], ["X/Y 欄空白", ",X,Y", ",,"]]) {
+    const csv = `Board,Component ID,PAD ID,Volume(%)${head}\n` +
+      ["U1", "U1", "U1", "U1", "R5", "R5", "X9"].map((c, i) => `1,${c},${i + 1},${100 + i}${cells}`).join("\n") + "\n";
+    const table = w.csvTable(csv), map = w.autoMap(table.head);
+    const opts = { ...w.guessOpts(table.head, map), side: "TOP",
+      place: { controlled: true, items: [{ side: "TOP", ref: "U1", x: 10, y: 20 }, { side: "TOP", ref: "R5", x: 30, y: 5 }] } };
+    const { rows } = w.buildRows(table, map, opts);
+    assert.equal(rows.length, 7, label);
+    assert.ok(rows.every(r => r.x == null && r.y == null), `${label}：受控匯入不產生焊墊 X/Y（前提）`);
+    H.T.pos = null;
+    const P = H.pos3D(rows);
+    assert.equal(P.size, 6, `${label}：有元件中心的 6 個焊墊都要畫，無座標的 X9 略過`);
+    for (const p of P.values()) assert.ok(Number.isFinite(p.x) && Number.isFinite(p.y) && p.est, `${label}：3D 座標必須是有限值且標為示意`);
+    assert.equal(new Set([...P.values()].map(p => p.x + "," + p.y)).size, 6, `${label}：焊墊不可疊在同一點`);
+    assert.ok(rows.every(r => !H.realXY(r)), `${label}：統計端不可把空白座標當成 (0,0)`);
+    // HUD 與匯出快照共用的註記
+    const S = H.S, saved = [S.rows, S.board, S.group];
+    try { S.rows = rows; S.board = rows[0].board; S.group = "ALL"; H.T.pos = null;
+      assert.equal(H.pos3DNote(), "元件中心示意，非焊墊實際位置（6 個焊墊） · 1 個焊墊無座標未繪出", label);
+    } finally { [S.rows, S.board, S.group] = saved; H.T.pos = null; }
+  }
 });
 
 test("3D 側欄出錯不擋 3D 初始化：safeBoard2D 標示錯誤並回傳 false", { skip: !JSDOM && "未安裝 jsdom" }, async () => {

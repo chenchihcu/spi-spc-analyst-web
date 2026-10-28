@@ -681,7 +681,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   <div class="brand">
     <h1>SPI·SPC 分析台</h1>
     <span class="tag">錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.4.4</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.4.5</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -1976,7 +1976,8 @@ const DEF_SPECS={volume:{lsl:70,usl:130,tgt:100},height:{lsl:90,usl:150,tgt:120}
 const DEFECTS={INS:"少錫（體積 < LSL）",EXC:"多錫（體積 > USL）",BRG:"面積過大（連錫風險，面積 > USL）",LOWH:"高度不足",HIH:"高度過高 / 拉尖",OFF:"印刷偏移"};
 const ALL_GRP="__ALL__";
 const isAllGrp=g=>g===ALL_GRP||g==="ALL";
-const realXY=r=>Boolean(r&&!r.gridPos&&isFinite(r.x)&&isFinite(r.y));
+/* Number.isFinite：空白座標欄解析為 null，全域 isFinite(null) 會當成 0 */
+const realXY=r=>Boolean(r&&!r.gridPos&&Number.isFinite(r.x)&&Number.isFinite(r.y));
 const S={rows:[],metrics:[],metric:"volume",group:ALL_GRP,chart:"xbars",pad:null,board:null,specSrc:"sample",partSpec:null,specDraft:null,specsG:null,sqDir:"Y",specs:JSON.parse(JSON.stringify(DEF_SPECS)),stencil:120,htol:{lo:75,hi:125},step:{on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]},selZone:1,wipe:5,aperture:{groups:{}},source:"範例資料",tab:"issues",F:[],issLv:"all",issCat:"all",issEnt:null,ctx:null,colorMode:"status",exag:20,ghost:true,bridgeWarn:true,csAxis:"X",selectedPad:null,A:null,ai:""};
 
 /* 階梯鋼板：由上而下第一個符合的區域生效，否則用基礎厚度 */
@@ -6776,8 +6777,8 @@ function pos3D(rows){
   if(T.pos&&T.pos.rows===rows)return T.pos.map;
   const map=new Map(),byComp=new Map();
   for(const r of rows){
-    if(isFinite(r.x)&&isFinite(r.y)){map.set(r,{x:r.x,y:r.y,est:false});continue}
-    if(!(isFinite(r.componentX)&&isFinite(r.componentY)))continue;
+    if(Number.isFinite(r.x)&&Number.isFinite(r.y)){map.set(r,{x:r.x,y:r.y,est:false});continue}
+    if(!(Number.isFinite(r.componentX)&&Number.isFinite(r.componentY)))continue;
     const k=r.board+"\0"+(r.comp||r.pad);let g=byComp.get(k);if(!g)byComp.set(k,g=[]);g.push(r);
   }
   for(const g of byComp.values()){
@@ -6787,6 +6788,12 @@ function pos3D(rows){
   }
   T.pos={rows,map};return map;
 }
+/* 本板 3D 位置註記：元件中心示意與未繪出焊墊數；HUD 與匯出快照共用 */
+function pos3DNote(){
+  const P=pos3D(S.rows),bRows=S.rows.filter(r=>r.board===S.board&&(isAllGrp(S.group)||r.group===S.group));
+  let nEst=0,nSkip=0;for(const r of bRows){const p=P.get(r);if(!p)nSkip++;else if(p.est)nEst++}
+  return[nEst?`元件中心示意，非焊墊實際位置（${nEst} 個焊墊）`:"",nSkip?`${nSkip} 個焊墊無座標未繪出`:""].filter(Boolean).join(" · ");
+}
 function build3D(){safeBoard2D();if(!T.ok||!window.THREE||!T||!T.root||!T.root.children)return;const A=S.A;while(T.root.children.length){const o=T.root.children.pop();o.geometry&&o.geometry.dispose();o.material&&o.material.dispose()}
   const all=S.rows,P=pos3D(all);let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
   for(const p of P.values()){if(p.x<x0)x0=p.x;if(p.x>x1)x1=p.x;if(p.y<y0)y0=p.y;if(p.y>y1)y1=p.y}
@@ -6794,8 +6801,8 @@ function build3D(){safeBoard2D();if(!T.ok||!window.THREE||!T||!T.root||!T.root.c
   x0-=4;x1+=4;y0-=4;y1+=4;const cx=(x0+x1)/2,cy=(y0+y1)/2;
   const brd=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,1.2,y1-y0),new THREE.MeshStandardMaterial({color:0x1f4a3a,roughness:.75}));brd.position.y=-0.6;T.root.add(brd);
   const bRows=S.rows.filter(r=>r.board===S.board&&(isAllGrp(S.group)||r.group===S.group)),rows=bRows.filter(r=>P.has(r)),ex=S.exag/1000;T.meshes=[];
-  const nEst=rows.filter(r=>P.get(r).est).length,nSkip=bRows.length-rows.length,hud=$("#hud");
-  if(hud&&(nEst||nSkip))hud.insertAdjacentHTML("beforeend",`<br><span class="note">${nEst?`元件中心示意，非焊墊實際位置（${nEst} 個焊墊）`:""}${nEst&&nSkip?" · ":""}${nSkip?`${nSkip} 個焊墊無座標未繪出`:""}</span>`);
+  const note=pos3DNote(),hud=$("#hud");
+  if(hud&&note)hud.insertAdjacentHTML("beforeend",`<br><span class="note">${esc(note)}</span>`);
   const cuMat=new THREE.MeshStandardMaterial({color:0xb87333,metalness:.6,roughness:.35});
   const hs=S.specs.height,vs=S.specs.volume;
   const pasteMats=new Map();
@@ -8762,7 +8769,20 @@ function afterPrint(){
 addEventListener("beforeprint",beforePrint);
 addEventListener("afterprint",afterPrint);
 
+/* 匯出快照（PNG、列印、PDF）把示意註記畫進圖內，不只留在互動 HUD */
 async function capture3DImage(){
+  const res=await capture3DRaw();
+  const note=res.ok&&S.rows&&S.rows.length?pos3DNote():"";
+  if(!note)return res;
+  try{
+    const img=await new Promise((ok,no)=>{const im=new Image();const tm=setTimeout(()=>no(new Error("timeout")),3000);im.onload=()=>{clearTimeout(tm);ok(im)};im.onerror=()=>{clearTimeout(tm);no(new Error("image"))};im.src=res.dataUrl});
+    const cv=document.createElement("canvas"),bar=34;cv.width=img.width;cv.height=img.height+bar;
+    const g=cv.getContext("2d");g.fillStyle="#ffffff";g.fillRect(0,0,cv.width,cv.height);g.drawImage(img,0,0);
+    g.fillStyle="#7a2e0e";g.font="bold 18px 'Microsoft JhengHei','Noto Sans TC',sans-serif";g.textBaseline="middle";g.fillText("⚠ "+note,12,img.height+bar/2);
+    return{ok:true,dataUrl:cv.toDataURL("image/png"),note};
+  }catch(e){return{...res,note}}
+}
+async function capture3DRaw(){
   if(T.ok&&T.renderer&&T.scene&&T.cam){
     const curSize=new THREE.Vector2();
     T.renderer.getSize(curSize);
@@ -9869,7 +9889,7 @@ if($("#mBtnTheme"))$("#mBtnTheme").onclick=()=>{if(typeof moreSheetCtrl!=="undef
 setupRecPicker();
 updateStartupDbBanner();
 /* 測試用：只有測試在載入前設定 window.SPI_TEST_HOOK 時才公開內部函式 */
-if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,pos3D,spreadOffset,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart});
+if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,pos3D,spreadOffset,pos3DNote,realXY,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart});
 const initHash=(location.hash||"").slice(1);
 if(ALL_TABS.includes(initHash))setTab(initHash,true);
 })();
