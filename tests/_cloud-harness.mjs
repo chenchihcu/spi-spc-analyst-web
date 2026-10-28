@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { gzipSync } from 'node:zlib';
 import { handleRequest } from '../cloudflare/worker.mjs';
 import { issueToken, COOKIE } from '../lib/auth-handler.mjs';
+import { Repo } from '../lib/repo.mjs';
 
 const ORIGIN = 'https://example.test';
 const USER = 'admin@example.test';
@@ -51,7 +52,8 @@ export async function createCloudHarness() {
     if (!response.ok) throw new Error(`fixture upload ${response.status}: ${await response.text()}`);
     return (await response.json()).record;
   };
-  return { fetch, upload, db, objects, close: () => db.close() };
+  // repo：直接寫入歷史（legacy）紀錄，模擬受控匯入前已存在的資料
+  return { fetch, upload, db, objects, repo: new Repo(DB, BLOBS), close: () => db.close() };
 }
 
 export function installBrowserCloud(window, harness) {

@@ -59,11 +59,12 @@ test('量測值全空白的列與前端 buildRows 一樣不計入板數、焊墊
   const generic = validateMeasurement(parseCsv('Board,RefDes,Pad,Volume\nB1,U1,1,100\nB2,U1,2,\nB3,R9,1,\n'), 'TOP', place);
   assert.deepEqual([generic.boards, generic.pads, generic.points], [1, 1, 1]);
   assert.deepEqual(generic.missing, [], '只有空白量測的位號不列為無座標');
+  assert.equal(generic.measuredRefs, 1, '只有空白量測的位號不計入量測位號');
   const units = validateMeasurement(parseCsv('Board,RefDes,Pad,Height(µm),Offset X\nB1,U1,1,,\nB2,U1,1,,0.1\n'), 'TOP', place);
   assert.deepEqual([units.boards, units.points], [1, 1], '含單位與偏移欄名的量測欄也要辨識');
   const head = 'Component ID,PAD ID,Height(%)1,Volume(%)1,Area(%)1,Result1,Height(%)2,Volume(%)2,Area(%)2,Result2\n';
   const wide = validateWideMeasurement(parseCsv(head + 'U1_1,1,101,99,98,PASS,,,,\nU1_2,2,,,,,,,,\n'), 'TOP', place);
-  assert.deepEqual([wide.boards, wide.pads, wide.points], [1, 1, 1]);
+  assert.deepEqual([wide.boards, wide.pads, wide.points, wide.measuredRefs], [1, 1, 1, 1]);
   const allEmpty = validateMeasurement(parseCsv('Board,RefDes,Pad,Volume\nB1,U1,1,\n'), 'TOP', place);
   assert.equal(allEmpty.code, 'empty');
 });
@@ -88,4 +89,7 @@ test('樣本座標與 TOP 量測：20 板、7 個無座標位號、座標多出 
   assert.deepEqual(measured.missing, ['L87', 'R737', 'R738', 'R740', 'R741', 'R742', 'R743']);
   const measuredRefs = new Set(parseCsv(fs.readFileSync(sampleSpi)).data.map(row => row[0].replace(/_\d+$/, '')));
   assert.equal(place.items.filter(x => x.side === 'TOP' && !measuredRefs.has(x.ref)).length, 79);
+  assert.equal(measured.measuredRefs, measuredRefs.size, '對應證明的量測位號數');
+  assert.equal(measured.coordRefsOnSide, 728);
+  assert.equal(measured.measuredRefs - measured.missing.length, 728 - 79, '有座標的量測位號＝座標此面位號扣掉未量測的');
 });
