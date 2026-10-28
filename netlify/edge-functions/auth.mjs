@@ -83,6 +83,8 @@ export async function handle(req, E, next, opts = {}) {
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
+const MITCORP_PATH = "M13.8,-0.0L28.5,-0.1L29.2,0.0L30.6,1.0L31.5,2.9L34.7,29.0L35.0,29.8L36.2,30.2L37.5,29.8L38.3,28.2L46.9,3.5L48.0,1.5L48.8,0.8L50.5,-0.1L66.3,0.0L67.6,1.0L68.4,3.2L68.4,30.8L68.3,32.2L67.7,33.8L66.0,34.8L62.8,35.0L59.2,34.8L57.7,33.8L57.3,31.5L57.3,5.8L56.7,4.5L55.2,4.0L53.0,4.7L52.0,6.5L43.5,31.5L42.2,33.3L41.2,34.1L38.2,34.8L28.8,34.8L26.0,34.0L24.6,32.5L24.0,29.8L20.9,5.8L20.2,4.5L18.5,4.0L17.0,4.5L16.5,5.2L12.3,26.8L11.3,30.0L10.5,31.5L8.4,33.8L6.3,35.0L2.2,35.7L1.2,35.7L0.0,35.0L0.0,30.2L1.2,29.6L4.5,28.9L5.4,28.0L6.2,26.2L10.7,3.0L11.9,1.0L13.8,-0.0ZM73.2,-0.0L83.8,0.0L84.6,1.3L84.5,4.2L83.8,5.4L82.8,5.7L75.5,5.8L73.2,5.5L72.7,4.8L72.5,2.8L72.6,1.0L73.2,-0.0ZM90.0,1.7L95.5,1.6L97.2,2.1L97.8,2.8L98.2,4.0L98.3,8.5L98.6,9.2L99.3,9.7L109.8,9.8L110.9,10.2L111.4,12.0L110.9,13.2L110.2,13.6L99.8,13.7L98.8,14.1L98.2,15.5L98.3,27.0L99.0,29.8L100.5,30.9L104.2,31.1L112.5,30.9L113.1,31.5L113.2,33.0L113.0,33.8L112.2,34.6L110.5,35.0L104.5,35.3L95.8,35.1L92.0,33.9L89.9,32.2L88.9,30.5L88.4,27.5L88.4,5.5L88.6,3.0L89.2,2.1L90.0,1.7ZM130.5,9.2L135.5,9.3L144.3,10.0L145.5,10.4L146.1,11.0L146.2,13.2L145.7,14.0L145.0,14.3L140.3,13.8L133.0,13.6L129.5,13.9L127.0,14.9L125.1,17.0L124.3,20.0L124.3,24.0L125.1,27.8L127.0,29.8L130.0,30.9L137.5,31.1L145.2,30.4L146.0,31.0L146.3,32.0L146.2,33.5L145.5,34.3L142.5,35.0L135.2,35.4L129.5,35.4L124.0,34.9L120.5,33.9L118.2,32.8L116.1,30.8L115.1,29.2L114.0,25.5L113.9,20.0L115.0,15.8L116.1,14.0L118.2,12.0L120.5,10.8L124.2,9.8L130.5,9.2ZM161.8,9.5L168.5,9.3L174.8,9.9L178.2,10.8L180.2,11.8L182.8,14.0L183.9,15.8L184.7,18.8L184.9,24.5L184.7,26.2L183.8,29.2L181.8,32.0L178.8,33.9L175.5,34.9L166.0,35.7L156.8,34.8L153.8,33.8L152.0,32.9L150.4,31.5L149.2,30.0L148.3,28.0L147.9,25.5L148.0,18.2L149.1,15.0L151.0,12.8L154.0,11.0L158.0,9.8L161.8,9.5ZM203.0,9.5L209.8,9.4L210.7,10.5L210.8,11.8L210.5,12.8L209.5,13.6L201.8,13.9L200.2,14.2L199.2,14.8L198.7,16.0L198.7,31.0L198.3,33.5L197.5,34.5L196.2,34.9L190.5,34.8L189.1,33.8L188.8,32.0L188.7,15.2L189.2,12.5L190.0,11.7L191.9,10.8L197.2,9.8L203.0,9.5ZM224.0,9.5L230.5,9.3L237.9,9.8L242.2,10.9L244.2,12.0L246.2,14.0L247.0,15.2L247.8,17.3L247.8,27.8L246.9,30.0L245.9,31.5L244.8,32.6L242.8,33.8L240.0,34.8L232.2,35.5L223.2,35.4L222.6,36.0L222.4,36.8L222.2,43.5L221.3,44.8L213.5,44.8L212.6,43.5L212.4,41.8L212.6,13.0L213.2,11.7L214.6,10.8L218.5,9.9L224.0,9.5ZM75.5,9.9L79.0,9.8L81.5,10.0L82.8,10.8L83.4,12.0L83.5,32.2L83.0,33.8L81.5,34.8L75.5,34.8L74.1,34.0L73.7,33.2L73.6,12.0L74.0,10.8L75.5,9.9ZM163.2,13.0L160.8,14.0L159.4,15.2L158.3,18.8L158.1,22.5L158.3,26.5L159.2,29.2L160.5,30.8L162.8,31.8L166.0,32.1L169.8,31.8L172.0,30.8L173.0,29.8L173.9,28.2L174.4,25.0L174.4,21.8L173.9,16.5L173.0,15.0L171.9,14.0L168.5,12.9L163.2,13.0ZM226.0,13.0L223.5,13.5L222.7,14.0L222.4,14.5L222.5,30.5L224.0,31.6L227.5,31.9L232.5,31.9L235.0,31.0L236.0,30.1L237.0,28.7L237.7,25.5L237.8,20.8L237.0,16.2L235.3,14.0L233.0,13.1L230.2,12.8L226.0,13.0Z";
+
 // 錫膏焊墊陣列：方形＝QFP／被動元件、圓形＝BGA；其中一顆標成異常（紅色），象徵系統抓出的問題
 function padArt() {
   const rows = [];
@@ -109,16 +111,19 @@ function loginPage(nextPath, error = "", user = "", status = 200) {
 @font-face{font-family:"IBM Plex Mono";font-weight:400;font-display:swap;src:url(/vendor/fonts/ibm-plex-mono-latin-400-normal.woff2) format("woff2")}
 /* 與分析台同一套色票：預設明亮主題；左側品牌區亦採用明亮清爽配色 */
 :root{--bg:#F2F4F0;--surface:#FFFFFF;--ink:#18201B;--muted:#58625B;--line:#D2D8D1;--accent:#A3521D;--on-accent:#FFFFFF;--ng:#B83A2C;--ng-soft:#F7DDD9;--warn:#A86E12;
-  --brand-bg:#E8ECE6;--brand-ink:#18201B;--brand-muted:#4A544D;--brand-accent:#6E3410;--paste:#C86D32;--paste-dim:#D2D8D1;--paste-bad:#B83A2C;
+  --brand-bg:#E8ECE6;--brand-ink:#18201B;--brand-muted:#4A544D;--brand-accent:#6E3410;--logo-ink:#04273F;--paste:#C86D32;--paste-dim:#D2D8D1;--paste-bad:#B83A2C;
   --f-display:"Barlow Condensed","Microsoft JhengHei","PingFang TC",system-ui,sans-serif;--f-body:"Microsoft JhengHei","PingFang TC","Noto Sans TC",system-ui,sans-serif;--f-mono:"IBM Plex Mono",ui-monospace,monospace;color-scheme:light}
-:root[data-theme="dark"]{--bg:#0F1311;--surface:#171C19;--ink:#E4E9E4;--muted:#98A39B;--line:#2D3731;--accent:#DB8A50;--on-accent:#14100C;--ng:#EC6F60;--ng-soft:#41201B;--warn:#E3AE50;--brand-bg:#0A0D0B;--brand-ink:#E4E9E4;--brand-muted:#98A39B;--brand-accent:#F2C6A5;--paste:#DB8A50;--paste-dim:#3A2516;--paste-bad:#EC6F60;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1311;--surface:#171C19;--ink:#E4E9E4;--muted:#98A39B;--line:#2D3731;--accent:#DB8A50;--on-accent:#14100C;--ng:#EC6F60;--ng-soft:#41201B;--warn:#E3AE50;--brand-bg:#0A0D0B;--brand-ink:#E4E9E4;--brand-muted:#98A39B;--brand-accent:#F2C6A5;--logo-ink:#E4E9E4;--paste:#DB8A50;--paste-dim:#3A2516;--paste-bad:#EC6F60;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1311;--surface:#171C19;--ink:#E4E9E4;--muted:#98A39B;--line:#2D3731;--accent:#DB8A50;--on-accent:#14100C;--ng:#EC6F60;--ng-soft:#41201B;--warn:#E3AE50;--brand-bg:#0A0D0B;--brand-ink:#E4E9E4;--brand-muted:#98A39B;--brand-accent:#F2C6A5;--logo-ink:#E4E9E4;--paste:#DB8A50;--paste-dim:#3A2516;--paste-bad:#EC6F60;color-scheme:dark}
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--f-body);display:grid;place-items:center;padding:24px 16px}
 .shell{width:min(860px,100%);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 .brand{background:var(--brand-bg);color:var(--brand-ink);border-right:1px solid var(--line);padding:36px 32px;display:flex;flex-direction:column;justify-content:space-between;gap:28px}
+.brand-head{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.mitcorp-logo{display:block;height:28px;width:auto;color:var(--logo-ink);flex-shrink:0}
 .brand h1{margin:0;font:600 40px/1 var(--f-display);letter-spacing:.02em;color:var(--brand-accent)}
-.brand .sub{margin:8px 0 0;color:var(--brand-muted);font-size:13px;letter-spacing:.06em}
+.brand .sub{margin:4px 0 0;color:var(--brand-muted);font-size:13px;letter-spacing:.06em}
 .art{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;max-width:300px}
 .pad{aspect-ratio:1.6;min-width:0;border-radius:2px;background:var(--paste)}
 .pad.r{aspect-ratio:1;border-radius:50%}
@@ -143,20 +148,23 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline
 .submit{font:inherit;font-weight:500;cursor:pointer;border:none;border-radius:8px;min-height:46px;background:var(--accent);color:var(--on-accent);margin-top:4px}
 .submit[aria-busy=true]{opacity:.75;cursor:progress}
 .foot{font-size:12px;color:var(--muted);margin:0}
-@media (max-width:720px){body{place-items:start center;padding:12px 12px}.shell{grid-template-columns:1fr}.brand{border-right:none;border-bottom:1px solid var(--line);padding:12px 20px;gap:6px;max-height:160px;overflow:hidden}.brand h1{font-size:22px}.brand .sub{display:none}.art{max-width:116px;gap:3px}.legend{display:none}.ver{font-size:12px}form{padding:18px 20px;gap:12px}}
+@media (max-width:720px){body{place-items:start center;padding:12px 12px}.shell{grid-template-columns:1fr}.brand{border-right:none;border-bottom:1px solid var(--line);padding:12px 20px;gap:6px;max-height:160px;overflow:hidden}.brand-head{flex-direction:row;align-items:center;gap:10px;flex-wrap:wrap}.mitcorp-logo{height:20px}.brand h1{font-size:22px}.brand .sub{display:none}.art{max-width:116px;gap:3px}.legend{display:none}.ver{font-size:12px}form{padding:18px 20px;gap:12px}}
 @media (prefers-reduced-motion:reduce){.pad.bad{animation:none}}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 </style></head><body>
 <main class="shell">
-  <section class="brand" aria-label="SPI·SPC 分析台">
-    <div><h1>SPI·SPC 分析台</h1><p class="sub">錫膏印刷檢測 · 統計製程問題偵測</p></div>
+  <section class="brand" aria-label="Mitcorp SPI·SPC 分析台">
+    <div class="brand-head">
+      <svg class="mitcorp-logo" viewBox="0 0 248 45" width="154" height="28" fill="currentColor" fill-rule="evenodd" role="img" aria-label="Mitcorp"><path d="${MITCORP_PATH}"/></svg>
+      <div><h1>SPI·SPC 分析台</h1><p class="sub">錫膏印刷檢測 · 統計製程問題偵測</p></div>
+    </div>
     <div><div class="art" aria-hidden="true">${padArt()}</div>
       <p class="legend" style="margin:14px 0 0"><i aria-hidden="true"></i>從數千顆焊墊的統計資料中，把異常抓出來</p></div>
     <p class="ver" style="margin:0">${esc(APP_VERSION)} · 更新 ${esc(APP_BUILT)}</p>
   </section>
   <form method="post" action="/__login" id="f" novalidate>
     <div><h2>登入</h2></div>
-    <p class="hint">請使用授權帳號登入，登入後 12 小時內免重新輸入。</p>
+    <p class="hint">請使用授權帳號登入（有效 12 小時）。</p>
     ${error ? `<div class="err" role="alert" id="err">${esc(error)}</div>` : ""}
     <label for="user">帳號<input id="user" name="user" type="email" inputmode="email" autocomplete="username" required placeholder="name@company.com" value="${esc(user)}"></label>
     <label for="pass">密碼
@@ -166,7 +174,7 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline
     <p class="caps" id="caps" hidden>Caps Lock 已開啟</p>
     <input type="hidden" name="next" value="${esc(nextPath)}">
     <button type="submit" class="submit" id="go">登入</button>
-    <p class="foot">只有授權人員可以使用。分析在您的瀏覽器中進行；匯入量測紀錄或座標檔時，原始檔會存入本網站的資料庫（供登入同事回溯），建立分享連結時該回合資料也會上傳到本網站。</p>
+    <p class="foot">僅限授權人員使用。統計運算於瀏覽器執行；匯入之量測與座標檔、建立之分享連結將加密存於雲端資料庫供團隊回溯。</p>
   </form>
 </main>
 <script>

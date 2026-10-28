@@ -57,6 +57,8 @@ test('2. 登入頁行動版規格 (lib/auth-handler.mjs loginPage)', () => {
     assert.match(html, /label\{[^}]*font-size:\s*15px/i, 'label 需設定 15px 字級');
     assert.match(html, /\.toggle\{[^}]*min-width:\s*44px;[^}]*min-height:\s*44px/i, '.toggle 觸控區域至少 44×44');
     assert.match(html, /@media\s*\(max-width:\s*720px\)[\s\S]*?\.brand\{[^}]*max-height:\s*160px/i, '手機寬度品牌區高度需限制在 160px 以內');
+    assert.match(html, /--logo-ink:\s*#04273F/i, '登入頁需定義 --logo-ink:#04273F');
+    assert.match(html, /<svg\s+class="mitcorp-logo"\s+viewBox="0 0 248 45"/i, '登入頁需包含 Mitcorp 向量商標');
   });
 });
 
@@ -72,6 +74,8 @@ test('3. 主頁 Head Meta 與 CSS Tokens (spi-spc.html)', () => {
 
   // b. Tokens in :root
   assert.match(htmlSource, /--tap-min:\s*44px;/i, '需定義 --tap-min');
+  assert.match(htmlSource, /--logo-ink:\s*#04273F;/i, '需定義 --logo-ink:#04273F');
+  assert.match(htmlSource, /<svg\s+class="mitcorp-logo"\s+viewBox="0 0 248 45"/i, '主頁需包含 Mitcorp 向量商標');
   assert.match(htmlSource, /--tabbar-h:\s*49px;/i, '需定義 --tabbar-h');
   assert.match(htmlSource, /--navbar-h:\s*44px;/i, '需定義 --navbar-h');
   assert.match(htmlSource, /--r-card:\s*16px;/i, '需定義 --r-card');
@@ -253,7 +257,7 @@ test('8. 版面回歸：最終發布巡檢（1440／820／390／320 × 明亮／
   // d. 報告預覽固定白紙：行內 var(--ng-soft) 等 token 須在紙張範圍固定為明亮值，深色模式才不會變成深字壓深底
   const paper = htmlSource.match(/\n\.report-preview\{--[^}]*\}/);
   assert.ok(paper, '.report-preview 需在範圍內重新宣告 token');
-  for (const t of ['--ink', '--muted', '--line', '--ok-soft', '--warn-soft', '--ng-soft']) assert.match(paper[0], new RegExp(`${t}:#`), `.report-preview 需固定 ${t}`);
+  for (const t of ['--ink', '--muted', '--line', '--ok-soft', '--warn-soft', '--ng-soft', '--logo-ink']) assert.match(paper[0], new RegExp(`${t}:#`), `.report-preview 需固定 ${t}`);
 
   // e. 剖面圖例文字用一般字色，系列色只放在符號上（文字直接用系列色時白底對比僅 2.1–2.5）
   const leg = htmlSource.match(/\$\("#csLegend"\)\.innerHTML=`[^`]*`/)[0];
