@@ -30,6 +30,70 @@ const validDate = value => {
   return !Number.isNaN(d.valueOf()) && d.toISOString().slice(0, 10) === value;
 };
 
+const parseMeta = rec => { try { const m = JSON.parse(rec.meta || '{}'); return m && typeof m === 'object' ? m : {}; } catch { return {}; } };
+const sameList = (a, b) => JSON.stringify([...new Set(a)].sort()) === JSON.stringify([...new Set(b)].sort());
+
+/* 從 R2 讀回原檔並重算指紋；缺檔與解壓失敗分開回報 */
+async function readRaw(repo, rec) {
+  const file = await repo.getRecordFile(rec.id);
+  if (!file) return { missing: true };
+  try {
+    const raw = gunzipSync(new Uint8Array(await file.arrayBuffer()), { maxOutputLength: MAX_RAW });
+    return { raw, sha256: createHash('sha256').update(raw).digest('hex') };
+  } catch { return { error: '原始檔解壓失敗' }; }
+}
+
+/* 受控座標原檔：指紋相同才解析；量測上傳與對應證明共用 */
+async function verifiedPlacement(repo, place) {
+  const file = await readRaw(repo, place);
+  if (file.missing) return { missing: true, error: '受控座標原始檔不可讀取' };
+  if (file.error) return { error: '受控座標原始檔不可驗證' };
+  if (file.sha256 !== place.sha256) return { sha256: file.sha256, shaOk: false, error: '受控座標原始檔指紋不符' };
+  const unit = parseMeta(place).unit;
+  let parsed;
+  try { parsed = validatePlacement(sourceTable(file.raw, place.name), { side: place.side, unit }); }
+  catch (e) { parsed = { error: e.message }; }
+  if (parsed.error) return { sha256: file.sha256, shaOk: true, error: '受控座標原始檔驗證失敗', detail: parsed };
+  return { sha256: file.sha256, shaOk: true, unit, parsed };
+}
+
+const sideCovered = (placeSide, side) => placeSide === 'BOTH' ? side === 'TOP' || side === 'BOT' : !!side && side === placeSide;
+
+/* 對應證明：重算兩份原檔指紋、身分與位號對應，並與上傳時的快照比對（RFC-SPI-PROOF-20261028 §5.2） */
+async function linkCheck(repo, rec) {
+  const own = await readRaw(repo, rec);
+  const measurement = { shaOk: !!own.sha256 && own.sha256 === rec.sha256, sha256: rec.sha256,
+    ...(own.missing ? { error: '量測原始檔不存在' } : own.error ? { error: own.error } : {}) };
+  if (!rec.place_id) return { linked: false, measurement, reimportedAs: await repo.reimportsOf(rec.id) };
+  const proof = parseMeta(rec).placeProof;
+  const snapshot = { present: !!(proof && typeof proof === 'object'), shaOk: null };
+  const place = await repo.getRecord(rec.place_id);
+  if (!place || place.kind !== 'place') return { linked: true, measurement, place: null, placeMissing: 'record', snapshot };
+  const pv = await verifiedPlacement(repo, place);
+  if (pv.missing) return { linked: true, measurement, place: null, placeMissing: 'file', snapshot };
+  if (snapshot.present) snapshot.shaOk = proof.sha256 === place.sha256 && (!pv.sha256 || proof.sha256 === pv.sha256);
+  const result = { linked: true, measurement, snapshot,
+    place: { id: place.id, part: place.part, rev: place.rev, side: place.side, unit: parseMeta(place).unit || '',
+      lifecycle: place.lifecycle, name: place.name, sha256: place.sha256, shaOk: pv.shaOk === true, ...(pv.error ? { error: pv.error } : {}) },
+    identity: { partOk: rec.part === place.part, revOk: !!rec.rev && rec.rev === place.rev, sideOk: sideCovered(place.side, rec.side),
+      proofPlaceIdOk: snapshot.present ? proof.placeId === rec.place_id : null } };
+  if (!measurement.shaOk) result.refs = { error: measurement.error || '量測原始檔指紋不符，未重新比對位號' };
+  else if (!pv.parsed) result.refs = { error: pv.error };
+  else {
+    let verified;
+    try { verified = validateMeasurement(sourceTable(own.raw, rec.name), rec.side, pv.parsed); }
+    catch (e) { verified = { error: e.message }; }
+    if (verified.error) result.refs = { error: String(verified.error) };
+    else {
+      let confirmed; try { confirmed = JSON.parse(rec.unmatched_refs || '[]'); } catch { confirmed = []; }
+      result.refs = { measured: verified.measuredRefs, matched: verified.measuredRefs - verified.missing.length,
+        coordOnSide: verified.coordRefsOnSide, missing: verified.missing, wrongSide: verified.wrongSide,
+        confirmed: Array.isArray(confirmed) ? confirmed : [], unmatchedConsistent: sameList(verified.missing, Array.isArray(confirmed) ? confirmed : []), error: null };
+    }
+  }
+  return result;
+}
+
 async function handleAdminApi(req, repo, user, env) {
   const origin = req.headers.get('origin');
   if (req.method !== 'GET' && origin && origin !== new URL(req.url).origin) return json({ error: '不接受其他網站的請求' }, 403);
@@ -56,6 +120,12 @@ async function handleRecordsApi(req, repo, user, env) {
   const admin = await repo.isAdmin(user);
 
   if (req.method === 'GET') {
+    const linkId = url.searchParams.get('link_check');
+    if (linkId) {
+      const rec = await repo.getRecord(linkId);
+      if (!rec || rec.kind !== 'spi') return json({ error: '找不到這筆量測紀錄' }, 404);
+      return json(await linkCheck(repo, rec));
+    }
     const id = url.searchParams.get('id');
     // 單筆 metadata
     if (id && url.searchParams.get('meta') === '1') {
@@ -160,7 +230,7 @@ async function handleRecordsApi(req, repo, user, env) {
     }
 
     let bytes = rawBytes || bodyBuf.length, sha256 = clientSha, specNote = null;
-    let verified = null, related = [];
+    let verified = null, related = [], proof = null;
     // 料號規格：伺服器解壓並驗證本體（格式、數值、標準化、料號一致），指紋由伺服器計算
     if (chk.meta.kind === 'spec') {
       let raw;
@@ -189,20 +259,23 @@ async function handleRecordsApi(req, repo, user, env) {
         if (!chk.meta.rev || !chk.meta.side || !chk.meta.placeId || (!chk.meta.workOrder && !chk.meta.measuredDate))
           return json({ error: '請選擇正式料號、版次、面別與受控座標，並填寫製令工單或量測日期' }, 422);
         if (chk.meta.measuredDate && !validDate(chk.meta.measuredDate)) return json({ error: '量測日期格式或日期不正確' }, 422);
+        if (chk.meta.sourceLegacyId) {
+          const legacy = await repo.getRecord(chk.meta.sourceLegacyId);
+          if (!legacy) return json({ error: '找不到要重新匯入的舊紀錄', code: 'legacy_source_missing' }, 422);
+          if (legacy.kind !== 'spi' || legacy.validation_source !== 'legacy')
+            return json({ error: '只有舊量測紀錄可以重新受控匯入', code: 'legacy_source_invalid' }, 422);
+          if (legacy.sha256 !== sha256) return json({ error: '原始檔與舊紀錄不同，已停止', code: 'legacy_source_mismatch' }, 422);
+        }
         const place = await repo.coordinateScope(chk.meta.part, chk.meta.rev, chk.meta.side);
         if (!place || place.id !== chk.meta.placeId || place.lifecycle !== 'active' || place.validation_source !== 'server_verified')
           return json({ error: '沒有對應的有效受控座標檔' }, 409);
-        const file = await repo.getRecordFile(place.id);
-        if (!file) return json({ error: '受控座標原始檔不可讀取' }, 409);
-        let placeRaw, placeMeta;
-        try { placeRaw = gunzipSync(new Uint8Array(await file.arrayBuffer()), { maxOutputLength: MAX_RAW }); placeMeta = JSON.parse(place.meta || '{}'); }
-        catch { return json({ error: '受控座標原始檔不可驗證' }, 409); }
-        const placeSha = createHash('sha256').update(placeRaw).digest('hex');
-        if (placeSha !== place.sha256) return json({ error: '受控座標原始檔指紋不符' }, 409);
-        const parsedPlace = validatePlacement(sourceTable(placeRaw, place.name), { side: place.side, unit: placeMeta.unit });
-        if (parsedPlace.error) return json({ error: '受控座標原始檔驗證失敗', detail: parsedPlace }, 409);
-        verified = validateMeasurement(table, chk.meta.side, parsedPlace);
+        const pv = await verifiedPlacement(repo, place);
+        if (pv.error) return json({ error: pv.error, ...(pv.detail ? { detail: pv.detail } : {}) }, 409);
+        verified = validateMeasurement(table, chk.meta.side, pv.parsed);
         if (verified.error) return json(verified, 422);
+        proof = { placeId: place.id, sha256: pv.sha256, part: place.part, rev: place.rev, side: place.side, unit: pv.unit || '',
+          measuredSide: chk.meta.side, measuredRefs: verified.measuredRefs, matchedRefs: verified.measuredRefs - verified.missing.length,
+          coordRefsOnSide: verified.coordRefsOnSide };
         const supplied = [...new Set(chk.meta.unmatchedRefs)].sort();
         if (verified.missing.length && (!chk.meta.unmatchedConfirmed || JSON.stringify(supplied) !== JSON.stringify(verified.missing)))
           return json({ error: '請確認全部無座標位號', code: 'unmatched_confirmation', missing: verified.missing, wrongSide: verified.wrongSide }, 422);
@@ -212,6 +285,7 @@ async function handleRecordsApi(req, repo, user, env) {
       }
     }
 
+    const now = Date.now();
     const rec = {
       id: randomBytes(16).toString('base64url'),
       ...chk.meta,
@@ -220,7 +294,8 @@ async function handleRecordsApi(req, repo, user, env) {
       gz_bytes: bodyBuf.length,
       sha256,
       user,
-      created: Date.now(),
+      created: now,
+      ...(proof ? { meta: { placeProof: { ...proof, at: now }, ...(chk.meta.sourceLegacyId ? { sourceLegacyId: chk.meta.sourceLegacyId } : {}) } } : {}),
       ...(chk.meta.kind === 'spec' ? {} : {
         validationSource: 'server_verified', lifecycle: related.length ? 'pending_review' : 'active',
         ...(chk.meta.kind === 'place' ? { comps: verified.items.length, sides: verified.sides, factor: verified.factor, formatVersion: verified.formatVersion }
