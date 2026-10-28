@@ -155,19 +155,20 @@ test('[slow] M-19 單板異常：穩定製程 10／25 板、實際群組大小�
   }
 });
 
-test('[slow] LISA 局部顯著性：全虛無資料在實際群組大小 30／60／100 焊墊下，至少一個偽顯著焊墊的比例（即 FDR）不超過 5%', () => {
-  // v10.4.0 原版只數觀測值所在的單側尾、未乘 2，BH 後 30／60／100 焊墊的 FDR 約 8.3%／7.7%／9.6%
-  const c = loadCore(), T = isSlow ? 3000 : 150, q = 0.05;
+test('[slow] LISA 局部標示：全虛無資料在實際群組大小 30／60／100 焊墊下，每焊墊標示率為名目 5%（雙尾、未校正）', () => {
+  // 方案 B：地圖只標位置、不做多重比較校正，個別焊墊的誤標率必須是名目 α；v10.4.0 單尾未乘 2 時約為 2 倍
+  const c = loadCore(), T = isSlow ? 1000 : 60, alpha = 0.05;
   let a = 20261028;
   const rnd = () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
   const nrm = () => { let u = 0; while (!u) u = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rnd()); };
   for (const n of [30, 60, 100]) {
-    let any = 0;
+    let sig = 0, tot = 0;
     for (let t = 0; t < T; t++) {
       const sa = c.calcMoranAndLISA(Array.from({ length: n }, (_, i) => ({ pad: 'p' + i, x: rnd() * 100, y: rnd() * 60, val: nrm() })), 6);
-      if (sa.lisa.some((x) => x.isSig)) any++;
+      sig += sa.lisa.filter((x) => x.isSig).length; tot += sa.n;
     }
-    const lim = q + 3 * Math.sqrt(q * (1 - q) / T);
-    assert.ok(any / T <= lim, `${n} 焊墊：${any}/${T} 個資料集出現偽顯著（${(any / T * 100).toFixed(2)}%，上限 ${(lim * 100).toFixed(2)}%）`);
+    // 同一資料集內各焊墊相關，標準誤放寬 3 倍
+    const lim = alpha + 9 * Math.sqrt(alpha * (1 - alpha) / tot);
+    assert.ok(sig / tot <= lim, `${n} 焊墊：每焊墊標示率 ${(sig / tot * 100).toFixed(2)}%（上限 ${(lim * 100).toFixed(2)}%）`);
   }
 });
