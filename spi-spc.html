@@ -24,6 +24,7 @@
   --accent:#A3521D;--accent-soft:#F4E4D6;--accent-ink:#6E3410;--logo-ink:#04273F;
   --ok:#2C7A4C;--ok-soft:#DDEFE3;--warn:#9B650E;--warn-soft:#F6E9CF;--ng:#B83A2C;--ng-soft:#F7DDD9;
   --series2:#3D6E8F;--grid:rgba(24,32,27,.08);--on-strong:#FFFFFF;
+  --lisa-hh:#EF4444;--lisa-ll:#3B82F6;--lisa-lh:#93C5FD;--lisa-hl:#F97316;--lisa-ns:#94A3B8;--c-3d-bg:#0D1117;
   --f-display:"Barlow Condensed","Microsoft JhengHei","PingFang TC",system-ui,sans-serif;
   --f-body:"Microsoft JhengHei","PingFang TC","Noto Sans TC",system-ui,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
@@ -48,6 +49,7 @@
   --accent:#DB8A50;--accent-soft:#3A2516;--accent-ink:#F2C6A5;--logo-ink:#E4E9E4;
   --ok:#55BE84;--ok-soft:#173726;--warn:#E3AE50;--warn-soft:#3A2D12;--ng:#EC6F60;--ng-soft:#41201B;
   --series2:#7FB2D4;--grid:rgba(228,233,228,.08);--on-strong:#14100C;color-scheme:dark;
+  --lisa-hh:#F87171;--lisa-ll:#60A5FA;--lisa-lh:#BAE6FD;--lisa-hl:#FB923C;--lisa-ns:#64748B;--c-3d-bg:#0D1117;
   --c-bar:rgba(15,19,17,.88);--c-hairline:rgba(228,233,228,.10);
   --tbl-sticky-shadow:2px 0 8px rgba(0,0,0,.5)}}
 :root[data-theme="dark"]{
@@ -744,7 +746,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.11.1</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.11.2</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -945,8 +947,8 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
       <div class="field"><label>著色</label><div class="seg" id="segColor">
         <button data-v="status" aria-pressed="true">判定</button><button data-v="height">高度偏差</button><button data-v="volume">體積偏差</button></div></div>
       <div class="field"><label for="inExag">高度放大 <span id="exagOut" class="num">20×</span></label><input type="range" id="inExag" min="5" max="60" step="1" value="20"></div>
-      <label class="row" style="font-size:var(--fs-ui)"><input type="checkbox" id="chkGhost" checked> 顯示鋼板開孔標稱外框</label>
-      <label class="row" style="font-size:var(--fs-ui)"><input type="checkbox" id="chkBridgeWarn" checked> 標示橋接警戒圈</label>
+      <label class="row" for="chkGhost" style="font-size:var(--fs-ui)"><input type="checkbox" id="chkGhost" checked aria-label="顯示鋼板開孔標稱外框"> 顯示鋼板開孔標稱外框</label>
+      <label class="row" for="chkBridgeWarn" style="font-size:var(--fs-ui)"><input type="checkbox" id="chkBridgeWarn" checked aria-label="標示橋接警戒圈"> 標示橋接警戒圈</label>
     </div>
     <div class="legend" id="leg3d" style="margin-top:10px"></div>
     <div class="view3d" id="view3d" aria-label="錫膏沉積 3D 模擬，拖曳旋轉、滾輪縮放、點選焊墊看數據">
@@ -963,7 +965,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
           <button type="button" data-axis="Y" aria-pressed="false">Y 軸剖面</button>
         </div>
       </div>
-      <div style="position:relative;background:#0d1117;border-radius:6px;padding:8px">
+      <div style="position:relative;background:var(--c-3d-bg);border-radius:6px;padding:8px">
         <canvas id="cProfile" width="460" height="190" role="img" aria-label="焊墊 2D 剖面切片曲線圖" style="display:block;width:100%;height:auto"></canvas>
       </div>
       <div id="csLegend" style="font-size:var(--fs-caption);margin-top:6px;display:flex;gap:12px;flex-wrap:wrap;color:var(--muted)"></div>
@@ -1043,11 +1045,11 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
       <h3>空間自相關與局部聚類 <small id="lisaSub"></small></h3>
             <div id="lisaMsg" style="margin:8px 0"></div>
       <div class="legend" id="lisaLeg">
-        <span><i class="sq" style="background:#ef4444"></i>HH 熱點</span>
-        <span><i class="sq" style="background:#3b82f6"></i>LL 冷點</span>
-        <span><i class="sq" style="background:#93c5fd"></i>LH 空間離群</span>
-        <span><i class="sq" style="background:#f97316"></i>HL 空間離群</span>
-        <span><i class="sq" style="background:#94a3b8"></i>NS 無顯著</span>
+        <span><i class="sq" style="background:var(--lisa-hh)"></i>HH 熱點</span>
+        <span><i class="sq" style="background:var(--lisa-ll)"></i>LL 冷點</span>
+        <span><i class="sq" style="background:var(--lisa-lh)"></i>LH 空間離群</span>
+        <span><i class="sq" style="background:var(--lisa-hl)"></i>HL 空間離群</span>
+        <span><i class="sq" style="background:var(--lisa-ns)"></i>NS 無顯著</span>
       </div>
       <div class="chartbox" style="height:320px;position:relative"><canvas id="cLISA" role="img" aria-label="LISA 空間聚類分佈圖" style="display:block;width:100%;height:100%"></canvas></div>
     </div>
@@ -1127,7 +1129,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 <section class="panel" id="p-lab" role="tabpanel" hidden>
   <div class="card">
     <h3>SPI × 回焊後 AOI／X-ray 關聯 </h3>
-        <div class="row"><label class="row" style="cursor:pointer"><input type="file" id="aoiFile" accept=".csv,.txt,.tsv" class="sr"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">上傳 AOI 結果 CSV</span></label><button id="btnAoiSample">產生範例 AOI 結果</button>
+        <div class="row"><label class="row" for="aoiFile" style="cursor:pointer"><input type="file" id="aoiFile" accept=".csv,.txt,.tsv" class="sr" aria-label="上傳 AOI 結果 CSV"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">上傳 AOI 結果 CSV</span></label><button id="btnAoiSample">產生範例 AOI 結果</button>
       <div class="field"><label for="aoiM">SPI 量測項目</label><select id="aoiM"></select></div><div class="field"><label for="aoiBw">分箱寬度</label><input type="number" id="aoiBw" value="10" min="1" max="50" step="1"></div><span class="note" id="aoiState"></span></div>
     <div id="aoiOut" style="margin-top:10px"></div>
     <div class="chartbox" id="aoiChartBox" hidden><canvas id="cAoi" role="img" aria-label="SPI 量測值分箱的回焊不良率"></canvas></div>
@@ -1140,7 +1142,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   </div>
   <div class="card">
     <h3>簡易 GR&amp;R </h3>
-        <div class="row"><label class="row" style="cursor:pointer"><input type="file" id="grrFile" accept=".csv,.txt,.tsv" class="sr"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">上傳重複量測 CSV</span></label><button id="btnGrrSample">產生範例重複量測</button>
+        <div class="row"><label class="row" for="grrFile" style="cursor:pointer"><input type="file" id="grrFile" accept=".csv,.txt,.tsv" class="sr" aria-label="上傳重複量測 CSV"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">上傳重複量測 CSV</span></label><button id="btnGrrSample">產生範例重複量測</button>
       <div class="field"><label for="grrM">量測項目</label><select id="grrM"></select></div><span class="note" id="grrState"></span></div>
     <div id="grrOut" style="margin-top:10px"></div>
   </div>
@@ -1157,7 +1159,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
         <li><b>AI Gateway 記錄設定：</b><span id="aiGatewayLogNotice">預設不保存提示詞與回應內容（已帶 <code>cf-aig-collect-log-payload: false</code>，僅留存 token 用量 metadata）。</span></li>
       </ul>
       <div class="row" style="align-items:center;margin-top:8px">
-        <label class="row" style="cursor:pointer;font-size:var(--fs-ui);align-items:center"><input type="checkbox" id="aiAnon"> <b>送出前匿名化板號與焊墊</b>（板號轉為 B01…、焊墊轉為 P001…，分析回覆後自動還原）</label>
+        <label class="row" for="aiAnon" style="cursor:pointer;font-size:var(--fs-ui);align-items:center"><input type="checkbox" id="aiAnon" aria-label="送出前匿名化板號與焊墊"> <b>送出前匿名化板號與焊墊</b>（板號轉為 B01…、焊墊轉為 P001…，分析回覆後自動還原）</label>
       </div>
       <details class="how" id="aiPayloadDetails" style="margin-top:8px">
         <summary>預覽送出內容</summary>
@@ -1174,16 +1176,16 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <div class="toolbar" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
       <div style="display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center">
         <b>匯出章節：</b>
-        <label><input type="checkbox" id="chkRep1" checked> 1. 封面</label>
-        <label><input type="checkbox" id="chkRep2" checked> 2. 執行摘要</label>
-        <label><input type="checkbox" id="chkRep3" checked> 3. 問題清單</label>
-        <label><input type="checkbox" id="chkRep4" checked> 4. 管制圖</label>
-        <label><input type="checkbox" id="chkRep5" checked> 5. 製程能力</label>
-        <label><input type="checkbox" id="chkRep6" checked> 6. 不良柏拉圖</label>
-        <label><input type="checkbox" id="chkRep7" checked> 7. 交叉驗證與失效模式</label>
-        <label><input type="checkbox" id="chkRep8" checked> 8. DFM建議</label>
-        <label><input type="checkbox" id="chkRep9" checked> 9. 資料範圍揭露</label>
-        <label><input type="checkbox" id="chkRep10" checked> 10. 方法附錄</label>
+        <label for="chkRep1"><input type="checkbox" id="chkRep1" checked aria-label="1. 封面"> 1. 封面</label>
+        <label for="chkRep2"><input type="checkbox" id="chkRep2" checked aria-label="2. 執行摘要"> 2. 執行摘要</label>
+        <label for="chkRep3"><input type="checkbox" id="chkRep3" checked aria-label="3. 問題清單"> 3. 問題清單</label>
+        <label for="chkRep4"><input type="checkbox" id="chkRep4" checked aria-label="4. 管制圖"> 4. 管制圖</label>
+        <label for="chkRep5"><input type="checkbox" id="chkRep5" checked aria-label="5. 製程能力"> 5. 製程能力</label>
+        <label for="chkRep6"><input type="checkbox" id="chkRep6" checked aria-label="6. 不良柏拉圖"> 6. 不良柏拉圖</label>
+        <label for="chkRep7"><input type="checkbox" id="chkRep7" checked aria-label="7. 交叉驗證與失效模式"> 7. 交叉驗證與失效模式</label>
+        <label for="chkRep8"><input type="checkbox" id="chkRep8" checked aria-label="8. DFM建議"> 8. DFM建議</label>
+        <label for="chkRep9"><input type="checkbox" id="chkRep9" checked aria-label="9. 資料範圍揭露"> 9. 資料範圍揭露</label>
+        <label for="chkRep10"><input type="checkbox" id="chkRep10" checked aria-label="10. 方法附錄"> 10. 方法附錄</label>
       </div>
       <div class="row" style="gap:8px">
         <button type="button" class="primary" id="btnRepPdf">匯出 PDF 報告</button>
@@ -1226,14 +1228,14 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
           <div class="field"><label for="placeRev">版本（必填）</label><input type="text" id="placeRev" maxlength="32" placeholder="例：V5" style="min-width:0;width:min(100%,90px)"></div>
           <button type="button" id="btnSelectPlace">從資料庫選取</button>
           <div class="field"><label for="placeSide">上傳面別</label><select id="placeSide"><option value="">請選擇</option><option value="TOP">TOP</option><option value="BOT">BOT</option><option value="BOTH">TOP＋BOT</option></select></div>
-          <label class="row" style="cursor:pointer"><input type="file" id="placeIn" accept=".csv" class="sr"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">管理者上傳座標檔</span></label>
+          <label class="row" for="placeIn" style="cursor:pointer"><input type="file" id="placeIn" accept=".csv" class="sr" aria-label="管理者上傳座標檔"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">管理者上傳座標檔</span></label>
           <div class="field"><label for="placeUnit">座標單位</label><select id="placeUnit"><option value="">請選擇</option><option value="mm">mm</option><option value="mil">mil</option><option value="inch">inch</option></select></div>
           <button id="placeClear" hidden>移除座標檔</button>
           <span class="note" id="placeState"></span>
         </div>
         <p class="note" id="vendorNote" hidden style="margin:0">立榮格式每列一焊墊（各板橫排），TOP／BOT 分別匯入；高度 % 依<b>鋼板厚度（必填）</b>換算 µm，並由座標檔對應位置與封裝群組。</p>
       </div>
-      <div class="drop" id="drop">拖放 CSV 或 Excel（.xlsx）檔到這裡，或 <label style="color:var(--accent);cursor:pointer;text-decoration:underline"><input type="file" id="fileIn" accept=".csv,.txt,.tsv,.xlsx" class="sr">選擇檔案</label></div>
+      <div class="drop" id="drop">拖放 CSV 或 Excel（.xlsx）檔到這裡，或 <label for="fileIn" style="color:var(--accent);cursor:pointer;text-decoration:underline"><input type="file" id="fileIn" accept=".csv,.txt,.tsv,.xlsx" class="sr" aria-label="選擇 SPI 量測檔案">選擇檔案</label></div>
       <textarea id="pasteIn" aria-label="貼上 CSV 文字" placeholder="或直接貼上 CSV 文字…" style="margin-top:8px"></textarea>
       <div class="row" style="margin-top:8px"><button class="primary" id="btnRead">讀取欄位</button><button id="btnPhme">載入 PHME 格式範例</button><span class="err" id="parseErr"></span></div>
       <div id="impDupNotice" class="note" role="status" hidden style="margin-top:8px;padding:8px 12px;border-radius:8px;background:var(--accent-soft);color:var(--accent-ink)"></div>
@@ -1317,7 +1319,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
         <div class="tbl"><table id="apTbl"></table></div>
     <p class="note" id="apNote"></p>
     <div class="row" style="margin-top:10px;flex-wrap:wrap;align-items:flex-end;gap:8px">
-      <label class="row" style="cursor:pointer;font-size:var(--fs-ui)"><input type="file" id="geomPadFile" accept=".csv,.txt,.tsv" class="sr"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">匯入幾何焊墊清單 CSV</span></label>
+      <label class="row" for="geomPadFile" style="cursor:pointer;font-size:var(--fs-ui)"><input type="file" id="geomPadFile" accept=".csv,.txt,.tsv" class="sr" aria-label="匯入幾何焊墊清單 CSV"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">匯入幾何焊墊清單 CSV</span></label>
       <button type="button" id="geomPadClear" hidden>清除幾何清單</button>
     </div>
     <p class="note" id="geomPadStatus" style="margin:6px 0 0">幾何焊墊清單用於開孔覆蓋率；不寫入量測 X/Y。逐焊墊 CSV 開孔仍優先於幾何。</p>
@@ -1435,16 +1437,16 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <div style="margin:16px 0;padding:12px;background:var(--surface2);border-radius:6px;border:1px solid var(--line)">
       <div class="lbl" style="font-weight:600;margin-bottom:8px">包含章節：</div>
       <div class="row" style="gap:12px;flex-wrap:wrap">
-        <label><input type="checkbox" id="chkMailRep1" checked> 封面</label>
-        <label><input type="checkbox" id="chkMailRep2" checked> 摘要</label>
-        <label><input type="checkbox" id="chkMailRep3" checked> 問題</label>
-        <label><input type="checkbox" id="chkMailRep4" checked> 管制圖</label>
-        <label><input type="checkbox" id="chkMailRep5" checked> 能力</label>
-        <label><input type="checkbox" id="chkMailRep6" checked> 柏拉圖</label>
-        <label><input type="checkbox" id="chkMailRep7" checked> 交叉/3D</label>
-        <label><input type="checkbox" id="chkMailRep8" checked> DFM</label>
-        <label><input type="checkbox" id="chkMailRep9" checked> 揭露</label>
-        <label><input type="checkbox" id="chkMailRep10" checked> 附錄</label>
+        <label for="chkMailRep1"><input type="checkbox" id="chkMailRep1" checked aria-label="封面"> 封面</label>
+        <label for="chkMailRep2"><input type="checkbox" id="chkMailRep2" checked aria-label="摘要"> 摘要</label>
+        <label for="chkMailRep3"><input type="checkbox" id="chkMailRep3" checked aria-label="問題"> 問題</label>
+        <label for="chkMailRep4"><input type="checkbox" id="chkMailRep4" checked aria-label="管制圖"> 管制圖</label>
+        <label for="chkMailRep5"><input type="checkbox" id="chkMailRep5" checked aria-label="能力"> 能力</label>
+        <label for="chkMailRep6"><input type="checkbox" id="chkMailRep6" checked aria-label="柏拉圖"> 柏拉圖</label>
+        <label for="chkMailRep7"><input type="checkbox" id="chkMailRep7" checked aria-label="交叉/3D"> 交叉/3D</label>
+        <label for="chkMailRep8"><input type="checkbox" id="chkMailRep8" checked aria-label="DFM"> DFM</label>
+        <label for="chkMailRep9"><input type="checkbox" id="chkMailRep9" checked aria-label="揭露"> 揭露</label>
+        <label for="chkMailRep10"><input type="checkbox" id="chkMailRep10" checked aria-label="附錄"> 附錄</label>
       </div>
     </div>
 
@@ -1551,7 +1553,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
       <!-- 未登入提示卡片 -->
       <div id="recPickerAuthNotice" class="card" hidden style="background:var(--accent-soft);border:1px solid var(--accent);padding:12px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:10px">
         <div>
-          <b style="color:var(--accent-ink);font-size:var(--fs-ui)">🔐 雲端資料庫需登入帳號</b>
+          <b style="color:var(--accent-ink);font-size:var(--fs-ui)">雲端資料庫需登入帳號</b>
           <div class="note" style="margin-top:2px;font-size:var(--fs-caption)">量測與座標資料庫 100% 依託 Cloudflare 雲端，請登入以存取產線資料。</div>
         </div>
         <a href="/__login" class="primary" style="display:inline-flex;align-items:center;text-decoration:none;font-size:var(--fs-caption);padding:6px 14px;border-radius:6px;min-height:34px;font-weight:600">前往登入</a>
@@ -1559,8 +1561,8 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 
       <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px">
         <div class="seg" role="tablist" style="display:inline-flex;border:1px solid var(--line);border-radius:8px;padding:2px;background:var(--surface2)">
-          <button type="button" class="seg-btn active" id="btnPickSpi" style="padding:5px 14px;border:none;border-radius:6px;background:var(--surface);font-weight:500;cursor:pointer;font-size:var(--fs-ui)">📊 量測記錄 (<span id="countPickSpi">0</span>)</button>
-          <button type="button" class="seg-btn" id="btnPickPlace" style="padding:5px 14px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-size:var(--fs-ui)">📍 座標檔庫 (<span id="countPickPlace">0</span>)</button>
+          <button type="button" class="seg-btn active" id="btnPickSpi" style="padding:5px 14px;border:none;border-radius:6px;background:var(--surface);font-weight:500;cursor:pointer;font-size:var(--fs-ui)">量測記錄 (<span id="countPickSpi">0</span>)</button>
+          <button type="button" class="seg-btn" id="btnPickPlace" style="padding:5px 14px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-size:var(--fs-ui)">座標檔庫 (<span id="countPickPlace">0</span>)</button>
         </div>
         <div style="display:flex;gap:8px;align-items:center;flex:1 1 240px;max-width:380px">
           <input type="text" id="recPickerQ" aria-label="搜尋批號、料號、工單、上傳者" placeholder="搜尋批號、料號、工單、上傳者…" style="width:100%;font-size:var(--fs-ui)">
@@ -1581,8 +1583,8 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
         </div>
         <div class="seg" id="pickQualitySeg" style="display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden">
           <button type="button" class="seg-btn active" data-qfilter="all" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:var(--surface)">全部狀態</button>
-          <button type="button" class="seg-btn" data-qfilter="ng" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:transparent">僅異常 ⚠️</button>
-          <button type="button" class="seg-btn" data-qfilter="pass" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:transparent">僅合格 ✓</button>
+          <button type="button" class="seg-btn" data-qfilter="ng" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:transparent">僅異常</button>
+          <button type="button" class="seg-btn" data-qfilter="pass" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:transparent">僅合格</button>
         </div>
       </div>
 
@@ -1601,7 +1603,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
         <!-- 獨立上傳新座標檔展開區塊 -->
         <div id="boxUploadPlaceForm" class="card" style="padding:10px 14px;background:var(--surface2);border:1px dashed var(--line);border-radius:8px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <b style="font-size:var(--fs-ui)">📍 登錄受控座標檔</b>
+            <b style="font-size:var(--fs-ui)">登錄受控座標檔</b>
             <span class="note" style="font-size:var(--fs-caption)">目前正式登錄支援 .csv</span>
           </div>
           <div class="up-place-row">
@@ -1624,7 +1626,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
               </select>
             </div>
             <div class="field"><span class="up-place-lab">原始檔（必填）</span>
-              <label class="row" style="cursor:pointer;margin:0"><input type="file" id="upPlaceFile" accept=".csv" class="sr"><span class="chipbtn" style="border:1px solid var(--line);padding:4px 10px;font-size:var(--fs-caption)">選取 CSV</span></label></div>
+              <label class="row" for="upPlaceFile" style="cursor:pointer;margin:0"><input type="file" id="upPlaceFile" accept=".csv" class="sr" aria-label="選取受控座標 CSV 原始檔"><span class="chipbtn" style="border:1px solid var(--line);padding:4px 10px;font-size:var(--fs-caption)">選取 CSV</span></label></div>
             <span id="upPlaceFileName" class="note" style="font-size:var(--fs-caption);align-self:flex-end;overflow-wrap:anywhere"></span>
             <button type="button" class="primary btn-sm" id="btnSubmitPlace" style="align-self:flex-end">存入資料庫</button>
           </div>
@@ -1658,7 +1660,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <div class="modal-body-stack">
       <div class="note" id="specSaveTarget"></div>
       <div class="field"><label for="specSaveNote">備註（最多 200 字，存入規格檔，之後不能修改）</label><textarea id="specSaveNote" maxlength="200" rows="3" placeholder="例：依加工廠 SPI 規格 2026-10"></textarea></div>
-      <label class="row" style="gap:6px;align-items:center"><input type="checkbox" id="specSaveDefault"> 設為此料號的預設版本（同料號新匯入會自動套用）</label>
+      <label class="row" for="specSaveDefault" style="gap:6px;align-items:center"><input type="checkbox" id="specSaveDefault" aria-label="設為此料號的預設版本"> 設為此料號的預設版本（同料號新匯入會自動套用）</label>
       <div class="err" id="specSaveErr" role="alert"></div>
     </div>
     <div class="sheet-foot sheet-foot--db sheet-foot--db-end">
@@ -3480,6 +3482,12 @@ function buildStatsData(st){
   const out=s.stats.out.slice();
   if(st&&st.A&&st.A.nelX&&st.A.nelX.rules){
     for(const rule of st.A.nelX.rules){
+      if(rule.id===1&&rule.idx&&rule.idx.length){
+        for(const i of rule.idx){
+          const b=st.A.boards[i];
+          out.push({board:b,refdes:"全部",pad:"全部",group:"全部",metric:st.A.m,value:st.A.byBoard[i]?st.A.byBoard[i].mean:NaN,mean:st.A.xs.cl,sd:st.A.xs.sB,z:st.A.xs.pts[i]?st.A.xs.pts[i].z:NaN,rule:"超限 (Nelson 規則 1: 1 點超出 3σ 管制界限)"});
+        }
+      }
       if(rule.id===2&&rule.idx&&rule.idx.length){
         for(const i of rule.idx){
           const b=st.A.boards[i];
@@ -3529,9 +3537,9 @@ function statsRows(st,R){const out=[];
   return out}
 function statsDataCsv(st){
   const data=buildStatsData(st);
-  const head=["Board","RefDes","Pad","Group","Metric","Value","Mean","SD","Z_Score","Rule","Spec_Source"],src=`"${specSrcText().replace(/"/g,'""')}"`;
-  const rows=data.map(d=>[d.board,d.refdes,d.pad,d.group,d.metric,f(d.value,2),f(d.mean,2),f(d.sd,2),f(d.z,2),`"${String(d.rule).replace(/"/g,'""')}"`,src]);
-  return[head.join(","),...rows.map(r=>r.join(","))].join("\r\n");
+  const head=["Board","RefDes","Pad","Group","Metric","Value","Mean","SD","Z_Score","Rule","Spec_Source"],src=specSrcText();
+  const rows=data.map(d=>[d.board,d.refdes,d.pad,d.group,d.metric,f(d.value,2),f(d.mean,2),f(d.sd,2),f(d.z,2),d.rule,src]);
+  return toCSV([head,...rows]);
 }
 /* 掃描單一量測項目：回傳各群組統計（n≥10）與候選（超規，或 |z|≥5 且偏離 ≥ max(0.10×規格寬, 3×解析度)） */
 function isoScan(R,st,k,gIdx){const byG=new Map();if(gIdx){for(const g of Object.keys(gIdx)){const a=gIdx[g].filter(r=>r[k]!=null&&isFinite(r[k]));if(a.length)byG.set(g,a)}}else{for(const r of R){if(r[k]==null||!isFinite(r[k]))continue;let a=byG.get(r.group);if(!a)byG.set(r.group,a=[]);a.push(r)}}
@@ -4487,7 +4495,7 @@ function detectIssues(st,onStage){
       if(ks.length>10)rowFacts.push(`另 ${ks.length-10} 筆極端焊墊（共 ${ks.length} 筆）`);
       if(faNote)rowFacts.push(faNote);
       const pVals=[...cellP.values()];
-      const pStr=pVals.length?pVals.map(x=>`Poisson p=${x.pv<.0001?x.pv.toExponential(2):f(x.pv,4)}（λ=${x.lam<.001?x.lam.toExponential(2):f(x.lam,4)}, k=${x.k}, 門檻 ${ f(thr,4)}）`).join("; "):"不適用（僅 |z|≥5 候選）";
+      const pStr=pVals.length?pVals.map(x=>`Poisson p=${x.pv<.0001?x.pv.toExponential(2):f(x.pv,4)}（λ=${x.lam<.001?x.lam.toExponential(2):f(x.lam,4)}, k=${x.k}, 門檻 ${thr<.0001?thr.toExponential(2):f(thr,4)}）`).join("; "):"不適用（僅 |z|≥5 候選）";
       add({lv:cardLv,cat:"孤立極端焊墊",sig:{t:"iso",k,boards:bIdxs.map(i=>boards[i]),pads:ks.map(c=>c.r.pad),rows:ks},
         title:`${lab(k)}有 ${ks.length} 處孤立極端焊墊（${ks.slice(0,3).map(c=>`${c.r.board}/${c.r.pad}`).join("、")}${ks.length>3?"…":""}）`,
         ents:[...new Set(ents)],score:zmax+ks.length*.2,
@@ -5408,7 +5416,43 @@ function fmKbDetailsHtml(ruleIds){
   return `<div style="margin-top:6px;padding:6px 10px;background:var(--surface2);border-radius:4px;font-size:var(--fs-caption)"><b style="color:var(--ink)">SPI 製程對應知識庫規則：</b>${body}</div>`;
 }
 
-if(typeof module!=="undefined")module.exports={rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,areaRatio,maxThkForAR,detectIssues,overallVerdict,compareRuns,dfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml};
+function issuesMd(F, st){
+  if(!F)F=(st&&st.F)||S.F||[];
+  if(!st)st=S;
+  const ver=typeof APP!=="undefined"?APP.ver:"";
+  const built=typeof APP!=="undefined"?APP.built:"";
+  const src=st.source||"";
+  const sten=st.stencil||"";
+  const stepOn=st.step&&st.step.on;
+  return `# SPI 問題偵測清單
+
+- 版本：${ver} · 系統更新 ${built} · 產生時間：${fmtNowUtc8()}
+- 資料來源：${src}；鋼板 ${sten} µm${stepOn?"（階梯）":""}
+
+`+F.map(x=>`## #${x.no!=null?x.no:x.id}［${x.level||(typeof LVL_MAP!=="undefined"&&LVL_MAP[x.lv])||x.lv}］${x.title}
+
+- 面向：${x.category||x.cat}｜規則：${x.rule_id}（${x.rule_name}）｜量測項目：${x.metric}
+- 板號：${x.boards}｜子板：${x.subboard}｜元件群組：${x.group}｜元件位號：${x.refdes}｜焊墊：${x.pads}
+- 觀測值：${x.observed}｜界限／規格：${x.limit}｜z：${x.z}｜p：${x.p}
+- 事實：
+${(x.facts||[]).map(t=>"  - "+t).join("\n")}
+- 推論（信心 ${x.confidence||x.conf}）：${x.inference||x.cause}
+- 建議動作：${x.action}
+- 跨面向佐證：${(x.corroborated_by||x.corrob||[]).length?(x.corroborated_by||x.corrob).map(i=>"#"+i).join("、"):"無"}${(x.same_phenomenon||[]).length?`；同一現象：${x.same_phenomenon.map(i=>"#"+i).join("、")}`:""}${(x.explained_pads||[]).length?`；已解釋焊墊：${x.explained_pads.join("；")}`:""}
+`).join("\n")+fmMd(F,st);
+}
+function fmMd(F, st){
+  if(!F)F=(st&&st.F)||S.F||[];
+  const Me=F.meta||(S.F&&S.F.meta);if(!Me||!Me.modes)return"";
+  return `\n## 失效模式交叉比對
+
+規則：至少兩個獨立面向支持、含必要面向且無矛盾，才判「可能」。單板異常共 ${Me.tests} 次檢定（門檻依板數校準），全無異常時預期約 ${f(Me.expFA,1)} 次誤報；此數字只涵蓋單板異常。
+
+| 候選失效模式 | 判讀 | 支持面向 | 證據與製程知識庫規則 |
+|---|---|---|---|
+`+Me.modes.map(m=>`| ${m.name} | ${m.verdict} | ${(m.dims||[]).join("、")||"—"} | ${[m.need||"",...(m.sup||[]).map(e=>"✓ "+e.d+"："+e.txt),...(m.con||[]).map(e=>"✗ "+e.d+"："+e.txt),...(m.rules&&m.rules.length?[`規則來源：${m.rules.join("、")}`]:[])].filter(Boolean).join("<br>").replace(/\|/g,"／")} |`).join("\n")+"\n";
+}
+if(typeof module!=="undefined")module.exports={issuesMd,fmMd,rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,areaRatio,maxThkForAR,detectIssues,overallVerdict,compareRuns,dfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml};
 </script>
 <script>
 
@@ -5793,9 +5837,7 @@ function renderFM(){const Me=S.F&&S.F.meta,box=$("#fmCard");if(!box)return;box.h
       <div class="fm-body"><p class="note" style="margin:0 0 4px">可能原因：${esc(m.cause)}${m.key?`　｜　必要面向：${m.key}`:""}</p><ul>${m.sup.map(e=>ev(e,1)).join("")}${m.con.map(e=>ev(e,0)).join("")}</ul>${kbDetails}</div></details>`;
   }).join(""));
   $$("#fmTbl [data-fmjump]").forEach(b=>b.onclick=()=>{setTab("issues");setTimeout(()=>flashIssue(+b.dataset.fmjump),60)})}
-function issuesMd(){return`# SPI 問題偵測清單\n\n- 版本：${APP.ver} · 系統更新 ${APP.built} · 產生時間：${fmtNowUtc8()}\n- 資料來源：${S.source}；鋼板 ${S.stencil} µm${S.step.on?"（階梯）":""}\n\n`+S.F.map(x=>`## #${x.no}［${x.level}］${x.title}\n\n- 面向：${x.category}｜規則：${x.rule_id}（${x.rule_name}）｜量測項目：${x.metric}\n- 板號：${x.boards}｜子板：${x.subboard}｜元件群組：${x.group}｜元件位號：${x.refdes}｜焊墊：${x.pads}\n- 觀測值：${x.observed}｜界限／規格：${x.limit}｜z：${x.z}｜p：${x.p}\n- 事實：\n${x.facts.map(t=>"  - "+t).join("\n")}\n- 推論（信心 ${x.confidence}）：${x.inference}\n- 建議動作：${x.action}\n- 跨面向佐證：${x.corroborated_by.length?x.corroborated_by.map(i=>"#"+i).join("、"):"無"}${x.same_phenomenon.length?`；同一現象：${x.same_phenomenon.map(i=>"#"+i).join("、")}`:""}${x.explained_pads.length?`；已解釋焊墊：${x.explained_pads.join("；")}`:""}\n`).join("\n")+fmMd()}
-function fmMd(){const Me=S.F&&S.F.meta;if(!Me||!Me.modes)return"";
-  return`\n## 失效模式交叉比對\n\n規則：至少兩個獨立面向支持、含必要面向且無矛盾，才判「可能」。單板異常共 ${Me.tests} 次檢定（門檻依板數校準），全無異常時預期約 ${f(Me.expFA,1)} 次誤報；此數字只涵蓋單板異常。\n\n| 候選失效模式 | 判讀 | 支持面向 | 證據與製程知識庫規則 |\n|---|---|---|---|\n`+Me.modes.map(m=>`| ${m.name} | ${m.verdict} | ${m.dims.join("、")||"—"} | ${[m.need||"",...m.sup.map(e=>"✓ "+e.d+"："+e.txt),...m.con.map(e=>"✗ "+e.d+"："+e.txt),...(m.rules&&m.rules.length?[`規則來源：${m.rules.join("、")}`]:[])].filter(Boolean).join("<br>").replace(/\|/g,"／")} |`).join("\n")+"\n"}
+// issuesMd and fmMd defined in Block 1
 $("#btnIssMd").onclick=()=>save("spi-issues.md",issuesMd());
 $("#btnIssCsv").onclick=()=>save("spi-issues.csv",issuesCsv(S.F));
 if($("#btnIssXlsx"))$("#btnIssXlsx").onclick=()=>save("spi-issues.xlsx",issuesXlsx(S.F));
@@ -7075,12 +7117,12 @@ function renderBoard2D(){
   if(S.colorMode==="height"){
     legHtml+=`<span style="display:inline-flex;align-items:center;gap:4px;margin-left:6px"><span style="display:inline-block;width:75px;height:10px;border-radius:2px;background:linear-gradient(to right, #2563eb, #06b6d4, #10b981, #f59e0b, #ef4444)"></span><span class="note" style="font-size:var(--fs-caption)">LSL ➔ USL</span></span>`;
   }
-  $("#leg3d").innerHTML=legHtml+(S.ghost?`<span><i class="sq" style="background:transparent;outline:1px solid #9aa3a0"></i>標稱開孔（${S.step.on?"所在區域鋼板厚度":"鋼板厚度 "+S.stencil+" µm"}）</span>`:"")
-    +(S.bridgeWarn?`<span><i class="sq" style="background:transparent;outline:1.5px solid #ef4444;border-radius:50%"></i>橋接風險（間距<40µm或餘裕<25%）</span>`:"")
+  $("#leg3d").innerHTML=legHtml+(S.ghost?`<span><i class="sq" style="background:transparent;outline:1px solid var(--muted)"></i>標稱開孔（${S.step.on?"所在區域鋼板厚度":"鋼板厚度 "+S.stencil+" µm"}）</span>`:"")
+    +(S.bridgeWarn?`<span><i class="sq" style="background:transparent;outline:1.5px solid var(--ng);border-radius:50%"></i>橋接風險（間距<40µm或餘裕<25%）</span>`:"")
     +(S.step.on?S.step.zones.map((z,i)=>`<span><i class="sq" style="background:${ZCOL[i%ZCOL.length]};opacity:.6"></i>${z.name} ${z.t} µm</span>`).join(""):"");
 
   if($("#csLegend")){
-    $("#csLegend").innerHTML=`<span><b style="color:#10b981">──</b> 實測截面</span><span><b style="color:#9ca3af">---</b> 標稱開孔</span><span><b style="color:#b87333">■</b> 銅箔基底</span><span><b style="color:#f59e0b">---</b> 規格 LSL/USL</span>`;
+    $("#csLegend").innerHTML=`<span><b style="color:var(--ok)">──</b> 實測截面</span><span><b style="color:var(--muted)">---</b> 標稱開孔</span><span><b style="color:var(--accent)">■</b> 銅箔基底</span><span><b style="color:var(--warn)">---</b> 規格 LSL/USL</span>`;
   }
   if(!S.selectedPad||S.selectedPad.board!==S.board){
     S.selectedPad=defs[0]||rows[0]||null;
@@ -7920,7 +7962,105 @@ function reportMd(){const A=S.A,u=METRICS[A.m].unit,lab={ok:"一致/正常",warn
   const vd=(S.F&&S.F.meta&&S.F.meta.verdict)||overallVerdict(S,S.F);
   const zCnt=S.step&&S.step.on?zoneCounts():null;
   const stepCovered=zCnt?Object.values(zCnt.c).reduce((a,b)=>a+b,0):0;
-  return`# SPI·SPC 分析報告\n\n- 產生時間：${fmtNowUtc8()}\n- 資料來源：${S.source}\n- 量測項目：${METRICS[A.m].label}；元件群組：${isAllGrp(S.group)?"全部":S.group}；管制圖：${chartName()}\n- 整體判定：${vd.label}（${vd.level}）${vd.reasons&&vd.reasons.length?" · 原因："+vd.reasons.join("；"):""}\n- 規格：LSL ${A.sp.lsl} / 目標 ${A.sp.tgt} / USL ${A.sp.usl} ${u}\n- 規格來源：${specSrcText()}\n- 刮刀行程方向：沿 ${S.sqDir||"Y"}；擦拭間隔：每 ${S.wipe} 片\n- 鋼板厚度：${S.stencil} µm（高度規格 ${S.htol.lo}%–${S.htol.hi}% 厚度）\n- 階梯鋼板：${S.step.on?S.step.zones.map(z=>`${z.name} ${z.t} µm（${z.mode==="group"?"群組 "+z.group:`X ${z.x0}–${z.x1}, Y ${z.y0}–${z.y1} mm`}）`).join("；")+`（涵蓋 ${stepCovered} 焊墊${stepCovered===0?" ⚠️ 未涵蓋任何焊墊":""}）`:"未啟用"}\n- 系統版本：${APP.ver} · 系統更新 ${APP.built}\n- 試產回合：${curRun()?curRun().name:""}\n${runSrc(curRun())?`- 資料來源追溯：${srcLine(runSrc(curRun()))}\n- 原始檔 SHA-256：${runSrc(curRun()).sha256}\n`:""}\n## 問題偵測（依嚴重度與佐證排序）\n\n${S.F.map(x=>`- #${x.no}［${x.level}］${x.title}（規則：${x.rule_id} ${x.rule_name}）\n  - 面向：${x.category}；量測項目：${x.metric}；板號：${x.boards}；焊墊：${x.pads}；群組：${x.group}；位號：${x.refdes}\n  - 觀測值：${x.observed}；界限：${x.limit}；z：${x.z}；p：${x.p}\n  - 事實：${x.facts.join("；")}\n  - 推論（信心 ${x.confidence}）：${x.inference}\n  - 建議動作：${x.action}${x.corroborated_by.length?"\n  - 跨面向佐證："+x.corroborated_by.map(i=>"#"+i).join("、"):""}${x.same_phenomenon.length?"\n  - 同一現象："+x.same_phenomenon.map(i=>"#"+i).join("、"):""}${x.explained_pads.length?"\n  - 已解釋焊墊："+x.explained_pads.join("；"):""}`).join("\n")||"- 未偵測到顯著問題"}\n\n## 一、統計結果（事實）\n\n| 指標 | 數值 |\n|---|---|\n| 樣本數 | ${A.N} |\n| 板數 | ${A.boards.length} |\n| 平均 | ${f(A.gMean,2)} ${u} |\n| σ 組內 / 整體 | ${f(A.sigmaW,3)} / ${f(A.overallSd,3)} |\n${A.cap?`| 能力計算方式 | ${A.cap.mixed?`逐元件群組（組內 σ），以最差群組 ${A.cap.worst} 代表`:"組內 σ"}${A.stable?"":"；製程未穩定，僅供參考"} |\n| Cp / Cpk | ${f(A.cap.cp)} / ${f(A.cap.cpk)} |\n| Cpk 95% 信賴區間（以 ${A.cap.nb} 片板計） | ${f(A.cap.ci[0])} – ${f(A.cap.ci[1])} |\n| Pp / Ppk | ${f(A.cap.pp)} / ${f(A.cap.ppk)} |\n| 預估 PPM / 超規 PPM（${mShort}${A.cap.mixed?`，最差群組 ${A.cap.worst}`:""}） | ${fmtPpm(A.cap.ppmExp)} / ${fmtPpm(A.cap.ppmObs)} |\n${A.cap.mixed?`| 預估 PPM / 超規 PPM（全部群組） | ${fmtPpm(A.cap.ppmExpAll)} / ${fmtPpm(A.cap.ppmObsAll)} |\n`:""}| 不良 PPM（全部判定項目） | ${fmtPpm(defPpm)} |\n`:""}| Anderson-Darling p | ${A.ad.p<.001?"<0.001":f(A.ad.p,3)} |\n${A.sw&&A.sw.valid?`| Shapiro-Wilk W / p | ${f(A.sw.w,4)} / ${A.sw.p<.001?"<0.001":f(A.sw.p,3)} |\n`:""}| 不良焊墊（全部項目） | ${A.defRows.length} |\n\n${A.cap&&A.cap.mixed?`\n### 逐元件群組製程能力\n\n| 元件群組 | n | 平均 | 規格 | Cpk | Cpk 95% 信賴區間 | Ppk | 預估 PPM | 超規 PPM（${mShort}） |\n|---|---|---|---|---|---|---|---|---|\n${A.cap.groups.map(g=>`| ${g.g} | ${g.n} | ${f(g.mu,1)} | ${f(g.lsl,0)}–${f(g.usl,0)} | ${f(g.cpk)} | ${f(g.ci[0])}–${f(g.ci[1])} | ${f(g.ppk)} | ${fmtPpm(g.ppmExp)} | ${fmtPpm(g.ppmObs)} |`).join("\n")}\n`:""}\n## 二、Nelson 規則（X̄ 圖，管制狀態判斷依據）\n\n${(A.nelX||A.nel).rules.map(r=>`- 規則 ${r.name}：${r.idx.length?"觸發（"+r.idx.map(i=>A.xs.pts[i].lab).join(", ")+"）":"通過"}`).join("\n")}${S.chart!=="xbars"?`\n\n目前畫面管制圖（${chartName()}）：${A.nel.rules.filter(r=>!r.na).map(r=>`規則 ${r.id} ${r.idx.length?"觸發":"通過"}`).join("、")}`:""}\n\n## 三、交叉驗證\n\n| 面向 | 來源 | 判定 | 依據 |\n|---|---|---|---|\n${A.xv.rows.map(x=>`| ${x.k} | ${x.src} | ${lab[x.st]} | ${x.ev} |`).join("\n")}\n\n${fmMd().trim()||"## 失效模式交叉比對\n\n- 無資料"}\n\n## 進階分析\n\n${(()=>{const W=advSummary(A);return[`- EWMA 越界：${W.EWMA越界.join(", ")||"無"}；CUSUM 訊號：${W.CUSUM訊號.join(", ")||"無"}`,`- 面積比 / 轉移效率：${W.面積比.map(g=>`${g.群組} AR ${g.AR}、TE ${g.轉移效率}%`).join("；")}`,`- 最差焊墊 Cpk：${W.最差焊墊Cpk.map(p=>`${p.焊墊} ${p.Cpk}`).join("、")}`,`- 對位異常板：${W.對位異常板.map(a=>`${a.板}（平移 ${a.平移X}/${a.平移Y} µm，旋轉 ${a.旋轉度}°）`).join("；")||"無"}`,W.刮刀前後?`- 刮刀前後差：${W.刮刀前後.差值}，p = ${W.刮刀前後.p}`:"",`- 擦拭週期（每 ${W.擦拭週期.每幾片} 片）：斜率 ${W.擦拭週期.每片斜率}/片，p = ${W.擦拭週期.p}`].filter(Boolean).join("\n")})()}\n\n## 四、不良柏拉圖\n\n${Object.entries(A.pareto).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`- ${DEFECTS[k]}：${v}`).join("\n")||"- 無"}\n${S.ai?`\n## 五、AI 品質工程分析（gpt-6.1-terra，含推論，需工程驗證）\n\n${S.ai}\n`:""}\n## 八、資料範圍揭露與未納入證據\n\n- 匯入總筆數：${S.rows.length} 筆；納入分析筆數：${S.rows.length} 筆\n- 板號推定狀態：${(S.boardInferred || S.rows.some(r=>r.boardInferred)) ? `板號為推定（每 ${S.boardInferred || Math.round(S.rows.length / (A.boards.length||1))} 筆）` : "板號完整，無推定缺失"}\n- 時間區間篩選：${S.timeFilter ? `${S.timeFilter.start || "—"} ～ ${S.timeFilter.end || "—"}（UTC+8）` : "未設定時間篩選（全時段）"}\n- 部分焊墊板數：${S.partialBoards && S.partialBoards.length ? `${S.partialBoards.length} 片板僅含部分焊墊（${S.partialBoards.join("、")}）` : "無部分板（所有板皆含完整焊墊）"}\n- 刮刀方向狀態：${S.sqDir ? `刮刀方向設定為 ${S.sqDir} 向` : "依板序奇偶推定"}\n- 焊墊座標狀態：${PLACE ? `已套用座標檔：${esc(PLACE.part)} ${esc(PLACE.rev)}` : "未套用獨立座標檔（採用資料內建座標或相對位置）"}\n\n## 九、方法附錄與統計檢驗說明\n\n- 判定規格來源：${specSrcText()}\n- 實驗設計 (DOE)：各因子單獨檢定、未調整其他因子與交互作用。\n`}
+  const cStat={ng:0,warn:0,info:0};
+  (S.F||[]).forEach(x=>{if(cStat[x.lv]!=null)cStat[x.lv]++;else if(x.level==="嚴重")cStat.ng++;else if(x.level==="警示")cStat.warn++;else cStat.info++});
+  const capT=repCapRows(A),worstGrp=capT.rows[0];
+  const act5=(S.F||[]).slice(0,5);
+  const dfmData=dfmTable(S);
+  return `# SPI·SPC 分析報告
+
+- 產生時間：${fmtNowUtc8()}
+- 資料來源：${S.source}
+- 量測項目：${METRICS[A.m].label}；元件群組：${isAllGrp(S.group)?"全部":S.group}；管制圖：${chartName()}
+- 整體判定：${vd.label}（${vd.level}）${vd.reasons&&vd.reasons.length?" · 原因："+vd.reasons.join("；"):""}
+- 規格：LSL ${A.sp.lsl} / 目標 ${A.sp.tgt} / USL ${A.sp.usl} ${u}
+- 規格來源：${specSrcText()}
+- 刮刀行程方向：沿 ${S.sqDir||"Y"}；擦拭間隔：每 ${S.wipe} 片
+- 鋼板厚度：${S.stencil} µm（高度規格 ${S.htol.lo}%–${S.htol.hi}% 厚度）
+- 階梯鋼板：${S.step.on?S.step.zones.map(z=>`${z.name} ${z.t} µm（${z.mode==="group"?"群組 "+z.group:`X ${z.x0}–${z.x1}, Y ${z.y0}–${z.y1} mm`}）`).join("；")+`（涵蓋 ${stepCovered} 焊墊${stepCovered===0?" ⚠️ 未涵蓋任何焊墊":""}）`:"未啟用"}
+- 系統版本：${APP.ver} · 系統更新 ${APP.built}
+- 試產回合：${curRun()?curRun().name:""}
+${runSrc(curRun())?`- 資料來源追溯：${srcLine(runSrc(curRun()))}\n- 原始檔 SHA-256：${runSrc(curRun()).sha256}\n`:""}
+## 一、執行摘要
+
+- 整體判定：${vd.label}（${vd.level}）${vd.reasons&&vd.reasons.length?" · 原因："+vd.reasons.join("；"):""}
+- 嚴重異常：${cStat.ng} 項｜警示訊號：${cStat.warn} 項｜資訊項目：${cStat.info} 項｜最差群組 Cpk：${worstGrp&&isFinite(worstGrp.cpk)?f(worstGrp.cpk,2):"—"}（${worstGrp?worstGrp.g:"—"}）
+
+### 優先處理問題摘要（前 5 項）
+
+| # | 嚴重度 | 問題標題 | 核心事實 | 推論原因與建議動作 |
+|---|---|---|---|---|
+${act5.length?act5.map(x=>`| #${x.no!=null?x.no:x.id} | ${x.level||(typeof LVL_MAP!=="undefined"&&LVL_MAP[x.lv])||x.lv} | ${x.title} | ${(x.facts&&x.facts[0])||"—"} | 推論：${x.inference||x.cause}；建議：${x.action} |`).join("\n"):"| — | — | 未偵測到需優先處置之問題 | — | — |"}
+${S.ai?`\n### AI 品質工程診斷摘要\n\n${S.ai}\n`:""}
+## 二、問題偵測清單（共 ${S.F.length} 項）
+
+${S.F.map(x=>`- #${x.no!=null?x.no:x.id}［${x.level||(typeof LVL_MAP!=="undefined"&&LVL_MAP[x.lv])||x.lv}］${x.title}（規則：${x.rule_id} ${x.rule_name}）
+  - 面向：${x.category||x.cat}；量測項目：${x.metric}；板號：${x.boards}；焊墊：${x.pads}；群組：${x.group}；位號：${x.refdes}
+  - 觀測值：${x.observed}；界限：${x.limit}；z：${x.z}；p：${x.p}
+  - 事實：${(x.facts||[]).join("；")}
+  - 推論（信心 ${x.confidence||x.conf}）：${x.inference||x.cause}
+  - 建議動作：${x.action}${(x.corroborated_by||x.corrob||[]).length?"\n  - 跨面向佐證："+(x.corroborated_by||x.corrob).map(i=>"#"+i).join("、"):""}${(x.same_phenomenon||[]).length?"\n  - 同一現象："+x.same_phenomenon.map(i=>"#"+i).join("、"):""}${(x.explained_pads||[]).length?"\n  - 已解釋焊墊："+x.explained_pads.join("；"):""}`).join("\n")||"- 未偵測到顯著問題"}
+
+## 三、統計製程管制圖
+
+- 管制圖類型：X̄ 圖（板平均，界限 ±3σ_B，σ_B = ${f(A.xs.sB,2)}） · 量測項目：${METRICS[A.m].short} · CL = ${f(A.xs.cl,2)} ${METRICS[A.m].unit}
+
+### Nelson 規則（X̄ 圖，管制狀態判斷依據）
+
+${(A.nelX||A.nel).rules.map(r=>`- 規則 ${r.name}：${r.idx.length?"觸發（"+r.idx.map(i=>A.xs.pts[i].lab).join(", ")+"）":"通過"}`).join("\n")}${S.chart!=="xbars"?`\n\n目前畫面管制圖（${chartName()}）：${A.nel.rules.filter(r=>!r.na).map(r=>`規則 ${r.id} ${r.idx.length?"觸發":"通過"}`).join("、")}`:""}
+
+## 四、製程能力分析
+
+| 指標 | 數值 |
+|---|---|
+| 樣本數 | ${A.N} |
+| 板數 | ${A.boards.length} |
+| 平均 | ${f(A.gMean,2)} ${u} |
+| σ 組內 / 整體 | ${f(A.sigmaW,3)} / ${f(A.overallSd,3)} |
+${A.cap?`| 能力計算方式 | ${A.cap.mixed?`逐元件群組（組內 σ），以最差群組 ${A.cap.worst} 代表`:"組內 σ"}${A.stable?"":"；製程未穩定，僅供參考"} |\n| Cp / Cpk | ${f(A.cap.cp)} / ${f(A.cap.cpk)} |\n| Cpk 95% 信賴區間（以 ${A.cap.nb} 片板計） | ${f(A.cap.ci[0])} – ${f(A.cap.ci[1])} |\n| Pp / Ppk | ${f(A.cap.pp)} / ${f(A.cap.ppk)} |\n| 預估 PPM / 超規 PPM（${mShort}${A.cap.mixed?`，最差群組 ${A.cap.worst}`:""}） | ${fmtPpm(A.cap.ppmExp)} / ${fmtPpm(A.cap.ppmObs)} |\n${A.cap.mixed?`| 預估 PPM / 超規 PPM（全部群組） | ${fmtPpm(A.cap.ppmExpAll)} / ${fmtPpm(A.cap.ppmObsAll)} |\n`:""}| 不良 PPM（全部判定項目） | ${fmtPpm(defPpm)} |\n`:""}| Anderson-Darling p | ${A.ad.p<.001?"<0.001":f(A.ad.p,3)} |
+${A.sw&&A.sw.valid?`| Shapiro-Wilk W / p | ${f(A.sw.w,4)} / ${A.sw.p<.001?"<0.001":f(A.sw.p,3)} |\n`:""}| 不良焊墊（全部項目） | ${A.defRows.length} |
+
+${A.cap&&A.cap.mixed?`
+### 逐元件群組製程能力
+
+| 元件群組 | n | 平均 | 規格 | Cpk | Cpk 95% 信賴區間 | Ppk | 預估 PPM | 超規 PPM（${mShort}） |
+|---|---|---|---|---|---|---|---|---|
+${A.cap.groups.map(g=>`| ${g.g} | ${g.n} | ${f(g.mu,1)} | ${f(g.lsl,0)}–${f(g.usl,0)} | ${f(g.cpk)} | ${f(g.ci[0])}–${f(g.ci[1])} | ${f(g.ppk)} | ${fmtPpm(g.ppmExp)} | ${fmtPpm(g.ppmObs)} |`).join("\n")}
+`:""}
+## 五、不良類型柏拉圖
+
+${Object.entries(A.pareto).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`- ${DEFECTS[k]}：${v}`).join("\n")||"- 無"}
+
+## 六、交叉驗證與失效模式比對
+
+### 交叉驗證面向表
+
+| 面向 | 來源 | 判定 | 依據 |
+|---|---|---|---|
+${A.xv.rows.map(x=>`| ${x.k} | ${x.src} | ${lab[x.st]} | ${x.ev} |`).join("\n")}
+
+${fmMd().trim()||"## 失效模式交叉比對\n\n- 無資料"}
+
+## 七、DFM 開孔建議
+
+| 元件群組 | 焊墊尺寸 mm | 開孔尺寸 mm | 鋼板 µm | 面積比 AR | 寬厚比 | IPC-7525 判定 | AR≥0.66 最大厚度 |
+|---|---|---|---|---|---|---|---|
+${(dfmData||[]).map(d=>`| ${d.group} | ${d.padDim} | ${d.apDim} | ${d.thk} | ${f(d.ar,2)} | ${f(d.asp,2)} | ${d.st==='ok'?'正常':d.st==='warn'?'注意':'風險'} | ${f(d.tmax,0)} µm |`).join("\n")}
+
+## 八、資料範圍揭露與未納入證據
+
+- 匯入總筆數：${S.rows.length} 筆；納入分析筆數：${S.rows.length} 筆
+- 板號推定狀態：${(S.boardInferred || S.rows.some(r=>r.boardInferred)) ? `板號為推定（每 ${S.boardInferred || Math.round(S.rows.length / (A.boards.length||1))} 筆）` : "板號完整，無推定缺失"}
+- 時間區間篩選：${S.timeFilter ? `${S.timeFilter.start || "—"} ～ ${S.timeFilter.end || "—"}（UTC+8）` : "未設定時間篩選（全時段）"}
+- 部分焊墊板數：${S.partialBoards && S.partialBoards.length ? `${S.partialBoards.length} 片板僅含部分焊墊（${S.partialBoards.join("、")}）` : "無部分板（所有板皆含完整焊墊）"}
+- 刮刀方向狀態：${S.sqDir ? `刮刀方向設定為 ${S.sqDir} 向` : "依板序奇偶推定"}
+- 焊墊座標狀態：${PLACE ? `已套用座標檔：${esc(PLACE.part)} ${esc(PLACE.rev)}` : "未套用獨立座標檔（採用資料內建座標或相對位置）"}
+
+## 九、方法附錄與統計檢驗說明
+
+- 判定規格來源：${specSrcText()}
+- 實驗設計 (DOE)：各因子單獨檢定、未調整其他因子與交互作用。
+`;}
 /* 下載：在 claude.ai 內用平台下載功能；一般瀏覽器（例如 Cloudflare Workers 正式站）直接下載檔案 */
 function browserDownload(filename,data){const isXlsx=/\.xlsx$/i.test(filename);const type=isXlsx?"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":(/\.csv$/.test(filename)?"text/csv;charset=utf-8":"text/markdown;charset=utf-8"),url=URL.createObjectURL(new Blob(isXlsx?[data]:["\uFEFF"+data],{type})),a=document.createElement("a");a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 /* 匯出鈕分散在各分頁，#expState 只在資料分頁；結果同時用 toast 顯示，避免在其他分頁按了沒反應 */
@@ -9266,8 +9406,8 @@ function proofVerdict(lc, browserOk) {
 }
 const shaShort = h => h ? `<span class="mono" title="SHA-256 ${esc(h)}">${esc(String(h).slice(0, 12))}…</span> <button type="button" class="linkbtn" data-copy="${esc(h)}" aria-label="複製完整 SHA-256">複製</button>` : '<span class="note">—</span>';
 const okMark = (v, okT = "一致", ngT = "不一致") => v === true ? `<span class="rec-ok">✓ ${okT}</span>` : v === false ? `<span class="rec-bad">✗ ${ngT}</span>` : '<span class="note">—</span>';
-const proofRows = rows => `<table class="proof-tbl"><thead><tr><th style="width:16%">項目</th><th>量測記錄</th><th>座標檔</th><th style="width:26%">結果</th></tr></thead><tbody>` +
-  rows.map(([a, b, c, d]) => `<tr><td data-label="項目"><b>${a}</b></td><td data-label="量測記錄">${b}</td><td data-label="座標檔">${c}</td><td data-label="結果">${d}</td></tr>`).join("") + "</tbody></table>";
+const proofRows = rows => `<div class="tbl"><table class="proof-tbl"><thead><tr><th style="width:16%">項目</th><th>量測記錄</th><th>座標檔</th><th style="width:26%">結果</th></tr></thead><tbody>` +
+  rows.map(([a, b, c, d]) => `<tr><td data-label="項目"><b>${a}</b></td><td data-label="量測記錄">${b}</td><td data-label="座標檔">${c}</td><td data-label="結果">${d}</td></tr>`).join("") + "</tbody></table></div>";
 function proofHtml(rec, lc, browser, vd) {
   const bm = browser.status === "fulfilled" ? okMark(browser.value.ok, "相同", "不同") : `<span class="note">未完成（${esc(browser.reason && browser.reason.message || "")}）</span>`;
   let h = `<div class="proof-banner ${vd.v === "none" ? "" : vd.v}" role="status"><b>${PROOF_MARK[vd.v]} ${esc(vd.msg)}</b>${vd.note ? `<br><span>${esc(vd.note)}</span>` : ""}</div>`;
