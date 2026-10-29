@@ -8547,9 +8547,6 @@ async function analyzeViaApi(out,st){
   const effModel=effectiveModelOf(pCfg,usedProv);
   const effEffort=pCfg.effort||"high";
   const body=JSON.stringify({payload:apiPayload()});
-  // #region agent log
-  fetch('http://127.0.0.1:7524/ingest/a37f49c5-9477-4794-8ecb-6ba230e6c7c8',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'548a31'},body:JSON.stringify({sessionId:'548a31',runId:'post-fix',hypothesisId:'A',location:'spi-spc.html:analyzeViaApi',message:'ai payload bytes after fit',data:{fit:AI_PAYLOAD_FIT,sent:new Blob([body]).size,underLimit:new Blob([body]).size<=40000},timestamp:Date.now()})}).catch(()=>{});
-  // #endregion
   const headers={
     "Content-Type":"application/json",
     "X-AI-Provider":usedProv,
