@@ -677,6 +677,23 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 .startup-db-banner__actions{gap:8px;margin:0;align-items:center}
 .startup-db-banner__btn{padding:6px 12px;font-size:13px}
 .startup-db-banner__dismiss{padding:6px 10px;font-size:12.5px;background:transparent;border:none;cursor:pointer;color:var(--muted)}
+.db-modal-panel--xs{max-width:420px;margin:auto}
+.db-modal-panel--sm{max-width:440px;margin:auto}
+.db-modal-panel--rec{max-width:480px;margin:auto}
+.db-modal-panel--md{max-width:760px;margin:auto}
+.sheet-head--db{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheet-head--db-rec{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:var(--surface)}
+.sheet-foot--db{padding:10px 16px;border-top:1px solid var(--line);display:flex;gap:8px}
+.sheet-foot--db-end{justify-content:flex-end}
+.modal-h3{margin:0;font-size:15px}
+.modal-h3--lead{margin:0 0 8px;font-size:15px}
+.modal-body-pad{padding:16px}
+.modal-body-scroll{padding:16px;overflow:auto}
+.modal-body-stack{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.modal-note-accent{font-size:12px;color:var(--accent-ink)}
+.modal-proof-body{padding:14px 16px;overflow:auto;display:flex;flex-direction:column;gap:12px;min-height:0}
+.modal-title-wrap{min-width:0;overflow-wrap:anywhere}
+.lib-warn{margin:0 0 8px}
 .rec-card-body {
   font-size: 12.5px;
   line-height: 1.5;
@@ -725,7 +742,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.9.1</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.9.3</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -746,7 +763,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   </div>
 </header>
 
-<p class="err" id="libWarn" hidden role="alert" style="margin:0 0 8px">圖表函式庫未能載入，數據分析與問題偵測仍可使用，圖表會空白。請重新整理頁面或檢查網路。</p>
+<p class="err lib-warn" id="libWarn" hidden role="alert">圖表函式庫未能載入，數據分析與問題偵測仍可使用，圖表會空白。請重新整理頁面或檢查網路。</p>
 <div class="sticky">
 <div class="rail" role="region" aria-label="分析設定">
   <button type="button" class="rail-chip" id="btnRailChip" aria-haspopup="dialog" aria-expanded="false" aria-controls="railSheet" aria-label="開啟分析設定與篩選"><span id="railChipSummary">範例資料 · 體積 · 全部元件 ▾</span></button>
@@ -1657,18 +1674,18 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 
 <!-- 料號規格：儲存新版本 -->
 <div class="db-modal" id="specSaveModal" role="dialog" aria-modal="true" aria-labelledby="specSaveTitle" hidden>
-  <div class="db-modal-panel" style="max-width:440px;margin:auto">
-    <div class="sheet-head" style="padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between">
-      <h3 id="specSaveTitle" style="margin:0;font-size:15px">儲存為新版本</h3>
+  <div class="db-modal-panel db-modal-panel--sm">
+    <div class="sheet-head sheet-head--db">
+      <h3 id="specSaveTitle" class="modal-h3">儲存為新版本</h3>
       <button type="button" class="sheet-close" data-close aria-label="關閉">✕</button>
     </div>
-    <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+    <div class="modal-body-stack">
       <div class="note" id="specSaveTarget"></div>
       <div class="field"><label for="specSaveNote">備註（最多 200 字，存入規格檔，之後不能修改）</label><textarea id="specSaveNote" maxlength="200" rows="3" placeholder="例：依加工廠 SPI 規格 2026-10"></textarea></div>
       <label class="row" style="gap:6px;align-items:center"><input type="checkbox" id="specSaveDefault"> 設為此料號的預設版本（同料號新匯入會自動套用）</label>
       <div class="err" id="specSaveErr" role="alert"></div>
     </div>
-    <div class="sheet-foot" style="padding:10px 16px;border-top:1px solid var(--line);display:flex;gap:8px">
+    <div class="sheet-foot sheet-foot--db sheet-foot--db-end">
       <button type="button" class="primary" id="specSaveOk">儲存</button>
       <button type="button" data-close>取消</button>
     </div>
@@ -1676,12 +1693,12 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 </div>
 <!-- 料號規格：版本清單 -->
 <div class="db-modal" id="specVerModal" role="dialog" aria-modal="true" aria-labelledby="specVerTitle" hidden>
-  <div class="db-modal-panel" style="max-width:760px;margin:auto">
-    <div class="sheet-head" style="padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between">
-      <h3 id="specVerTitle" style="margin:0;font-size:15px">料號規格版本</h3>
+  <div class="db-modal-panel db-modal-panel--md">
+    <div class="sheet-head sheet-head--db">
+      <h3 id="specVerTitle" class="modal-h3">料號規格版本</h3>
       <button type="button" class="sheet-close" data-close aria-label="關閉">✕</button>
     </div>
-    <div style="padding:12px 16px;overflow:auto">
+    <div class="modal-body-scroll" style="padding:12px 16px">
       <div class="note" id="specVerState" role="status"></div>
       <div class="tbl"><table id="specVerTbl"></table></div>
     </div>
@@ -1689,12 +1706,12 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 </div>
 <!-- 料號規格：確認對話框 -->
 <div class="db-modal" id="specConfirmModal" role="alertdialog" aria-modal="true" aria-labelledby="specConfirmTitle" aria-describedby="specConfirmMsg" hidden>
-  <div class="db-modal-panel" style="max-width:420px;margin:auto">
-    <div style="padding:16px">
-      <h3 id="specConfirmTitle" style="margin:0 0 8px;font-size:15px">放棄未儲存的規格修改？</h3>
+  <div class="db-modal-panel db-modal-panel--xs">
+    <div class="modal-body-pad">
+      <h3 id="specConfirmTitle" class="modal-h3--lead">放棄未儲存的規格修改？</h3>
       <p id="specConfirmMsg" style="margin:0"></p>
     </div>
-    <div class="sheet-foot" style="padding:10px 16px;border-top:1px solid var(--line);display:flex;gap:8px">
+    <div class="sheet-foot sheet-foot--db">
       <button type="button" class="primary" id="specConfirmOk">放棄修改並繼續</button>
       <button type="button" data-close>取消</button>
     </div>
@@ -1702,13 +1719,13 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 </div>
 <!-- 量測紀錄與座標檔的對應證明（疊在資料庫對話框之上） -->
 <div class="db-modal" id="proofModal" role="dialog" aria-modal="true" aria-labelledby="proofTitle" hidden>
-  <div class="db-modal-panel" style="max-width:760px;margin:auto">
-    <div class="sheet-head" style="padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px">
-      <h3 id="proofTitle" tabindex="-1" style="margin:0;font-size:15px;min-width:0;overflow-wrap:anywhere">對應證明</h3>
+  <div class="db-modal-panel db-modal-panel--md">
+    <div class="sheet-head sheet-head--db">
+      <h3 id="proofTitle" tabindex="-1" class="modal-h3 modal-title-wrap">對應證明</h3>
       <button type="button" class="sheet-close" data-close aria-label="關閉">✕</button>
     </div>
-    <div id="proofBody" style="padding:14px 16px;overflow:auto;display:flex;flex-direction:column;gap:12px;min-height:0"></div>
-    <div class="sheet-foot" style="padding:10px 16px;border-top:1px solid var(--line);display:flex;justify-content:flex-end">
+    <div id="proofBody" class="modal-proof-body"></div>
+    <div class="sheet-foot sheet-foot--db sheet-foot--db-end">
       <button type="button" data-close>關閉</button>
     </div>
   </div>
@@ -1716,25 +1733,25 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 <datalist id="partList"></datalist>
 <!-- 量測紀錄：完整未對應位號 -->
 <div class="db-modal" id="unmatchedRefsModal" role="dialog" aria-modal="true" aria-labelledby="unmatchedRefsTitle" aria-describedby="unmatchedRefsList" hidden>
-  <div class="db-modal-panel" style="max-width:480px;margin:auto">
-    <div style="padding:16px;overflow:auto">
-      <h3 id="unmatchedRefsTitle" style="margin:0 0 8px;font-size:15px">無座標位號</h3>
+  <div class="db-modal-panel db-modal-panel--rec">
+    <div class="modal-body-scroll">
+      <h3 id="unmatchedRefsTitle" class="modal-h3--lead">無座標位號</h3>
       <p id="unmatchedRefsList" style="margin:0;overflow-wrap:anywhere"></p>
     </div>
-    <div class="sheet-foot" style="padding:10px 16px;border-top:1px solid var(--line)">
+    <div class="sheet-foot sheet-foot--db">
       <button type="button" data-close>關閉</button>
     </div>
   </div>
 </div>
 <!-- 工單號與備註修改彈窗 -->
 <div class="db-modal" id="recEditModal" role="dialog" aria-modal="true" aria-label="修改量測鑑別資料與備註" hidden>
-  <div class="db-modal-panel" style="max-width:440px;margin:auto">
-    <div class="sheet-head" style="padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between">
-      <h3 style="margin:0;font-size:15px">修改量測鑑別資料與備註</h3>
+  <div class="db-modal-panel db-modal-panel--sm">
+    <div class="sheet-head sheet-head--db">
+      <h3 class="modal-h3">修改量測鑑別資料與備註</h3>
       <button type="button" class="sheet-close" id="recEditClose" aria-label="關閉">✕</button>
     </div>
-    <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px">
-      <div class="note" id="recEditTarget" style="font-size:12px;color:var(--accent-ink)"></div>
+    <div class="modal-body-stack">
+      <div class="note modal-note-accent" id="recEditTarget"></div>
       <div class="field"><label for="recEditWorkOrder">製令工單（與量測日期至少填一項）</label><input type="text" id="recEditWorkOrder" maxlength="64"></div>
       <div class="field"><label for="recEditMeasuredDate">量測日期</label><input type="date" id="recEditMeasuredDate"></div>
       <div class="field"><label for="recEditLot">批號（選填）</label><input type="text" id="recEditLot" maxlength="64"></div>
@@ -1743,9 +1760,9 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
       <div class="field"><label for="recEditNote">備註（最多 200 字）</label><textarea id="recEditNote" maxlength="200" rows="3" placeholder="選填，可輸入批次說明或測試標記…"></textarea></div>
       <div id="recEditState" class="note" style="min-height:16px"></div>
     </div>
-    <div class="sheet-foot" style="padding:10px 16px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px">
-      <button type="button" id="recEditCancel">取消</button>
+    <div class="sheet-foot sheet-foot--db sheet-foot--db-end">
       <button type="button" class="primary" id="recEditSave">儲存更新</button>
+      <button type="button" id="recEditCancel">取消</button>
     </div>
   </div>
 </div>
@@ -8465,6 +8482,16 @@ async function analyzeViaApi(out,st){
     if(!res.ok){let msg=res.status===404?"此網站沒有啟用 AI 分析服務":`伺服器回應 ${res.status}`;try{const j=await res.json();if(j.error)msg=j.error;if(j.usage){AI_LAST_USAGE=j.usage;if(AI_SERVER_META[usedProv])AI_SERVER_META[usedProv].usage=j.usage;renderAiUsageUI(j.usage,pCfg,usedProv)}}catch(e){}st.textContent="AI 分析無法使用："+msg;return}
     const rd=res.body.getReader(),dec=new TextDecoder();
     for(;;){const{done,value}=await rd.read();if(done)break;text+=dec.decode(value,{stream:true});out.innerHTML=mdLite(deAnonymizeText(text))}
+    const failMarker="［AI 分析失敗：";
+    const failIdx=text.indexOf(failMarker);
+    if(failIdx>=0){
+      const failLine=text.slice(failIdx).split(/\r?\n/)[0];
+      st.textContent=failLine;
+      const beforeFail=deAnonymizeText(text.slice(0,failIdx).trim());
+      if(beforeFail){S.ai=beforeFail;if($("#aiResultTools"))$("#aiResultTools").hidden=!S.ai}
+      else{S.ai="";if($("#aiResultTools"))$("#aiResultTools").hidden=true}
+      return;
+    }
     S.ai=deAnonymizeText(text);if($("#aiResultTools"))$("#aiResultTools").hidden=!S.ai;
     const usedModelHdr=res.headers.get("X-AI-Model")||effModel;
     const usedEffortHdr=res.headers.get("X-AI-Reasoning-Effort")||effEffort;

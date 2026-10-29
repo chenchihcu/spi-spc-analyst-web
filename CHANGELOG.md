@@ -2,6 +2,17 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.9.3 — 2026-10-29 14:00:00（AI：Antigravity 上游 429 錯誤解析與短重試）
+
+- **Antigravity／Gemini 429 不再只顯示「回應 HTTP 429」**：`cloudflare/ai.mjs` 解析陣列或物件形狀的上游錯誤本文；`limit: 0` 時不重試並提示至 Google AI Studio 確認配額；短暫 429／503 在 4 秒內最多重試 3 次（尊重 `Retry-After`）。
+- **AI 診斷狀態列**：串流正文含 `［AI 分析失敗：` 時不再顯示「完成」。
+- 測試：`tests/ai-model.test.mjs` 新增上游錯誤解析與重試案例。
+
+## v10.9.2 — 2026-10-29 13:45:00（UI：模態框 token 與對話框按鈕順序）
+
+- **RFC-SPI-UI P1／P2 收斂**：料號規格／證明／編輯等 `.db-modal` 共用 `.sheet-head--db`、`.sheet-foot--db`、`.db-modal-panel--*`；`#recEditModal` 改為儲存左、取消右（Institution 對話框順序）；`#libWarn` 改 class。
+- 回歸：`tests/mobile-layout.test.mjs` 禁止記錄庫 emoji 圖示。
+
 ## v10.9.1 — 2026-10-29 13:35:00（UI：記錄庫 SVG 與範例橫幅 token）
 
 - **RFC-SPI-UI-20261029 後續 P1**：記錄庫／範例提示改 stroke SVG（`.ui-ico`），不再用 emoji 當圖示；`.rec-card-sub` 改 `--muted`；範例資料橫幅樣式收斂至 `.startup-db-banner*` class。

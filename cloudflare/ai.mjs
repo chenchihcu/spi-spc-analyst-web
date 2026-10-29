@@ -302,6 +302,158 @@ function resolveModelAndEffort(req, env, provCfg) {
   return { model, reasoningEffort };
 }
 
+export const UPSTREAM_RETRY_MAX_ATTEMPTS = 3;
+export const UPSTREAM_RETRY_MAX_DELAY_MS = 4000;
+const UPSTREAM_RETRY_BACKOFF_MS = [1000, 2000, 4000];
+
+function errorPayloadFromJson(value) {
+  if (!value || typeof value !== 'object') return null;
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const inner = errorPayloadFromJson(item);
+      if (inner) return inner;
+    }
+    return null;
+  }
+  if (value.error && typeof value.error === 'object') return value.error;
+  if (typeof value.message === 'string' && value.message.trim()) return value;
+  return null;
+}
+
+/** @returns {{ message: string, bodyText: string, hasLimitZero: boolean, status?: string, code?: number }} */
+export function extractUpstreamError(bodyText) {
+  const raw = String(bodyText || '').trim();
+  if (!raw) return { message: '', bodyText: raw, hasLimitZero: false };
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    const snippet = raw.slice(0, 500);
+    return { message: snippet, bodyText: raw, hasLimitZero: /limit:\s*0/i.test(snippet) };
+  }
+  const err = errorPayloadFromJson(parsed);
+  const message = err?.message ? String(err.message).trim() : '';
+  const combined = message || raw.slice(0, 500);
+  const hasLimitZero = /limit:\s*0/i.test(combined);
+  return {
+    message: combined,
+    bodyText: raw,
+    hasLimitZero,
+    status: err?.status,
+    code: err?.code,
+  };
+}
+
+function parseRetryAfterMs(headers) {
+  const ra = headers?.get?.('retry-after');
+  if (ra == null || ra === '') return null;
+  const asNum = Number(ra);
+  if (Number.isFinite(asNum) && asNum >= 0) return asNum * 1000;
+  const asDate = Date.parse(ra);
+  if (Number.isFinite(asDate)) return Math.max(0, asDate - Date.now());
+  return null;
+}
+
+function parseRetryInBodyMs(message) {
+  const m = String(message || '').match(/Please retry in ([\d.]+)s/i);
+  if (!m) return null;
+  const sec = Number(m[1]);
+  return Number.isFinite(sec) ? Math.ceil(sec * 1000) : null;
+}
+
+/** @returns {{ retry: boolean, waitMs: number, extracted: ReturnType<typeof extractUpstreamError>, reason?: string }} */
+export function planUpstreamRetry({
+  status,
+  headers,
+  bodyText,
+  attemptIndex,
+  maxAttempts = UPSTREAM_RETRY_MAX_ATTEMPTS,
+}) {
+  const extracted = extractUpstreamError(bodyText);
+  if (status !== 429 && status !== 503) {
+    return { retry: false, waitMs: 0, extracted, reason: 'not_retryable_status' };
+  }
+  if (extracted.hasLimitZero || /limit:\s*0/i.test(bodyText)) {
+    return { retry: false, waitMs: 0, extracted, reason: 'limit_zero' };
+  }
+  const msg = extracted.message;
+  if (/402|depleted prepay|permission_denied|invalid_argument/i.test(msg)) {
+    return { retry: false, waitMs: 0, extracted, reason: 'client_error' };
+  }
+  if (attemptIndex >= maxAttempts - 1) {
+    return { retry: false, waitMs: 0, extracted, reason: 'exhausted' };
+  }
+  let waitMs = parseRetryAfterMs(headers);
+  if (waitMs == null) waitMs = parseRetryInBodyMs(msg);
+  if (waitMs == null) waitMs = UPSTREAM_RETRY_BACKOFF_MS[attemptIndex] ?? UPSTREAM_RETRY_MAX_DELAY_MS;
+  if (waitMs > UPSTREAM_RETRY_MAX_DELAY_MS) {
+    return { retry: false, waitMs: 0, extracted, reason: 'wait_too_long' };
+  }
+  return { retry: true, waitMs, extracted };
+}
+
+export function formatUpstreamFailureMessage(provLabel, status, extracted, didRetry) {
+  const base = extracted.message
+    ? `${status} ${extracted.message}`
+    : `${provLabel} 回應 HTTP ${status}`;
+  if (extracted.hasLimitZero || /limit:\s*0/i.test(extracted.message)) {
+    return `${base}。此 API 金鑰對該模型額度為 0，請至 Google AI Studio 確認計費／配額，或改選其他模型／服務商。`;
+  }
+  if (didRetry && (status === 429 || status === 503)) {
+    return `${base}。已自動重試仍失敗，請稍後再試或改選其他服務商。`;
+  }
+  return base;
+}
+
+function abortableDelay(ms, signal) {
+  const wait = Math.max(0, Number(ms) || 0);
+  if (wait === 0) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(Object.assign(new Error('Aborted'), { name: 'AbortError' }));
+      return;
+    }
+    const timer = setTimeout(resolve, wait);
+    const onAbort = () => {
+      clearTimeout(timer);
+      reject(Object.assign(new Error('Aborted'), { name: 'AbortError' }));
+    };
+    signal?.addEventListener?.('abort', onAbort, { once: true });
+  });
+}
+
+async function fetchUpstreamWithRetry(targetUrl, headers, bodyPayload, signal, provLabel) {
+  let didRetry = false;
+  for (let attempt = 0; attempt < UPSTREAM_RETRY_MAX_ATTEMPTS; attempt++) {
+    const res = await fetch(targetUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(bodyPayload),
+      signal,
+    });
+    if (res.ok) return { res, didRetry };
+    const bodyText = await res.text();
+    const plan = planUpstreamRetry({
+      status: res.status,
+      headers: res.headers,
+      bodyText,
+      attemptIndex: attempt,
+      maxAttempts: UPSTREAM_RETRY_MAX_ATTEMPTS,
+    });
+    if (plan.retry) {
+      didRetry = true;
+      await abortableDelay(plan.waitMs, signal);
+      continue;
+    }
+    return {
+      res: null,
+      error: formatUpstreamFailureMessage(provLabel, res.status, plan.extracted, didRetry),
+      didRetry,
+    };
+  }
+  return { res: null, error: `${provLabel} 回應 HTTP 429`, didRetry: true };
+}
+
 export async function handleAnalyze(req, env = {}, userArg = '') {
   if (env && env.AI_ENABLED === 'false') {
     return json({ error: '管理員已停用 AI 分析功能' }, 403);
@@ -433,36 +585,34 @@ export async function handleAnalyze(req, env = {}, userArg = '') {
       let usageReported = null;
       let finishReason = null;
       try {
-        const res = await fetch(targetUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${keyInfo.apiKey}`,
-            ...(logPayload ? {} : { 'cf-aig-collect-log-payload': 'false' }),
-          },
-          body: JSON.stringify({
-            model,
-            reasoning_effort: reasoningEffort,
-            max_completion_tokens: MAX_TOKENS,
-            stream: true,
-            stream_options: { include_usage: true },
-            messages: [
-              { role: 'system', content: SYSTEM_PROMPT },
-              ...userMessages,
-            ],
-          }),
-          signal: upstreamCtrl.signal,
-        });
-
-        if (!res.ok) {
-          let errMsg = `${provCfg.label} 回應 HTTP ${res.status}`;
-          try {
-            const errJson = await res.json();
-            if (errJson?.error?.message) errMsg = `${res.status} ${errJson.error.message}`;
-          } catch {}
-          controller.enqueue(enc.encode(`\n\n［AI 分析失敗：${errMsg}］`));
+        const upstreamHeaders = {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${keyInfo.apiKey}`,
+          ...(logPayload ? {} : { 'cf-aig-collect-log-payload': 'false' }),
+        };
+        const upstreamBody = {
+          model,
+          reasoning_effort: reasoningEffort,
+          max_completion_tokens: MAX_TOKENS,
+          stream: true,
+          stream_options: { include_usage: true },
+          messages: [
+            { role: 'system', content: SYSTEM_PROMPT },
+            ...userMessages,
+          ],
+        };
+        const upstream = await fetchUpstreamWithRetry(
+          targetUrl,
+          upstreamHeaders,
+          upstreamBody,
+          upstreamCtrl.signal,
+          provCfg.label,
+        );
+        if (!upstream.res) {
+          controller.enqueue(enc.encode(`\n\n［AI 分析失敗：${upstream.error}］`));
           return;
         }
+        const res = upstream.res;
 
         const reader = res.body.getReader();
         const dec = new TextDecoder();

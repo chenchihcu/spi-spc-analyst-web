@@ -12,6 +12,8 @@ import {
   CURSOR_CHAT_URL,
   PROVIDERS,
   DEFAULT_LIMITS,
+  extractUpstreamError,
+  planUpstreamRetry,
 } from '../cloudflare/ai.mjs';
 
 function createD1Stub() {
@@ -257,4 +259,96 @@ test('D1 各平台獨立使用量追蹤與雙維度限額攔截（OpenAI 額滿�
   assert.equal(r4.res.status, 429);
   const err4 = JSON.parse(r4.text);
   assert.equal(err4.code, 'monthly_token_limit_exceeded');
+});
+
+test('extractUpstreamError 支援 Gemini 陣列與 OpenAI 物件', () => {
+  const fromArray = extractUpstreamError('[{"error":{"message":"Resource has been exhausted (e.g. check quota).","code":429}}]');
+  assert.equal(fromArray.message, 'Resource has been exhausted (e.g. check quota).');
+  const fromObject = extractUpstreamError('{"error":{"message":"You exceeded your current quota"}}');
+  assert.equal(fromObject.message, 'You exceeded your current quota');
+  const limitZero = extractUpstreamError('{"error":{"message":"Quota exceeded, limit: 0, model: gemini-3.1-pro"}}');
+  assert.equal(limitZero.hasLimitZero, true);
+  assert.equal(planUpstreamRetry({ status: 429, headers: new Headers(), bodyText: limitZero.bodyText, attemptIndex: 0 }).retry, false);
+});
+
+test('Antigravity 429 陣列錯誤本文：解析上游 message 且不盲目重試 limit: 0', async () => {
+  const gemini429 = JSON.stringify([{
+    error: {
+      code: 429,
+      message: 'Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro',
+      status: 'RESOURCE_EXHAUSTED',
+    },
+  }]);
+  let calls = 0;
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async () => {
+    calls += 1;
+    return new Response(gemini429, { status: 429, headers: { 'content-type': 'application/json' } });
+  };
+  try {
+    const req = new Request('https://spi.example/api/analyze', {
+      method: 'POST',
+      headers: { 'X-AI-Provider': 'antigravity', 'X-Antigravity-Key': 'user-agy-key' },
+      body: BODY,
+    });
+    const res = await handleAnalyze(req, {}, USER);
+    const text = await res.text();
+    assert.equal(res.status, 200);
+    assert.equal(calls, 1);
+    assert.match(text, /429 Quota exceeded/);
+    assert.match(text, /Google AI Studio/);
+    assert.doesNotMatch(text, /Antigravity 回應 HTTP 429］/);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+});
+
+test('短暫 429 配合 Retry-After: 0 自動重試後成功', async () => {
+  let calls = 0;
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init) => {
+    calls += 1;
+    if (calls === 1) {
+      return new Response(JSON.stringify({ error: { message: 'Rate limit', status: 'RESOURCE_EXHAUSTED' } }), {
+        status: 429,
+        headers: { 'Retry-After': '0' },
+      });
+    }
+    const sent = JSON.parse(init.body);
+    return new Response(sse(sent.model, '分析結果'), { status: 200, headers: { 'content-type': 'text/event-stream' } });
+  };
+  try {
+    const req = new Request('https://spi.example/api/analyze', {
+      method: 'POST',
+      headers: { 'X-AI-Provider': 'antigravity', 'X-Antigravity-Key': 'user-agy-key' },
+      body: BODY,
+    });
+    const res = await handleAnalyze(req, {}, USER);
+    const text = await res.text();
+    assert.equal(calls, 2);
+    assert.equal(text, '分析結果');
+    assert.doesNotMatch(text, /［AI 分析失敗/);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+});
+
+test('OpenAI 形狀 { error: { message } } 的 429 可讀取 message', async () => {
+  const errBody = JSON.stringify({ error: { message: 'You exceeded your current quota', type: 'insufficient_quota' } });
+  let calls = 0;
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async () => {
+    calls += 1;
+    return new Response(errBody, { status: 429, headers: { 'Retry-After': '120' } });
+  };
+  try {
+    const req = new Request('https://spi.example/api/analyze', { method: 'POST', headers: { 'X-OpenAI-Key': 'user-custom-key' }, body: BODY });
+    const res = await handleAnalyze(req, {}, USER);
+    const text = await res.text();
+    assert.equal(res.status, 200);
+    assert.equal(calls, 1);
+    assert.match(text, /You exceeded your current quota/);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
 });
