@@ -2,6 +2,14 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.10.1 — 2026-10-29 16:50:00（UI：文案收斂與字級 token）
+
+- **文案收斂**：移除各頁「怎麼看」等教學折疊與重複副標；使用者可見標題不再附英文譯名（報告／PDF 章名同步）；`METRICS` 量測項目標籤僅中文。
+- **字級 scale**：`:root` 新增 `--fs-*` 語意 token；14 個分析頁、對話框與報告預覽同一角色共用同一級；手機維持 16px 內文／輸入框。
+- **Chart.js**：預設圖表字級改讀 `--fs-caption`。
+- **專案規則**：[`AGENTS.md`](AGENTS.md) 新增介面中文命名契約；[`docs/spec-ui-copy-rfc.md`](docs/spec-ui-copy-rfc.md)。
+- 測試：`tests/ui-copy.test.mjs`、`tests/type-scale.test.mjs`；`tests/mobile-layout.test.mjs` 密碼欄改對 `--fs-input`。
+
 ## v10.10.0 — 2026-10-29 14:38:00（AI：移除 Cursor、檢查可用模型、404 修正指引）
 
 - **移除 Cursor 服務商**：`api.cursor.com` 沒有 `/v1/chat/completions` 路由（無金鑰 POST 即回 `404 Route POST:/v1/chat/completions not found`），此服務商從未能使用。前後端型錄、金鑰欄位、備援順序與配額設定只剩 OpenAI、Antigravity；舊設定仍送 `X-AI-Provider: cursor` 時 `/api/analyze` 回 `400`、`code=provider_removed`，不再呼叫上游。

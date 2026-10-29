@@ -180,11 +180,11 @@ test("進階整合測試：buildRows 解析形貌欄位並整合至 analyze 與 
   assert.ok(A.printerCorr != null, "analyze 應產出 printerCorr");
 
   const issues = core.detectIssues(st);
-  const bridgeIssue = issues.find(x => x.cat === "形貌缺陷" && x.rule_id.includes("BridgeMargin"));
+  const bridgeIssue = issues.find(x => x.cat === "形貌缺陷" && x.rule_id.includes("橋接餘裕"));
   assert.ok(bridgeIssue != null, "應偵測出橋接餘裕不足問題卡");
   assert.equal(bridgeIssue.lv, "ng");
 
-  const peakingIssue = issues.find(x => x.cat === "形貌缺陷" && x.rule_id.includes("Peaking"));
+  const peakingIssue = issues.find(x => x.cat === "形貌缺陷" && x.rule_id.includes("脫模拉尖"));
   assert.ok(peakingIssue != null, "應偵測出拉尖超標問題卡");
   assert.equal(peakingIssue.lv, "warn");
 });

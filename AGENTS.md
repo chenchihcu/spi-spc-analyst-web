@@ -52,6 +52,9 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
 - **固定白底區塊要固定 token**：列印用的白紙（`.report-preview`）裡的行內 `var(--*)` 會跟著深色主題變深；在該範圍重新宣告明亮 token。圖例文字用一般字色，系列色只放在符號上。
   - 檢查：深色模式下報告頁文字對比 ≥ 4.5；`tests/mobile-layout.test.mjs` 測試 8d、8e。
   - 出處：v10.3.3（深色模式報告判定框對比 1.2）。
+- **使用者可見文案只用中文標題、不附英文譯名**：介面、報告預覽、PDF 與匯出標題中，「中文（English）」或「中文 (English)」只保留中文部分。無括號的專名、單位、標準號、檔名保留（例如 Cpk、DFM、SPI、CSV、Johnson、ISO 21747、µm）。不新增「怎麼看」或只重複標題的教學副標；計算結果列、空狀態、錯誤與會改變判讀的警示句保留。
+  - 檢查：`tests/ui-copy.test.mjs` 掃描 `spi-spc.html` 禁止 `Executive Summary`、`Closed-Loop Correction`、`<summary>怎麼看</summary>` 等禁用模式。
+  - 契約：`docs/spec-ui-copy-rfc.md`。
 
 ## 驗證
 

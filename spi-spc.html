@@ -40,6 +40,8 @@
   --c-bar:rgba(242,244,240,.88);
   --c-hairline:rgba(24,32,27,.10);
   --tbl-sticky-shadow:2px 0 5px rgba(24,32,27,.08);
+  --fs-brand:32px;--fs-brand-narrow:28px;--fs-kpi:30px;--fs-title:18px;--fs-heading:15px;--fs-body:14px;--fs-ui:13px;--fs-caption:12px;--fs-icon:18px;--fs-chart:10px;
+  --fs-input:16px;--fs-body-mobile:16px;--fs-nav-title:17px;--fs-rail:15px;--fs-label-mobile:13px;--fs-tab-label:11px;--fs-issue-title-mobile:16px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0F1311;--surface:#171C19;--surface2:#212923;--ink:#E4E9E4;--muted:#98A39B;--line:#2D3731;
@@ -57,7 +59,7 @@
   --tbl-sticky-shadow:2px 0 8px rgba(0,0,0,.5)}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.6;padding:env(safe-area-inset-top,0px) max(16px,env(safe-area-inset-right,0px)) calc(48px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:var(--fs-body);line-height:1.6;padding:env(safe-area-inset-top,0px) max(16px,env(safe-area-inset-right,0px)) calc(48px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 .wrap{max-width:1280px;margin:0 auto}
 h1,h2,h3{text-wrap:balance;margin:0;font-weight:700}
 .num,.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
@@ -65,9 +67,9 @@ header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-
 .brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .mitcorp-logo{display:block;height:26px;width:auto;color:var(--logo-ink);flex-shrink:0}
 .brand-sep{width:1px;height:22px;background:var(--line);flex-shrink:0}
-.brand h1{font-family:var(--f-display);font-size:32px;font-weight:600;letter-spacing:.02em;line-height:1}
-.brand .tag{font-size:12px;color:var(--muted);letter-spacing:.08em}
-.chipBtn{border:none;min-height:0;cursor:pointer;font:inherit;font-size:12px;color:var(--ink)}.chipBtn:hover{background:var(--line)}
+.brand h1{font-family:var(--f-display);font-size:var(--fs-brand);font-weight:600;letter-spacing:.02em;line-height:1}
+.brand .tag{font-size:var(--fs-caption);color:var(--muted);letter-spacing:.08em}
+.chipBtn{border:none;min-height:0;cursor:pointer;font:inherit;font-size:var(--fs-caption);color:var(--ink)}.chipBtn:hover{background:var(--line)}
 /* hidden 屬性一律隱藏：避免 .panel{display:grid} 等規則蓋過瀏覽器預設，導致未選取的頁籤也顯示 */
 [hidden]{display:none!important}
 .printHead,.print3d{display:none}
@@ -76,8 +78,8 @@ header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   html,body{background:#fff!important}
   .wrap{max-width:none!important;padding:0!important}
-  .printHead{display:block;font-size:12px;border-bottom:1.5px solid #000;padding:0 0 6px;margin:0 0 10px;color:#000}
-  .printHead b{font-size:15px;margin-right:10px}
+  .printHead{display:block;font-size:var(--fs-caption);border-bottom:1.5px solid #000;padding:0 0 6px;margin:0 0 10px;color:#000}
+  .printHead b{font-size:var(--fs-heading);margin-right:10px}
   header.top,.rail,.tabs,.ctxbar,#toast,#busy,#libWarn{display:none!important}
   .sticky{position:static!important;box-shadow:none!important}
   .panel button:not([data-ent]),.panel input[type=file],.panel .drop,#hud{display:none!important}
@@ -90,18 +92,18 @@ header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-
   a[href]{text-decoration:none;color:inherit}
 }
 /* ---------- v9.7 瀏覽體驗：精簡頁首、可收合卡片、本頁目錄、回到頂端 ---------- */
-.brand .ver{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.brand .ver{font-size:var(--fs-caption);color:var(--muted);white-space:nowrap}
 .brand .ver b{font-weight:500;color:var(--ink)}
 .toprow{gap:8px}
 .menuwrap{position:relative}
 .menu{position:absolute;right:0;top:calc(100% + 6px);z-index:30;min-width:200px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.14);padding:6px;display:grid;gap:2px}
 .menu[hidden]{display:none}
-.menu button,.menu a{all:unset;box-sizing:border-box;display:block;padding:9px 12px;border-radius:7px;font-size:13.5px;cursor:pointer;color:var(--ink)}
+.menu button,.menu a{all:unset;box-sizing:border-box;display:block;padding:9px 12px;border-radius:7px;font-size:var(--fs-ui);cursor:pointer;color:var(--ink)}
 .menu button:hover,.menu a:hover,.menu button:focus-visible,.menu a:focus-visible{background:var(--surface2)}
 .menu button[hidden],.menu a[hidden]{display:none}
-.menu-user{margin:0;padding:8px 12px 6px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line)}
-.specbtn{display:inline-flex;align-items:center;gap:6px;font-size:13px;align-self:flex-end}
-.specbtn .lbl{color:var(--muted);font-size:12px}
+.menu-user{margin:0;padding:8px 12px 6px;font-size:var(--fs-caption);color:var(--muted);border-bottom:1px solid var(--line)}
+.specbtn{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-ui);align-self:flex-end}
+.specbtn .lbl{color:var(--muted);font-size:var(--fs-caption)}
 /* 黏性頂部：往下捲時把設定列推出畫面，只留頁籤；往上捲再出現（高度不變，內容不跳動） */
 .sticky{transition:top .18s ease}
 .sticky.compact{top:calc(-1 * var(--railH,0px))}
@@ -118,8 +120,8 @@ details.iss-card>summary:hover{background:var(--surface2)}
 details.iss-card>summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .iss-sum-l{display:flex;gap:6px;align-items:center;white-space:nowrap;min-width:92px}
 .iss-sum-t{min-width:0}
-.iss-sum-t b{display:block;font-size:14.5px;font-weight:600;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.iss-sum-t span{display:block;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iss-sum-t b{display:block;font-size:var(--fs-body);font-weight:600;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iss-sum-t span{display:block;font-size:var(--fs-caption);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .iss-spark{width:120px;height:30px;display:block}
 .iss-spark text{display:none}
 .iss-chev{color:var(--muted);transition:transform .15s}
@@ -131,26 +133,26 @@ details[open].iss-card>summary{border-bottom:1px solid var(--line);border-radius
 @media (max-width:480px){details.iss-card>summary{padding:8px 10px;gap:2px 8px}.iss-sum-l{min-width:auto;gap:4px}}
 /* 卡片收合（各分析頁） */
 .card.collapsible>h3{cursor:pointer;user-select:none}
-.card .cbtn{all:unset;cursor:pointer;color:var(--muted);font-size:12px;padding:2px 8px;border-radius:6px;margin-left:auto}
+.card .cbtn{all:unset;cursor:pointer;color:var(--muted);font-size:var(--fs-caption);padding:2px 8px;border-radius:6px;margin-left:auto}
 .card .cbtn:hover,.card .cbtn:focus-visible{background:var(--surface2);color:var(--ink)}
 .card.collapsed>:not(h3){display:none!important}
 .card.collapsed>h3{margin-bottom:0}
 /* 本頁目錄與回到頂端 */
 .toc{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:8px 0;border-bottom:1px solid var(--line);background:var(--bg)}
 .toc[hidden]{display:none}
-.toc .lbl{font-size:11px;color:var(--muted);align-self:center;white-space:nowrap;margin-right:2px}
-.toc button{all:unset;cursor:pointer;white-space:nowrap;font-size:12.5px;padding:5px 11px;border-radius:999px;background:var(--surface2);color:var(--ink);flex-shrink:0}
+.toc .lbl{font-size:var(--fs-caption);color:var(--muted);align-self:center;white-space:nowrap;margin-right:2px}
+.toc button{all:unset;cursor:pointer;white-space:nowrap;font-size:var(--fs-caption);padding:5px 11px;border-radius:999px;background:var(--surface2);color:var(--ink);flex-shrink:0}
 .toc button:hover,.toc button:focus-visible{background:var(--line)}
-#toTop{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:25;width:44px;height:44px;border-radius:50%;padding:0;font-size:18px;box-shadow:0 4px 14px rgba(0,0,0,.16)}
+#toTop{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:25;width:44px;height:44px;border-radius:50%;padding:0;font-size:var(--fs-icon);box-shadow:0 4px 14px rgba(0,0,0,.16)}
 #toTop[hidden]{display:none}
 /* 資料與規格子分頁 */
 .subtabs{display:flex;gap:6px;flex-wrap:wrap}
 .subtab{border-radius:999px;padding:6px 16px}
 .subtab[aria-selected="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
 .recrow input{min-width:160px}
-.rec-act{display:flex;gap:6px;flex-wrap:wrap}.rec-act button{min-height:30px;padding:3px 10px;font-size:12.5px}.rec-ok{color:var(--ok)}.rec-bad{color:var(--ng)}
+.rec-act{display:flex;gap:6px;flex-wrap:wrap}.rec-act button{min-height:30px;padding:3px 10px;font-size:var(--fs-caption)}.rec-ok{color:var(--ok)}.rec-bad{color:var(--ng)}
 /* 資料庫對話框：操作鈕、版次與狀態膠囊、座標登錄表單、對應證明（RFC-SPI-PROOF-20261028） */
-.btn-sm{font-size:12px;padding:3px 8px;min-height:32px}
+.btn-sm{font-size:var(--fs-caption);padding:3px 8px;min-height:32px}
 .rec-acts{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:4px;align-items:center}
 .rec-acts .sep{width:1px;align-self:stretch;min-height:24px;background:var(--line);margin:0 2px}
 .pill.rev{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
@@ -158,23 +160,23 @@ details[open].iss-card>summary{border-bottom:1px solid var(--line);border-radius
 tr.rec-new>td{background:var(--accent-soft)}
 .up-place-row{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:flex-end}
 .up-place-row .field{margin:0;min-width:0;max-width:100%}
-.up-place-row label,.up-place-lab{display:block;font-size:12px;color:var(--muted)}
+.up-place-row label,.up-place-lab{display:block;font-size:var(--fs-caption);color:var(--muted)}
 #upPlacePart{min-width:16ch;max-width:100%}#upPlaceRev{width:9ch}
 .proof-banner{border:1px solid var(--line);border-left-width:6px;border-radius:8px;padding:10px 12px;background:var(--surface2);color:var(--ink);overflow-wrap:anywhere}
 .proof-banner.ok{border-color:var(--ok);background:var(--ok-soft)}.proof-banner.warn{border-color:var(--warn);background:var(--warn-soft)}.proof-banner.ng{border-color:var(--ng);background:var(--ng-soft)}
 .proof-tbl{width:100%;border-collapse:collapse;table-layout:fixed}
-.proof-tbl th,.proof-tbl td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;overflow-wrap:anywhere;font-size:13px}
-.proof-tbl th{font-size:12px;color:var(--muted);font-weight:700}
+.proof-tbl th,.proof-tbl td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;overflow-wrap:anywhere;font-size:var(--fs-ui)}
+.proof-tbl th{font-size:var(--fs-caption);color:var(--muted);font-weight:700}
 .proof-list{max-height:240px;overflow:auto;overflow-wrap:anywhere;padding:6px 0;margin:0}
 .proof-refs li{padding:2px 0}
-@media (max-width:600px){.proof-tbl thead{display:none}.proof-tbl,.proof-tbl tbody,.proof-tbl tr,.proof-tbl td{display:block;width:100%}.proof-tbl tr{border-bottom:1px solid var(--line);padding:6px 0}.proof-tbl td{border:none;padding:2px 0}.proof-tbl td[data-label]::before{content:attr(data-label) "：";color:var(--muted);font-size:12px}}
+@media (max-width:600px){.proof-tbl thead{display:none}.proof-tbl,.proof-tbl tbody,.proof-tbl tr,.proof-tbl td{display:block;width:100%}.proof-tbl tr{border-bottom:1px solid var(--line);padding:6px 0}.proof-tbl td{border:none;padding:2px 0}.proof-tbl td[data-label]::before{content:attr(data-label) "：";color:var(--muted);font-size:var(--fs-caption)}}
 .seg-btn.active{font-weight:700;box-shadow:inset 0 0 0 1px var(--muted)}
 .vendor{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding:10px 12px;margin-bottom:10px;border-radius:8px;background:var(--surface2)}
 #zoneMap{max-height:420px;width:auto;max-width:100%;margin:0 auto;display:block}
 /* 長表格：預設 10 列，可展開；表頭固定 */
 tr.more-row{display:none}
 table.show-all tr.more-row{display:table-row}
-.tbl-more{margin-top:6px;font-size:12.5px}
+.tbl-more{margin-top:6px;font-size:var(--fs-caption)}
 .tbl.sticky-head{overflow:visible}
 .tbl.sticky-head thead th{position:sticky;top:var(--stickyH,0px);background:var(--surface);z-index:1}
 @media (pointer:coarse){.toc button{padding:9px 14px}.subtab{min-height:44px}.menu button,.menu a{padding:12px 14px}}
@@ -188,10 +190,10 @@ table.show-all tr.more-row{display:table-row}
   tr.more-row{display:table-row!important}
   details.iss-card>summary{border-bottom:1px solid #ccc}
   .linkbtn[data-jump]{display:inline!important;border:none!important;background:none!important;padding:0!important;color:inherit!important;text-decoration:none!important;min-height:0!important;min-width:0!important;font:inherit!important}
-  .printHead{display:block!important;margin-bottom:12px;font-size:12px;line-height:1.6;color:#333;border-bottom:1px solid #999;padding-bottom:6px}
+  .printHead{display:block!important;margin-bottom:12px;font-size:var(--fs-caption);line-height:1.6;color:#333;border-bottom:1px solid #999;padding-bottom:6px}
   #view3d canvas{display:none!important}
   #view3d .print3d{display:block!important;width:100%!important;max-width:100%!important;height:auto!important}
-  #view3d .print3d-err{display:block!important;color:#c00!important;font-size:12px!important}
+  #view3d .print3d-err{display:block!important;color:#c00!important;font-size:var(--fs-caption)!important}
   #p-report > .card:first-child{display:none!important}
   .report-preview-wrap{padding:0!important;background:transparent!important}
   .report-preview{max-width:100%!important;padding:0!important;box-shadow:none!important;border-radius:0!important}
@@ -199,39 +201,39 @@ table.show-all tr.more-row{display:table-row}
 .report-preview-wrap{display:flex;justify-content:center;background:var(--surface2);padding:20px 10px;border-radius:var(--r);overflow-x:auto}
 .report-preview{--surface:#FFFFFF;--surface2:#E8ECE6;--ink:#18201B;--muted:#58625B;--line:#D2D8D1;--logo-ink:#04273F;--ok:#2C7A4C;--ok-soft:#DDEFE3;--warn:#9B650E;--warn-soft:#F6E9CF;--ng:#B83A2C;--ng-soft:#F7DDD9;color-scheme:light;width:100%;max-width:820px;background:#ffffff;color:#1a1a1a;padding:36px 40px;box-shadow:0 4px 20px rgba(0,0,0,0.12);border-radius:4px;font-family:var(--f-body);line-height:1.6}
 @media (max-width:768px){.report-preview-wrap{padding:10px 0;background:transparent}.report-preview{padding:16px 12px;box-shadow:none;border-radius:0}}
-#busy{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--surface);padding:9px 16px;border-radius:999px;font-size:13.5px;box-shadow:0 4px 18px rgba(0,0,0,.18)}#busy[hidden]{display:none}
+#busy{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--surface);padding:9px 16px;border-radius:999px;font-size:var(--fs-ui);box-shadow:0 4px 18px rgba(0,0,0,.18)}#busy[hidden]{display:none}
 .spin{width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(1turn)}}
 @media (prefers-reduced-motion:reduce){.spin{animation-duration:2.4s}}
-.shareRow{display:flex;gap:8px;margin:10px 0;align-items:center}.shareRow input{flex:1;min-width:0;font-family:var(--f-mono);font-size:12.5px}
-.shareHint{font-size:12.5px;color:var(--muted);margin:8px 0 14px}
-.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:3px 10px;border-radius:999px;background:var(--surface2);color:var(--muted);white-space:nowrap}
+.shareRow{display:flex;gap:8px;margin:10px 0;align-items:center}.shareRow input{flex:1;min-width:0;font-family:var(--f-mono);font-size:var(--fs-caption)}
+.shareHint{font-size:var(--fs-caption);color:var(--muted);margin:8px 0 14px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-caption);padding:3px 10px;border-radius:999px;background:var(--surface2);color:var(--muted);white-space:nowrap}
 .chip b{color:var(--ink);font-weight:500}
 .sticky{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg)}
 .rail{padding-block:10px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px 16px;align-items:flex-end}
 .vsep{width:1px;height:34px;background:var(--line);align-self:flex-end}
-.how{margin:-4px 0 10px;font-size:12.5px;color:var(--muted)}
+.how{margin:-4px 0 10px;font-size:var(--fs-caption);color:var(--muted)}
 .how summary{cursor:pointer;width:max-content;color:var(--accent-ink)}
 .how p{margin:6px 0 0;max-width:72ch;line-height:1.65}
-.click-hint{font-size:11.5px;color:var(--muted)}
-.tabgrp{align-self:center;font-size:11px;letter-spacing:.08em;color:var(--muted);padding:0 4px 0 12px;white-space:nowrap;border-left:1px solid var(--line);margin-left:6px}
+.click-hint{font-size:var(--fs-caption);color:var(--muted)}
+.tabgrp{align-self:center;font-size:var(--fs-caption);letter-spacing:.08em;color:var(--muted);padding:0 4px 0 12px;white-space:nowrap;border-left:1px solid var(--line);margin-left:6px}
 .tabgrp:first-child{border-left:none;margin-left:0;padding-left:0}
-.ctxbar{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font-size:13px;padding:8px 12px;margin-top:8px;border-radius:8px;background:var(--accent-soft);color:var(--accent-ink)}
+.ctxbar{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font-size:var(--fs-ui);padding:8px 12px;margin-top:8px;border-radius:8px;background:var(--accent-soft);color:var(--accent-ink)}
 .ctxbar #ctxText{flex:1 1 260px;min-width:0}
 .pmap{display:grid;gap:8px}
 .pmap-row{display:grid;grid-template-columns:72px 1fr;gap:8px;align-items:center}
 .pmap-cells{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:2px;min-width:0}
-.pmap-cells button{min-height:30px;padding:0;border-radius:3px;border:1px solid transparent;background:var(--surface2);font-family:var(--f-mono);font-size:10px;color:var(--muted);overflow:hidden}
+.pmap-cells button{min-height:30px;padding:0;border-radius:3px;border:1px solid transparent;background:var(--surface2);font-family:var(--f-mono);font-size:var(--fs-chart);color:var(--muted);overflow:hidden}
 .pmap-cells button.ng{background:var(--ng);color:var(--on-strong)}.pmap-cells button.warn{background:var(--warn);color:var(--on-strong)}.pmap-cells button.info{background:var(--series2);color:var(--on-strong)}
 .pmap-cells button[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:1px}
-.pmap-lab{font-size:12px;color:var(--muted)}
-.sevhead{display:flex;align-items:baseline;gap:8px;margin:6px 0 -2px;font-size:15px}
+.pmap-lab{font-size:var(--fs-caption);color:var(--muted)}
+.sevhead{display:flex;align-items:baseline;gap:8px;margin:6px 0 -2px;font-size:var(--fs-heading)}
 .ev{display:block;width:100%;height:76px}
-.ev-cap{font-size:11.5px;color:var(--muted);margin-bottom:2px}
+.ev-cap{font-size:var(--fs-caption);color:var(--muted);margin-bottom:2px}
 .iss-body{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:12px 20px;align-items:start}
 @media (max-width:720px){.iss-body{grid-template-columns:1fr}.pmap-row{grid-template-columns:1fr}.pmap-cells button{min-height:26px;font-size:0}}
-#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--surface);padding:10px 16px;border-radius:10px;font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50;max-width:min(560px,calc(100% - 32px));display:inline-flex;align-items:center;gap:10px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--surface);padding:10px 16px;border-radius:10px;font-size:var(--fs-ui);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50;max-width:min(560px,calc(100% - 32px));display:inline-flex;align-items:center;gap:10px}
 #toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
-#toast .toast-close{all:unset;cursor:pointer;color:var(--surface);opacity:.85;font-size:14px;padding:4px 8px;min-width:28px;min-height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px}
+#toast .toast-close{all:unset;cursor:pointer;color:var(--surface);opacity:.85;font-size:var(--fs-body);padding:4px 8px;min-width:28px;min-height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px}
 #toast .toast-close:hover,#toast .toast-close:focus-visible{opacity:1;background:rgba(255,255,255,.15)}
 .iss-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
 .iss{display:grid;gap:6px}
@@ -242,28 +244,28 @@ table.show-all tr.more-row{display:table-row}
 .iss-head>*,.iss-detail>.note>*,.iss-foot>*{min-width:0}
 /* 規則名稱是判讀證據：窄螢幕換行顯示全文，不截斷；多行時改小圓角 */
 .iss-head .pill{white-space:normal;overflow-wrap:anywhere;border-radius:10px}
-.iss-head .no{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
-.iss-head .cat{font-size:12px;color:var(--muted);letter-spacing:.04em}
-.iss-card h3{font-size:16px;margin:0;line-height:1.45}
-.lbl{font-size:11px;color:var(--muted);letter-spacing:.08em;margin-right:6px}
-.iss-card ul{margin:0;padding-left:18px;font-size:13.5px}
+.iss-head .no{font-family:var(--f-mono);font-size:var(--fs-caption);color:var(--muted)}
+.iss-head .cat{font-size:var(--fs-caption);color:var(--muted);letter-spacing:.04em}
+.iss-card h3{font-size:var(--fs-heading);margin:0;line-height:1.45}
+.lbl{font-size:var(--fs-caption);color:var(--muted);letter-spacing:.08em;margin-right:6px}
+.iss-card ul{margin:0;padding-left:18px;font-size:var(--fs-ui)}
 .iss-card ul li{margin:2px 0}
-.iss-card .inf{margin:0;font-size:13.5px}
+.iss-card .inf{margin:0;font-size:var(--fs-ui)}
 .iss-foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px}
-.chipbtn{border-radius:999px;min-height:30px;padding:3px 12px;font-size:12.5px}
+.chipbtn{border-radius:999px;min-height:30px;padding:3px 12px;font-size:var(--fs-caption)}
 /* 首頁橫幅「最近記錄」：先預留一列晶片高度，非同步載入後不推動下方內容；過多時橫向捲動而不換行 */
 #bannerRecentRuns{min-height:34px}
 #bannerRecentRuns .banner-run-chip{flex:0 0 auto;white-space:nowrap}
 .chipbtn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink);font-weight:500}
-.linkbtn{background:none;border:none;padding:0;min-height:0;color:var(--accent-ink);text-decoration:underline;font-size:12.5px}
+.linkbtn{background:none;border:none;padding:0;min-height:0;color:var(--accent-ink);text-decoration:underline;font-size:var(--fs-caption)}
 .acts{display:grid;gap:8px;margin:0;padding:0;list-style:none}
 .acts li{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
 .acts .lv{width:8px;height:8px;border-radius:50%}
-.corr td{text-align:center;font-family:var(--f-mono);font-size:12px;border:1px solid var(--surface)}
+.corr td{text-align:center;font-family:var(--f-mono);font-size:var(--fs-caption);border:1px solid var(--surface)}
 .vec{width:100%;max-width:100%;display:block;border-radius:8px;background:var(--surface2)}
 @media (max-width:720px){.vsep{display:none}}
 .field{display:flex;flex-direction:column;gap:3px;min-width:0}
-.field label{font-size:11px;color:var(--muted);letter-spacing:.06em}
+.field label{font-size:var(--fs-caption);color:var(--muted);letter-spacing:.06em}
 select{max-width:100%}
 select,input[type=number],input[type=text],input[type=password],textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:6px 9px;min-height:34px;scroll-margin-top:calc(var(--navbar-h) + var(--safe-t) + 16px);scroll-margin-bottom:calc(var(--tabbar-h) + var(--safe-b) + 16px)}
 #p-report label, #p-mail label{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:4px 6px;cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -275,7 +277,7 @@ button.primary{background:var(--accent);border-color:var(--accent);color:var(--o
 button:disabled{opacity:.5;cursor:default}
 .tabs-bar{display:flex;align-items:center;gap:4px;margin-top:4px;border-bottom:1px solid var(--line)}
 .tabs{display:flex;flex:1 1 auto;min-width:0;gap:2px;overflow-x:auto;scrollbar-width:none}
-.tab-scroll{flex:0 0 auto;min-width:44px;min-height:44px;padding:0 10px;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.tab-scroll{flex:0 0 auto;min-width:44px;min-height:44px;padding:0 10px;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:var(--fs-input);line-height:1;display:inline-flex;align-items:center;justify-content:center}
 .tab{background:none;border:none;border-bottom:2px solid transparent;border-radius:0;padding:8px 14px;color:var(--muted);white-space:nowrap;min-height:40px;flex-shrink:0}
 .tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:500}
 /* 頁籤列可左右滑動時，在有更多頁籤的一側淡出提示 */
@@ -285,8 +287,8 @@ button:disabled{opacity:.5;cursor:default}
 /* 平板與手機（觸控）：放大可點範圍到約 44px，輸入欄位 16px 防止 iOS Safari 自動放大，畫布拖曳不觸發頁面捲動 */
 @media (pointer:coarse){
   button,select,input[type=number],input[type=text],input[type=date],textarea{min-height:44px;min-width:44px}
-  select,input[type=number],input[type=text],input[type=date],textarea{font-size:16px!important}
-  input[type=password]{min-height:44px;min-width:44px;font-size:16px!important}
+  select,input[type=number],input[type=text],input[type=date],textarea{font-size:var(--fs-input)!important}
+  input[type=password]{min-height:44px;min-width:44px;font-size:var(--fs-input)!important}
   .tab{min-height:46px;min-width:44px;padding:10px 16px}
   #btnMore,.chip.chipBtn,a.chip,.chipbtn{min-height:44px;min-width:44px;padding:6px 14px;display:inline-flex;align-items:center;justify-content:center}
   #bannerRecentRuns{min-height:44px}
@@ -307,24 +309,24 @@ button:disabled{opacity:.5;cursor:default}
 .panel{padding-top:18px;display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:16px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
-.card h3{font-size:15px;display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.card h3 small{font-weight:400;font-size:12px;color:var(--muted)}
+.card h3{font-size:var(--fs-heading);display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.card h3 small{font-weight:400;font-size:var(--fs-caption);color:var(--muted)}
 .chartbox{position:relative;height:280px}
 .chartbox.tall{height:340px}.chartbox.short{height:200px}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:2px}
-.kpi .k{font-size:11px;color:var(--muted);letter-spacing:.06em}
-.kpi .v{font-family:var(--f-display);font-size:30px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
-.kpi .s{font-size:11.5px;color:var(--muted)}
+.kpi .k{font-size:var(--fs-caption);color:var(--muted);letter-spacing:.06em}
+.kpi .v{font-family:var(--f-display);font-size:var(--fs-kpi);font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:var(--fs-caption);color:var(--muted)}
 .kpi.ok .v{color:var(--ok)}.kpi.warn .v{color:var(--warn)}.kpi.ng .v{color:var(--ng)}
-.pill{display:inline-block;font-size:11.5px;font-weight:500;padding:1px 9px;border-radius:999px;white-space:nowrap}
+.pill{display:inline-block;font-size:var(--fs-caption);font-weight:500;padding:1px 9px;border-radius:999px;white-space:nowrap}
 .pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.warn{background:var(--warn-soft);color:var(--warn)}.pill.ng{background:var(--ng-soft);color:var(--ng)}.pill.na{background:var(--surface2);color:var(--muted)}
 .verdict{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;padding:16px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface)}
 .verdict .mark{width:10px;align-self:stretch;border-radius:3px}
 .verdict.ok .mark{background:var(--ok)}.verdict.warn .mark{background:var(--warn)}.verdict.ng .mark{background:var(--ng)}
-.verdict h2{font-size:18px}
+.verdict h2{font-size:var(--fs-title)}
 .verdict p{margin:4px 0 0;color:var(--muted);max-width:75ch}
-.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted);margin-bottom:6px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:var(--fs-caption);color:var(--muted);margin-bottom:6px}
 .legend i{display:inline-block;width:14px;height:0;border-top:2px solid;vertical-align:middle;margin-right:5px}
 .legend i.dash{border-top-style:dashed}
 .legend i.sq{height:10px;width:10px;border:none;border-radius:2px}
@@ -332,17 +334,17 @@ button:disabled{opacity:.5;cursor:default}
 .tbl td:first-child,.tbl th:first-child{position:sticky;left:0;background:var(--surface);z-index:2;box-shadow:var(--tbl-sticky-shadow);border-right:1px solid var(--c-hairline)}
 .tbl.sticky-head thead th:first-child{z-index:4}
 .tbl.has-overflow{box-shadow:inset -16px 0 12px -12px rgba(24,32,27,.14)}
-.tbl-scroll-hint{font-size:12px;color:var(--muted);text-align:right;margin:4px 0 0}
-table{border-collapse:collapse;width:100%;font-size:13px}
+.tbl-scroll-hint{font-size:var(--fs-caption);color:var(--muted);text-align:right;margin:4px 0 0}
+table{border-collapse:collapse;width:100%;font-size:var(--fs-ui)}
 th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
-th{font-size:11.5px;color:var(--muted);font-weight:500;letter-spacing:.04em;white-space:nowrap}
+th{font-size:var(--fs-caption);color:var(--muted);font-weight:500;letter-spacing:.04em;white-space:nowrap}
 td.num,th.num{text-align:right}
 .xv td:first-child{white-space:nowrap;font-weight:500}
-.note{font-size:12px;color:var(--muted)}
-.fact{font-size:11px;color:var(--muted);letter-spacing:.06em}
+.note{font-size:var(--fs-caption);color:var(--muted)}
+.fact{font-size:var(--fs-caption);color:var(--muted);letter-spacing:.06em}
 .view3d{position:relative;height:min(52vh,440px,calc(100dvh - var(--stickyH,140px) - 160px));min-height:min(240px,calc(100dvh - var(--stickyH,140px) - 160px));border-radius:var(--r);overflow:hidden;background:var(--surface2);touch-action:none;cursor:grab}
 .view3d canvas{display:block}
-.hud{position:absolute;left:10px;bottom:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12px;max-width:min(320px,calc(100% - 20px));pointer-events:auto}
+.hud{position:absolute;left:10px;bottom:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:var(--fs-caption);max-width:min(320px,calc(100% - 20px));pointer-events:auto}
 .hud b{font-family:var(--f-mono)}
 .toolbar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:flex-end}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
@@ -352,20 +354,20 @@ td.num,th.num{text-align:right}
 /* 觸控：放在基準高度之後，否則同權重的基準規則會蓋掉 44px */
 @media (pointer:coarse){.seg button,#startupDbBanner button,#recPickerQ,#recPickerReload{min-height:44px;min-width:44px}}
 .seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-ink);font-weight:500}
-.ai-out{font-size:14px;line-height:1.75;max-width:80ch}
-.ai-out h4{font-size:15px;margin:16px 0 4px}
+.ai-out{font-size:var(--fs-body);line-height:1.75;max-width:80ch}
+.ai-out h4{font-size:var(--fs-heading);margin:16px 0 4px}
 .ai-out ul{margin:4px 0;padding-left:20px}
 .ai-out p{margin:6px 0}
 .rules li{margin:2px 0}
 .heat{width:100%;max-width:100%;display:block;border-radius:8px;background:var(--surface2)}
 .drop{border:1.5px dashed var(--line);border-radius:var(--r);padding:18px;text-align:center;color:var(--muted)}
 .drop.over{border-color:var(--accent);background:var(--accent-soft)}
-textarea{width:100%;min-height:140px;font-family:var(--f-mono);font-size:12px}
+textarea{width:100%;min-height:140px;font-family:var(--f-mono);font-size:var(--fs-caption)}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.err{color:var(--ng);font-size:13px}
+.err{color:var(--ng);font-size:var(--fs-ui)}
 input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-@media (max-width:520px){.brand h1{font-size:28px}.chartbox{height:240px}}
+@media (max-width:520px){.brand h1{font-size:var(--fs-brand-narrow)}.chartbox{height:240px}}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
   .spin{animation:none!important}
@@ -383,7 +385,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 
 @media (max-width:600px), (pointer:coarse) and (max-height:500px){
   html,body{-webkit-text-size-adjust:100%}
-  body{font-size:16px!important;line-height:1.5;padding-bottom:calc(var(--tabbar-h) + var(--safe-b) + 24px)!important}
+  body{font-size:var(--fs-body-mobile)!important;line-height:1.5;padding-bottom:calc(var(--tabbar-h) + var(--safe-b) + 24px)!important}
   .tabs-bar,nav.tabs{display:none!important}
   #moreWrap{display:none!important}
   .brand .tag{display:none!important}
@@ -408,7 +410,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   .brand{justify-content:center;width:100%;gap:8px;flex-wrap:nowrap}
   .brand .mitcorp-logo{height:16px}
   .brand .brand-sep{height:14px}
-  .brand h1{font-size:17px!important;font-weight:600!important;line-height:44px;margin:0;text-align:center}
+  .brand h1{font-size:var(--fs-nav-title)!important;font-weight:600!important;line-height:44px;margin:0;text-align:center}
 
   .sticky{position:sticky!important;top:calc(var(--navbar-h) + var(--safe-t))!important;z-index:15;background:var(--bg)}
   .rail{padding:4px 0;border-bottom:0.5px solid var(--line);display:block}
@@ -423,7 +425,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     border-radius:var(--r);
     background:var(--surface);
     border:1px solid var(--line);
-    font-size:15px;
+    font-size:var(--fs-rail);
     font-weight:500;
     color:var(--ink);
     box-shadow:0 1px 3px rgba(0,0,0,0.06);
@@ -434,7 +436,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   .rail-sheet-modal .sheet-backdrop{display:none!important}
   .rail-sheet-modal .sheet-handle,.rail-sheet-modal .sheet-head{display:flex}
   .rail-fields{display:flex;flex-direction:column;gap:14px}
-  .rail-fields select{width:100%;min-height:44px;font-size:16px!important}
+  .rail-fields select{width:100%;min-height:44px;font-size:var(--fs-input)!important}
   .rail-fields .specbtn{width:100%;min-height:44px;justify-content:center;border:1px solid var(--line);border-radius:var(--r);background:var(--surface2)}
 
   .mtab{
@@ -469,7 +471,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     -webkit-tap-highlight-color:transparent;
   }
   .mtab-btn svg{display:block;width:22px;height:22px}
-  .mtab-btn span{font-size:11px!important;font-weight:600;line-height:1}
+  .mtab-btn span{font-size:var(--fs-tab-label)!important;font-weight:600;line-height:1}
   .mtab-btn[aria-selected="true"],.mtab-btn.active{color:var(--accent)}
 
   .sheet-modal:not(.open){display:none!important}
@@ -489,9 +491,9 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   }
   .sheet-handle{width:36px;height:5px;border-radius:999px;background:var(--line);margin:0 auto 4px;align-self:center}
   .sheet-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:8px;border-bottom:0.5px solid var(--c-hairline)}
-  .sheet-head h3{font-size:17px;font-weight:600;margin:0}
-  .sheet-close{all:unset;cursor:pointer;font-size:18px;min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted)}
-  .sheet-sec-title{font-size:13px!important;font-weight:600;color:var(--muted);letter-spacing:0.04em;padding:10px 4px 4px}
+  .sheet-head h3{font-size:var(--fs-nav-title);font-weight:600;margin:0}
+  .sheet-close{all:unset;cursor:pointer;font-size:var(--fs-icon);min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted)}
+  .sheet-sec-title{font-size:var(--fs-ui)!important;font-weight:600;color:var(--muted);letter-spacing:0.04em;padding:10px 4px 4px}
   .sheet-list{display:flex;flex-direction:column;background:var(--surface2);border-radius:var(--r-card);overflow:hidden}
   .sheet-row{
     all:unset;
@@ -501,7 +503,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     justify-content:space-between;
     min-height:52px;
     padding:0 16px;
-    font-size:16px;
+    font-size:var(--fs-body-mobile);
     font-weight:500;
     color:var(--ink);
     border-bottom:0.5px solid var(--c-hairline);
@@ -509,16 +511,16 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   }
   .sheet-row:last-child{border-bottom:none}
   .sheet-row:active,.sheet-row:hover{background:var(--line)}
-  .sheet-arrow{color:var(--muted);font-size:18px}
-  .sheet-ver-info{text-align:center;font-size:12px!important;color:var(--muted);padding:16px 0 8px}
+  .sheet-arrow{color:var(--muted);font-size:var(--fs-icon)}
+  .sheet-ver-info{text-align:center;font-size:var(--fs-caption)!important;color:var(--muted);padding:16px 0 8px}
   .sheet-ver-info p{margin:2px 0}
 
-  .field label{font-size:13px!important}
-  .lbl,.tabgrp,.ver,.click-hint,.ev-cap,.how,.kpi .k,.kpi .s,.pill,th,.fact,.pmap-lab,.note,small,#aiPayloadPre{font-size:12px!important}
+  .field label{font-size:var(--fs-label-mobile)!important}
+  .lbl,.tabgrp,.ver,.click-hint,.ev-cap,.how,.kpi .k,.kpi .s,.pill,th,.fact,.pmap-lab,.note,small,#aiPayloadPre{font-size:var(--fs-caption)!important}
 
   button,select,input,textarea,summary,[role="button"]{min-height:44px}
-  select,input[type=number],input[type=text],input[type=date],textarea{font-size:16px!important}
-  input[type=password]{min-height:44px;min-width:44px;font-size:16px!important}
+  select,input[type=number],input[type=text],input[type=date],textarea{font-size:var(--fs-input)!important}
+  input[type=password]{min-height:44px;min-width:44px;font-size:var(--fs-input)!important}
   .card .cbtn,.toc button,.how summary{min-height:44px!important;display:inline-flex!important;align-items:center!important;padding:0 12px!important}
   .chipbtn,.chip.chipBtn,a.chip,.seg button,.linkbtn,.rec-act button{min-height:44px!important;min-width:44px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important}
 
@@ -544,7 +546,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     align-items:center;
     justify-content:center;
     padding:0 16px;
-    font-size:14px;
+    font-size:var(--fs-body);
     border-radius:999px;
   }
 
@@ -566,7 +568,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   .view3d.touch-3d{touch-action:none}
   #p-issues{padding-top:8px;gap:8px}
   #p-issues>.iss-top{order:1;gap:6px}
-  #p-issues>.iss-top h2{font-size:16px!important}
+  #p-issues>.iss-top h2{font-size:var(--fs-issue-title-mobile)!important}
   #p-issues>.iss-top #issSub,#p-issues>.iss-top #fmLine{display:none}
   #p-issues>#issFilter{order:2;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:4px}
   #p-issues>#issFilter>*{flex-shrink:0}
@@ -584,7 +586,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 
 @media (max-width:720px){
   .pmap-cells{display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
-  .pmap-cells button{min-width:28px!important;min-height:44px!important;height:44px!important;flex:0 0 auto;font-size:12px!important}
+  .pmap-cells button{min-width:28px!important;min-height:44px!important;height:44px!important;flex:0 0 auto;font-size:var(--fs-caption)!important}
   .pmap-cells.pmap-boards{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:4px;overflow-x:visible}
   .pmap-boards button{min-width:44px!important}
 }
@@ -654,12 +656,12 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   gap: 8px;
 }
 .rec-card-title {
-  font-size: 15px;
+  font-size:var(--fs-heading);
   font-weight: 600;
   color: var(--ink);
 }
 .rec-card-sub {
-  font-size: 12px;
+  font-size:var(--fs-caption);
   color: var(--muted);
   margin-top: 2px;
 }
@@ -671,12 +673,12 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 .startup-db-banner__main{display:flex;align-items:center;gap:10px;flex:1 1 300px;min-width:0}
 .startup-db-banner__body{min-width:0}
 .startup-db-banner__title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.startup-db-banner__title{color:var(--accent-ink);font-size:14px}
-.startup-db-banner__pill{font-size:11px;background:var(--surface)}
-.startup-db-banner__cloud{color:var(--ink);font-size:12px}
+.startup-db-banner__title{color:var(--accent-ink);font-size:var(--fs-body)}
+.startup-db-banner__pill{font-size:var(--fs-caption);background:var(--surface)}
+.startup-db-banner__cloud{color:var(--ink);font-size:var(--fs-caption)}
 .startup-db-banner__actions{gap:8px;margin:0;align-items:center}
-.startup-db-banner__btn{padding:6px 12px;font-size:13px}
-.startup-db-banner__dismiss{padding:6px 10px;font-size:12.5px;background:transparent;border:none;cursor:pointer;color:var(--muted)}
+.startup-db-banner__btn{padding:6px 12px;font-size:var(--fs-ui)}
+.startup-db-banner__dismiss{padding:6px 10px;font-size:var(--fs-caption);background:transparent;border:none;cursor:pointer;color:var(--muted)}
 .db-modal-panel--xs{max-width:420px;margin:auto}
 .db-modal-panel--sm{max-width:440px;margin:auto}
 .db-modal-panel--rec{max-width:480px;margin:auto}
@@ -685,17 +687,17 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 .sheet-head--db-rec{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:var(--surface)}
 .sheet-foot--db{padding:10px 16px;border-top:1px solid var(--line);display:flex;gap:8px}
 .sheet-foot--db-end{justify-content:flex-end}
-.modal-h3{margin:0;font-size:15px}
-.modal-h3--lead{margin:0 0 8px;font-size:15px}
+.modal-h3{margin:0;font-size:var(--fs-heading)}
+.modal-h3--lead{margin:0 0 8px;font-size:var(--fs-heading)}
 .modal-body-pad{padding:16px}
 .modal-body-scroll{padding:16px;overflow:auto}
 .modal-body-stack{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
-.modal-note-accent{font-size:12px;color:var(--accent-ink)}
+.modal-note-accent{font-size:var(--fs-caption);color:var(--accent-ink)}
 .modal-proof-body{padding:14px 16px;overflow:auto;display:flex;flex-direction:column;gap:12px;min-height:0}
 .modal-title-wrap{min-width:0;overflow-wrap:anywhere}
 .lib-warn{margin:0 0 8px}
 .rec-card-body {
-  font-size: 12.5px;
+  font-size:var(--fs-caption);
   line-height: 1.5;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -717,10 +719,10 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 }
 .rec-card-actions .primary {
   flex: 1 1 auto;
-  font-size: 13.5px;
+  font-size:var(--fs-ui);
   font-weight: 600;
 }
-.load-state{display:inline-flex;align-items:center;gap:6px;min-height:36px;max-width:min(36vw,260px);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.load-state{display:inline-flex;align-items:center;gap:6px;min-height:36px;max-width:min(36vw,260px);font-size:var(--fs-caption);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .load-state .light{width:10px;height:10px;border-radius:50%;background:var(--muted);flex:none}
 .load-state[data-state="ok"] .light{background:var(--ok)}
 .load-state[data-state="error"] .light{background:var(--ng)}
@@ -742,7 +744,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.10.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.10.1</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -862,14 +864,13 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   </div>
   <div class="iss-top">
     <div>
-      <h2 id="issHead" style="font-size:20px">掃描中…</h2>
+      <h2 id="issHead" style="font-size:var(--fs-title)">掃描中…</h2>
       <p class="note" id="issSub" style="margin:4px 0 0;max-width:80ch"></p>
       <p id="fmLine" style="margin:6px 0 0;max-width:80ch"></p>
     </div>
     <div class="row"><button id="btnIssMd">匯出問題清單 .md</button><button id="btnIssCsv">.csv</button><button id="btnIssXlsx">.xlsx</button></div>
   </div>
-  <details class="how"><summary>偵測邏輯</summary><p>系統自動掃描全部量測項目（體積、高度佔鋼板厚%、面積、X/Y 偏移），不受上方「量測項目」選擇影響，依十個面向找問題：單板突發（整板／局部元件群組）、拼板子板位置效應、系統性能力不足、焊墊位置長期偏離、持續漂移（CUSUM 回推起點）、空間梯度、刮刀前後差、擦拭週期、對位（平移／旋轉／伸縮）、設計 DFM（面積比、寬厚比、轉移效率），以及量測一致性。統計量採中位數與 MAD 等穩健方法，避免單一異常板拉偏基準。單板突發的偏移若該板（或該區）沒有超出規格的焊墊，最多判為「警示」：偏離其他板但仍在規格內，需要追蹤而非立即處置。多個發現指向同一板、同一元件群組或同一焊墊時，互相列為佐證，佐證越多信心越高。再依形狀、時間、空間、設計、對位、量測六個獨立面向做失效模式交叉比對（交叉驗證頁），至少兩個面向支持且無矛盾才判為「可能」原因。「事實」為資料計算結果；「推論」為可能原因，需現場驗證。</p></details>
-  <div class="card"><h3>問題地圖 <small id="pmapSub">每格一片板，顏色為該板最嚴重的問題；點格子只看該板相關問題</small></h3><div class="pmap" id="pmap"></div>
+    <div class="card"><h3>問題地圖 <small id="pmapSub"></small></h3><div class="pmap" id="pmap"></div>
     <div class="legend" style="margin:8px 0 0"><span><i class="sq" style="background:var(--ng)"></i>✕ 嚴重</span><span><i class="sq" style="background:var(--warn)"></i>! 警示</span><span><i class="sq" style="background:var(--series2)"></i>ℹ 資訊</span><span><i class="sq" style="background:var(--surface2);outline:1px solid var(--line)"></i>無問題</span></div></div>
   <div class="row" id="issFilter" role="group" aria-label="篩選問題"></div>
   <div class="iss" id="issList"></div>
@@ -878,14 +879,14 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 <section class="panel" id="p-overview" role="tabpanel" hidden>
   <div class="verdict" id="verdict"><div class="mark"></div><div><h2 id="vTitle">計算中…</h2><p id="vText"></p></div></div>
   <div class="kpis" id="kpis"></div>
-  <div class="card"><h3>優先處理的問題 <small>取自「問題偵測」前 4 項，點按鈕直接前往證據圖表</small></h3><ul class="acts" id="acts"></ul></div>
+  <div class="card"><h3>優先處理的問題 </h3><ul class="acts" id="acts"></ul></div>
   <div class="grid2">
-    <div class="card"><h3>管制圖摘要 <small id="ovChartSub"></small></h3><p class="click-hint">點選資料點可開啟該板 3D 模擬</p><div class="chartbox"><canvas id="cOvCtrl" role="img" aria-label="管制圖摘要"></canvas></div></div>
+    <div class="card"><h3>管制圖摘要 <small id="ovChartSub"></small></h3><div class="chartbox"><canvas id="cOvCtrl" role="img" aria-label="管制圖摘要"></canvas></div></div>
     <div class="card">
-      <h3>不良柏拉圖 <small>全部量測項目依規格判定</small></h3>
+      <h3>不良柏拉圖 </h3>
       <div class="chartbox" id="ovParetoBox"><canvas id="cOvPareto" role="img" aria-label="不良類型柏拉圖"></canvas></div>
       <p class="note" id="ovParetoEmpty" hidden style="margin:12px 0 0">沒有判定不良的焊墊</p>
-      <p class="note" id="ovParetoNote" style="margin:8px 0 0">一個焊墊可有多種不良，處數 ≥ 不良焊墊數</p>
+      <p class="note" id="ovParetoNote" style="margin:8px 0 0">一個焊墊可有多種不良，處數 ≥ 不良焊墊數。</p>
     </div>
   </div>
 </section>
@@ -893,8 +894,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 <section class="panel" id="p-control" role="tabpanel" hidden>
   <div class="card">
     <h3><span id="ctrlTitle">X̄ 圖</span><small id="ctrlSub"></small></h3>
-    <details class="how"><summary>怎麼看</summary><p id="ctrlHow"></p></details>
-    <div class="legend" id="ctrlLegend"></div><p class="click-hint">點選資料點可開啟該板 3D 模擬</p>
+        <div class="legend" id="ctrlLegend"></div>
     <div class="chartbox tall"><canvas id="cCtrl1" role="img" aria-label="主管制圖"></canvas></div>
   </div>
   <div class="card" id="ctrl2Card">
@@ -902,7 +902,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <div class="chartbox short"><canvas id="cCtrl2" role="img" aria-label="離散管制圖"></canvas></div>
   </div>
   <div class="card">
-    <h3>Nelson 判異規則 <small>以標準化 z 值判定，紅點為觸發點</small></h3>
+    <h3>Nelson 判異規則 </h3>
     <div class="tbl"><table id="nelsonTbl"></table></div>
   </div>
 </section>
@@ -922,17 +922,15 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   </div>
   <div class="card" id="capNonNormalCard" hidden style="margin-bottom:12px"></div>
   <div class="kpis" id="capKpis"></div>
-  <div class="card" id="capGrp" hidden><h3>逐元件群組製程能力 <small>不同元件設計的平均差不是製程變異，混在一起算會低估能力；依 Cpk 由低到高排列</small></h3><div class="tbl"><table id="capGrpTbl"></table></div></div>
+  <div class="card" id="capGrp" hidden><h3>逐元件群組製程能力 </h3><div class="tbl"><table id="capGrpTbl"></table></div></div>
   <div class="grid2">
     <div class="card"><h3>直方圖與常態曲線 <small id="histSub"></small></h3>
-      <details class="how"><summary>怎麼看</summary><p>柱狀為實測分布，曲線為同平均與標準差的常態分布。雙峰或明顯偏斜通常代表混入不同元件群組或不同鋼板厚度區，先用上方「元件群組」分開看，能力指標才有意義。</p></details>
-      <div class="legend"><span><i class="sq" style="background:var(--series2)"></i>實測分布</span><span><i style="border-color:var(--accent)"></i>常態擬合</span><span><i class="dash" style="border-color:var(--ng)"></i>LSL / USL</span></div>
+            <div class="legend"><span><i class="sq" style="background:var(--series2)"></i>實測分布</span><span><i style="border-color:var(--accent)"></i>常態擬合</span><span><i class="dash" style="border-color:var(--ng)"></i>LSL / USL</span></div>
       <div class="chartbox tall"><canvas id="cHist" role="img" aria-label="直方圖"></canvas></div></div>
     <div class="card"><h3>常態機率圖 Q-Q <small id="qqSub"></small></h3>
-      <details class="how"><summary>怎麼看</summary><p>點越貼近直線越符合常態。兩端上翹或下彎代表尾部比常態厚，預估 PPM 會低估實際不良；此時以「超規 PPM」為準。</p></details>
-      <div class="chartbox tall"><canvas id="cQQ" role="img" aria-label="常態機率圖"></canvas></div></div>
+            <div class="chartbox tall"><canvas id="cQQ" role="img" aria-label="常態機率圖"></canvas></div></div>
   </div>
-  <div class="card"><h3>各板盒鬚圖 <small>箱體為 Q1–Q3，橫線為中位數，鬚為最小–最大</small></h3>
+  <div class="card"><h3>各板盒鬚圖 </h3>
     <div class="chartbox"><canvas id="cBox" role="img" aria-label="各板盒鬚圖"></canvas></div></div>
 </section>
 
@@ -947,8 +945,8 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
       <div class="field"><label>著色</label><div class="seg" id="segColor">
         <button data-v="status" aria-pressed="true">判定</button><button data-v="height">高度偏差</button><button data-v="volume">體積偏差</button></div></div>
       <div class="field"><label for="inExag">高度放大 <span id="exagOut" class="num">20×</span></label><input type="range" id="inExag" min="5" max="60" step="1" value="20"></div>
-      <label class="row" style="font-size:13px"><input type="checkbox" id="chkGhost" checked> 顯示鋼板開孔標稱外框</label>
-      <label class="row" style="font-size:13px"><input type="checkbox" id="chkBridgeWarn" checked> 標示橋接警戒圈</label>
+      <label class="row" style="font-size:var(--fs-ui)"><input type="checkbox" id="chkGhost" checked> 顯示鋼板開孔標稱外框</label>
+      <label class="row" style="font-size:var(--fs-ui)"><input type="checkbox" id="chkBridgeWarn" checked> 標示橋接警戒圈</label>
     </div>
     <div class="legend" id="leg3d" style="margin-top:10px"></div>
     <div class="view3d" id="view3d" aria-label="錫膏沉積 3D 模擬，拖曳旋轉、滾輪縮放、點選焊墊看數據">
@@ -968,45 +966,41 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
       <div style="position:relative;background:#0d1117;border-radius:6px;padding:8px">
         <canvas id="cProfile" width="460" height="190" role="img" aria-label="焊墊 2D 剖面切片曲線圖" style="display:block;width:100%;height:auto"></canvas>
       </div>
-      <div id="csLegend" style="font-size:12px;margin-top:6px;display:flex;gap:12px;flex-wrap:wrap;color:var(--muted)"></div>
+      <div id="csLegend" style="font-size:var(--fs-caption);margin-top:6px;display:flex;gap:12px;flex-wrap:wrap;color:var(--muted)"></div>
     </div>
     <div class="card"><h3>本板不良焊墊 <small id="boardDefSub"></small></h3><div class="tbl" style="max-height:280px;overflow:auto"><table id="boardDefTbl"></table></div></div>
   </div>
-  <div class="card"><h3>本板 vs 全體 <small>各元件群組平均</small></h3><div class="chartbox"><canvas id="cBoardCmp" role="img" aria-label="本板與全體比較"></canvas></div></div>
+  <div class="card"><h3>本板 vs 全體 </h3><div class="chartbox"><canvas id="cBoardCmp" role="img" aria-label="本板與全體比較"></canvas></div></div>
 </section>
 
 <section class="panel" id="p-cross" role="tabpanel" hidden>
-  <div class="card" id="fmCard"><h3>失效模式交叉比對 <small>錫膏印刷的失效通常是多因素的：每個候選原因需至少兩個獨立面向（形狀、時間、空間、設計、對位、量測）支持且無矛盾，才判為「可能」</small></h3>
+  <div class="card" id="fmCard"><h3>失效模式交叉比對 </h3>
     <div id="fmTbl"></div><p class="note" id="fmRest" style="margin:6px 0 0"></p></div>
-  <div class="card"><h3>交叉驗證矩陣 <small>不同圖表與統計檢定是否指向同一結論</small></h3>
-    <details class="how"><summary>怎麼看</summary><p>單一圖表容易誤判。當兩個以上獨立來源（例如 Ppk÷Cpk 與管制圖、X̄ 圖與 P′ 圖）指向同一結論，信心較高；彼此矛盾時，先檢查資料分層與量測系統，再下結論。</p></details>
-    <div class="tbl"><table class="xv" id="xvTbl"></table></div></div>
+  <div class="card"><h3>交叉驗證矩陣 </h3>
+        <div class="tbl"><table class="xv" id="xvTbl"></table></div></div>
   <div class="grid2">
     <div class="card"><h3>高度 × 面積 散佈 <small id="scSub"></small></h3>
       <div class="chartbox tall"><canvas id="cScatter" role="img" aria-label="高度與面積散佈圖"></canvas></div></div>
     <div class="card"><h3>焊墊位置熱圖 <small id="heatSub"></small></h3>
-      <p class="click-hint">點選焊墊可看該焊墊的 I-MR 管制圖</p>
       <canvas class="heat" id="heat" width="900" height="600" role="img" aria-label="依焊墊位置的平均值熱圖"></canvas>
       <div class="legend" id="heatLeg" style="margin-top:8px"></div></div>
   </div>
   <div class="grid2">
-    <div class="card"><h3>元件群組比較 <small>平均 ± 1σ</small></h3><div class="chartbox"><canvas id="cGroups" role="img" aria-label="元件群組比較"></canvas></div></div>
-    <div class="card"><h3>X̄ 越界板 vs P' 圖越界板 <small>兩張管制圖是否抓到同一批板</small></h3><div id="overlap"></div></div>
+    <div class="card"><h3>元件群組比較 </h3><div class="chartbox"><canvas id="cGroups" role="img" aria-label="元件群組比較"></canvas></div></div>
+    <div class="card"><h3>X̄ 越界板 vs P' 圖越界板 </h3><div id="overlap"></div></div>
   </div>
 </section>
 
 <section class="panel" id="p-adv" role="tabpanel" hidden>
   <div class="card">
     <h3>面積比 × 轉移效率 <small id="arSub"></small></h3>
-    <details class="how"><summary>怎麼看</summary><p>面積比 AR = 開孔面積 ÷ 孔壁面積（矩形 L·W ÷ 2(L+W)·T，圓形 D ÷ 4T），T 為該焊墊所在區域的鋼板厚度。IPC-7525 建議 AR ≥ 0.66，低於此值錫膏不易脫模，轉移效率（以 SPI 體積% 代表）會下降且變異增大。此處假設開孔尺寸等於焊墊尺寸（1:1）。</p></details>
-    <div class="legend" id="arLeg"></div>
+        <div class="legend" id="arLeg"></div>
     <div class="chartbox tall"><canvas id="cAR" role="img" aria-label="面積比與轉移效率散佈圖"></canvas></div>
     <div class="tbl" style="margin-top:10px"><table id="arTbl"></table></div>
   </div>
   <div class="card">
-    <h3>多變量 Hotelling T² 管制圖 <small id="t2Sub">體積、面積、高度多變量分析</small></h3>
-    <details class="how"><summary>怎麼看</summary><p>以每片板的平均向量進行多變量品質管制。傳統單變量管制圖分別看面積、高度、體積，容易漏掉變數間關聯異常或造成整體型 I 誤報膨脹。Hotelling T² 綜合多個變數，若點超出 UCL 代表該片板的多變量均值顯著異常。Phase I 界限採 Beta 分布精確計算；若凍結基準後匯入新板（Phase II），則使用 F 分布界限。注意：若板數不足（需 ≥ max(p+2, 11)）或變數高度共線（條件數 > 1e12），系統將拒絕計算並說明原因。</p></details>
-    <div class="toolbar" style="flex-wrap:wrap;gap:8px;align-items:center">
+    <h3>多變量 Hotelling T² 管制圖 <small id="t2Sub"></small></h3>
+        <div class="toolbar" style="flex-wrap:wrap;gap:8px;align-items:center">
       <div class="field"><label for="selT2Dims">分析維度組合</label><select id="selT2Dims"><option value="area,height" selected>面積 + 高度（預設推薦）</option><option value="volume,height">體積 + 高度</option><option value="volume,area,height">體積 + 面積 + 高度</option></select></div>
       <button type="button" id="btnT2Freeze" class="btn" style="align-self:flex-end">以目前資料為基準（凍結 Phase I 基準）</button>
       <span id="t2FreezeStatus" class="note" style="align-self:center"></span>
@@ -1016,47 +1010,38 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   </div>
   <div class="grid2">
     <div class="card"><h3>焊墊 Cpk 排行 <small id="pcSub"></small></h3>
-      <details class="how"><summary>怎麼看</summary><p>每個焊墊位置跨板計算 Cpk，列出最差 15 個。整體 Cpk 合格不代表每個位置都合格；集中在同一元件或同一區域，通常指向該處開孔設計或鋼板局部問題。</p></details>
-      <p class="click-hint">點選長條可看該焊墊的 I-MR 管制圖</p>
       <div class="chartbox tall"><canvas id="cPadCpk" role="img" aria-label="焊墊 Cpk 排行"></canvas></div></div>
     <div class="card"><h3>量測項目相關矩陣 <small id="corrSub"></small></h3>
-      <details class="how"><summary>怎麼看</summary><p>體積應與高度、面積都高度相關。若體積與高度相關偏低，可能是 SPI 基準面或高度量測問題；偏移量與體積無關屬正常，若相關則代表偏移已造成錫膏被焊墊邊緣截斷。</p></details>
-      <div class="tbl"><table class="corr" id="corrTbl"></table></div></div>
+            <div class="tbl"><table class="corr" id="corrTbl"></table></div></div>
   </div>
   <div class="card">
-    <h3>對位分解 <small>每板偏移拆成平移、旋轉、伸縮</small></h3>
-    <details class="how"><summary>怎麼看</summary><p>以最小平方法將每顆焊墊的 X/Y 偏移擬合為：平移（整片偏）、旋轉（θ）、伸縮（鋼板或 PCB 漲縮，ppm）。平移大調整對位補償；旋轉大檢查 PCB 定位與 Mark 點辨識；伸縮大檢查鋼板張力或 PCB 漲縮，需重新開鋼板補償。向量圖箭頭為放大後的偏移方向與大小。</p></details>
-    <div class="toolbar"><div class="field"><label for="selAlignBoard">板號</label><select id="selAlignBoard"></select></div><div class="field"><label for="inVec">箭頭放大 <span class="num" id="vecOut">40×</span></label><input type="range" id="inVec" min="10" max="150" value="40" step="5"></div></div>
+    <h3>對位分解 </h3>
+        <div class="toolbar"><div class="field"><label for="selAlignBoard">板號</label><select id="selAlignBoard"></select></div><div class="field"><label for="inVec">箭頭放大 <span class="num" id="vecOut">40×</span></label><input type="range" id="inVec" min="10" max="150" value="40" step="5"></div></div>
     <div class="grid2" style="margin-top:10px">
       <canvas class="vec" id="vecCv" width="900" height="600" role="img" aria-label="偏移向量圖"></canvas>
       <div class="tbl" style="max-height:380px;overflow:auto"><table id="alignTbl"></table></div>
     </div>
   </div>
   <div class="grid2">
-    <div class="card"><h3>刮刀前 / 後行程比較 <small id="strokeSub">依板序奇偶推定行程方向</small></h3>
-      <details class="how"><summary>怎麼看</summary><p>雙刮刀印刷時，前刮與後刮的壓力、角度、磨耗可能不同。以 Welch t 檢定比較兩個行程方向的板平均（資料有方向欄位時依欄位分組，沒有才以奇數板／偶數板推定）；p &lt; 0.05 表示兩方向有顯著差異，應分別校正兩支刮刀。若您的資料有行程方向欄位，結果會更準確。</p></details>
-      <div class="chartbox short"><canvas id="cStroke" role="img" aria-label="刮刀前後比較"></canvas></div><p id="strokeTxt" style="margin:8px 0 0"></p></div>
+    <div class="card"><h3>刮刀前 / 後行程比較 <small id="strokeSub"></small></h3>
+            <div class="chartbox short"><canvas id="cStroke" role="img" aria-label="刮刀前後比較"></canvas></div><p id="strokeTxt" style="margin:8px 0 0"></p></div>
     <div class="card"><h3>鋼板擦拭週期 <small id="wipeSub"></small></h3>
-      <details class="how"><summary>怎麼看</summary><p>依擦拭後第幾片分組。面積或連錫風險隨片數上升，代表鋼板底面殘錫累積，可縮短擦拭間隔或改用濕擦 / 真空擦；高度隨片數下降則可能是孔壁殘留。</p></details>
-      <div class="row"><div class="field"><label for="inWipe">每幾片擦拭一次</label><input type="number" id="inWipe" min="2" max="50" step="1" value="5"></div></div><div class="chartbox short" style="margin-top:8px"><canvas id="cWipe" role="img" aria-label="擦拭週期分析"></canvas></div><p id="wipeTxt" style="margin:8px 0 0"></p></div></div>
+            <div class="row"><div class="field"><label for="inWipe">每幾片擦拭一次</label><input type="number" id="inWipe" min="2" max="50" step="1" value="5"></div></div><div class="chartbox short" style="margin-top:8px"><canvas id="cWipe" role="img" aria-label="擦拭週期分析"></canvas></div><p id="wipeTxt" style="margin:8px 0 0"></p></div></div>
   <div class="card" id="cardMorph">
-    <h3>3D 微觀形貌特徵指標 <small id="morphSub">橋接餘裕、脫模拉尖、共面性與覆蓋率</small></h3>
-    <details class="how"><summary>怎麼看</summary><p>現代 3D SPI 輸出的微觀幾何特徵：橋接餘裕（Bridge Margin，相鄰焊墊間實際最短間距比例，&lt;25% 具高短路風險）、脫模拉尖（Peaking，&gt;35µm 易引致回焊錫珠飛濺或貼片吸嘴排氣不良）、共面性（Coplanarity）與覆蓋率（Coverage）。</p></details>
-    <div class="kpis" id="morphKpis" style="margin-top:10px"></div>
+    <h3>3D 微觀形貌特徵指標 <small id="morphSub"></small></h3>
+        <div class="kpis" id="morphKpis" style="margin-top:10px"></div>
     <div class="tbl" style="margin-top:10px;max-height:280px;overflow:auto"><table id="morphTbl"></table></div>
   </div>
 
   <div class="grid2">
     <div class="card" id="cardPause">
-      <h3>停線時效與鋼板壽命衰退 <small id="pauseSub">停機間隔時間與首片體積衰退分析</small></h3>
-      <details class="how"><summary>怎麼看</summary><p>SMT 停線時鋼板上的錫膏溶劑揮發，黏度上升導致脫模轉移效率驟降。系統分析停機間隔（≥15分鐘）後首片板與穩態板的體積差，並推算建議的「安全靜置時間上限（Safe Dwell Limit）」。若停機超過上限，印刷機應強制執行自動溶劑擦拭與試刮。</p></details>
-      <div id="pauseMsg" style="margin:8px 0"></div>
+      <h3>停線時效與鋼板壽命衰退 <small id="pauseSub"></small></h3>
+            <div id="pauseMsg" style="margin:8px 0"></div>
       <div class="tbl" style="max-height:260px;overflow:auto"><table id="pauseTbl"></table></div>
     </div>
     <div class="card" id="cardLISA">
-      <h3>空間自相關與局部聚類 (Moran's I & LISA) <small id="lisaSub">全板局部壓合下陷、頂針支撐與載具熱區鑑別</small></h3>
-      <details class="how"><summary>怎麼看</summary><p>以反距離權重 k-NN 空間權重矩陣計算全板 Moran's I 與 Anselin LISA 局部空間聚類。HH (高錫量熱區) 常見於頂針過高頂起 PCB 或載具鼓起；LL (低錫量冷區) 常見於 PCB 壓合下陷或缺乏下頂針支撐；LH/HL 為空間離群點。Z-score 採 Cliff–Ord 隨機化變異數；Z &gt; 2.58 且 999 次置換檢定 p &lt; 0.005 才判空間群聚顯著（i.i.d. 資料誤報約 0.5%）。</p></details>
-      <div id="lisaMsg" style="margin:8px 0"></div>
+      <h3>空間自相關與局部聚類 <small id="lisaSub"></small></h3>
+            <div id="lisaMsg" style="margin:8px 0"></div>
       <div class="legend" id="lisaLeg">
         <span><i class="sq" style="background:#ef4444"></i>HH 熱點</span>
         <span><i class="sq" style="background:#3b82f6"></i>LL 冷點</span>
@@ -1068,7 +1053,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     </div>
   </div>
   <div class="card" id="cardRelChart">
-    <h3>關係圖 <small id="relChartSub">進階分析專用，不影響管制圖圖種</small></h3>
+    <h3>關係圖 <small id="relChartSub"></small></h3>
     <div class="toolbar"><div class="field"><label for="selRelChart">圖種</label>
       <select id="selRelChart"><option value="specScatter">規格散點（面積 × 高度）</option><option value="quad">四象限（AR × 轉移效率）</option><option value="corr">相關（高度 × 面積）</option><option value="parallel">平行座標</option><option value="radar">Radar（體積／面積／高度）</option></select></div></div>
     <div id="relChartMsg" class="note" style="margin:8px 0"></div>
@@ -1078,9 +1063,8 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 
 <section class="panel" id="p-stats" role="tabpanel" hidden>
   <div class="card">
-    <h3>統計異常點集中清單 <small id="statsSub">超出管制界限 (OOC)、偏移 (Shift)、漂移 (Drift)、離群值 (|z|≥4)</small></h3>
-    <details class="how"><summary>怎麼看</summary><p>集中列出所有被統計規則標記的異常點，包含超出一覽規格或管制界限 (|z|>3) 的 OOC 點、連續 9 點在中心線同側的偏移 (Nelson 規則 2)、連續 6 點遞增或遞減的漂移 (Nelson 規則 3 / CUSUM)，以及群組內穩健 |z|≥4 的離群值。支援直接匯出 CSV。</p></details>
-    <div class="row" style="margin-bottom:12px">
+    <h3>統計異常點集中清單 <small id="statsSub"></small></h3>
+        <div class="row" style="margin-bottom:12px">
       <button id="btnStatsCsv">匯出異常清單 .csv</button>
     </div>
     <div class="tbl" style="max-height:420px;overflow:auto">
@@ -1088,14 +1072,13 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     </div>
   </div>
   <div class="card">
-    <h3>板號 × 元件群組 不良品矩陣 (Pass/Fail) <small id="matrixSub">每板各零件群組之不良數、合格數與不良率</small></h3>
-    <details class="how"><summary>怎麼看</summary><p>計算每片板子在各零件群組（0402, 0603, QFP, BGA 等）的不良數與不良率，可快速辨識高風險板別或特定高不良群組。</p></details>
-    <div class="tbl" style="max-height:420px;overflow:auto">
+    <h3>板號 × 元件群組 不良品矩陣 <small id="matrixSub"></small></h3>
+        <div class="tbl" style="max-height:420px;overflow:auto">
       <table id="matrixTbl"></table>
     </div>
   </div>
   <div class="card" id="sidedPpmCard">
-    <h3>雙邊規格分側 PPM / DPMO <small id="sidedPpmSub">體積 Volume · 需雙邊規格</small></h3>
+    <h3>雙邊規格分側 PPM / DPMO <small id="sidedPpmSub"></small></h3>
     <div class="kpis" id="sidedPpmKpis"></div>
     <p class="note" id="sidedPpmNote" style="margin:8px 0 0"></p>
   </div>
@@ -1103,9 +1086,8 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 
 <section class="panel" id="p-compare" role="tabpanel" hidden>
   <div class="card">
-    <h3>試產回合比較 <small>同一產品在不同鋼板版本、印刷參數或錫膏下的結果</small></h3>
-    <details class="how"><summary>判定方式</summary><p>逐元件群組比較 B 回合相對 A 回合：轉移效率以「每板群組平均」做 Welch t 檢定；不良率以「每板不良率」做 Welch t 檢定（實驗單位是板，不是焊墊；不良數合計 ≥ 5 才判定）；Ppk 差異超過兩倍標準誤（以板數計）視為顯著。三者只要有改善且沒有惡化，判為「改善」；兩邊都有則為「有好有壞」。面積比依各回合自己的鋼板厚度與開孔設定計算。</p></details>
-    <div class="toolbar">
+    <h3>試產回合比較 </h3>
+        <div class="toolbar">
       <div class="field"><label for="cmpA">A 回合（基準）</label><select id="cmpA"></select></div>
       <div class="field"><label for="cmpB">B 回合（比較）</label><select id="cmpB"></select></div>
       <div class="field"><label for="cmpM">Ppk 量測項目</label><select id="cmpM"></select></div>
@@ -1116,27 +1098,25 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <div class="tbl" style="margin-top:12px"><table id="cmpTbl"></table></div>
   </div>
   <div class="grid2">
-    <div class="card"><h3>轉移效率 A vs B <small>各群組平均體積 %，虛線為目標</small></h3><div class="legend" id="cmpLeg1"></div><div class="chartbox"><canvas id="cCmpTE" role="img" aria-label="兩回合轉移效率比較"></canvas></div></div>
-    <div class="card"><h3>不良率 A vs B <small>PPM（焊墊），全部量測項目依規格判定</small></h3><div class="legend" id="cmpLeg2"></div><div class="chartbox"><canvas id="cCmpD" role="img" aria-label="兩回合不良率比較"></canvas></div></div>
+    <div class="card"><h3>轉移效率 A vs B </h3><div class="legend" id="cmpLeg1"></div><div class="chartbox"><canvas id="cCmpTE" role="img" aria-label="兩回合轉移效率比較"></canvas></div></div>
+    <div class="card"><h3>不良率 A vs B </h3><div class="legend" id="cmpLeg2"></div><div class="chartbox"><canvas id="cCmpD" role="img" aria-label="兩回合不良率比較"></canvas></div></div>
   </div>
-  <div class="card"><h3>問題偵測結果比較 <small>A 回合的問題在 B 回合是否仍存在</small></h3><div id="cmpIss"></div></div>
+  <div class="card"><h3>問題偵測結果比較 </h3><div id="cmpIss"></div></div>
 </section>
 
 <section class="panel" id="p-dfm" role="tabpanel" hidden>
   <div class="card">
     <h3>DFM 開孔修改建議表 <small id="dfmSub"></small></h3>
-    <details class="how"><summary>風險分數怎麼算</summary><p>每個元件群組依六項指標加總風險分數：面積比（低於 0.8 開始扣分，0.66 以下重扣）、寬厚比（低於 1.7）、轉移效率偏離目標、錫量變異 CV（高於 8%）、穩健焊墊 Cpk（低於 1.33）、不良 PPM。分數 ≥ 4 為高風險、≥ 2 為中風險。建議動作依規則產生：面積比不足優先建議階梯減薄或加大開孔；面積比合格但錫量不足建議加大開孔、圓形改圓角方形或改善脫模；錫量過多或連錫風險建議縮減開孔或改 Home-plate／倒 U 形。數值為依目前資料推算的估計，開鋼板前請與鋼板廠確認。</p></details>
-    <div class="row"><button class="primary" id="btnDfmCsv">匯出建議表 .csv</button><button id="btnDfmMd">匯出 .md（給鋼板廠／Layout）</button><span class="note" id="dfmState"></span></div>
+        <div class="row"><button class="primary" id="btnDfmCsv">匯出建議表 .csv</button><button id="btnDfmMd">匯出 .md（給鋼板廠／Layout）</button><span class="note" id="dfmState"></span></div>
     <div class="tbl" style="margin-top:12px"><table id="dfmTbl"></table></div>
   </div>
   <div class="grid2">
-    <div class="card"><h3>風險分數組成 <small>各群組分數來源</small></h3><div class="legend" id="dfmLeg"></div><div class="chartbox"><canvas id="cDfm" role="img" aria-label="DFM 風險分數組成"></canvas></div></div>
-    <div class="card"><h3>個別開孔檢查清單 <small>同群組中長期偏離的焊墊位置</small></h3><div class="tbl" style="max-height:340px;overflow:auto"><table id="dfmPads"></table></div><div id="dfmUncovered"></div></div>
+    <div class="card"><h3>風險分數組成 </h3><div class="legend" id="dfmLeg"></div><div class="chartbox"><canvas id="cDfm" role="img" aria-label="DFM 風險分數組成"></canvas></div></div>
+    <div class="card"><h3>個別開孔檢查清單 </h3><div class="tbl" style="max-height:340px;overflow:auto"><table id="dfmPads"></table></div><div id="dfmUncovered"></div></div>
   </div>
   <div class="card" id="cardClosedLoop" style="margin-top:16px">
-    <h3>印刷機閉環補償建議 (Closed-Loop Correction) <small id="printerCorrSub">基於最近 3 板量測之即時對位補償與動態擦拭觸發</small></h3>
-    <details class="how"><summary>怎麼看</summary><p>工業 4.0 閉環控制：依據最近 k 板（預設 3 板）的 X/Y 偏移與旋轉 θ 中位數，套用 0.6 阻尼濾波生成印刷機即時反向補償值，並受限於 ±20µm 安全 Clamp 上限與死區過濾。同時監控滲錫與坍塌累積，動態觸發鋼板清潔（AGI 指標）。</p></details>
-    <div class="kpis" id="printerCorrKpis" style="margin-top:10px"></div>
+    <h3>印刷機閉環補償建議 <small id="printerCorrSub"></small></h3>
+        <div class="kpis" id="printerCorrKpis" style="margin-top:10px"></div>
     <div style="display:flex;gap:12px;align-items:center;margin-top:12px;flex-wrap:wrap">
       <button type="button" class="primary" id="btnExportCorrectionJson">匯出印刷機補償參數 (.json)</button>
       <span id="printerCorrNote" class="note"></span>
@@ -1146,32 +1126,29 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 
 <section class="panel" id="p-lab" role="tabpanel" hidden>
   <div class="card">
-    <h3>SPI × 回焊後 AOI／X-ray 關聯 <small>用實際回焊結果訂 SPI 規格</small></h3>
-    <details class="how"><summary>怎麼用</summary><p>上傳回焊後 AOI 或 X-ray 結果 CSV（需含板號、焊墊或元件位號、判定或不良類型），以「板號 + 焊墊」對應目前回合的 SPI 資料；只有元件位號時，該元件所有焊墊都視為同一判定。系統把 SPI 量測值分箱計算回焊不良率與 95% 信賴區間（Wilson），以目標值附近為基準不良率，向兩側延伸到不良率超過基準 3 倍（或基準 + 0.5%）為止，作為建議的 SPI 規格窗口。每箱樣本少於 20 不納入判定。</p></details>
-    <div class="row"><label class="row" style="cursor:pointer"><input type="file" id="aoiFile" accept=".csv,.txt,.tsv" class="sr"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">上傳 AOI 結果 CSV</span></label><button id="btnAoiSample">產生範例 AOI 結果</button>
+    <h3>SPI × 回焊後 AOI／X-ray 關聯 </h3>
+        <div class="row"><label class="row" style="cursor:pointer"><input type="file" id="aoiFile" accept=".csv,.txt,.tsv" class="sr"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">上傳 AOI 結果 CSV</span></label><button id="btnAoiSample">產生範例 AOI 結果</button>
       <div class="field"><label for="aoiM">SPI 量測項目</label><select id="aoiM"></select></div><div class="field"><label for="aoiBw">分箱寬度</label><input type="number" id="aoiBw" value="10" min="1" max="50" step="1"></div><span class="note" id="aoiState"></span></div>
     <div id="aoiOut" style="margin-top:10px"></div>
     <div class="chartbox" id="aoiChartBox" hidden><canvas id="cAoi" role="img" aria-label="SPI 量測值分箱的回焊不良率"></canvas></div>
   </div>
   <div class="card">
-    <h3>印刷參數 DOE <small id="doeSub">刮刀壓力、印刷速度、分離速度的效應</small></h3>
-    <details class="how"><summary>怎麼用</summary><p>資料需有參數欄位（Pressure／壓力、Speed／速度、Separation speed／分離速度），每片板一組設定。系統以「每片板」為一個實驗單位，對每個因子做單因子變異數分析並計算主效應（高水準平均 − 低水準平均），並列出各參數組合的錫量、變異、不良率，以「接近目標、變異小、不良少」綜合排序找最佳窗口。全因子設計下主效應檢定較保守；交互作用未納入。</p></details>
-    <div class="row"><div class="field"><label for="doeResp">反應變數</label><select id="doeResp"></select></div><button id="btnDoeSample">載入 DOE 範例回合</button><span class="note" id="doeState"></span></div>
+    <h3>印刷參數 DOE <small id="doeSub"></small></h3>
+        <div class="row"><div class="field"><label for="doeResp">反應變數</label><select id="doeResp"></select></div><button id="btnDoeSample">載入 DOE 範例回合</button><span class="note" id="doeState"></span></div>
     <div id="doeOut" style="margin-top:10px"></div>
     <div class="grid2" id="doeCharts" style="margin-top:10px"></div>
   </div>
   <div class="card">
-    <h3>簡易 GR&amp;R <small>確認 SPI 程式的量測可信度</small></h3>
-    <details class="how"><summary>怎麼用</summary><p>同一片板（建議 10 個不同焊墊）由 2–3 位操作員（或重新上板載入）各量 2–3 次，上傳 CSV（欄位：焊墊、操作員、次數、體積／高度／面積）。以交叉變異數分析法計算重複性（EV）、再現性（AV）與交互作用，%GRR 以總變異與公差兩種基準呈現。判定採 AIAG 慣例：&lt; 10% 可接受、10–30% 視用途、≥ 30% 不可接受，可區分類別數 ndc ≥ 5。只有一位操作員時僅計算重複性。</p></details>
-    <div class="row"><label class="row" style="cursor:pointer"><input type="file" id="grrFile" accept=".csv,.txt,.tsv" class="sr"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">上傳重複量測 CSV</span></label><button id="btnGrrSample">產生範例重複量測</button>
+    <h3>簡易 GR&amp;R </h3>
+        <div class="row"><label class="row" style="cursor:pointer"><input type="file" id="grrFile" accept=".csv,.txt,.tsv" class="sr"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">上傳重複量測 CSV</span></label><button id="btnGrrSample">產生範例重複量測</button>
       <div class="field"><label for="grrM">量測項目</label><select id="grrM"></select></div><span class="note" id="grrState"></span></div>
     <div id="grrOut" style="margin-top:10px"></div>
   </div>
 </section>
 
 <section class="panel" id="p-ai" role="tabpanel" hidden>
-  <div class="card" id="aiSettingsCard"><h3 id="aiSettingsHead">API 金鑰、模型／推理強度與獨立配額設定 <small id="aiKeyBadge"><span class="pill warn">尚未設定金鑰</span></small></h3><div style="display:grid;grid-template-columns:minmax(0,1fr);gap:12px"><div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:13px;font-weight:600">啟用服務商：</span><div class="seg" id="aiProviderSeg" role="group" aria-label="選擇 AI 服務商" style="display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden"><button type="button" data-ai-prov="openai" aria-pressed="true">OpenAI</button><button type="button" data-ai-prov="antigravity" aria-pressed="false">Antigravity</button></div></div><div id="aiAllProvidersSummary" class="row" style="gap:6px;flex-wrap:wrap;font-size:12px"></div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px"><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKey" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>OpenAI API Key</b></span><span id="aiBadgeOpenai" class="pill warn" style="font-size:11px;padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKey" placeholder="sk-proj-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggle" title="顯示或隱藏 OpenAI API Key">顯示</button></div></div><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKeyAntigravity" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>Antigravity API Key</b></span><span id="aiBadgeAntigravity" class="pill warn" style="font-size:11px;padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKeyAntigravity" placeholder="AIza... / agy-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggleAntigravity" title="顯示或隱藏 Antigravity API Key">顯示</button></div></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap"><div class="field" style="flex:1 1 220px;min-width:0"><label for="selAiModel">模型選擇 (<span id="aiModelProvName">OpenAI</span>)</label><select id="selAiModel" style="width:100%"><option value="gpt-6.1-terra" selected>gpt-6.1-terra（旗艦深度推理 · 推薦）</option><option value="o4-mini">o4-mini（精準數理推理）</option><option value="gpt-5.4">gpt-5.4（通用旗艦）</option><option value="custom">自訂模型名稱…</option></select></div><div class="field" style="flex:0 0 auto"><button type="button" id="btnAiCheckModels" title="用目前服務商的 API Key 查詢實際可用的模型">檢查可用模型</button></div><div class="field" id="aiCustomModelField" hidden style="flex:1 1 180px;min-width:0"><label for="inAiCustomModel">自訂模型名稱</label><input type="text" id="inAiCustomModel" placeholder="例：gpt-6.1-terra" style="width:100%;font-family:var(--f-mono)"></div><div class="field" style="flex:1 1 200px;min-width:0"><label for="selAiEffort">推理強度 (Reasoning Effort)</label><select id="selAiEffort" style="width:100%"><option value="high" selected>高 (high) — 深度工程根因推理（推薦）</option><option value="medium">中 (medium) — 均衡推理深度與速度</option><option value="low">低 (low) — 快速重點摘要</option></select></div><div class="field" style="flex:1 1 220px;min-width:0"><label for="inAiCustomEndpoint">自訂 API 端點 (選填 https://)</label><input type="text" id="inAiCustomEndpoint" placeholder="預設使用官方端點" spellcheck="false" style="width:100%;font-family:var(--f-mono)"></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap;padding-top:4px;border-top:1px dashed var(--line)"><div style="font-size:12.5px;font-weight:600;color:var(--accent-ink);min-width:140px" id="aiLimitProvTitle">OpenAI 獨立配額上限：</div><div class="field"><label for="inAiDailyLim">每日次數上限 (次/日)</label><input type="number" id="inAiDailyLim" value="20" min="1" max="500" step="1" style="width:96px"></div><div class="field"><label for="inAiTokenLim">每月 Token 上限</label><input type="number" id="inAiTokenLim" value="500000" min="1000" max="10000000" step="10000" style="width:120px"></div><div class="field"><label for="inAiUsdLim">每月費用上限 (USD)</label><input type="number" id="inAiUsdLim" value="5.0" min="0.5" max="500" step="0.5" style="width:96px"></div><div class="row" style="gap:6px"><button type="button" class="primary" id="btnAiSaveCfg">儲存設定</button><button type="button" id="btnAiClearKey" title="清除目前所選服務商的金鑰">清除當前金鑰</button></div></div><div class="row" style="gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted)"><span class="chip">目前服務商：<b id="aiProviderLabel">OpenAI</b></span><span class="chip">模型：<b class="mono" id="aiModelLabel">gpt-6.1-terra</b></span><span class="chip">推理強度：<b class="mono" id="aiEffortLabel">高 (high)</b></span><span class="chip" style="white-space:normal;min-width:0">計價基準：<b id="aiPriceLabel">輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens</b></span><span class="note" id="aiCfgMsg" role="status"></span></div><div class="grid2" style="gap:10px;margin-top:2px"><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;margin-bottom:6px"><b><span id="aiDailyBarProv">OpenAI</span> 今日呼叫次數 (<span id="aiUsageDayLabel">今日</span>)</b><span class="mono" id="aiDailyUsageText">0 / 20 次 (0%)</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiDailyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;margin-bottom:6px;gap:8px;flex-wrap:wrap"><b><span id="aiMonthlyBarProv">OpenAI</span> 本月累計用量 (<span id="aiUsageMonthLabel">本月</span>)</b><span class="mono" id="aiMonthlyUsageText">0 tokens · 預估 $0.00 / $5.00 USD</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiMonthlyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div></div></div></div><div class="card"><h3>AI 品質工程分析 <small id="aiCardSub">OpenAI gpt-6.1-terra（高推理強度） · 將目前全部統計結果與交叉驗證送出，嚴格區分事實與推論</small></h3>
-    <div class="notice" id="aiNoticeBox" style="background:var(--surface2);padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:12.5px;color:var(--ink)">
+  <div class="card" id="aiSettingsCard"><h3 id="aiSettingsHead">API 金鑰、模型／推理強度與獨立配額設定 <small id="aiKeyBadge"><span class="pill warn">尚未設定金鑰</span></small></h3><div style="display:grid;grid-template-columns:minmax(0,1fr);gap:12px"><div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:var(--fs-ui);font-weight:600">啟用服務商：</span><div class="seg" id="aiProviderSeg" role="group" aria-label="選擇 AI 服務商" style="display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden"><button type="button" data-ai-prov="openai" aria-pressed="true">OpenAI</button><button type="button" data-ai-prov="antigravity" aria-pressed="false">Antigravity</button></div></div><div id="aiAllProvidersSummary" class="row" style="gap:6px;flex-wrap:wrap;font-size:var(--fs-caption)"></div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px"><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKey" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>OpenAI API Key</b></span><span id="aiBadgeOpenai" class="pill warn" style="font-size:var(--fs-caption);padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKey" placeholder="sk-proj-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggle" title="顯示或隱藏 OpenAI API Key">顯示</button></div></div><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKeyAntigravity" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>Antigravity API Key</b></span><span id="aiBadgeAntigravity" class="pill warn" style="font-size:var(--fs-caption);padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKeyAntigravity" placeholder="AIza... / agy-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggleAntigravity" title="顯示或隱藏 Antigravity API Key">顯示</button></div></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap"><div class="field" style="flex:1 1 220px;min-width:0"><label for="selAiModel">模型選擇 (<span id="aiModelProvName">OpenAI</span>)</label><select id="selAiModel" style="width:100%"><option value="gpt-6.1-terra" selected>gpt-6.1-terra（旗艦深度推理 · 推薦）</option><option value="o4-mini">o4-mini（精準數理推理）</option><option value="gpt-5.4">gpt-5.4（通用旗艦）</option><option value="custom">自訂模型名稱…</option></select></div><div class="field" style="flex:0 0 auto"><button type="button" id="btnAiCheckModels" title="用目前服務商的 API Key 查詢實際可用的模型">檢查可用模型</button></div><div class="field" id="aiCustomModelField" hidden style="flex:1 1 180px;min-width:0"><label for="inAiCustomModel">自訂模型名稱</label><input type="text" id="inAiCustomModel" placeholder="例：gpt-6.1-terra" style="width:100%;font-family:var(--f-mono)"></div><div class="field" style="flex:1 1 200px;min-width:0"><label for="selAiEffort">推理強度</label><select id="selAiEffort" style="width:100%"><option value="high" selected>高 — 深度工程根因推理（推薦）</option><option value="medium">中 — 均衡推理深度與速度</option><option value="low">低 — 快速重點摘要</option></select></div><div class="field" style="flex:1 1 220px;min-width:0"><label for="inAiCustomEndpoint">自訂 API 端點 (選填 https://)</label><input type="text" id="inAiCustomEndpoint" placeholder="預設使用官方端點" spellcheck="false" style="width:100%;font-family:var(--f-mono)"></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap;padding-top:4px;border-top:1px dashed var(--line)"><div style="font-size:var(--fs-ui);font-weight:600;color:var(--accent-ink);min-width:140px" id="aiLimitProvTitle">OpenAI 獨立配額上限：</div><div class="field"><label for="inAiDailyLim">每日次數上限 (次/日)</label><input type="number" id="inAiDailyLim" value="20" min="1" max="500" step="1" style="width:96px"></div><div class="field"><label for="inAiTokenLim">每月 Token 上限</label><input type="number" id="inAiTokenLim" value="500000" min="1000" max="10000000" step="10000" style="width:120px"></div><div class="field"><label for="inAiUsdLim">每月費用上限 (USD)</label><input type="number" id="inAiUsdLim" value="5.0" min="0.5" max="500" step="0.5" style="width:96px"></div><div class="row" style="gap:6px"><button type="button" class="primary" id="btnAiSaveCfg">儲存設定</button><button type="button" id="btnAiClearKey" title="清除目前所選服務商的金鑰">清除當前金鑰</button></div></div><div class="row" style="gap:8px;flex-wrap:wrap;font-size:var(--fs-caption);color:var(--muted)"><span class="chip">目前服務商：<b id="aiProviderLabel">OpenAI</b></span><span class="chip">模型：<b class="mono" id="aiModelLabel">gpt-6.1-terra</b></span><span class="chip">推理強度：<b class="mono" id="aiEffortLabel">高</b></span><span class="chip" style="white-space:normal;min-width:0">計價基準：<b id="aiPriceLabel">輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens</b></span><span class="note" id="aiCfgMsg" role="status"></span></div><div class="grid2" style="gap:10px;margin-top:2px"><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-ui);margin-bottom:6px"><b><span id="aiDailyBarProv">OpenAI</span> 今日呼叫次數 (<span id="aiUsageDayLabel">今日</span>)</b><span class="mono" id="aiDailyUsageText">0 / 20 次 (0%)</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiDailyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-ui);margin-bottom:6px;gap:8px;flex-wrap:wrap"><b><span id="aiMonthlyBarProv">OpenAI</span> 本月累計用量 (<span id="aiUsageMonthLabel">本月</span>)</b><span class="mono" id="aiMonthlyUsageText">0 tokens · 預估 $0.00 / $5.00 USD</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiMonthlyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div></div></div></div><div class="card"><h3>AI 品質工程分析 <small id="aiCardSub">OpenAI gpt-6.1-terra（高推理強度） · 將目前全部統計結果與交叉驗證送出，嚴格區分事實與推論</small></h3>
+    <div class="notice" id="aiNoticeBox" style="background:var(--surface2);padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:var(--fs-ui);color:var(--ink)">
       <p style="margin:0 0 6px"><b>送出前告知與資料隱私保護：</b></p>
       <ul style="margin:0 0 6px 18px;padding:0;line-height:1.6">
         <li><b>服務商路徑：</b><span id="aiNoticeServicePath">由本站後端以 API Key 安全轉發至 OpenAI（<code>gpt-6.1-terra</code>，推理能力：<code>high</code>）。</span></li>
@@ -1180,11 +1157,11 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
         <li><b>AI Gateway 記錄設定：</b><span id="aiGatewayLogNotice">預設不保存提示詞與回應內容（已帶 <code>cf-aig-collect-log-payload: false</code>，僅留存 token 用量 metadata）。</span></li>
       </ul>
       <div class="row" style="align-items:center;margin-top:8px">
-        <label class="row" style="cursor:pointer;font-size:13px;align-items:center"><input type="checkbox" id="aiAnon"> <b>送出前匿名化板號與焊墊</b>（板號轉為 B01…、焊墊轉為 P001…，分析回覆後自動還原）</label>
+        <label class="row" style="cursor:pointer;font-size:var(--fs-ui);align-items:center"><input type="checkbox" id="aiAnon"> <b>送出前匿名化板號與焊墊</b>（板號轉為 B01…、焊墊轉為 P001…，分析回覆後自動還原）</label>
       </div>
       <details class="how" id="aiPayloadDetails" style="margin-top:8px">
-        <summary>預覽送出內容 (JSON)</summary>
-        <pre class="mono" id="aiPayloadPre" style="max-height:220px;overflow:auto;background:var(--bg);padding:8px;border-radius:6px;font-size:11.5px;margin-top:6px"></pre>
+        <summary>預覽送出內容</summary>
+        <pre class="mono" id="aiPayloadPre" style="max-height:220px;overflow:auto;background:var(--bg);padding:8px;border-radius:6px;font-size:var(--fs-caption);margin-top:6px"></pre>
       </details>
     </div>
     <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap"><div class="row"><button class="primary" id="btnAI">產生分析報告</button><button id="btnAIStop" hidden>停止</button><span class="note" id="aiState"></span></div><div class="row" id="aiResultTools" hidden><button type="button" id="btnAICopy">複製診斷結果</button><button type="button" id="btnAIMd">匯出 AI 診斷 .md</button></div></div>
@@ -1237,7 +1214,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   </div>
   <div class="grid2" data-sub="import">
     <div class="card">
-      <h3>匯入 SPI 資料 <small>選格式、讀欄位並套用</small></h3>
+      <h3>匯入 SPI 資料 </h3>
       <div class="vendor" id="vendorBox">
         <div class="row">
           <div class="field"><label for="selVendor">① 加工廠 SPI 格式</label><select id="selVendor"><option value="generic">通用格式（每列一筆量測）</option><option value="lirong">立榮電子（每列一焊墊、各板橫排）</option><option value="zsf">振順豐（絕對值橫排）</option></select></div>
@@ -1278,12 +1255,12 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
         <div id="mapPrev" class="note"></div>
         <div class="row recrow" id="recRow"><div class="field"><label for="inLot">批號（選填）</label><input type="text" id="inLot" maxlength="64" placeholder="例：L2410-01"></div><div class="field"><label for="inPart">產品料號（必填）</label><input type="text" id="inPart" class="mono" list="partList" autocomplete="off" maxlength="64" placeholder="例：301-000100124" aria-describedby="inPartHint"><span class="note" id="inPartHint" aria-live="polite"></span></div><div class="field"><label for="inRev">正式版次（必填）</label><input type="text" id="inRev" maxlength="32" placeholder="例：V5"></div><div class="field"><label for="inWorkOrder">製令工單（與量測日期至少填一項）</label><input type="text" id="inWorkOrder" maxlength="64"></div><div class="field"><label for="inMeasuredDate">量測日期（與製令工單至少填一項）</label><input type="date" id="inMeasuredDate"></div><div class="field"><label for="inImpStencil">鋼板厚度 µm（必填）</label><input type="number" id="inImpStencil" min="30" max="300" step="1" list="stencilList" placeholder="例：120" required aria-required="true"></div><div class="field"><label for="inSupplierWo">廠商工單號</label><input type="text" id="inSupplierWo" maxlength="64" placeholder="例：SWO-202410-01"></div><div class="field"><label for="inOutsourceWo">外包工單號</label><input type="text" id="inOutsourceWo" maxlength="64" placeholder="例：OWO-88912"></div><span class="note" id="recNote" style="align-self:center;max-width:52ch"></span></div>
         <p class="note" id="impSaveNotice" style="margin:6px 0;max-width:70ch">正式匯入須連線登入、選取有效受控座標檔；待管理者判定的新檔不納入預設分析。</p>
-        <div class="row"><label class="row" style="font-size:13px"><input type="radio" name="impMode" value="new" checked> 新增為新回合</label><input type="text" id="inRunName" aria-label="新回合名稱" placeholder="回合名稱，例：試產 2 · 鋼板 V2" style="min-width:min(100%,220px)">
-          <label class="row" style="font-size:13px"><input type="radio" name="impMode" value="replace"> 取代目前回合</label><button class="primary" id="btnApply">套用匯入</button></div>
+        <div class="row"><label class="row" style="font-size:var(--fs-ui)"><input type="radio" name="impMode" value="new" checked> 新增為新回合</label><input type="text" id="inRunName" aria-label="新回合名稱" placeholder="回合名稱，例：試產 2 · 鋼板 V2" style="min-width:min(100%,220px)">
+          <label class="row" style="font-size:var(--fs-ui)"><input type="radio" name="impMode" value="replace"> 取代目前回合</label><button class="primary" id="btnApply">套用匯入</button></div>
       </div>
     </div>
     <div class="card">
-      <h3>規格設定 <small>規格由你定義並存成料號規格</small></h3>
+      <h3>規格設定 </h3>
       <div class="row" style="margin-bottom:10px">
         <div class="field"><label for="inStencil2">鋼板厚度 µm</label><input type="number" id="inStencil2" list="stencilList" min="30" max="300" step="1"><datalist id="stencilList"><option value="80"><option value="100"><option value="110"><option value="120"><option value="130"><option value="150"></datalist></div>
         <div class="field"><label for="selSqDir">刮刀行程方向</label><select id="selSqDir"><option value="Y">沿 PCB Y 方向</option><option value="X">沿 PCB X 方向</option></select></div>
@@ -1322,26 +1299,25 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     </div>
   </div>
   <div class="grid2" data-sub="runs" hidden>
-    <div class="card"><h3>試產回合管理 <small id="runSaveNote">回合資料保存在這台電腦的瀏覽器，重新整理不會遺失</small></h3>
+    <div class="card"><h3>試產回合管理 <small id="runSaveNote"></small></h3>
       <div id="runLegacy" role="status" hidden></div>
       <div class="tbl"><table id="runTbl"></table></div>
       <div class="row" style="margin-top:8px"><button id="btnAddB">新增範例：改版 B 回合</button><button id="btnSample">還原範例並清除已保存的回合</button></div></div>
   </div>
   <div class="card" data-sub="stencil" hidden>
-    <h3>階梯鋼板與位置設定 <small>由上而下第一個符合的區域生效；未涵蓋的焊墊使用基礎厚度</small></h3>
-    <div class="row"><label class="row" style="font-size:13px"><input type="checkbox" id="chkStep"> 啟用階梯鋼板</label><button id="btnAddZone">新增區域</button><span class="note" id="zoneSum"></span></div>
+    <h3>階梯鋼板與位置設定 </h3>
+    <div class="row"><label class="row" style="font-size:var(--fs-ui)"><input type="checkbox" id="chkStep"> 啟用階梯鋼板</label><button id="btnAddZone">新增區域</button><span class="note" id="zoneSum"></span></div>
     <div class="tbl" style="margin-top:10px"><table id="zoneTbl"></table></div>
     <p class="note">位置設定：先在表格選取一個區域（「框選」欄），再於下方板面圖上拖曳框出範圍，該區域會自動改為「座標區域」。座標單位 mm，與 SPI 資料 X / Y 相同。</p>
     <canvas class="heat" id="zoneMap" width="900" height="600" style="touch-action:none;cursor:crosshair" role="img" aria-label="階梯鋼板區域位置圖，可拖曳框選"></canvas>
     <div class="legend" id="zoneLeg" style="margin-top:8px"></div>
   </div>
   <div class="card" data-sub="stencil" hidden>
-    <h3>鋼板開孔設定 <small>依元件群組設定開孔，面積比、3D 外框與轉移效率改以實際開孔計算</small></h3>
-    <details class="how"><summary>怎麼設定</summary><p>優先順序：CSV 內逐焊墊的開孔尺寸欄（Aperture L / W、開孔長 / 開孔寬）＞此處「指定 L × W」＞焊墊尺寸 ×（1 − 線性縮減%）。線性縮減是長寬各縮減的百分比，例如 10% 代表開孔為焊墊的 90% × 90%（面積約 81%）。圓形開孔只需填 L（直徑）。</p></details>
-    <div class="tbl"><table id="apTbl"></table></div>
+    <h3>鋼板開孔設定 </h3>
+        <div class="tbl"><table id="apTbl"></table></div>
     <p class="note" id="apNote"></p>
     <div class="row" style="margin-top:10px;flex-wrap:wrap;align-items:flex-end;gap:8px">
-      <label class="row" style="cursor:pointer;font-size:13px"><input type="file" id="geomPadFile" accept=".csv,.txt,.tsv" class="sr"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">匯入幾何焊墊清單 CSV</span></label>
+      <label class="row" style="cursor:pointer;font-size:var(--fs-ui)"><input type="file" id="geomPadFile" accept=".csv,.txt,.tsv" class="sr"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">匯入幾何焊墊清單 CSV</span></label>
       <button type="button" id="geomPadClear" hidden>清除幾何清單</button>
     </div>
     <p class="note" id="geomPadStatus" style="margin:6px 0 0">幾何焊墊清單用於開孔覆蓋率；不寫入量測 X/Y。逐焊墊 CSV 開孔仍優先於幾何。</p>
@@ -1366,15 +1342,15 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 <section class="panel" id="p-share" role="tabpanel" hidden>
   <div class="card">
     <div class="row" style="justify-content:space-between;align-items:center">
-      <h3>建立分享連結 <small>將目前回合製作成 30 天有效的分享連結</small></h3>
+      <h3>建立分享連結 </h3>
       <button type="button" class="linkbtn" id="btnShareBack">← 返回</button>
     </div>
     <div id="sharePreBox">
       <div class="row" style="margin:12px 0;gap:20px;flex-wrap:wrap">
-        <div><span class="lbl">分享回合</span><div class="num" id="shareRunName" style="font-size:16px;font-weight:600">-</div></div>
-        <div><span class="lbl">筆數</span><div class="num" id="shareRowCount" style="font-size:16px;font-weight:600">-</div></div>
-        <div><span class="lbl">預估大小</span><div class="num" id="shareEstSize" style="font-size:16px;font-weight:600">-</div></div>
-        <div><span class="lbl">有效期限</span><div class="num" style="font-size:16px;font-weight:600">30 天</div></div>
+        <div><span class="lbl">分享回合</span><div class="num" id="shareRunName" style="font-size:var(--fs-input);font-weight:600">-</div></div>
+        <div><span class="lbl">筆數</span><div class="num" id="shareRowCount" style="font-size:var(--fs-input);font-weight:600">-</div></div>
+        <div><span class="lbl">預估大小</span><div class="num" id="shareEstSize" style="font-size:var(--fs-input);font-weight:600">-</div></div>
+        <div><span class="lbl">有效期限</span><div class="num" style="font-size:var(--fs-input);font-weight:600">30 天</div></div>
       </div>
       <p class="note" style="margin:8px 0;color:var(--ink)">
         <b>注意事項：</b>開啟者須登入本站才能存取；建立分享時，此回合的量測資料與設定將上傳並保存在本站伺服器（供授權同事檢視）。
@@ -1405,7 +1381,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 <section class="panel" id="p-shares" role="tabpanel" hidden>
   <div class="card">
     <div class="row" style="justify-content:space-between;align-items:center">
-      <h3>我的分享連結 <small>檢視或撤銷您建立的分享</small></h3>
+      <h3>我的分享連結 </h3>
       <button type="button" class="linkbtn" id="btnSharesBack">← 返回</button>
     </div>
     <div class="tbl" style="margin-top:12px;max-height:450px;overflow:auto">
@@ -1419,7 +1395,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 <section class="panel" id="p-mail" role="tabpanel" hidden>
   <div class="card">
     <div class="row" style="justify-content:space-between;align-items:center">
-      <h3>以 Email 轉寄分析報告 <small>瀏覽器端產生附件並叫用郵件客戶端</small></h3>
+      <h3>以 Email 轉寄分析報告 </h3>
       <button type="button" class="linkbtn" id="btnMailBack">← 返回報告</button>
     </div>
     <p class="note" style="margin:8px 0;color:var(--ink)">
@@ -1430,12 +1406,12 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
       <div style="flex:1;min-width:240px">
         <label for="mailTo" class="lbl" style="font-weight:600">收件人 (To)：</label>
         <input type="text" id="mailTo" placeholder="選填，多筆以半形逗號或分號分隔 (只用於 mailto)" style="width:100%;box-sizing:border-box;margin-top:4px">
-        <span class="note" id="mailToErr" style="color:var(--ng);display:none;font-size:12px">收件人 Email 格式不正確</span>
+        <span class="note" id="mailToErr" style="color:var(--ng);display:none;font-size:var(--fs-caption)">收件人 Email 格式不正確</span>
       </div>
       <div style="flex:1;min-width:240px">
         <label for="mailCc" class="lbl" style="font-weight:600">副本 (Cc)：</label>
         <input type="text" id="mailCc" placeholder="選填，多筆以半形逗號或分號分隔" style="width:100%;box-sizing:border-box;margin-top:4px">
-        <span class="note" id="mailCcErr" style="color:var(--ng);display:none;font-size:12px">副本 Email 格式不正確</span>
+        <span class="note" id="mailCcErr" style="color:var(--ng);display:none;font-size:var(--fs-caption)">副本 Email 格式不正確</span>
       </div>
     </div>
 
@@ -1449,7 +1425,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
         <label for="mailBody" class="lbl" style="font-weight:600">郵件內文／摘要：</label>
         <button type="button" class="linkbtn" id="btnMailCopySummary">複製摘要</button>
       </div>
-      <textarea id="mailBody" rows="7" style="width:100%;box-sizing:border-box;font-family:inherit;font-size:13px;line-height:1.5;padding:8px"></textarea>
+      <textarea id="mailBody" rows="7" style="width:100%;box-sizing:border-box;font-family:inherit;font-size:var(--fs-ui);line-height:1.5;padding:8px"></textarea>
       <div class="row" style="justify-content:space-between;margin-top:4px">
         <span class="note" id="mailBodyLen">字數：0 字</span>
         <span class="note" id="mailUrlLen">mailto 網址長度：0 / 1800 字元</span>
@@ -1472,14 +1448,14 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
       </div>
     </div>
 
-    <div id="mailStatus" role="status" style="margin:12px 0;font-size:13px;min-height:20px;color:var(--ink)">
+    <div id="mailStatus" role="status" style="margin:12px 0;font-size:var(--fs-ui);min-height:20px;color:var(--ink)">
       <span id="mailStatusText">正在產生 PDF…</span>
     </div>
 
     <div class="row" style="gap:12px;align-items:center;flex-wrap:wrap;margin-top:16px">
       <button type="button" class="primary" id="btnSharePdf" disabled>分享 PDF 到郵件…</button>
       <button type="button" id="btnSharePdfWithSummary" disabled>連同摘要分享</button>
-      <span class="note" id="lblAppleNote" style="font-size:12px;color:var(--muted);display:none">（部分 iPhone 版本此方式不會出現「儲存到檔案」）</span>
+      <span class="note" id="lblAppleNote" style="font-size:var(--fs-caption);color:var(--muted);display:none">（部分 iPhone 版本此方式不會出現「儲存到檔案」）</span>
       <button type="button" id="btnMailDlPdf" disabled>下載 PDF</button>
       <button type="button" id="btnMailOpenMailto">開啟郵件 (mailto)</button>
     </div>
@@ -1566,8 +1542,8 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <div class="sheet-head" style="padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:var(--surface)">
       <div style="display:flex;align-items:center;gap:10px">
         <svg class="ui-ico ui-ico--folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
-        <h3 style="margin:0;font-size:16px">量測記錄與座標檔資料庫</h3>
-        <span class="note" id="recPickerMode" style="font-size:12px"></span>
+        <h3 style="margin:0;font-size:var(--fs-input)">量測記錄與座標檔資料庫</h3>
+        <span class="note" id="recPickerMode" style="font-size:var(--fs-caption)"></span>
       </div>
       <button type="button" class="sheet-close" id="recPickerClose" aria-label="關閉選單">✕</button>
     </div>
@@ -1575,38 +1551,38 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
       <!-- 未登入提示卡片 -->
       <div id="recPickerAuthNotice" class="card" hidden style="background:var(--accent-soft);border:1px solid var(--accent);padding:12px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:10px">
         <div>
-          <b style="color:var(--accent-ink);font-size:13.5px">🔐 雲端資料庫需登入帳號</b>
-          <div class="note" style="margin-top:2px;font-size:12px">量測與座標資料庫 100% 依託 Cloudflare 雲端，請登入以存取產線資料。</div>
+          <b style="color:var(--accent-ink);font-size:var(--fs-ui)">🔐 雲端資料庫需登入帳號</b>
+          <div class="note" style="margin-top:2px;font-size:var(--fs-caption)">量測與座標資料庫 100% 依託 Cloudflare 雲端，請登入以存取產線資料。</div>
         </div>
-        <a href="/__login" class="primary" style="display:inline-flex;align-items:center;text-decoration:none;font-size:12.5px;padding:6px 14px;border-radius:6px;min-height:34px;font-weight:600">前往登入</a>
+        <a href="/__login" class="primary" style="display:inline-flex;align-items:center;text-decoration:none;font-size:var(--fs-caption);padding:6px 14px;border-radius:6px;min-height:34px;font-weight:600">前往登入</a>
       </div>
 
       <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px">
         <div class="seg" role="tablist" style="display:inline-flex;border:1px solid var(--line);border-radius:8px;padding:2px;background:var(--surface2)">
-          <button type="button" class="seg-btn active" id="btnPickSpi" style="padding:5px 14px;border:none;border-radius:6px;background:var(--surface);font-weight:500;cursor:pointer;font-size:13px">📊 量測記錄 (<span id="countPickSpi">0</span>)</button>
-          <button type="button" class="seg-btn" id="btnPickPlace" style="padding:5px 14px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-size:13px">📍 座標檔庫 (<span id="countPickPlace">0</span>)</button>
+          <button type="button" class="seg-btn active" id="btnPickSpi" style="padding:5px 14px;border:none;border-radius:6px;background:var(--surface);font-weight:500;cursor:pointer;font-size:var(--fs-ui)">📊 量測記錄 (<span id="countPickSpi">0</span>)</button>
+          <button type="button" class="seg-btn" id="btnPickPlace" style="padding:5px 14px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-size:var(--fs-ui)">📍 座標檔庫 (<span id="countPickPlace">0</span>)</button>
         </div>
         <div style="display:flex;gap:8px;align-items:center;flex:1 1 240px;max-width:380px">
-          <input type="text" id="recPickerQ" aria-label="搜尋批號、料號、工單、上傳者" placeholder="搜尋批號、料號、工單、上傳者…" style="width:100%;font-size:13px">
+          <input type="text" id="recPickerQ" aria-label="搜尋批號、料號、工單、上傳者" placeholder="搜尋批號、料號、工單、上傳者…" style="width:100%;font-size:var(--fs-ui)">
           <button type="button" id="recPickerReload" title="重新整理" style="padding:4px 12px">↻</button>
         </div>
       </div>
 
       <!-- SMT 產線快捷過濾列 -->
       <div id="recFilterBar" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:6px 10px;background:var(--surface2);border-radius:8px">
-        <span class="note" style="font-size:12px;font-weight:600">篩選：</span>
-        <select id="pickPartFilter" aria-label="依產品料號篩選" style="font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--surface)">
+        <span class="note" style="font-size:var(--fs-caption);font-weight:600">篩選：</span>
+        <select id="pickPartFilter" aria-label="依產品料號篩選" style="font-size:var(--fs-caption);padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--surface)">
           <option value="">全部料號</option>
         </select>
         <div class="seg" id="pickSideSeg" style="display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden">
-          <button type="button" class="seg-btn active" data-side="" style="padding:3px 8px;font-size:12px;border:none;background:var(--surface)">全面別</button>
-          <button type="button" class="seg-btn" data-side="TOP" style="padding:3px 8px;font-size:12px;border:none;background:transparent">TOP</button>
-          <button type="button" class="seg-btn" data-side="BOT" style="padding:3px 8px;font-size:12px;border:none;background:transparent">BOT</button>
+          <button type="button" class="seg-btn active" data-side="" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:var(--surface)">全面別</button>
+          <button type="button" class="seg-btn" data-side="TOP" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:transparent">TOP</button>
+          <button type="button" class="seg-btn" data-side="BOT" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:transparent">BOT</button>
         </div>
         <div class="seg" id="pickQualitySeg" style="display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden">
-          <button type="button" class="seg-btn active" data-qfilter="all" style="padding:3px 8px;font-size:12px;border:none;background:var(--surface)">全部狀態</button>
-          <button type="button" class="seg-btn" data-qfilter="ng" style="padding:3px 8px;font-size:12px;border:none;background:transparent">僅異常 ⚠️</button>
-          <button type="button" class="seg-btn" data-qfilter="pass" style="padding:3px 8px;font-size:12px;border:none;background:transparent">僅合格 ✓</button>
+          <button type="button" class="seg-btn active" data-qfilter="all" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:var(--surface)">全部狀態</button>
+          <button type="button" class="seg-btn" data-qfilter="ng" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:transparent">僅異常 ⚠️</button>
+          <button type="button" class="seg-btn" data-qfilter="pass" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:transparent">僅合格 ✓</button>
         </div>
       </div>
 
@@ -1625,8 +1601,8 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
         <!-- 獨立上傳新座標檔展開區塊 -->
         <div id="boxUploadPlaceForm" class="card" style="padding:10px 14px;background:var(--surface2);border:1px dashed var(--line);border-radius:8px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-            <b style="font-size:13px">📍 登錄受控座標檔</b>
-            <span class="note" style="font-size:11.5px">目前正式登錄支援 .csv</span>
+            <b style="font-size:var(--fs-ui)">📍 登錄受控座標檔</b>
+            <span class="note" style="font-size:var(--fs-caption)">目前正式登錄支援 .csv</span>
           </div>
           <div class="up-place-row">
             <div class="field"><label for="upPlacePart">產品料號（必填）</label><input type="text" id="upPlacePart" class="mono" list="partList" autocomplete="off" maxlength="64" placeholder="例：301-0011001123" aria-describedby="upPlacePartHint"></div>
@@ -1648,8 +1624,8 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
               </select>
             </div>
             <div class="field"><span class="up-place-lab">原始檔（必填）</span>
-              <label class="row" style="cursor:pointer;margin:0"><input type="file" id="upPlaceFile" accept=".csv" class="sr"><span class="chipbtn" style="border:1px solid var(--line);padding:4px 10px;font-size:12px">選取 CSV</span></label></div>
-            <span id="upPlaceFileName" class="note" style="font-size:11.5px;align-self:flex-end;overflow-wrap:anywhere"></span>
+              <label class="row" style="cursor:pointer;margin:0"><input type="file" id="upPlaceFile" accept=".csv" class="sr"><span class="chipbtn" style="border:1px solid var(--line);padding:4px 10px;font-size:var(--fs-caption)">選取 CSV</span></label></div>
+            <span id="upPlaceFileName" class="note" style="font-size:var(--fs-caption);align-self:flex-end;overflow-wrap:anywhere"></span>
             <button type="button" class="primary btn-sm" id="btnSubmitPlace" style="align-self:flex-end">存入資料庫</button>
           </div>
           <div id="upPlacePartHint" class="note" aria-live="polite" style="margin-top:4px"></div>
@@ -1663,10 +1639,10 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
       </div>
     </div>
     <div class="sheet-foot" style="padding:10px 18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:var(--surface2);flex:0 0 auto">
-      <span class="note" style="font-size:12px;min-width:0">原始檔不可修改；「驗證」檢查指紋與座標對應</span>
+      <span class="note" style="font-size:var(--fs-caption);min-width:0">原始檔不可修改；「驗證」檢查指紋與座標對應</span>
       <div style="display:flex;gap:8px;flex:none">
-        <button type="button" id="btnRecPickerGoImport" style="font-size:13px">＋ 匯入新檔</button>
-        <button type="button" id="btnRecPickerCloseBottom" class="primary" style="font-size:13px">完成</button>
+        <button type="button" id="btnRecPickerGoImport" style="font-size:var(--fs-ui)">＋ 匯入新檔</button>
+        <button type="button" id="btnRecPickerCloseBottom" class="primary" style="font-size:var(--fs-ui)">完成</button>
       </div>
     </div>
   </div>
@@ -2090,7 +2066,7 @@ function samplePhmeCSV(){const r=rng(424200),L=buildLayout().filter(p=>p.group!=
   return out.join("\n")}
 
 /* ============ 狀態 ============ */
-const METRICS={volume:{label:"體積 Volume",short:"體積",unit:"%"},height:{label:"高度 Height",short:"高度",unit:"µm"},hpct:{label:"高度 % 鋼板厚",short:"高度%厚",unit:"%"},area:{label:"面積 Area",short:"面積",unit:"%"},offx:{label:"X 偏移 Offset X",short:"X 偏移",unit:"µm"},offy:{label:"Y 偏移 Offset Y",short:"Y 偏移",unit:"µm"}};
+const METRICS={volume:{label:"體積",short:"體積",unit:"%"},height:{label:"高度",short:"高度",unit:"µm"},hpct:{label:"高度 % 鋼板厚",short:"高度%厚",unit:"%"},area:{label:"面積",short:"面積",unit:"%"},offx:{label:"X 偏移",short:"X 偏移",unit:"µm"},offy:{label:"Y 偏移",short:"Y 偏移",unit:"µm"}};
 const DEF_SPECS={volume:{lsl:70,usl:130,tgt:100},height:{lsl:90,usl:150,tgt:120},hpct:{lsl:75,usl:125,tgt:100},area:{lsl:70,usl:130,tgt:100},offx:{lsl:-75,usl:75,tgt:0},offy:{lsl:-75,usl:75,tgt:0}};
 const DEFECTS={INS:"少錫（體積 < LSL）",EXC:"多錫（體積 > USL）",BRG:"面積過大（連錫風險，面積 > USL）",LOWH:"高度不足",HIH:"高度過高 / 拉尖",OFF:"印刷偏移"};
 const ALL_GRP="__ALL__";
@@ -4732,16 +4708,16 @@ function detectIssues(st,onStage){
 
   stage(10,"進階特徵");
   /* ---- 進階分析特徵問題偵測 (RFC-SPI-2026-001) ---- */
-  // 1. 形貌缺陷：橋接餘裕不足 (Bridge Margin)
+  // 1. 形貌缺陷：橋接餘裕不足
   const bmRows=R.filter(r=>r.bridgemargin!=null&&isFinite(r.bridgemargin));
   if(bmRows.length){
     const badBm=bmRows.filter(r=>r.bridgemargin<25||(r.bridgegap!=null&&r.bridgegap<40));
     if(badBm.length>=3){
       const hitB=[...new Set(badBm.map(r=>r.board))];
       add({lv:"ng",cat:"形貌缺陷",sig:{t:"morph",k:"bridgemargin",boards:hitB},
-        title:`焊墊橋接間距餘裕不足（共 ${badBm.length} 處 Bridge Margin < 25%）`,
+        title:`焊墊橋接間距餘裕不足（共 ${badBm.length} 處橋接餘裕 < 25%）`,
         ents:hitB.map(b=>"b:"+b),score:3.2,
-        rule_id:"形貌缺陷 BridgeMargin",rule_name:"橋接安全裕度不足",metric:"橋接裕度",
+        rule_id:"形貌缺陷 橋接餘裕",rule_name:"橋接安全裕度不足",metric:"橋接裕度",
         boards:fmtBoards(hitB.map(b=>boards.indexOf(b)).filter(i=>i>=0)),subboard:subOf(R),group:"ALL",refdes:"多個元件",
         pads:badBm.slice(0,5).map(r=>`${r.board}:${r.pad}(${f(r.bridgemargin,1)}%)`).join("; ")+(badBm.length>5?` 等 ${badBm.length} 處`:""),
         observed:topList(badBm.map(r=>`${r.board} ${r.pad}: 裕度 ${f(r.bridgemargin,1)}%${r.bridgegap!=null?`，間距 ${f(r.bridgegap,1)}µm`:""}`),10),
@@ -4752,16 +4728,16 @@ function detectIssues(st,onStage){
     }
   }
 
-  // 2. 形貌缺陷：脫模拉尖 (Peaking)
+  // 2. 形貌缺陷：脫模拉尖
   const pkRows=R.filter(r=>r.peaking!=null&&isFinite(r.peaking));
   if(pkRows.length){
     const badPk=pkRows.filter(r=>r.peaking>35);
     if(badPk.length>=3){
       const hitB=[...new Set(badPk.map(r=>r.board))];
       add({lv:"warn",cat:"形貌缺陷",sig:{t:"morph",k:"peaking",boards:hitB},
-        title:`焊墊脫模拉尖超標（共 ${badPk.length} 處 Peaking > 35 µm）`,
+        title:`焊墊脫模拉尖超標（共 ${badPk.length} 處 > 35 µm）`,
         ents:hitB.map(b=>"b:"+b),score:2.4,
-        rule_id:"形貌缺陷 Peaking",rule_name:"脫模拉尖突起",metric:"拉尖高",
+        rule_id:"形貌缺陷 脫模拉尖",rule_name:"脫模拉尖突起",metric:"拉尖高",
         boards:fmtBoards(hitB.map(b=>boards.indexOf(b)).filter(i=>i>=0)),subboard:subOf(R),group:"ALL",refdes:"多個元件",
         pads:badPk.slice(0,5).map(r=>`${r.board}:${r.pad}(${f(r.peaking,1)}µm)`).join("; ")+(badPk.length>5?` 等 ${badPk.length} 處`:""),
         observed:topList(badPk.map(r=>`${r.board} ${r.pad}: 拉尖 ${f(r.peaking,1)} µm`),10),
@@ -5429,7 +5405,7 @@ function fmKbDetailsHtml(ruleIds){
   const body=ruleIds.map(rid=>{const rObj=SPI_PROCESS_KB_RULES.find(x=>x.id===rid);
     if(!rObj)return `<div><b class="mono">${fmKbEsc(rid)}</b></div>`;
     return `<div style="margin:4px 0"><b class="mono">${fmKbEsc(rid)}</b>（${fmKbEsc(rObj.type)}）：${fmKbEsc(rObj.desc)}<br><span style="color:var(--muted)">原因：${rObj.causes.map(fmKbEsc).join("；")}｜建議：${fmKbEsc(rObj.action)}</span></div>`}).join("");
-  return `<div style="margin-top:6px;padding:6px 10px;background:var(--surface2);border-radius:4px;font-size:12px"><b style="color:var(--ink)">SPI 製程對應知識庫規則：</b>${body}</div>`;
+  return `<div style="margin-top:6px;padding:6px 10px;background:var(--surface2);border-radius:4px;font-size:var(--fs-caption)"><b style="color:var(--ink)">SPI 製程對應知識庫規則：</b>${body}</div>`;
 }
 
 if(typeof module!=="undefined")module.exports={rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,areaRatio,maxThkForAR,detectIssues,overallVerdict,compareRuns,dfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml};
@@ -5718,7 +5694,7 @@ function evSvg(ev,lv){if(!ev||!ev.values||!ev.values.some(isFinite))return"";con
     V.forEach((v,i)=>{if(isFinite(v))g+=`<circle cx="${x(i)}" cy="${y(v)}" r="${hiS.has(i)?3.6:1.8}" style="fill:${hiS.has(i)?col:mut}"><title>${esc(ev.labels[i])}：${f(v,1)} ${ev.unit||""}</title></circle>`});}
   else{const bw=iw/n;V.forEach((v,i)=>{if(!isFinite(v))return;const y0=y(Math.max(lo,Math.min(0,hi))),yv=y(v),top=Math.min(y0,yv),h=Math.max(1,Math.abs(y0-yv));
     g+=`<rect x="${(pl+i*bw+bw*.15).toFixed(1)}" y="${top.toFixed(1)}" width="${(bw*.7).toFixed(1)}" height="${h.toFixed(1)}" style="fill:${hiS.has(i)?col:mut};opacity:${hiS.has(i)?1:.45}"><title>${esc(ev.labels[i])}：${f(v,2)} ${ev.unit||""}</title></rect>`})}
-  const t=(x,yy,txt,anc)=>`<text x="${x}" y="${yy}" text-anchor="${anc||"start"}" style="fill:${mut};font:10px var(--f-mono)">${esc(txt)}</text>`;
+  const t=(x,yy,txt,anc)=>`<text x="${x}" y="${yy}" text-anchor="${anc||"start"}" style="fill:${mut};font:var(--fs-chart) var(--f-mono)">${esc(txt)}</text>`;
   g+=t(pl-4,pt+8,f(hi-pad,1),"end")+t(pl-4,pt+ih,f(lo+pad,1),"end")+t(pl,H-3,ev.labels[0])+t(W-pr,H-3,ev.labels[n-1],"end");
   return`<div class="ev-cap">${esc(ev.title)}${ev.unit?`（${esc(ev.unit)}）`:""}</div><svg class="ev" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${esc(ev.title)}">${g}</svg>`}
 /* 跨板彙總卡（孤立極端焊墊：sig.rows 每個子項有自己的等級）在地圖上只看命中這片板／這個群組的子項，
@@ -5733,13 +5709,13 @@ function renderPmap(){const B=[...new Set(S.rows.map(r=>r.board))],G=[...new Set
   const worst=list=>list.reduce((w,o)=>w==null||rank[o.lv]<rank[w]?o.lv:w,null);
   const tip=(lab,list,unit)=>{if(!list.length)return"無問題";const lv=worst(list),agg=list.filter(o=>isAgg(o.x)).length;
     return`${list.length} 項相關問題，本${unit}最高：${LVT[lv]}${agg?`（其中 ${agg} 張為跨板彙總卡，依本${unit}命中的焊墊判定等級）`:""}`};
-  const cell=(ent,lab,list)=>{const lv=worst(list);const isPart=S.partialBoards&&S.partialBoards.includes(lab);const sym=lv==="ng"?"✕":lv==="warn"?"!":lv==="info"?"ℹ":"";const symHtml=sym?`<span class="pmap-sym" aria-hidden="true" style="font-size:9px;line-height:1;margin-left:1px;font-weight:700">${sym}</span>`:"";return`<button data-ent="${esc(ent)}" class="${lv||""}" aria-pressed="${S.issEnt===ent}" title="${esc(lab)}${isPart?"（部分焊墊）":""}：${esc(tip(lab,list,"板"))}">${esc(lab.replace(/^[A-Za-z]+0?/,""))}${symHtml}${isPart?'<span class="subpill" style="font-size:9px;color:var(--warn);display:block;line-height:1">部分</span>':""}</button>`};
+  const cell=(ent,lab,list)=>{const lv=worst(list);const isPart=S.partialBoards&&S.partialBoards.includes(lab);const sym=lv==="ng"?"✕":lv==="warn"?"!":lv==="info"?"ℹ":"";const symHtml=sym?`<span class="pmap-sym" aria-hidden="true" style="font-size:var(--fs-chart);line-height:1;margin-left:1px;font-weight:700">${sym}</span>`:"";return`<button data-ent="${esc(ent)}" class="${lv||""}" aria-pressed="${S.issEnt===ent}" title="${esc(lab)}${isPart?"（部分焊墊）":""}：${esc(tip(lab,list,"板"))}">${esc(lab.replace(/^[A-Za-z]+0?/,""))}${symHtml}${isPart?'<span class="subpill" style="font-size:var(--fs-chart);color:var(--warn);display:block;line-height:1">部分</span>':""}</button>`};
   const sys=S.F.filter(x=>!x.ents.some(e=>e.startsWith("b:")||e.startsWith("g:")||e.startsWith("drift:")));
   /* 一次走過全部問題，分到各板／各群組（問題數上千、群組數百時不必每格重掃全部問題） */
   const byB=new Map(B.map(b=>[b,[]])),byG=new Map(G.map(g=>["g:"+g,[]]));
   for(const x of S.F){for(const b of issueBoards(x)){const a=byB.get(b);if(a)a.push({x,lv:lvOn(x,"b:"+b)})}for(const e of x.ents){const a=byG.get(e);if(a&&(!a.length||a[a.length-1].x!==x))a.push({x,lv:lvOn(x,e)})}}
   $("#pmap").innerHTML=`<div class="pmap-row"><span class="pmap-lab">各板（依印刷順序）</span><div class="pmap-cells pmap-boards">${B.map(b=>cell("b:"+b,b,byB.get(b))).join("")}</div></div>
-    <div class="pmap-row"><span class="pmap-lab">元件群組</span><div class="pmap-cells">${G.map(g=>`<button data-ent="g:${esc(g)}" class="${worst(byG.get("g:"+g))||""}" aria-pressed="${S.issEnt==="g:"+g}" title="${esc(g)}：${esc(tip(g,byG.get("g:"+g),"群組"))}" style="font-size:11px">${esc(g)}</button>`).join("")}</div></div>
+    <div class="pmap-row"><span class="pmap-lab">元件群組</span><div class="pmap-cells">${G.map(g=>`<button data-ent="g:${esc(g)}" class="${worst(byG.get("g:"+g))||""}" aria-pressed="${S.issEnt==="g:"+g}" title="${esc(g)}：${esc(tip(g,byG.get("g:"+g),"群組"))}" style="font-size:var(--fs-caption)">${esc(g)}</button>`).join("")}</div></div>
     ${sys.length?`<p class="note" style="margin:0">另有 ${sys.length} 項不屬特定板或群組的整體性問題（${[...new Set(sys.map(x=>x.cat))].join("、")}）。</p>`:""}
     ${S.issEnt?`<p style="margin:0"><span class="pill warn">只顯示 ${esc(S.issEnt.slice(S.issEnt.indexOf(":")+1))} 相關的問題</span> <button class="linkbtn" id="pmapClear">顯示全部</button></p>`:""}`;
   $$("#pmap [data-ent]").forEach(b=>b.onclick=()=>{S.issEnt=S.issEnt===b.dataset.ent?null:b.dataset.ent;renderIssues()});if($("#pmapClear"))$("#pmapClear").onclick=()=>{S.issEnt=null;renderIssues()}}
@@ -5751,15 +5727,14 @@ function renderIssues(){const F=S.F||[],c={ng:0,warn:0,info:0};F.forEach(x=>c[x.
     $("#issSub").textContent="請至「資料與規格」匯入 SPI 數據檔案，或點選頂部「載入範例資料」開始分析。";
     $("#pmap").innerHTML='<p class="note" style="padding:16px 0">尚無焊墊分佈數據</p>';
     $("#issFilter").innerHTML="";
-    $("#issList").innerHTML='<div class="note" style="text-align:center;padding:32px 16px"><p style="font-size:15px;margin-bottom:8px">尚無問題偵測結果</p><p>匯入資料後，系統將自動依十個面向進行統計檢定並列出異常問題。</p></div>';
+    $("#issList").innerHTML='<div class="note" style="text-align:center;padding:32px 16px"><p style="font-size:var(--fs-heading);margin-bottom:8px">尚無問題偵測結果</p><p>匯入資料後，系統將自動依十個面向進行統計檢定並列出異常問題。</p></div>';
     return;
   }
   if(F.pending){$("#issHead").textContent=`正在偵測問題（${S.rows.length.toLocaleString()} 筆）…`;$("#issSub").textContent="資料量大，於背景計算中，完成後會自動顯示結果。";$("#pmap").innerHTML="";$("#issList").innerHTML='<p class="note">計算中…</p>';return}
   $("#issHead").textContent=F.length?`偵測到 ${F.length} 項問題：嚴重 ${c.ng}、警示 ${c.warn}、資訊 ${c.info}`:"未偵測到統計上顯著的問題";
   const multi=F.filter(x=>x.corrob.length>=2).length;
   const Me=F.meta;
-  $("#issSub").textContent=(F.length?`排序：嚴重度 → 佐證數 → 異常強度。${multi} 項有兩個以上其他發現互相佐證，建議優先處理。`:"十個面向皆在正常範圍；仍可至各頁籤檢視細節。")
-    +(Me&&Me.tests?` 單板異常共做 ${Me.tests.toLocaleString()} 次檢定（板 × 元件群組 × 量測項目），門檻已依板數校準，每次檢定誤報約 ${Me.alpha.toExponential(1)}，即使製程完全正常也預期約 ${f(Me.expFA,1)} 次誤報；另有效果量與不良數門檻，實際更少。這個數字只涵蓋單板異常；Nelson 規則、孤立極端焊墊、多變量離群等其他偵測各有誤報率（Nelson 卡片列出模擬值）。單一發現請搭配下一行的失效模式交叉比對判讀。`:"");
+  $("#issSub").textContent=F.length?"":"十個面向皆在正常範圍。";
   fmLine();
   renderPmap();
   const cats=[...new Set(F.map(x=>x.cat))];
@@ -5777,7 +5752,7 @@ function renderIssues(){const F=S.F||[],c={ng:0,warn:0,info:0};F.forEach(x=>c[x.
   const isBoardCard = x => Boolean(isBoardInf && ((x.cat && (x.cat.includes("X̄") || x.cat.includes("板"))) || (x.boards && x.boards !== "全部" && x.boards !== "—")));
   const card=x=>`<details class="iss-card" id="iss-${x.id}" data-id="${x.id}"${ISS_OPEN.has(x.id)?" open":""}>
     <summary><span class="iss-sum-l"><span class="no">#${x.id}</span><span class="pill ${x.lv}">${LVL[x.lv]}</span></span>
-      <span class="iss-sum-t"><b>${esc(x.title)}</b><span>${isBoardCard(x)?'<span class="pill warn" style="font-size:10.5px;padding:1px 4px;margin-right:4px">推定子群組，僅供參考</span>':""}${esc(x.cat)}｜${esc(keyFact(x))}${x.corrob.length?`｜佐證 ${x.corrob.length}`:""}</span></span>
+      <span class="iss-sum-t"><b>${esc(x.title)}</b><span>${isBoardCard(x)?'<span class="pill warn" style="font-size:var(--fs-chart);padding:1px 4px;margin-right:4px">推定子群組，僅供參考</span>':""}${esc(x.cat)}｜${esc(keyFact(x))}${x.corrob.length?`｜佐證 ${x.corrob.length}`:""}</span></span>
       ${spark(x)}<span class="iss-chev" aria-hidden="true">▾</span></summary>
     <div class="iss-detail">
     <div class="iss-head"><span class="cat">${esc(x.cat)}</span><span class="pill na">${esc(x.rule_id||"")} · ${esc(x.rule_name||"")}</span>${isBoardCard(x)?'<span class="pill warn">推定子群組，僅供參考</span>':""}${x.corrob.length?`<span class="pill na">佐證 ${x.corrob.length}</span>`:""}${x.same_phenomenon&&x.same_phenomenon.length?`<span class="pill na">同一現象 ${x.same_phenomenon.length}</span>`:""}<span class="pill na">信心 ${esc(x.conf)}</span></div>
@@ -5812,7 +5787,7 @@ function renderFM(){const Me=S.F&&S.F.meta,box=$("#fmCard");if(!box)return;box.h
   const act=Me.modes.filter(m=>m.verdict==="可能"||m.verdict==="證據矛盾"||m.verdict==="待確認"),rest=Me.modes.filter(m=>!act.includes(m));
   $("#fmRest").innerHTML=rest.length?`未見跡象：${rest.filter(m=>m.verdict==="未見跡象").map(m=>esc(m.name.split("（")[0])).join("、")||"—"}${rest.some(m=>m.verdict==="資料不足")?`　｜　資料不足：${rest.filter(m=>m.verdict==="資料不足").map(m=>`${esc(m.name.split("（")[0])}（${esc(m.need)}）`).join("、")}`:""}`:"";
   $("#fmTbl").innerHTML=kbHead+(!act.length?'<p class="note">沒有任何失效模式出現證據</p>':act.map(m=>{
-    const ruleBadges = m.rules&&m.rules.length ? ` <span class="mono note" style="font-size:11px">[${m.rules.join("、")}]</span>` : "";
+    const ruleBadges = m.rules&&m.rules.length ? ` <span class="mono note" style="font-size:var(--fs-caption)">[${m.rules.join("、")}]</span>` : "";
     const kbDetails = typeof fmKbDetailsHtml==="function"?fmKbDetailsHtml(m.rules):"";
     return `<details class="fm"><summary><span class="pill ${cls[m.verdict]}">${m.verdict}</span><b>${esc(m.name)}</b>${ruleBadges}<span class="note">${m.dims.length?"支持面向："+m.dims.join("、"):""}${m.con.length?"　矛盾 "+m.con.length+" 項":""}</span></summary>
       <div class="fm-body"><p class="note" style="margin:0 0 4px">可能原因：${esc(m.cause)}${m.key?`　｜　必要面向：${m.key}`:""}</p><ul>${m.sup.map(e=>ev(e,1)).join("")}${m.con.map(e=>ev(e,0)).join("")}</ul>${kbDetails}</div></details>`;
@@ -5982,7 +5957,7 @@ function renderOverview(){
   const cpkVal=S.pendingVerify?PENDING_VERIFY_LABEL:(A.cap&&isFinite(A.cap.cpk)?f(A.cap.cpk):cpkShow.value);
   const cpkSub=S.pendingVerify?(cpkShow.sub||"開孔覆蓋率未滿"):A.cap?(A.cap.reason||((A.stable?"":"製程未穩定，僅供參考 · ")+(A.cap.mixed?`${A.cap.worst} · 規格 ${f(A.cap.lsl,0)} – ${f(A.cap.usl,0)} ${u}`:`規格 ${A.sp.lsl} – ${A.sp.usl} ${u}`))):"未設定規格";
   const defPpm=S.pendingVerify?PENDING_VERIFY_LABEL:fmtPpm(Math.round(defTot/padTot*1e6));
-  $("#kpis").innerHTML=kpi("平均 "+METRICS[A.m].short,f(A.gMean,1)+`<small style="font-size:15px"> ${u}</small>`,`σ 整體 ${f(A.overallSd,2)} · 組內 ${f(A.sigmaW,2)}`)
+  $("#kpis").innerHTML=kpi("平均 "+METRICS[A.m].short,f(A.gMean,1)+`<small style="font-size:var(--fs-heading)"> ${u}</small>`,`σ 整體 ${f(A.overallSd,2)} · 組內 ${f(A.sigmaW,2)}`)
     +kpi("CPK"+(A.cap&&A.cap.mixed?"（最差群組）":""),cpkVal,cpkSub,S.pendingVerify?"warn":(A.cap?capCls(A.cap.cpk):""))
     +kpi("PPK"+(A.cap&&A.cap.mixed?"（最差群組）":""),A.cap&&isFinite(A.cap.ppk)?f(A.cap.ppk):"—",A.cap?(A.cap.reason||((A.stable?"":"製程未穩定，僅供參考 · ")+"長期 σ")):"",A.cap?capCls(A.cap.ppk):"")
     +kpi("判異點數",(A.nelX||A.nel).flag.size,`X̄ 圖 ${(A.nelX||A.nel).rules.filter(r=>r.idx.length&&r.id!==7).length} 條 Nelson 規則觸發`,(A.nelX||A.nel).flag.size?"ng":"ok")
@@ -6054,7 +6029,6 @@ const HOW={xbars:"每點是一片板所有焊墊的平均，S 圖看板內離散
 function renderControl(){
   if(!hasData()){
     $("#ctrlTitle").textContent="管制圖（無資料）";$("#ctrl2Title").textContent="";$("#ctrl2Card").hidden=true;
-    $("#ctrlHow").textContent="尚未載入量測資料。匯入數據後即可顯示管制圖與判異分析。";
     $("#ctrlSub").textContent="";$("#ctrlLegend").innerHTML="";
     $("#nelsonTbl").innerHTML='<tbody><tr><td colspan="4" class="note">尚未載入資料</td></tr></tbody>';
     return;
@@ -6066,7 +6040,7 @@ function renderControl(){
     p:["P′ 圖（每板不良率 %，Laney）",""],
     ewma:["EWMA 圖（λ = 0.2，L = 3）",""],
     cusum:["CUSUM 圖（k = 0.5σ，h = 5σ）",""]}[c]||["管制圖",""];
-  $("#ctrlTitle").textContent=t[0]+` · ${METRICS[S.metric].label}`;$("#ctrl2Title").textContent=t[1];$("#ctrl2Card").hidden=!t[1];$("#ctrlHow").textContent=HOW[c]||"";
+  $("#ctrlTitle").textContent=t[0]+` · ${METRICS[S.metric].label}`;$("#ctrl2Title").textContent=t[1];$("#ctrl2Card").hidden=!t[1];
   const cl=c==="imr"?A.imr.cl:c==="p"?A.pc.cl*100:c==="xbarr"?(A.xr&&A.xr.cl):A.xs.cl;
   const ewOut=A.ewma.filter(p=>p.v>p.ucl||p.v<p.lcl).map(p=>p.lab),cuOut=A.cusum.pts.filter(p=>p.cp>A.cusum.h||p.cm>A.cusum.h).map(p=>p.lab),cuStart=A.cusum.pts.findIndex(p=>p.cp>A.cusum.h||p.cm>A.cusum.h);
   const warnText = A.xs.subgroupWarning ? ` · <span class="note">${A.xs.subgroupWarning}</span>` : "";
@@ -6107,7 +6081,7 @@ function renderControl(){
         {data:uv,borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},{data:lv,borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},{data:c==="imr"?s.map(()=>clv):s.map(x=>x.cl),borderColor:css("--accent"),borderWidth:1.2,pointRadius:0}]},options:baseOpts()})}
   }
   const pts=A.series;
-  $("#nelsonTbl").innerHTML=`<thead><tr><th>規則</th><th>狀態</th><th>觸發點</th><th>錫膏印刷常見對應原因</th></tr></thead><tbody>`+A.nel.rules.map(r=>`<tr><td>${r.name}</td><td>${r.na?'<span class="pill na">不適用</span>':r.idx.length?(r.id===7?'<span class="pill warn">觸發</span>':'<span class="pill ng">觸發</span>'):'<span class="pill ok">通過</span>'}</td><td class="mono" style="font-size:12px">${r.idx.length?r.idx.map(i=>pts[i].lab).join(" "):"—"}</td><td class="note">${r.na?"此管制圖不適用此規則（僅 X̄ / I-MR 使用全部 8 條；P' 圖用 1–4；EWMA / CUSUM 僅用 1）":r.hint}</td></tr>`).join("")+"</tbody>";
+  $("#nelsonTbl").innerHTML=`<thead><tr><th>規則</th><th>狀態</th><th>觸發點</th><th>錫膏印刷常見對應原因</th></tr></thead><tbody>`+A.nel.rules.map(r=>`<tr><td>${r.name}</td><td>${r.na?'<span class="pill na">不適用</span>':r.idx.length?(r.id===7?'<span class="pill warn">觸發</span>':'<span class="pill ng">觸發</span>'):'<span class="pill ok">通過</span>'}</td><td class="mono" style="font-size:var(--fs-caption)">${r.idx.length?r.idx.map(i=>pts[i].lab).join(" "):"—"}</td><td class="note">${r.na?"此管制圖不適用此規則（僅 X̄ / I-MR 使用全部 8 條；P' 圖用 1–4；EWMA / CUSUM 僅用 1）":r.hint}</td></tr>`).join("")+"</tbody>";
 }
 
 /* ---------- 能力 ---------- */
@@ -6176,8 +6150,8 @@ function renderCap(){
           <p class="note" style="margin:0">${isSkewed ? `⚠️ 原始數據偏離常態分佈（偏態 ${f(A.sk.skew, 2)}），常態 Cpk 可能失真；建議依 ${nn.method} 評估能力。` : `數據經 ${nn.method} 檢驗轉換，提供非對稱公差之等效能力評估。`}</p>
         </div>
         <div style="display:flex;gap:16px;align-items:center">
-          <div style="text-align:right"><span class="note">轉換等效 Ppk</span><div class="num" style="font-size:18px;font-weight:600">${ppkVal}</div></div>
-          <div style="text-align:right"><span class="note">等效預估 PPM</span><div class="num" style="font-size:18px;font-weight:600">${ppmVal}</div></div>
+          <div style="text-align:right"><span class="note">轉換等效 Ppk</span><div class="num" style="font-size:var(--fs-icon);font-weight:600">${ppkVal}</div></div>
+          <div style="text-align:right"><span class="note">等效預估 PPM</span><div class="num" style="font-size:var(--fs-icon);font-weight:600">${ppmVal}</div></div>
         </div>
       </div>`;
     } else {
@@ -6320,7 +6294,7 @@ function renderCross(){
   const scBase=!A.msa?"":A.msa.derived?"機台體積由面積×高度計算，相關性不具佐證意義":`體積 vs 高度×面積 組內 r = ${f(A.rHA,3)}`;
   $("#scSub").textContent=[scBase,S.scatterDisclosure?S.scatterDisclosure.text:""].filter(Boolean).join(" · ");
   mk("cScatter",{type:"scatter",data:{datasets:[{data:ok,pointRadius:1.8,backgroundColor:css("--series2")+"99"},{data:bad,pointRadius:3.5,pointStyle:"triangle",backgroundColor:css("--ng")}]},
-    options:baseOpts({scales:{x:{type:"linear",title:{display:true,text:"面積 Area (%)",color:css("--muted"),font:{size:11}},ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:10}},grid:{color:css("--grid")}},y:{title:{display:true,text:"高度 Height (µm)",color:css("--muted"),font:{size:11}},ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:10}},grid:{color:css("--grid")}}},
+    options:baseOpts({scales:{x:{type:"linear",title:{display:true,text:"面積 (%)",color:css("--muted"),font:{size:11}},ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:10}},grid:{color:css("--grid")}},y:{title:{display:true,text:"高度 (µm)",color:css("--muted"),font:{size:11}},ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:10}},grid:{color:css("--grid")}}},
       plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`${i.raw.r.board} ${i.raw.r.pad}  面積 ${i.raw.x}%  高度 ${i.raw.y}µm`}}}})});
   drawHeat();
   const G=A.groups;
@@ -6447,7 +6421,7 @@ function renderRelChartUI(){
   }
   if(kind==="specScatter"){
     const data=rows.filter(r=>r.volume!=null&&r.height!=null).slice(0,2000).map(r=>({x:r.volume,y:r.height,r}));
-    mk("cRelChart",{type:"scatter",data:{datasets:[{data,pointRadius:2,backgroundColor:css("--series2")+"99"}]},options:baseOpts({scales:{x:{title:{display:true,text:"體積 Volume (%)"}},y:{title:{display:true,text:"高度 Height (µm)"}}}})});
+    mk("cRelChart",{type:"scatter",data:{datasets:[{data,pointRadius:2,backgroundColor:css("--series2")+"99"}]},options:baseOpts({scales:{x:{title:{display:true,text:"體積 (%)"}},y:{title:{display:true,text:"高度 (µm)"}}}})});
     if(msgEl)msgEl.textContent="規格散點 · 體積 × 高度";
     return;
   }
@@ -6573,7 +6547,7 @@ function renderMorphologyUI(){
 
   const hasMorph = bmRows.length > 0 || pkRows.length > 0 || cpRows.length > 0 || cvRows.length > 0;
   if (!hasMorph) {
-    if (subEl) subEl.textContent = "此資料未包含 3D 形貌特徵欄位（BridgeMargin / Peaking / Coplanarity / Coverage）";
+    if (subEl) subEl.textContent = "此資料未包含 3D 形貌特徵欄位（橋接餘裕／脫模拉尖／共面性／覆蓋率）";
     kpisEl.innerHTML = `<span class="note">此匯入檔案未包含 3D 形貌特徵欄位；若 SPI 機台支援輸出焊墊間隙、表面平整度或拉尖高度，可於資料匯入時對應。</span>`;
     tblEl.innerHTML = `<tbody><tr><td class="note">無形貌資料</td></tr></tbody>`;
     return;
@@ -6918,7 +6892,7 @@ function renderGRR(){const G=S.grr;const ms=G?G.metrics:["volume"];if(!ms.includ
   const cls=v=>v<10?"ok":v<30?"warn":"ng",verdict=v=>v<10?"可接受":v<30?"視用途條件接受":"不可接受",worst=Math.max(R.pctTV,isFinite(R.pctTol)?R.pctTol:0);
   const pc=x=>f(x*x/(R.tv*R.tv)*100,1);
   $("#grrOut").innerHTML=`<div class="kpis">${kpi("%GRR（總變異）",f(R.pctTV,1)+"%",verdict(R.pctTV),cls(R.pctTV))}${kpi("%GRR（公差）",isFinite(R.pctTol)?f(R.pctTol,1)+"%":"—",isFinite(tol)?`公差 ${f(tol,0)} ${u}（LSL–USL）`:"未設定規格",isFinite(R.pctTol)?cls(R.pctTol):"")}
-    ${kpi("可區分類別 ndc",R.ndc,R.ndc>=5?"≥ 5，足以區分焊墊差異":"< 5，解析力不足",R.ndc>=5?"ok":"ng")}${kpi("量測誤差 σ",f(R.grr,2)+` <small style="font-size:14px">${u}</small>`,`焊墊間 σ ${f(R.pv,2)} ${u}`)}</div>
+    ${kpi("可區分類別 ndc",R.ndc,R.ndc>=5?"≥ 5，足以區分焊墊差異":"< 5，解析力不足",R.ndc>=5?"ok":"ng")}${kpi("量測誤差 σ",f(R.grr,2)+` <small style="font-size:var(--fs-body)">${u}</small>`,`焊墊間 σ ${f(R.pv,2)} ${u}`)}</div>
     <div class="tbl" style="margin-top:10px"><table><thead><tr><th>變異來源</th><th class="num">σ（${u}）</th><th class="num">貢獻 %</th><th>說明</th></tr></thead><tbody>
     <tr><td>重複性 EV</td><td class="num mono">${f(R.ev,3)}</td><td class="num mono">${pc(R.ev)}</td><td class="note">同一人同一焊墊重複量測的差異${R.pooled?"（含合併之交互作用）":"（機台本身）"}</td></tr>
     ${R.b>1?`<tr><td>再現性 AV</td><td class="num mono">${f(R.av,3)}</td><td class="num mono">${pc(R.av)}</td><td class="note">操作員／重新載入造成的差異</td></tr><tr><td>交互作用</td><td class="num mono">${R.pooled?"—":f(R.inter,3)}</td><td class="num mono">${R.pooled?"0.0%":pc(R.inter)}</td><td class="note">p = ${f(R.pInt,3)}${R.pooled?" > 0.25（已併入重複性）":R.pInt>.25?"（不顯著）":""}</td></tr>`:""}
@@ -7099,7 +7073,7 @@ function renderBoard2D(){
   const L={status:[[css("--ok"),"規格內"],[css("--warn"),"高度 / 偏移超規"],[css("--ng"),"少錫・多錫・連錫風險"]],height:[[divColor(-1),"高度低於目標"],[divColor(0),"接近目標"],[divColor(1),"高度高於目標"]],volume:[[divColor(-1),"體積低於目標"],[divColor(0),"接近目標"],[divColor(1),"體積高於目標"]]}[S.colorMode];
   let legHtml = L.map(l=>`<span><i class="sq" style="background:${l[0]}"></i>${l[1]}</span>`).join("");
   if(S.colorMode==="height"){
-    legHtml+=`<span style="display:inline-flex;align-items:center;gap:4px;margin-left:6px"><span style="display:inline-block;width:75px;height:10px;border-radius:2px;background:linear-gradient(to right, #2563eb, #06b6d4, #10b981, #f59e0b, #ef4444)"></span><span class="note" style="font-size:11px">LSL ➔ USL</span></span>`;
+    legHtml+=`<span style="display:inline-flex;align-items:center;gap:4px;margin-left:6px"><span style="display:inline-block;width:75px;height:10px;border-radius:2px;background:linear-gradient(to right, #2563eb, #06b6d4, #10b981, #f59e0b, #ef4444)"></span><span class="note" style="font-size:var(--fs-caption)">LSL ➔ USL</span></span>`;
   }
   $("#leg3d").innerHTML=legHtml+(S.ghost?`<span><i class="sq" style="background:transparent;outline:1px solid #9aa3a0"></i>標稱開孔（${S.step.on?"所在區域鋼板厚度":"鋼板厚度 "+S.stencil+" µm"}）</span>`:"")
     +(S.bridgeWarn?`<span><i class="sq" style="background:transparent;outline:1.5px solid #ef4444;border-radius:50%"></i>橋接風險（間距<40µm或餘裕<25%）</span>`:"")
@@ -7946,7 +7920,7 @@ function reportMd(){const A=S.A,u=METRICS[A.m].unit,lab={ok:"一致/正常",warn
   const vd=(S.F&&S.F.meta&&S.F.meta.verdict)||overallVerdict(S,S.F);
   const zCnt=S.step&&S.step.on?zoneCounts():null;
   const stepCovered=zCnt?Object.values(zCnt.c).reduce((a,b)=>a+b,0):0;
-  return`# SPI·SPC 分析報告\n\n- 產生時間：${fmtNowUtc8()}\n- 資料來源：${S.source}\n- 量測項目：${METRICS[A.m].label}；元件群組：${isAllGrp(S.group)?"全部":S.group}；管制圖：${chartName()}\n- 整體判定：${vd.label}（${vd.level}）${vd.reasons&&vd.reasons.length?" · 原因："+vd.reasons.join("；"):""}\n- 規格：LSL ${A.sp.lsl} / 目標 ${A.sp.tgt} / USL ${A.sp.usl} ${u}\n- 規格來源：${specSrcText()}\n- 刮刀行程方向：沿 ${S.sqDir||"Y"}；擦拭間隔：每 ${S.wipe} 片\n- 鋼板厚度：${S.stencil} µm（高度規格 ${S.htol.lo}%–${S.htol.hi}% 厚度）\n- 階梯鋼板：${S.step.on?S.step.zones.map(z=>`${z.name} ${z.t} µm（${z.mode==="group"?"群組 "+z.group:`X ${z.x0}–${z.x1}, Y ${z.y0}–${z.y1} mm`}）`).join("；")+`（涵蓋 ${stepCovered} 焊墊${stepCovered===0?" ⚠️ 未涵蓋任何焊墊":""}）`:"未啟用"}\n- 系統版本：${APP.ver} · 系統更新 ${APP.built}\n- 試產回合：${curRun()?curRun().name:""}\n${runSrc(curRun())?`- 資料來源追溯：${srcLine(runSrc(curRun()))}\n- 原始檔 SHA-256：${runSrc(curRun()).sha256}\n`:""}\n## 問題偵測（依嚴重度與佐證排序）\n\n${S.F.map(x=>`- #${x.no}［${x.level}］${x.title}（規則：${x.rule_id} ${x.rule_name}）\n  - 面向：${x.category}；量測項目：${x.metric}；板號：${x.boards}；焊墊：${x.pads}；群組：${x.group}；位號：${x.refdes}\n  - 觀測值：${x.observed}；界限：${x.limit}；z：${x.z}；p：${x.p}\n  - 事實：${x.facts.join("；")}\n  - 推論（信心 ${x.confidence}）：${x.inference}\n  - 建議動作：${x.action}${x.corroborated_by.length?"\n  - 跨面向佐證："+x.corroborated_by.map(i=>"#"+i).join("、"):""}${x.same_phenomenon.length?"\n  - 同一現象："+x.same_phenomenon.map(i=>"#"+i).join("、"):""}${x.explained_pads.length?"\n  - 已解釋焊墊："+x.explained_pads.join("；"):""}`).join("\n")||"- 未偵測到顯著問題"}\n\n## 一、統計結果（事實）\n\n| 指標 | 數值 |\n|---|---|\n| 樣本數 | ${A.N} |\n| 板數 | ${A.boards.length} |\n| 平均 | ${f(A.gMean,2)} ${u} |\n| σ 組內 / 整體 | ${f(A.sigmaW,3)} / ${f(A.overallSd,3)} |\n${A.cap?`| 能力計算方式 | ${A.cap.mixed?`逐元件群組（組內 σ），以最差群組 ${A.cap.worst} 代表`:"組內 σ"}${A.stable?"":"；製程未穩定，僅供參考"} |\n| Cp / Cpk | ${f(A.cap.cp)} / ${f(A.cap.cpk)} |\n| Cpk 95% 信賴區間（以 ${A.cap.nb} 片板計） | ${f(A.cap.ci[0])} – ${f(A.cap.ci[1])} |\n| Pp / Ppk | ${f(A.cap.pp)} / ${f(A.cap.ppk)} |\n| 預估 PPM / 超規 PPM（${mShort}${A.cap.mixed?`，最差群組 ${A.cap.worst}`:""}） | ${fmtPpm(A.cap.ppmExp)} / ${fmtPpm(A.cap.ppmObs)} |\n${A.cap.mixed?`| 預估 PPM / 超規 PPM（全部群組） | ${fmtPpm(A.cap.ppmExpAll)} / ${fmtPpm(A.cap.ppmObsAll)} |\n`:""}| 不良 PPM（全部判定項目） | ${fmtPpm(defPpm)} |\n`:""}| Anderson-Darling p | ${A.ad.p<.001?"<0.001":f(A.ad.p,3)} |\n${A.sw&&A.sw.valid?`| Shapiro-Wilk W / p | ${f(A.sw.w,4)} / ${A.sw.p<.001?"<0.001":f(A.sw.p,3)} |\n`:""}| 不良焊墊（全部項目） | ${A.defRows.length} |\n\n${A.cap&&A.cap.mixed?`\n### 逐元件群組製程能力\n\n| 元件群組 | n | 平均 | 規格 | Cpk | Cpk 95% 信賴區間 | Ppk | 預估 PPM | 超規 PPM（${mShort}） |\n|---|---|---|---|---|---|---|---|---|\n${A.cap.groups.map(g=>`| ${g.g} | ${g.n} | ${f(g.mu,1)} | ${f(g.lsl,0)}–${f(g.usl,0)} | ${f(g.cpk)} | ${f(g.ci[0])}–${f(g.ci[1])} | ${f(g.ppk)} | ${fmtPpm(g.ppmExp)} | ${fmtPpm(g.ppmObs)} |`).join("\n")}\n`:""}\n## 二、Nelson 規則（X̄ 圖，管制狀態判斷依據）\n\n${(A.nelX||A.nel).rules.map(r=>`- 規則 ${r.name}：${r.idx.length?"觸發（"+r.idx.map(i=>A.xs.pts[i].lab).join(", ")+"）":"通過"}`).join("\n")}${S.chart!=="xbars"?`\n\n目前畫面管制圖（${chartName()}）：${A.nel.rules.filter(r=>!r.na).map(r=>`規則 ${r.id} ${r.idx.length?"觸發":"通過"}`).join("、")}`:""}\n\n## 三、交叉驗證\n\n| 面向 | 來源 | 判定 | 依據 |\n|---|---|---|---|\n${A.xv.rows.map(x=>`| ${x.k} | ${x.src} | ${lab[x.st]} | ${x.ev} |`).join("\n")}\n\n${fmMd().trim()||"## 失效模式交叉比對\n\n- 無資料"}\n\n## 進階分析\n\n${(()=>{const W=advSummary(A);return[`- EWMA 越界：${W.EWMA越界.join(", ")||"無"}；CUSUM 訊號：${W.CUSUM訊號.join(", ")||"無"}`,`- 面積比 / 轉移效率：${W.面積比.map(g=>`${g.群組} AR ${g.AR}、TE ${g.轉移效率}%`).join("；")}`,`- 最差焊墊 Cpk：${W.最差焊墊Cpk.map(p=>`${p.焊墊} ${p.Cpk}`).join("、")}`,`- 對位異常板：${W.對位異常板.map(a=>`${a.板}（平移 ${a.平移X}/${a.平移Y} µm，旋轉 ${a.旋轉度}°）`).join("；")||"無"}`,W.刮刀前後?`- 刮刀前後差：${W.刮刀前後.差值}，p = ${W.刮刀前後.p}`:"",`- 擦拭週期（每 ${W.擦拭週期.每幾片} 片）：斜率 ${W.擦拭週期.每片斜率}/片，p = ${W.擦拭週期.p}`].filter(Boolean).join("\n")})()}\n\n## 四、不良柏拉圖\n\n${Object.entries(A.pareto).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`- ${DEFECTS[k]}：${v}`).join("\n")||"- 無"}\n${S.ai?`\n## 五、AI 品質工程分析（gpt-6.1-terra，含推論，需工程驗證）\n\n${S.ai}\n`:""}\n## 八、資料範圍揭露與未納入證據 (Data Scope & Exclusions)\n\n- 匯入總筆數：${S.rows.length} 筆；納入分析筆數：${S.rows.length} 筆\n- 板號推定狀態：${(S.boardInferred || S.rows.some(r=>r.boardInferred)) ? `板號為推定（每 ${S.boardInferred || Math.round(S.rows.length / (A.boards.length||1))} 筆）` : "板號完整，無推定缺失"}\n- 時間區間篩選：${S.timeFilter ? `${S.timeFilter.start || "—"} ～ ${S.timeFilter.end || "—"}（UTC+8）` : "未設定時間篩選（全時段）"}\n- 部分焊墊板數：${S.partialBoards && S.partialBoards.length ? `${S.partialBoards.length} 片板僅含部分焊墊（${S.partialBoards.join("、")}）` : "無部分板（所有板皆含完整焊墊）"}\n- 刮刀方向狀態：${S.sqDir ? `刮刀方向設定為 ${S.sqDir} 向` : "依板序奇偶推定"}\n- 焊墊座標狀態：${PLACE ? `已套用座標檔：${esc(PLACE.part)} ${esc(PLACE.rev)}` : "未套用獨立座標檔（採用資料內建座標或相對位置）"}\n\n## 九、方法附錄與統計檢驗說明 (Methodology Appendix)\n\n- 判定規格來源：${specSrcText()}\n- 實驗設計 (DOE)：各因子單獨檢定、未調整其他因子與交互作用。\n`}
+  return`# SPI·SPC 分析報告\n\n- 產生時間：${fmtNowUtc8()}\n- 資料來源：${S.source}\n- 量測項目：${METRICS[A.m].label}；元件群組：${isAllGrp(S.group)?"全部":S.group}；管制圖：${chartName()}\n- 整體判定：${vd.label}（${vd.level}）${vd.reasons&&vd.reasons.length?" · 原因："+vd.reasons.join("；"):""}\n- 規格：LSL ${A.sp.lsl} / 目標 ${A.sp.tgt} / USL ${A.sp.usl} ${u}\n- 規格來源：${specSrcText()}\n- 刮刀行程方向：沿 ${S.sqDir||"Y"}；擦拭間隔：每 ${S.wipe} 片\n- 鋼板厚度：${S.stencil} µm（高度規格 ${S.htol.lo}%–${S.htol.hi}% 厚度）\n- 階梯鋼板：${S.step.on?S.step.zones.map(z=>`${z.name} ${z.t} µm（${z.mode==="group"?"群組 "+z.group:`X ${z.x0}–${z.x1}, Y ${z.y0}–${z.y1} mm`}）`).join("；")+`（涵蓋 ${stepCovered} 焊墊${stepCovered===0?" ⚠️ 未涵蓋任何焊墊":""}）`:"未啟用"}\n- 系統版本：${APP.ver} · 系統更新 ${APP.built}\n- 試產回合：${curRun()?curRun().name:""}\n${runSrc(curRun())?`- 資料來源追溯：${srcLine(runSrc(curRun()))}\n- 原始檔 SHA-256：${runSrc(curRun()).sha256}\n`:""}\n## 問題偵測（依嚴重度與佐證排序）\n\n${S.F.map(x=>`- #${x.no}［${x.level}］${x.title}（規則：${x.rule_id} ${x.rule_name}）\n  - 面向：${x.category}；量測項目：${x.metric}；板號：${x.boards}；焊墊：${x.pads}；群組：${x.group}；位號：${x.refdes}\n  - 觀測值：${x.observed}；界限：${x.limit}；z：${x.z}；p：${x.p}\n  - 事實：${x.facts.join("；")}\n  - 推論（信心 ${x.confidence}）：${x.inference}\n  - 建議動作：${x.action}${x.corroborated_by.length?"\n  - 跨面向佐證："+x.corroborated_by.map(i=>"#"+i).join("、"):""}${x.same_phenomenon.length?"\n  - 同一現象："+x.same_phenomenon.map(i=>"#"+i).join("、"):""}${x.explained_pads.length?"\n  - 已解釋焊墊："+x.explained_pads.join("；"):""}`).join("\n")||"- 未偵測到顯著問題"}\n\n## 一、統計結果（事實）\n\n| 指標 | 數值 |\n|---|---|\n| 樣本數 | ${A.N} |\n| 板數 | ${A.boards.length} |\n| 平均 | ${f(A.gMean,2)} ${u} |\n| σ 組內 / 整體 | ${f(A.sigmaW,3)} / ${f(A.overallSd,3)} |\n${A.cap?`| 能力計算方式 | ${A.cap.mixed?`逐元件群組（組內 σ），以最差群組 ${A.cap.worst} 代表`:"組內 σ"}${A.stable?"":"；製程未穩定，僅供參考"} |\n| Cp / Cpk | ${f(A.cap.cp)} / ${f(A.cap.cpk)} |\n| Cpk 95% 信賴區間（以 ${A.cap.nb} 片板計） | ${f(A.cap.ci[0])} – ${f(A.cap.ci[1])} |\n| Pp / Ppk | ${f(A.cap.pp)} / ${f(A.cap.ppk)} |\n| 預估 PPM / 超規 PPM（${mShort}${A.cap.mixed?`，最差群組 ${A.cap.worst}`:""}） | ${fmtPpm(A.cap.ppmExp)} / ${fmtPpm(A.cap.ppmObs)} |\n${A.cap.mixed?`| 預估 PPM / 超規 PPM（全部群組） | ${fmtPpm(A.cap.ppmExpAll)} / ${fmtPpm(A.cap.ppmObsAll)} |\n`:""}| 不良 PPM（全部判定項目） | ${fmtPpm(defPpm)} |\n`:""}| Anderson-Darling p | ${A.ad.p<.001?"<0.001":f(A.ad.p,3)} |\n${A.sw&&A.sw.valid?`| Shapiro-Wilk W / p | ${f(A.sw.w,4)} / ${A.sw.p<.001?"<0.001":f(A.sw.p,3)} |\n`:""}| 不良焊墊（全部項目） | ${A.defRows.length} |\n\n${A.cap&&A.cap.mixed?`\n### 逐元件群組製程能力\n\n| 元件群組 | n | 平均 | 規格 | Cpk | Cpk 95% 信賴區間 | Ppk | 預估 PPM | 超規 PPM（${mShort}） |\n|---|---|---|---|---|---|---|---|---|\n${A.cap.groups.map(g=>`| ${g.g} | ${g.n} | ${f(g.mu,1)} | ${f(g.lsl,0)}–${f(g.usl,0)} | ${f(g.cpk)} | ${f(g.ci[0])}–${f(g.ci[1])} | ${f(g.ppk)} | ${fmtPpm(g.ppmExp)} | ${fmtPpm(g.ppmObs)} |`).join("\n")}\n`:""}\n## 二、Nelson 規則（X̄ 圖，管制狀態判斷依據）\n\n${(A.nelX||A.nel).rules.map(r=>`- 規則 ${r.name}：${r.idx.length?"觸發（"+r.idx.map(i=>A.xs.pts[i].lab).join(", ")+"）":"通過"}`).join("\n")}${S.chart!=="xbars"?`\n\n目前畫面管制圖（${chartName()}）：${A.nel.rules.filter(r=>!r.na).map(r=>`規則 ${r.id} ${r.idx.length?"觸發":"通過"}`).join("、")}`:""}\n\n## 三、交叉驗證\n\n| 面向 | 來源 | 判定 | 依據 |\n|---|---|---|---|\n${A.xv.rows.map(x=>`| ${x.k} | ${x.src} | ${lab[x.st]} | ${x.ev} |`).join("\n")}\n\n${fmMd().trim()||"## 失效模式交叉比對\n\n- 無資料"}\n\n## 進階分析\n\n${(()=>{const W=advSummary(A);return[`- EWMA 越界：${W.EWMA越界.join(", ")||"無"}；CUSUM 訊號：${W.CUSUM訊號.join(", ")||"無"}`,`- 面積比 / 轉移效率：${W.面積比.map(g=>`${g.群組} AR ${g.AR}、TE ${g.轉移效率}%`).join("；")}`,`- 最差焊墊 Cpk：${W.最差焊墊Cpk.map(p=>`${p.焊墊} ${p.Cpk}`).join("、")}`,`- 對位異常板：${W.對位異常板.map(a=>`${a.板}（平移 ${a.平移X}/${a.平移Y} µm，旋轉 ${a.旋轉度}°）`).join("；")||"無"}`,W.刮刀前後?`- 刮刀前後差：${W.刮刀前後.差值}，p = ${W.刮刀前後.p}`:"",`- 擦拭週期（每 ${W.擦拭週期.每幾片} 片）：斜率 ${W.擦拭週期.每片斜率}/片，p = ${W.擦拭週期.p}`].filter(Boolean).join("\n")})()}\n\n## 四、不良柏拉圖\n\n${Object.entries(A.pareto).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`- ${DEFECTS[k]}：${v}`).join("\n")||"- 無"}\n${S.ai?`\n## 五、AI 品質工程分析（gpt-6.1-terra，含推論，需工程驗證）\n\n${S.ai}\n`:""}\n## 八、資料範圍揭露與未納入證據\n\n- 匯入總筆數：${S.rows.length} 筆；納入分析筆數：${S.rows.length} 筆\n- 板號推定狀態：${(S.boardInferred || S.rows.some(r=>r.boardInferred)) ? `板號為推定（每 ${S.boardInferred || Math.round(S.rows.length / (A.boards.length||1))} 筆）` : "板號完整，無推定缺失"}\n- 時間區間篩選：${S.timeFilter ? `${S.timeFilter.start || "—"} ～ ${S.timeFilter.end || "—"}（UTC+8）` : "未設定時間篩選（全時段）"}\n- 部分焊墊板數：${S.partialBoards && S.partialBoards.length ? `${S.partialBoards.length} 片板僅含部分焊墊（${S.partialBoards.join("、")}）` : "無部分板（所有板皆含完整焊墊）"}\n- 刮刀方向狀態：${S.sqDir ? `刮刀方向設定為 ${S.sqDir} 向` : "依板序奇偶推定"}\n- 焊墊座標狀態：${PLACE ? `已套用座標檔：${esc(PLACE.part)} ${esc(PLACE.rev)}` : "未套用獨立座標檔（採用資料內建座標或相對位置）"}\n\n## 九、方法附錄與統計檢驗說明\n\n- 判定規格來源：${specSrcText()}\n- 實驗設計 (DOE)：各因子單獨檢定、未調整其他因子與交互作用。\n`}
 /* 下載：在 claude.ai 內用平台下載功能；一般瀏覽器（例如 Cloudflare Workers 正式站）直接下載檔案 */
 function browserDownload(filename,data){const isXlsx=/\.xlsx$/i.test(filename);const type=isXlsx?"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":(/\.csv$/.test(filename)?"text/csv;charset=utf-8":"text/markdown;charset=utf-8"),url=URL.createObjectURL(new Blob(isXlsx?[data]:["\uFEFF"+data],{type})),a=document.createElement("a");a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 /* 匯出鈕分散在各分頁，#expState 只在資料分頁；結果同時用 toast 顯示，避免在其他分頁按了沒反應 */
@@ -8091,7 +8065,7 @@ const AI_PROVIDERS_META={
   }
 };
 /* @ai-providers-meta END */
-const AI_EFFORT_LABELS={high:"高 (high)",medium:"中 (medium)",low:"低 (low)"};
+const AI_EFFORT_LABELS={high:"高",medium:"中",low:"低"};
 let AI_SERVER_HAS_KEY=false,AI_LAST_USAGE=null;
 const AI_SERVER_META={
   openai:{hasServerKey:false,usage:null,limits:null,availableModels:null},
@@ -8249,7 +8223,7 @@ function updateAiStatusLabels(cfgArg){
   const cfg=cfgArg||loadAiCfg();
   const act=cfg.activeProvider,meta=AI_PROVIDERS_META[act]||AI_PROVIDERS_META.openai,pCfg=cfg.providers[act];
   const effModel=effectiveModelOf(pCfg,act);
-  const effLabel=AI_EFFORT_LABELS[pCfg.effort]||"高 (high)";
+  const effLabel=AI_EFFORT_LABELS[pCfg.effort]||"高";
   if($("#aiProviderLabel"))$("#aiProviderLabel").textContent=meta.label;
   if($("#aiModelProvName"))$("#aiModelProvName").textContent=meta.label;
   if($("#aiLimitProvTitle"))$("#aiLimitProvTitle").textContent=meta.label+" 獨立配額上限：";
@@ -8334,11 +8308,86 @@ function updateAiPreview(){
   const el=$("#aiPayloadPre");
   if(el)try{el.textContent=JSON.stringify(apiPayload(),null,2)}catch(e){}
 }
+/* 與 lib/analyze-core.mjs 的 LIMITS 對齊。40 KB 檢查發生在伺服器截斷之前，超長的群組／各板摘要要先收斂再送出。 */
+let AI_PAYLOAD_NOTE="",AI_PAYLOAD_FIT=null;
+const AI_FIT_LIMITS={maxBytes:40000,maxText:400,maxArray:60,maxFacts:8,maxIssues:40,maxDepth:5};
+function aiEvenTake(arr,k){
+  if(!Array.isArray(arr)||arr.length<=k)return arr;
+  if(k<=1)return arr.slice(0,k);
+  const out=[],used=new Set();
+  for(let i=0;i<k;i++){
+    const idx=Math.round(i*(arr.length-1)/(k-1));
+    if(used.has(idx))continue;
+    used.add(idx);out.push(arr[idx]);
+  }
+  return out;
+}
+function aiClip(v,d,maxA,maxT){
+  if(d>AI_FIT_LIMITS.maxDepth)return undefined;
+  if(v==null)return null;
+  if(typeof v==="number")return Number.isFinite(v)?v:null;
+  if(typeof v==="boolean")return v;
+  if(typeof v==="string")return v.replace(/[\u0000-\u001f]/g," ").slice(0,maxT);
+  if(Array.isArray(v))return v.slice(0,maxA).map(x=>aiClip(x,d+1,maxA,maxT)).filter(x=>x!==undefined);
+  if(typeof v==="object"){
+    const o={};
+    for(const [k,x] of Object.entries(v).slice(0,40)){
+      const c=aiClip(x,d+1,maxA,maxT);
+      if(c!==undefined)o[String(k).slice(0,60)]=c;
+    }
+    return o;
+  }
+  return undefined;
+}
+function aiShapeForFit(src,maxA){
+  const o=JSON.parse(JSON.stringify(src));
+  const adv=o["進階"];
+  if(adv&&Array.isArray(adv["面積比"])&&adv["面積比"].length>maxA)adv["面積比"]=adv["面積比"].slice().sort((a,b)=>(+a.AR||0)-(+b.AR||0)).slice(0,maxA);
+  if(Array.isArray(o["各板"])&&o["各板"].length>maxA)o["各板"]=aiEvenTake(o["各板"],maxA);
+  if(adv){
+    for(const k of ["EWMA越界","CUSUM訊號"])if(Array.isArray(adv[k])&&adv[k].length>maxA)adv[k]=aiEvenTake(adv[k],maxA);
+    if(Array.isArray(adv["對位異常板"])&&adv["對位異常板"].length>maxA){
+      const sev=a=>Math.max(Math.abs(+a.平移X||0),Math.abs(+a.平移Y||0),Math.abs(+a.旋轉度||0));
+      adv["對位異常板"]=adv["對位異常板"].slice().sort((a,b)=>sev(b)-sev(a)).slice(0,maxA);
+    }
+  }
+  if(Array.isArray(o["元件群組統計"])&&o["元件群組統計"].length>maxA){
+    const keep=new Set((adv&&adv["面積比"]||[]).map(x=>x["群組"]));
+    const pref=o["元件群組統計"].filter(g=>keep.has(g["群組"]));
+    const rest=o["元件群組統計"].filter(g=>!keep.has(g["群組"]));
+    o["元件群組統計"]=(pref.length?pref.concat(rest):o["元件群組統計"]).slice(0,maxA);
+  }
+  if(Array.isArray(o["Nelson"]))o["Nelson"].forEach(r=>{if(r&&Array.isArray(r["點"])&&r["點"].length>maxA)r["點"]=aiEvenTake(r["點"],maxA)});
+  return o;
+}
+function fitAiPayload(p){
+  const before=new Blob([JSON.stringify({payload:p})]).size;
+  const ar0=(p["進階"]&&Array.isArray(p["進階"]["面積比"]))?p["進階"]["面積比"].length:0;
+  const b0=Array.isArray(p["各板"])?p["各板"].length:0;
+  const g0=Array.isArray(p["元件群組統計"])?p["元件群組統計"].length:0;
+  let maxA=AI_FIT_LIMITS.maxArray,maxT=AI_FIT_LIMITS.maxText,out=null,bytes=before;
+  for(let guard=0;guard<12;guard++){
+    out=aiClip(aiShapeForFit(p,maxA),0,maxA,maxT);
+    if(out&&Array.isArray(out["系統偵測問題清單"]))out["系統偵測問題清單"]=out["系統偵測問題清單"].slice(0,AI_FIT_LIMITS.maxIssues).map(x=>{if(x&&Array.isArray(x["事實"]))x["事實"]=x["事實"].slice(0,AI_FIT_LIMITS.maxFacts);return x});
+    bytes=new Blob([JSON.stringify({payload:out})]).size;
+    if(bytes<=AI_FIT_LIMITS.maxBytes)break;
+    if(maxA>8)maxA=Math.max(8,Math.floor(maxA/2));
+    else maxT=Math.max(80,Math.floor(maxT/2));
+  }
+  const ar1=(out&&out["進階"]&&Array.isArray(out["進階"]["面積比"]))?out["進階"]["面積比"].length:0;
+  const b1=(out&&Array.isArray(out["各板"]))?out["各板"].length:0;
+  const g1=(out&&Array.isArray(out["元件群組統計"]))?out["元件群組統計"].length:0;
+  const trimmed=ar0>ar1||b0>b1||g0>g1||before>AI_FIT_LIMITS.maxBytes;
+  AI_PAYLOAD_NOTE=trimmed?"，過長的統計已收斂":"";
+  AI_PAYLOAD_FIT={before,after:bytes,trimmed,ar0,ar1,b0,b1,g0,g1};
+  window.AI_PAYLOAD_FIT=AI_PAYLOAD_FIT;
+  return out;
+}
 function apiPayload(){
   const p=aiPayload();delete p["前15不良焊墊"];
-  if($("#aiAnon")&&$("#aiAnon").checked)return anonymizePayload(p);
+  if($("#aiAnon")&&$("#aiAnon").checked)return fitAiPayload(anonymizePayload(p));
   AI_ANON_MAP=null;
-  return p;
+  return fitAiPayload(p);
 }
 window.apiPayload=apiPayload;
 if($("#aiProviderSeg")){
@@ -8498,6 +8547,9 @@ async function analyzeViaApi(out,st){
   const effModel=effectiveModelOf(pCfg,usedProv);
   const effEffort=pCfg.effort||"high";
   const body=JSON.stringify({payload:apiPayload()});
+  // #region agent log
+  fetch('http://127.0.0.1:7524/ingest/a37f49c5-9477-4794-8ecb-6ba230e6c7c8',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'548a31'},body:JSON.stringify({sessionId:'548a31',runId:'post-fix',hypothesisId:'A',location:'spi-spc.html:analyzeViaApi',message:'ai payload bytes after fit',data:{fit:AI_PAYLOAD_FIT,sent:new Blob([body]).size,underLimit:new Blob([body]).size<=40000},timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
   const headers={
     "Content-Type":"application/json",
     "X-AI-Provider":usedProv,
@@ -8511,7 +8563,7 @@ async function analyzeViaApi(out,st){
     headers["X-AI-Key"]=pCfg.apiKey;
   }
   aiAbort=new AbortController();$("#btnAI").disabled=true;$("#btnAIStop").hidden=false;out.innerHTML="";
-  st.textContent=`分析中…（使用 ${meta.label} · ${effModel} · 推理強度 ${effEffort}${fallbackNotice} · 送出統計摘要 ${f(new Blob([body]).size/1024,1)} KB，不含原始 SPI 資料）`;let text="";
+  st.textContent=`分析中…（使用 ${meta.label} · ${effModel} · 推理強度 ${effEffort}${fallbackNotice} · 送出統計摘要 ${f(new Blob([body]).size/1024,1)} KB，不含原始 SPI 資料${AI_PAYLOAD_NOTE}）`;let text="";
   try{const res=await fetch("/api/analyze",{method:"POST",headers,body,signal:aiAbort.signal});
     if(!res.ok){let msg=res.status===404?"此網站沒有啟用 AI 分析服務":`伺服器回應 ${res.status}`;try{const j=await res.json();if(j.error)msg=j.error;if(j.usage){AI_LAST_USAGE=j.usage;if(AI_SERVER_META[usedProv])AI_SERVER_META[usedProv].usage=j.usage;renderAiUsageUI(j.usage,pCfg,usedProv)}}catch(e){}st.textContent="AI 分析無法使用："+msg;return}
     const rd=res.body.getReader(),dec=new TextDecoder();
@@ -8925,7 +8977,7 @@ async function renderRecords(force){if(!$("#recSpi"))return;await RecDB.ready;$(
   $("#recSpiSub").textContent=`${S1.length} 筆${q?"（篩選後）":""}`;$("#recPlaceSub").textContent=`${P1.length} 筆${q?"（篩選後）":""}`;
   $("#recSpi").innerHTML=S1.length?`<thead><tr><th>批號</th><th>產品料號</th><th>工單</th><th>面別</th><th>原始檔</th><th class="num">板 × 焊墊</th><th>上傳者</th><th>上傳時間</th><th>檔案指紋</th><th></th></tr></thead><tbody>`+S1.map(r=>{
     const wo=[r.workOrder?`製令:${esc(r.workOrder)}`:"",r.measuredDate?`日期:${esc(r.measuredDate)}`:"",r.supplierWo?`廠:${esc(r.supplierWo)}`:"",r.outsourceWo?`委:${esc(r.outsourceWo)}`:""] .filter(Boolean).join("<br>")||"未提供";
-    return `<tr><td><b>${esc(r.lot||"未提供")}</b></td><td>${esc(r.part)} ${esc(r.rev||"")}<br><span class="note">${esc(r.lifecycle==="active"?"有效":r.lifecycle==="pending_review"?"待管理者判定":r.lifecycle==="superseded"?"已被修正":"舊資料・未受控")}</span></td><td style="font-size:11px">${wo}</td><td>${esc(r.side||"—")}</td><td>${esc(r.name)}<br><span class="note">${r.bytes<1024?`${r.bytes} B`:`${(r.bytes/1024).toFixed(0)} KB`}</span></td><td class="num mono">${r.boards||"—"} × ${r.pads||"—"}</td><td>${esc(r.user)}</td><td class="mono" style="white-space:nowrap">${esc(fmtTime(r.created))}</td><td>${fp(r)}</td>
+    return `<tr><td><b>${esc(r.lot||"未提供")}</b></td><td>${esc(r.part)} ${esc(r.rev||"")}<br><span class="note">${esc(r.lifecycle==="active"?"有效":r.lifecycle==="pending_review"?"待管理者判定":r.lifecycle==="superseded"?"已被修正":"舊資料・未受控")}</span></td><td style="font-size:var(--fs-caption)">${wo}</td><td>${esc(r.side||"—")}</td><td>${esc(r.name)}<br><span class="note">${r.bytes<1024?`${r.bytes} B`:`${(r.bytes/1024).toFixed(0)} KB`}</span></td><td class="num mono">${r.boards||"—"} × ${r.pads||"—"}</td><td>${esc(r.user)}</td><td class="mono" style="white-space:nowrap">${esc(fmtTime(r.created))}</td><td>${fp(r)}</td>
     <td><div class="rec-act">${r.lifecycle!=="pending_review"?`<button data-ract="open" data-id="${esc(r.id)}">${r.lifecycle==="superseded"?"歷史檢視":"開啟分析"}</button>`:""}<button data-ract="dl" data-id="${esc(r.id)}">下載原始檔</button><button data-ract="ver" data-id="${esc(r.id)}">驗證</button>${del(r)}</div></td></tr>`;
   }).join("")+"</tbody>":`<tbody><tr><td colspan="10" class="note">${q?"沒有符合的量測紀錄":"尚無量測紀錄。在「匯入與規格」匯入檔案並填寫批號、產品料號後，原始檔會自動存到這裡。"}</td></tr></tbody>`;
   $("#recPlace").innerHTML=P1.length?`<thead><tr><th>產品料號</th><th>版次／面別</th><th>原始檔</th><th class="num">元件數</th><th>上傳者</th><th>上傳時間</th><th>檔案指紋</th><th></th></tr></thead><tbody>`+P1.map(r=>`<tr${PLACE&&PLACE.recId===r.id?' style="background:var(--accent-soft)"':""}><td><b>${esc(r.part)}</b></td><td>${esc(r.rev)} ${esc(r.side)}<br><span class="note">${esc(r.lifecycle==="active"?"有效":r.lifecycle==="archived"?"已封存":"舊資料・未受控")}</span></td><td>${esc(r.name)}</td><td class="num mono">${r.comps||"—"}</td><td>${esc(r.user)}</td><td class="mono" style="white-space:nowrap">${esc(fmtTime(r.created))}</td><td>${fp(r)}</td>
@@ -9038,7 +9090,7 @@ function updateStartupDbBanner() {
   const recentBox = $("#bannerRecentRuns");
   if (!recentBox) return;
   /* 有後端時先佔住一列高度顯示讀取中，結果回來只換內容、不改高度 */
-  const boxNote = (t) => { recentBox.hidden = false; recentBox.innerHTML = `<span class="note" style="font-size:12px">${esc(t)}</span>`; };
+  const boxNote = (t) => { recentBox.hidden = false; recentBox.innerHTML = `<span class="note" style="font-size:var(--fs-caption)">${esc(t)}</span>`; };
   if (ME_PROBE && !recentBox.querySelector(".banner-run-chip")) boxNote("讀取最近記錄…");
 
   RecDB.ready.then(async () => {
@@ -9058,14 +9110,14 @@ function updateStartupDbBanner() {
         let qBadge = "";
         if (r.qualitySnapshot) {
           if (r.qualitySnapshot.totalDefects === 0) {
-            qBadge = `<span class="pill ok" style="font-size:11px;padding:1px 6px">✓ 良品</span>`;
+            qBadge = `<span class="pill ok" style="font-size:var(--fs-caption);padding:1px 6px">✓ 良品</span>`;
           } else {
-            qBadge = `<span class="pill bad" style="font-size:11px;padding:1px 6px">⚠ ${r.qualitySnapshot.totalDefects} 缺點</span>`;
+            qBadge = `<span class="pill bad" style="font-size:var(--fs-caption);padding:1px 6px">⚠ ${r.qualitySnapshot.totalDefects} 缺點</span>`;
           }
         }
-        return `<button type="button" class="chipbtn banner-run-chip" data-id="${esc(r.id)}" style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;font-size:12px;border:1px solid var(--line);border-radius:6px;background:var(--surface);cursor:pointer;min-height:34px" title="一鍵載入批號 ${esc(r.lot)}">
+        return `<button type="button" class="chipbtn banner-run-chip" data-id="${esc(r.id)}" style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;font-size:var(--fs-caption);border:1px solid var(--line);border-radius:6px;background:var(--surface);cursor:pointer;min-height:34px" title="一鍵載入批號 ${esc(r.lot)}">
           <span style="font-weight:600">🕒 ${esc(r.lot)}</span>
-          <span class="note" style="font-size:11.5px">${esc(r.part || "—")} (${esc(r.side || "ALL")})</span>
+          <span class="note" style="font-size:var(--fs-caption)">${esc(r.part || "—")} (${esc(r.side || "ALL")})</span>
           ${qBadge}
         </button>`;
       }).join("");
@@ -9258,7 +9310,7 @@ async function showPlaceProof(rec) {
     + `<table class="proof-tbl"><tbody>${[["料號", `<span class="mono">${esc(rec.part)}</span>`], ["版次", esc(rec.rev)], ["面別", esc(rec.side === "BOTH" ? "TOP＋BOT" : rec.side || "—")],
       ["單位", esc(rec.unit || "未記錄")], ["元件數", esc(rec.comps || "—")], ["狀態", esc(lcName(rec.validation_source === "legacy" ? "legacy" : rec.lifecycle))], ["原始檔", esc(rec.name || "")], ["指紋", shaShort(rec.sha256)]]
       .map(([k, v]) => `<tr><td data-label="項目" style="width:22%"><b>${k}</b></td><td data-label="內容">${v}</td></tr>`).join("")}</tbody></table>`
-    + `<h4 style="margin:0;font-size:14px">被 ${users.length} 筆量測引用</h4>`
+    + `<h4 style="margin:0;font-size:var(--fs-body)">被 ${users.length} 筆量測引用</h4>`
     + (users.length ? `<ul class="proof-refs proof-list" style="padding-left:18px">${users.slice(0, 20).map(x => `<li><button type="button" class="linkbtn" data-goto="${esc(x.id)}">${esc(x.lot || "未提供批號")}</button>・${esc(x.side || "—")}・${esc(lcName(x.lifecycle))}・${esc(fmtTime(x.created))}</li>`).join("")}</ul>${users.length > 20 ? `<p class="note" style="margin:0">還有 ${users.length - 20} 筆</p>` : ""}`
       : '<p class="note" style="margin:0">尚無量測引用</p>');
   renderRecPicker(); renderRecords();
@@ -9373,12 +9425,12 @@ async function renderRecPicker(force) {
       }
       const hl = PICKER_HIGHLIGHT && PICKER_HIGHLIGHT.id === r.id;
       return `<tr data-row-id="${esc(r.id)}"${hl ? ' class="rec-new"' : ""}>
-        <td><b>${esc(r.lot||"未提供")}</b>${hl && PICKER_HIGHLIGHT.label ? ` <span class="pill warn">${esc(PICKER_HIGHLIGHT.label)}</span>` : ""}<br><span class="note mono" style="font-size:11.5px">${esc(r.part || "—")} ${esc(r.rev||"")}</span><br>${spiBadge(r)}</td>
-        <td>${esc(r.side || "—")}<br><span class="note" style="font-size:11.5px">${wo}</span></td>
+        <td><b>${esc(r.lot||"未提供")}</b>${hl && PICKER_HIGHLIGHT.label ? ` <span class="pill warn">${esc(PICKER_HIGHLIGHT.label)}</span>` : ""}<br><span class="note mono" style="font-size:var(--fs-caption)">${esc(r.part || "—")} ${esc(r.rev||"")}</span><br>${spiBadge(r)}</td>
+        <td>${esc(r.side || "—")}<br><span class="note" style="font-size:var(--fs-caption)">${wo}</span></td>
         <td class="num mono">${r.boards || r.pads ? `${r.boards || "—"} × ${r.pads || "—"}` : '<span class="note" style="white-space:nowrap" title="舊資料未記錄板數與焊墊數">未記錄</span>'}</td>
         <td>${placeInfo}</td>
         <td>${qualityInfo}</td>
-        <td class="mono" style="font-size:11.5px">${esc(fmtTime(r.created))}<br><span class="note">${esc(r.user)}</span></td>
+        <td class="mono" style="font-size:var(--fs-caption)">${esc(fmtTime(r.created))}<br><span class="note">${esc(r.user)}</span></td>
         <td>${fp(r)}</td>
         <td style="text-align:right">
           <div class="rec-acts">
@@ -9403,37 +9455,37 @@ async function renderRecPicker(force) {
       if (r.qualitySnapshot) {
         const defs = r.qualitySnapshot.defects ?? r.qualitySnapshot.totalDefects ?? 0;
         if (defs === 0) {
-          qualityInfo = `<span class="pill ok" style="font-size:11.5px">✓ 良品</span>`;
+          qualityInfo = `<span class="pill ok" style="font-size:var(--fs-caption)">✓ 良品</span>`;
         } else {
-          qualityInfo = `<span class="pill bad" style="font-size:11.5px">⚠ ${defs} 缺點</span>`;
+          qualityInfo = `<span class="pill bad" style="font-size:var(--fs-caption)">⚠ ${defs} 缺點</span>`;
         }
       }
       const pt = placeText(r, list), again = reimp.get(r.id);
       return `<div class="rec-card" data-row-id="${esc(r.id)}" style="padding:12px;background:${PICKER_HIGHLIGHT && PICKER_HIGHLIGHT.id === r.id ? "var(--accent-soft)" : "var(--surface)"};border:1px solid var(--line);border-radius:10px;margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
           <div style="min-width:0">
-            <b style="font-size:15px">${esc(r.lot||"未提供")}</b>
-            <div class="note" style="font-size:12px;margin-top:2px"><span class="mono">${esc(r.part || "—")}</span> ${esc(r.rev||"")} · 面別: ${esc(r.side || "—")} · ${esc(r.lifecycle==="pending_review"?"待判定":r.lifecycle==="superseded"?"已被修正":r.lifecycle==="active"?"有效":"舊資料・未受控")}</div>
+            <b style="font-size:var(--fs-heading)">${esc(r.lot||"未提供")}</b>
+            <div class="note" style="font-size:var(--fs-caption);margin-top:2px"><span class="mono">${esc(r.part || "—")}</span> ${esc(r.rev||"")} · 面別: ${esc(r.side || "—")} · ${esc(r.lifecycle==="pending_review"?"待判定":r.lifecycle==="superseded"?"已被修正":r.lifecycle==="active"?"有效":"舊資料・未受控")}</div>
           </div>
           <div style="display:flex;gap:4px;align-items:center">
             ${qualityInfo}
-            <span class="pill" style="font-size:11px;background:var(--surface2)">${esc(r.boards || 0)}板</span>
+            <span class="pill" style="font-size:var(--fs-caption);background:var(--surface2)">${esc(r.boards || 0)}板</span>
           </div>
         </div>
-        <div class="note" style="font-size:12px;margin:8px 0;line-height:1.4">
+        <div class="note" style="font-size:var(--fs-caption);margin:8px 0;line-height:1.4">
           工單: ${wo}<br>
           座標: ${pt ? (pt.missing ? '<span class="rec-bad">✗ 座標檔不存在</span>' : `<span class="mono">${esc(pt.text)}</span>`) : again && again.length ? "無座標引用（已重新匯入）" : "無座標引用"}<br>
           上傳: ${esc(fmtTime(r.created))} · ${esc(r.user)}
           ${r.note ? `<br><span style="color:var(--ink)">備註: ${esc(r.note)}</span>` : ""}
         </div>
         <div class="rec-card-actions" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
-          ${!["pending_review","superseded"].includes(r.lifecycle)?`<button class="primary" data-pact="load" data-id="${esc(r.id)}" style="flex:1 1 120px;min-height:44px;font-size:14px;font-weight:600">載入分析</button>`:""}
-          <button data-pact="ver" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:13px">驗證</button>
-          <button data-pact="open" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:13px">調整</button>
-          ${again && again.length ? `<button data-pact="goto" data-id="${esc(again[0].id)}" style="min-height:44px;font-size:13px">已重新匯入 →</button>` : !pt && canReimport(r) ? `<button data-pact="reimport" data-id="${esc(r.id)}" style="min-height:44px;font-size:13px">重新受控匯入</button>` : ""}
+          ${!["pending_review","superseded"].includes(r.lifecycle)?`<button class="primary" data-pact="load" data-id="${esc(r.id)}" style="flex:1 1 120px;min-height:44px;font-size:var(--fs-body);font-weight:600">載入分析</button>`:""}
+          <button data-pact="ver" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-ui)">驗證</button>
+          <button data-pact="open" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-ui)">調整</button>
+          ${again && again.length ? `<button data-pact="goto" data-id="${esc(again[0].id)}" style="min-height:44px;font-size:var(--fs-ui)">已重新匯入 →</button>` : !pt && canReimport(r) ? `<button data-pact="reimport" data-id="${esc(r.id)}" style="min-height:44px;font-size:var(--fs-ui)">重新受控匯入</button>` : ""}
           ${RecDB.isAdmin&&r.lifecycle==="pending_review"?`<button data-pact="new-batch" data-id="${esc(r.id)}">新一批</button><button data-pact="correct" data-id="${esc(r.id)}">修正既有</button>`:""}
           ${editBtn(r)}
-          <button data-pact="dl" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:13px">下載</button>
+          <button data-pact="dl" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-ui)">下載</button>
           ${delBtn(r)}
         </div>
       </div>`;
@@ -9457,13 +9509,13 @@ async function renderRecPicker(force) {
       const selectable=r.lifecycle==="active"&&r.validation_source==="server_verified";
       const defBadge = placeBadge(r, selectable), hl = PICKER_HIGHLIGHT && PICKER_HIGHLIGHT.id === r.id;
       return `<tr data-row-id="${esc(r.id)}"${isCur || hl ? ' class="rec-new"' : ""}>
-        <td><b class="mono">${esc(r.part)}</b>${hl && PICKER_HIGHLIGHT.label ? ` <span class="pill warn">${esc(PICKER_HIGHLIGHT.label)}</span>` : ""}<br><span class="note" title="${esc(r.name || "")}" style="font-size:11.5px;display:inline-block;max-width:14ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom">${esc(r.name || "")}</span></td>
+        <td><b class="mono">${esc(r.part)}</b>${hl && PICKER_HIGHLIGHT.label ? ` <span class="pill warn">${esc(PICKER_HIGHLIGHT.label)}</span>` : ""}<br><span class="note" title="${esc(r.name || "")}" style="font-size:var(--fs-caption);display:inline-block;max-width:14ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom">${esc(r.name || "")}</span></td>
         <td>${esc(r.side || "ALL")}</td>
         <td><span class="pill rev">${esc(r.rev)}</span></td>
         <td>${esc(r.unit || "未確認")}</td>
         <td class="num mono">${r.comps || "—"}</td>
         <td>${defBadge}</td>
-        <td class="mono" style="font-size:11.5px">${esc(fmtTime(r.created))}<br><span class="note">${esc(r.user)}</span></td>
+        <td class="mono" style="font-size:var(--fs-caption)">${esc(fmtTime(r.created))}<br><span class="note">${esc(r.user)}</span></td>
         <td>${fp(r)}</td>
         <td style="text-align:right">
           <div class="rec-acts">
@@ -9488,14 +9540,14 @@ async function renderRecPicker(force) {
       return `<div class="rec-card" data-row-id="${esc(r.id)}" style="padding:12px;background:${PICKER_HIGHLIGHT && PICKER_HIGHLIGHT.id === r.id ? "var(--accent-soft)" : "var(--surface)"};border:1px solid var(--line);border-radius:10px;margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
           <div style="min-width:0">
-            <b class="mono" style="font-size:15px">${esc(r.part)}</b>
-            <div class="note" style="font-size:12px;margin-top:2px">面別: ${esc(r.side || "ALL")} · 版次: ${esc(r.rev)}</div>
+            <b class="mono" style="font-size:var(--fs-heading)">${esc(r.part)}</b>
+            <div class="note" style="font-size:var(--fs-caption);margin-top:2px">面別: ${esc(r.side || "ALL")} · 版次: ${esc(r.rev)}</div>
           </div>
           <div>
             ${placeBadge(r, selectable)}
           </div>
         </div>
-        <div class="note" style="font-size:12px;margin:8px 0">
+        <div class="note" style="font-size:var(--fs-caption);margin:8px 0">
           元件數: ${r.comps || "—"} · 單位: ${esc(r.unit || "未確認")}<br>
           原始檔: <span style="overflow-wrap:anywhere">${esc(r.name || "")}</span><br>
           ${r.lifecycle === "archived" ? `<span>${ARCHIVED_TIP}</span><br>` : ""}
@@ -9503,11 +9555,11 @@ async function renderRecPicker(force) {
           ${r.note ? `<br><span style="color:var(--ink)">備註: ${esc(r.note)}</span>` : ""}
         </div>
         <div class="rec-card-actions" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
-          ${isCur ? '<button class="primary" disabled style="flex:1 1 120px;min-height:44px;font-size:14px">目前已選取</button>' : selectable?`<button class="primary" data-pact="use-place" data-id="${esc(r.id)}" style="flex:1 1 120px;min-height:44px;font-size:14px">選取此座標檔</button>`:""}
+          ${isCur ? '<button class="primary" disabled style="flex:1 1 120px;min-height:44px;font-size:var(--fs-body)">目前已選取</button>' : selectable?`<button class="primary" data-pact="use-place" data-id="${esc(r.id)}" style="flex:1 1 120px;min-height:44px;font-size:var(--fs-body)">選取此座標檔</button>`:""}
           ${RecDB.isAdmin&&selectable?`<button data-pact="archive-place" data-id="${esc(r.id)}">封存</button>`:""}
           ${RecDB.isAdmin&&r.validation_source==="legacy"?`<button data-pact="register-legacy-place" data-id="${esc(r.id)}">驗證納管</button>`:""}
-          <button data-pact="ver" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:13px">驗證</button>
-          <button data-pact="dl" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:13px">下載</button>
+          <button data-pact="ver" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-ui)">驗證</button>
+          <button data-pact="dl" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-ui)">下載</button>
           ${delBtn(r)}
         </div>
       </div>`;
@@ -10212,26 +10264,26 @@ function renderReport(){
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">
         <svg class="mitcorp-logo" viewBox="0 0 248 45" width="121" height="22" fill="currentColor" fill-rule="evenodd" role="img" aria-label="Mitcorp" style="height:22px"><path d="${MITCORP_SVG_PATH}"/></svg>
         <span style="width:1px;height:20px;background:var(--line)"></span>
-        <h1 style="font-size:22px;margin:0">SPI·SPC 錫膏印刷統計製程管制分析報告</h1>
+        <h1 style="font-size:var(--fs-title);margin:0">SPI·SPC 錫膏印刷統計製程管制分析報告</h1>
       </div>
-      <div style="font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 16px">
+      <div style="font-size:var(--fs-caption);color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 16px">
         <span>產生時間：${nowStr} (UTC+8)</span><span>系統版本：${esc(APP.ver)} · ${esc(APP.built)}</span>
       </div>
     </div>
     <div class="tbl" style="margin-bottom:20px"><table><tbody>
       <tr><th>試產回合</th><td><b>${esc(S.source)}</b></td><th>批號 (Lot)</th><td><b>${esc(lot)}</b></td></tr>
       <tr><th>產品料號</th><td>${esc(part)}</td><th>面別 (Side)</th><td>${esc(side)}</td></tr>
-      <tr><th>鋼板厚度</th><td>${S.stencil} µm${stepHtml}</td><th>資料指紋 SHA-256</th><td class="mono" style="font-size:11px">${esc(sha)}</td></tr>
+      <tr><th>鋼板厚度</th><td>${S.stencil} µm${stepHtml}</td><th>資料指紋 SHA-256</th><td class="mono" style="font-size:var(--fs-caption)">${esc(sha)}</td></tr>
       <tr><th>分析樣本</th><td>${A.boards.length} 片板 · ${A.pads.length} 焊墊 · 共 ${S.rows.length.toLocaleString()} 筆</td><th>判定規格來源</th><td>${esc(specSrcText())}</td></tr>
     </tbody></table></div></div>`;
 
   const worstGrp=repCapRows(A).rows[0];
   const act5=F.slice(0,5);
   const s2=`<div class="rep-sec" id="repSec2">
-    <h2 style="font-size:17px;border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">一、執行摘要 (Executive Summary)</h2>
+    <h2 style="font-size:var(--fs-heading);border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">一、執行摘要</h2>
     <div style="padding:12px 16px;border-radius:8px;margin-bottom:16px;background:${ov.level==='ng'?'var(--ng-soft,#fee)':ov.level==='warn'?'var(--warn-soft,#fff8e6)':'var(--ok-soft,#eef9f2)'};border:1px solid ${ov.level==='ng'?'var(--ng)':ov.level==='warn'?'var(--warn)':'var(--ok)'}">
-      <div style="font-size:15px;font-weight:600;margin-bottom:4px">整體判定：${ov.label}</div>
-      <ul style="margin:0;padding-left:20px;font-size:13px">${(ov.reasons||["製程穩定且能力足夠"]).map(r=>`<li>${esc(r)}</li>`).join("")}</ul>
+      <div style="font-size:var(--fs-heading);font-weight:600;margin-bottom:4px">整體判定：${ov.label}</div>
+      <ul style="margin:0;padding-left:20px;font-size:var(--fs-ui)">${(ov.reasons||["製程穩定且能力足夠"]).map(r=>`<li>${esc(r)}</li>`).join("")}</ul>
     </div>
     <div class="kpis" style="margin-bottom:16px">
       ${kpi("嚴重異常",cStat.ng+" 項","需立即處置",cStat.ng?"ng":"ok")}
@@ -10239,7 +10291,7 @@ function renderReport(){
       ${kpi("資訊項目",cStat.info+" 項","統計參考","na")}
       ${kpi("最差群組 Cpk",worstGrp&&isFinite(worstGrp.cpk)?f(worstGrp.cpk,2):"—",worstGrp?worstGrp.g:"—",worstGrp&&worstGrp.cpk<1.33?"warn":"ok")}
     </div>
-    <h3 style="font-size:13.5px;margin:12px 0 6px">五大判定項目 X̄ 管制狀態表</h3>
+    <h3 style="font-size:var(--fs-ui);margin:12px 0 6px">五大判定項目 X̄ 管制狀態表</h3>
     <div class="tbl" style="margin-bottom:16px"><table>
       <thead><tr><th>量測項目</th><th class="num">平均值 μ</th><th class="num">LCL</th><th class="num">UCL</th><th class="num">規格窗</th><th>狀態判定</th></tr></thead>
       <tbody>${["volume","hpct","area","offx","offy"].map(m=>{
@@ -10249,23 +10301,23 @@ function renderReport(){
         return `<tr><td>${METRICS[m].label} <span class="note">${METRICS[m].unit}</span></td><td class="num mono">${f(mu,1)}</td><td class="num mono">${isFinite(A.xLcl)&&S.metric===m?f(A.xLcl,1):"—"}</td><td class="num mono">${isFinite(A.xUcl)&&S.metric===m?f(A.xUcl,1):"—"}</td><td class="num mono">${sp.lsl??"—"} ~ ${sp.usl??"—"}</td><td><span class="pill ${isFlag?'ng':'ok'}">${isFlag?'判異':'正常'}</span></td></tr>`
       }).join("")}</tbody>
     </table></div>
-    <h3 style="font-size:13.5px;margin:12px 0 6px">優先處理問題摘要（前 5 項）</h3>
+    <h3 style="font-size:var(--fs-ui);margin:12px 0 6px">優先處理問題摘要（前 5 項）</h3>
     <div class="tbl" style="margin-bottom:16px"><table>
       <thead><tr><th>#</th><th>嚴重度</th><th>問題標題</th><th>核心事實</th><th>推論原因與建議動作</th></tr></thead>
-      <tbody>${act5.length?act5.map(x=>`<tr><td class="mono">#${x.id}</td><td><span class="pill ${x.lv}">${LVL[x.lv]}</span></td><td><b>${esc(x.title)}</b><div class="note">${esc(x.cat)}</div></td><td style="font-size:12px">${esc(x.facts[0]||"—")}</td><td style="font-size:12px"><b>推論：</b>${esc(x.cause)}<br><b>動作：</b>${esc(x.action)}</td></tr>`).join(""):'<tr><td colspan="5" class="note">未偵測到需優先處置之問題</td></tr>'}</tbody>
-    </table></div>${S.ai?`<h3 style="font-size:13.5px;margin:12px 0 6px">AI 品質工程診斷摘要（gpt-6.1-terra）</h3><div class="ai-out" style="padding:10px 14px;background:var(--surface2);border-radius:8px;border:1px solid var(--line);margin-bottom:16px">${mdLite(S.ai)}</div>`:""}</div>`;
+      <tbody>${act5.length?act5.map(x=>`<tr><td class="mono">#${x.id}</td><td><span class="pill ${x.lv}">${LVL[x.lv]}</span></td><td><b>${esc(x.title)}</b><div class="note">${esc(x.cat)}</div></td><td style="font-size:var(--fs-caption)">${esc(x.facts[0]||"—")}</td><td style="font-size:var(--fs-caption)"><b>推論：</b>${esc(x.cause)}<br><b>動作：</b>${esc(x.action)}</td></tr>`).join(""):'<tr><td colspan="5" class="note">未偵測到需優先處置之問題</td></tr>'}</tbody>
+    </table></div>${S.ai?`<h3 style="font-size:var(--fs-ui);margin:12px 0 6px">AI 品質工程診斷摘要（gpt-6.1-terra）</h3><div class="ai-out" style="padding:10px 14px;background:var(--surface2);border-radius:8px;border:1px solid var(--line);margin-bottom:16px">${mdLite(S.ai)}</div>`:""}</div>`;
 
   const s3=`<div class="rep-sec" id="repSec3">
-    <h2 style="font-size:17px;border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">二、問題偵測清單（共 ${F.length} 項）</h2>
+    <h2 style="font-size:var(--fs-heading);border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">二、問題偵測清單（共 ${F.length} 項）</h2>
     <div class="tbl" style="margin-bottom:16px"><table>
       <thead><tr><th>#</th><th>等級</th><th>面向</th><th>規則 ID 與名稱</th><th>量測項目</th><th>板號／群組</th><th>焊墊</th><th>觀測值與界限</th><th>統計量 (z, p)</th><th>事實與推論</th><th>佐證／已解釋</th></tr></thead>
       <tbody>${F.length?F.map(x=>`<tr>
         <td class="mono">#${x.id}</td><td><span class="pill ${x.lv}">${LVL[x.lv]}</span></td><td>${esc(x.cat)}</td>
-        <td style="font-size:11px"><b>${esc(x.rule_id||"—")}</b><br>${esc(x.rule_name||"—")}</td><td>${esc(x.metric)}</td>
-        <td style="font-size:11px">${esc(x.boards)}<br>${esc(x.group)}</td><td class="mono" style="font-size:10.5px">${esc(x.pads)}</td>
-        <td style="font-size:11px">觀測：${esc(x.observed)}<br>界限：${esc(x.limit)}</td><td class="mono" style="font-size:10.5px">z: ${esc(x.z)}<br>p: ${esc(x.p)}</td>
-        <td style="font-size:11px"><b>事實：</b>${esc(x.facts.join("；"))}<br><b>推論：</b>${esc(x.cause)}<br><b>建議：</b>${esc(x.action)}</td>
-        <td style="font-size:10.5px">佐證：${x.corrob&&x.corrob.length?x.corrob.map(i=>"#"+i).join("、"):"無"}${x.explained_pads&&x.explained_pads.length?`<br>已解釋：${esc(x.explained_pads.join("；"))}`:""}</td>
+        <td style="font-size:var(--fs-caption)"><b>${esc(x.rule_id||"—")}</b><br>${esc(x.rule_name||"—")}</td><td>${esc(x.metric)}</td>
+        <td style="font-size:var(--fs-caption)">${esc(x.boards)}<br>${esc(x.group)}</td><td class="mono" style="font-size:var(--fs-chart)">${esc(x.pads)}</td>
+        <td style="font-size:var(--fs-caption)">觀測：${esc(x.observed)}<br>界限：${esc(x.limit)}</td><td class="mono" style="font-size:var(--fs-chart)">z: ${esc(x.z)}<br>p: ${esc(x.p)}</td>
+        <td style="font-size:var(--fs-caption)"><b>事實：</b>${esc(x.facts.join("；"))}<br><b>推論：</b>${esc(x.cause)}<br><b>建議：</b>${esc(x.action)}</td>
+        <td style="font-size:var(--fs-chart)">佐證：${x.corrob&&x.corrob.length?x.corrob.map(i=>"#"+i).join("、"):"無"}${x.explained_pads&&x.explained_pads.length?`<br>已解釋：${esc(x.explained_pads.join("；"))}`:""}</td>
       </tr>`).join(""):'<tr><td colspan="11" class="note">無偵測到問題</td></tr>'}</tbody>
     </table></div></div>`;
 
@@ -10273,25 +10325,25 @@ function renderReport(){
   try{ctrlImgUrl=repCtrlUrl(A)}catch(e){}
 
   const s4=`<div class="rep-sec" id="repSec4">
-    <h2 style="font-size:17px;border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">三、統計製程管制圖 (Control Charts)</h2>
+    <h2 style="font-size:var(--fs-heading);border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">三、統計製程管制圖</h2>
     <p class="note">管制圖類型：X̄ 圖（板平均，界限 ±3σ_B，σ_B = ${f(A.xs.sB,2)}） · 量測項目：${METRICS[A.m].short} · CL = ${f(A.xs.cl,2)} ${METRICS[A.m].unit}</p>
     ${ctrlImgUrl?`<div style="text-align:center;margin-bottom:16px"><img src="${ctrlImgUrl}" style="width:100%;max-width:760px;height:auto;border:1px solid var(--line);border-radius:6px" alt="管制圖"></div>`:""}
-    <h3 style="font-size:13.5px;margin:12px 0 6px">Nelson 判異規則檢核表</h3>
+    <h3 style="font-size:var(--fs-ui);margin:12px 0 6px">Nelson 判異規則檢核表</h3>
     <div class="tbl" style="margin-bottom:16px"><table>
       <thead><tr><th>規則編號</th><th>規則名稱與條件</th><th class="num">觸發點數</th><th>觸發板號清單</th></tr></thead>
-      <tbody>${(A.nelX||A.nel).rules.map(r=>`<tr><td class="mono">Rule ${r.id}</td><td>${esc(r.name)}</td><td class="num mono">${r.idx?r.idx.length:0}</td><td class="mono" style="font-size:11px">${r.idx&&r.idx.length?r.idx.map(i=>A.boards[i]||i).join("、"):"無"}</td></tr>`).join("")}</tbody>
+      <tbody>${(A.nelX||A.nel).rules.map(r=>`<tr><td class="mono">Rule ${r.id}</td><td>${esc(r.name)}</td><td class="num mono">${r.idx?r.idx.length:0}</td><td class="mono" style="font-size:var(--fs-caption)">${r.idx&&r.idx.length?r.idx.map(i=>A.boards[i]||i).join("、"):"無"}</td></tr>`).join("")}</tbody>
     </table></div></div>`;
 
   let histImgUrl="";const capT=repCapRows(A);
   try{histImgUrl=repHistUrl(A)}catch(e){}
 
   const s5=`<div class="rep-sec" id="repSec5">
-    <h2 style="font-size:17px;border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">四、製程能力分析 (Process Capability)</h2>
+    <h2 style="font-size:var(--fs-heading);border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">四、製程能力分析</h2>
     <div class="tbl" style="margin-bottom:16px"><table>
       <thead><tr><th>元件群組</th><th class="num">樣本數 n</th><th class="num">板數</th><th class="num">平均 μ</th><th class="num">組內 σ_w</th><th class="num">整體 σ_o</th><th class="num">Cp</th><th class="num">Cpk</th><th class="num">Pp</th><th class="num">Ppk</th><th class="num">超規 PPM</th></tr></thead>
       <tbody>${capT.rows.map(g=>`<tr><td><b>${esc(g.g)}</b></td><td class="num mono">${g.n}</td><td class="num mono">${g.nb??"—"}</td><td class="num mono">${f(g.mu,1)}</td><td class="num mono">${f(g.sw,2)}</td><td class="num mono">${f(g.sl,2)}</td><td class="num mono">${isFinite(g.cp)?f(g.cp,2):"—"}</td><td class="num mono"><b>${isFinite(g.cpk)?f(g.cpk,2):"—"}</b></td><td class="num mono">${isFinite(g.pp)?f(g.pp,2):"—"}</td><td class="num mono">${isFinite(g.ppk)?f(g.ppk,2):"—"}</td><td class="num mono">${fmtPpm(g.ppmObs)}</td></tr>`).join("")||'<tr><td colspan="11" class="note">無規格或資料不足，無法計算</td></tr>'}</tbody>
     </table></div>${capT.total>capT.rows.length?`<p class="note">依 Cpk 由低到高列出前 ${capT.rows.length} 個群組（共 ${capT.total} 個）</p>`:""}
-    ${histImgUrl?`<div style="text-align:center;margin-bottom:16px"><h4 style="font-size:13px;margin:0 0 6px">實測直方圖分佈</h4><img src="${histImgUrl}" style="width:100%;max-width:760px;height:auto;border:1px solid var(--line);border-radius:6px" alt="直方圖"></div>`:""}
+    ${histImgUrl?`<div style="text-align:center;margin-bottom:16px"><h4 style="font-size:var(--fs-ui);margin:0 0 6px">實測直方圖分佈</h4><img src="${histImgUrl}" style="width:100%;max-width:760px;height:auto;border:1px solid var(--line);border-radius:6px" alt="直方圖"></div>`:""}
     <p class="note">常態性檢定：Anderson-Darling A² = ${f(A.ad.A,3)}，p ${A.ad.p<.001?"< 0.001":"= "+f(A.ad.p,3)}（${adVerdict(A.ad)}）${A.sw&&A.sw.valid?`；Shapiro-Wilk W = ${f(A.sw.w,4)}，p ${A.sw.p<.001?"< 0.001":"= "+f(A.sw.p,3)}`:""}。</p>
     ${(()=>{const volSp=S.specs.volume,rows=S.rows.filter(r=>(isAllGrp(S.group)||r.group===S.group)),sided=computeSidedPpmBlock(rows,volSp,"volume",{boards:A.boards}),fmt=formatSidedPpmBlock(sided,fmtPpm);return`<div class="tbl" style="margin-top:12px"><table><tbody>
       <tr><th>低於下限 PPM</th><td class="num mono">${fmt.belowLslPpm}</td><th>高於上限 PPM</th><td class="num mono">${fmt.aboveUslPpm}</td></tr>
@@ -10320,26 +10372,26 @@ function renderReport(){
   }
 
   const s6=`<div class="rep-sec" id="repSec6">
-    <h2 style="font-size:17px;border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">五、不良類型柏拉圖 (Pareto Analysis)</h2>
+    <h2 style="font-size:var(--fs-heading);border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">五、不良類型柏拉圖</h2>
     ${P.length>0&&paretoImgUrl?`<div style="text-align:center;margin-bottom:12px"><img src="${paretoImgUrl}" style="width:100%;max-width:760px;height:auto;border:1px solid var(--line);border-radius:6px" alt="不良柏拉圖"></div>`:`<p class="note" style="padding:16px;background:var(--surface2);border-radius:6px">沒有判定不良的焊墊</p>`}
     <p class="note" style="margin-top:4px">一個焊墊可有多種不良，處數 ≥ 不良焊墊數。</p>
-    <div style="margin-top:12px;font-size:12px;color:var(--muted)">
+    <div style="margin-top:12px;font-size:var(--fs-caption);color:var(--muted)">
       <p style="margin:2px 0">重複犯焊墊分析 (M-09)：本版尚未提供（規劃中）</p>
-      <p style="margin:2px 0">Pass/Fail 判定矩陣 (M-10)：本版尚未提供（規劃中）</p>
+      <p style="margin:2px 0">不良品矩陣：本版尚未提供（規劃中）</p>
     </div></div>`;
 
   const Me=F.meta,modes=(Me&&Me.modes)||[];
   const s7=`<div class="rep-sec" id="repSec7">
-    <h2 style="font-size:17px;border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">六、交叉驗證與失效模式比對 (Cross Validation)</h2>
+    <h2 style="font-size:var(--fs-heading);border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">六、交叉驗證與失效模式比對</h2>
     <div class="tbl" style="margin-bottom:16px"><table>
       <thead><tr><th>候選失效模式</th><th>綜合判定</th><th>支持面向</th><th>支持與矛盾證據摘要</th></tr></thead>
-      <tbody>${modes.length?modes.map(m=>`<tr><td><b>${esc(m.name)}</b></td><td><span class="pill ${m.verdict==='可能'?'ng':m.verdict==='未見跡象'?'ok':'warn'}">${esc(m.verdict)}</span></td><td>${esc(m.dims?m.dims.join("、"):"—")}</td><td style="font-size:11.5px">${m.sup?m.sup.map(e=>`✓ ${esc(e.d)}：${esc(e.txt)}`).join("<br>"):""}${m.con&&m.con.length?`<br><span style="color:var(--warn)">✗ ${m.con.map(e=>`${esc(e.d)}：${esc(e.txt)}`).join("<br>")}</span>`:""}</td></tr>`).join(""):'<tr><td colspan="4" class="note">無失效模式資料</td></tr>'}</tbody>
+      <tbody>${modes.length?modes.map(m=>`<tr><td><b>${esc(m.name)}</b></td><td><span class="pill ${m.verdict==='可能'?'ng':m.verdict==='未見跡象'?'ok':'warn'}">${esc(m.verdict)}</span></td><td>${esc(m.dims?m.dims.join("、"):"—")}</td><td style="font-size:var(--fs-caption)">${m.sup?m.sup.map(e=>`✓ ${esc(e.d)}：${esc(e.txt)}`).join("<br>"):""}${m.con&&m.con.length?`<br><span style="color:var(--warn)">✗ ${m.con.map(e=>`${esc(e.d)}：${esc(e.txt)}`).join("<br>")}</span>`:""}</td></tr>`).join(""):'<tr><td colspan="4" class="note">無失效模式資料</td></tr>'}</tbody>
     </table></div>
     <p class="note">失效模式交叉比對規則庫：整合 R001–R030 製程知識庫規則；維持 ≥2 個獨立面向佐證始判定為可能失效模式。</p></div>`;
 
   const dfmData=dfmTable(S);
   const s8=`<div class="rep-sec" id="repSec8">
-    <h2 style="font-size:17px;border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">七、DFM 開孔建議 (DFM Recommendations)</h2>
+    <h2 style="font-size:var(--fs-heading);border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">七、DFM 開孔建議</h2>
     <div class="tbl" style="margin-bottom:16px"><table>
       <thead><tr><th>元件群組</th><th class="num">焊墊尺寸 mm</th><th class="num">開孔尺寸 mm</th><th class="num">鋼板 µm</th><th class="num">面積比 AR</th><th class="num">寬厚比</th><th>IPC-7525 判定</th><th class="num">AR≥0.66 最大厚度</th></tr></thead>
       <tbody>${dfmData.map(d=>`<tr><td><b>${esc(d.group)}</b></td><td class="num mono">${esc(d.padDim)}</td><td class="num mono">${esc(d.apDim)}</td><td class="num mono">${d.thk}</td><td class="num mono">${f(d.ar,2)}</td><td class="num mono">${f(d.asp,2)}</td><td><span class="pill ${d.st}">${d.st==='ok'?'正常':d.st==='warn'?'注意':'風險'}</span></td><td class="num mono">${f(d.tmax,0)} µm</td></tr>`).join("")}</tbody>
@@ -10347,7 +10399,7 @@ function renderReport(){
 
   const hasXY=hasValidSpatialXY(S.rows,realXY),spEx=reportSpatialExclusionLines(hasXY);
   const s9=`<div class="rep-sec" id="repSec9">
-    <h2 style="font-size:17px;border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">八、資料範圍揭露與未納入證據 (Data Scope & Exclusions)</h2>
+    <h2 style="font-size:var(--fs-heading);border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">八、資料範圍揭露與未納入證據</h2>
     <div class="tbl" style="margin-bottom:16px"><table><tbody>
       <tr><th>匯入總筆數</th><td class="num mono">${S.rows.length.toLocaleString()} 筆</td><th>納入分析筆數</th><td class="num mono">${S.rows.length.toLocaleString()} 筆</td></tr>
       <tr><th>無效/排除筆數</th><td class="num mono">0 筆</td><th>資料排除原因</th><td>無格式錯誤或遺漏關鍵欄位之資料</td></tr>
@@ -10359,8 +10411,8 @@ function renderReport(){
     </tbody></table></div></div>`;
 
   const s10=`<div class="rep-sec" id="repSec10">
-    <h2 style="font-size:17px;border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">九、方法附錄與統計檢驗說明 (Methodology Appendix)</h2>
-    <div style="font-size:13px;line-height:1.7">
+    <h2 style="font-size:var(--fs-heading);border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">九、方法附錄與統計檢驗說明</h2>
+    <div style="font-size:var(--fs-ui);line-height:1.7">
       <p><b>1. 管制圖與製程能力指標：</b>X̄-S 圖以每片板為子群組；Cpk 以組內標準差 σ_w 計算短期能力，Ppk 以整體標準差 σ_o 計算長期能力。Nelson 判異規則涵蓋點超出 3σ（Rule 1）、連續 9 點在中心線同側（Rule 2）等 8 項標準檢驗。</p>
       <p><b>2. 雙重標準差與多重檢定校準 (D-12, D-32, D-64)：</b>單板突發異常採 Bonferroni 校準與參數式自助法校準，消除虛假發現率；刮刀方向與擦拭週期採用去趨勢迴歸檢定。</p>
       <p><b>3. 兩類 PPM 定義：</b>預估 PPM 假設常態分佈，由規範邊界距中心線之 Z 值積分計算；超規 PPM 為實際檢測超規焊墊數除以總焊墊數之實測計數比率。</p>
@@ -10518,7 +10570,7 @@ async function generateReportPdfBlob(opts={}){
 
   // 2. 執行摘要
   if(chs[2]){
-    drawSectionHeader("一","執行摘要 (Executive Summary)");
+    drawSectionHeader("一","執行摘要");
     printText(`整體判定：${ov.label}（${ov.level==="ok"?"正常":ov.level==="warn"?"警示":"異常"}）`,14,curY,{bold:true,size:10});
     curY+=5;
     for(const r of (ov.reasons||["製程穩定且能力足夠"])){checkBreak(5);printText(`• ${r}`,16,curY,{size:8.5});curY+=4.5}
@@ -10552,7 +10604,7 @@ async function generateReportPdfBlob(opts={}){
 
   // 4. 管制圖
   if(chs[4]){
-    drawSectionHeader("三","統計製程管制圖 (Control Charts)");
+    drawSectionHeader("三","統計製程管制圖");
     try{
       const ctrlUrl=repCtrlUrl(A);
       checkBreak(68);
@@ -10565,7 +10617,7 @@ async function generateReportPdfBlob(opts={}){
 
   // 5. 製程能力
   if(chs[5]){
-    drawSectionHeader("四","製程能力分析 (Process Capability)");
+    drawSectionHeader("四","製程能力分析");
     const capT=repCapRows(A),capRows=capT.rows.map(g=>[g.g,String(g.n),f(g.mu,1),f(g.sw,2),f(g.sl,2),isFinite(g.cp)?f(g.cp,2):"—",isFinite(g.cpk)?f(g.cpk,2):"—",isFinite(g.ppk)?f(g.ppk,2):"—",fmtPpm(g.ppmObs)]);
     drawTable(["群組","n","平均","σ_w","σ_o","Cp","Cpk","Ppk","超規 PPM"],capRows,[30,16,20,20,20,19,19,19,19]);
     if(capT.total>capT.rows.length){printText(`依 Cpk 由低到高列出前 ${capT.rows.length} 個群組（共 ${capT.total} 個）`,14,curY,{size:8,color:[100,100,100]});curY+=5}
@@ -10582,7 +10634,7 @@ async function generateReportPdfBlob(opts={}){
 
   // 6. 不良柏拉圖
   if(chs[6]){
-    drawSectionHeader("五","不良類型柏拉圖 (Pareto Analysis)");
+    drawSectionHeader("五","不良類型柏拉圖");
     const P=Object.entries(S.A.pareto||{}).sort((a,b)=>b[1]-a[1]);
     if(P.length>0){
       try{
@@ -10606,13 +10658,13 @@ async function generateReportPdfBlob(opts={}){
     }else{printText("沒有判定不良的焊墊",14,curY,{size:9});curY+=6}
     printText("一個焊墊可有多種不良，處數 ≥ 不良焊墊數。",14,curY,{size:8});
     curY+=4;
-    printText("重複犯焊墊分析 (M-09) 與 Pass/Fail 矩陣 (M-10)：本版尚未提供（規劃中）",14,curY,{size:8,color:[120,120,120]});
+    printText("重複犯焊墊分析與不良品矩陣：本版尚未提供（規劃中）",14,curY,{size:8,color:[120,120,120]});
     curY+=6;
   }
 
   // 7. 交叉驗證與 3D 快照
   if(chs[7]){
-    drawSectionHeader("六","交叉驗證與 3D 錫膏模擬 (Cross Validation & 3D)");
+    drawSectionHeader("六","交叉驗證與 3D 錫膏模擬");
     const Me=F.meta,modes=(Me&&Me.modes)||[];
     if(modes.length){
       const mRows=modes.map(m=>[m.name,m.verdict,m.dims?m.dims.join("、"):"—",m.sup?m.sup.map(e=>e.d).join("、"):"—"]);
@@ -10632,7 +10684,7 @@ async function generateReportPdfBlob(opts={}){
 
   // 8. DFM 開孔建議
   if(chs[8]){
-    drawSectionHeader("七","DFM 開孔建議 (DFM Recommendations)");
+    drawSectionHeader("七","DFM 開孔建議");
     const dfmData=dfmTable(S);
     const dRows=dfmData.map(d=>[d.group,d.padDim,d.apDim,String(d.thk),f(d.ar,2),f(d.asp,2),d.st==="ok"?"正常":d.st==="warn"?"注意":"風險",`${f(d.tmax,0)} µm`]);
     drawTable(["群組","焊墊 mm","開孔 mm","厚度","AR","寬厚比","判定","最大厚度"],dRows,[30,26,26,18,18,18,18,28]);
@@ -10640,7 +10692,7 @@ async function generateReportPdfBlob(opts={}){
 
   // 9. 資料範圍揭露
   if(chs[9]){
-    drawSectionHeader("八","資料範圍揭露與未納入證據 (Data Scope & Exclusions)");
+    drawSectionHeader("八","資料範圍揭露與未納入證據");
     drawTable(["項目","內容","項目","內容"],[
       ["匯入總筆數",`${S.rows.length} 筆`,"納入分析筆數",`${S.rows.length} 筆`],
       ["排除筆數","0 筆","排除原因","無格式錯誤欄位"],
@@ -10651,7 +10703,7 @@ async function generateReportPdfBlob(opts={}){
 
   // 10. 方法附錄與缺字檢核
   if(chs[10]){
-    drawSectionHeader("九","方法附錄與缺字檢核紀錄 (Methodology Appendix)");
+    drawSectionHeader("九","方法附錄與缺字檢核紀錄");
     printText("1. 管制圖與製程能力指標：X̄-S 圖以每板為子群組；Cpk 以組內標準差計算短期能力，Ppk 以整體標準差計算長期能力。",14,curY,{size:8.5});
     curY+=5;
     printText("2. 雙重標準差與多重檢定校準 (D-12, D-32, D-64)：單板突發異常採 Bonferroni 校準與自助法校準，消除虛假發現率。",14,curY,{size:8.5});
@@ -11113,9 +11165,22 @@ function applyMobileChartFont(){
     }
   }
 }
-applyMobileChartFont();
+function chartCaptionFontPx(){
+  try{
+    const raw=getComputedStyle(document.documentElement).getPropertyValue("--fs-caption").trim();
+    const n=parseFloat(raw);
+    return Number.isFinite(n)?n:12;
+  }catch(e){return 12}
+}
+function applyChartFontDefaults(){
+  if(window.Chart&&window.Chart.defaults){
+    if(!window.Chart.defaults.font)window.Chart.defaults.font={};
+    window.Chart.defaults.font.size=chartCaptionFontPx();
+  }
+}
+
 if(typeof window!=="undefined"&&window.matchMedia){
-  try{window.matchMedia(PHONE_MQ).addEventListener("change",applyMobileChartFont)}catch(e){}
+  try{window.matchMedia(PHONE_MQ).addEventListener("change",applyChartFontDefaults)}catch(e){}
 }
 $("#selRun").addEventListener("change",updateRailSummary);
 $("#selMetric").addEventListener("change",updateRailSummary);

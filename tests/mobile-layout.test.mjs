@@ -294,7 +294,8 @@ test('9. 版面回歸：code review（v10.3.3）找到的問題', () => {
 
   // c. 階梯鋼板區域表的選取單選鈕觸控時只有 24px：包進 label.row 取得 44px 熱區
   assert.match(htmlSource, /<td><label class="row"><input type="radio" name="selZone"/, '區域選取單選鈕需包在 label.row 內');
-  assert.match(htmlSource, /input\[type=password\]\{min-height:44px;min-width:44px;font-size:16px!important\}/, '密碼欄位需在觸控 44px 與 16px 防縮放規則內');
+  assert.match(htmlSource, /--fs-input:\s*16px;/i, '需定義 --fs-input:16px');
+  assert.match(htmlSource, /input\[type=password\]\{min-height:44px;min-width:44px;font-size:var\(--fs-input\)!important\}/, '密碼欄位需在觸控 44px 與 --fs-input 防縮放規則內');
   assert.match(htmlSource, /return\{g,group:g,padDim,apDim,st:stLvl/, 'dfmTable0 需提供報告頁所需欄位別名');
   // 檢查可用模型：結果綁定服務商＋金鑰＋端點；回應時以最新設定為準，設定已變更就不套用（PR #81 review）
   assert.match(htmlSource, /availableModels=\{sig,models:j\.models\}/, '可用模型清單需綁定查詢簽章');
