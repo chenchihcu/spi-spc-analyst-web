@@ -258,6 +258,7 @@ Institution §9：版本單一來源 `package.json`；build 注入 `#appVer`／`
 | 已合併 `main` | `4e712f1` RFC；`606f247` v10.9.1；`3c99798` RFC v1.2；`b0502cd` **v10.9.2** 模態 token／`#recEditModal` 按鈕順序（同 commit 含 **v10.9.3** AI 429 修復） |
 | 自動化 | `ui.smoke`、`mobile-layout`（含 emoji／`recEditSave` 守衛）、`npm test` 398／398；`release-check` **NEEDS REVIEW**（console 2 處，exit 0）；`build:cloudflare` 2026-10-29 14:03 UTC+8 |
 | 真機 | iPhone Safari — **NOT TESTED**（計畫 §4 允許） |
+| 正式站靜態 | 登入頁 `https://spi-spc-analyst.chihfu-chen-tw.workers.dev/login` HTTP 200，顯示 **v10.9.3**（2026-10-29 13:51 UTC+8）；**登入後資料庫路徑未驗證** |
 | 殘留 | 大量 panel 行內 `style`（AI 設定卡等）；`font-weight:600` 全站未改 |
 
 **計畫明確不做（已遵守）：** 無 `design-system/` persist、無 Tailwind／品牌重刷、未改 `tests/mobile-layout` 斷點矩陣邏輯（僅增 emoji 守衛）。
