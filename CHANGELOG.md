@@ -2,6 +2,11 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.9.1 — 2026-10-29 13:35:00（UI：記錄庫 SVG 與範例橫幅 token）
+
+- **RFC-SPI-UI-20261029 後續 P1**：記錄庫／範例提示改 stroke SVG（`.ui-ico`），不再用 emoji 當圖示；`.rec-card-sub` 改 `--muted`；範例資料橫幅樣式收斂至 `.startup-db-banner*` class。
+- 規格：`docs/spec-ui-layout-rfc.md`。
+
 ## v10.9.0 — 2026-10-29 11:30:00（Windows 對照 FR-1～FR-11）
 
 - **Windows 桌面對照行為（FR-1～FR-11）**：缺座標時熱圖／LISA 與報告空間段落標示未納入；問題卡與交叉驗證列標示四種證據種類；散佈圖揭露分析／顯示筆數；總覽 CPK 切頁快照；SPI 製程知識庫改 `vendor/spi-process-kb-rules.json` 並顯示版本；問題卡摘要用問題自身量測項目；進階分析關係圖（`S.relChart`）與管制圖分離；幾何焊墊清單覆蓋率與待查 KPI；立榮／振順豐柏拉圖子板尾碼；統計與報告雙邊分側 PPM／DPMO。

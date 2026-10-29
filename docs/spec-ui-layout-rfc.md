@@ -180,8 +180,8 @@ Viewport：`<meta name="viewport" content="width=device-width, initial-scale=1, 
 
 | ID | 優先級 | 描述 | 建議方向 |
 |----|--------|------|----------|
-| UI-GAP-01 | P1 | Emoji 作圖示（`📂` 記錄庫、`💡` 範例橫幅等） | 改為與 `.mtab-btn` 同風格 SVG + `aria-hidden`；保留文字標籤 |
-| UI-GAP-02 | P1 | 行內 `style` 與 `--c-sub:#666` 繞過 token | 收斂至 class + `var(--muted)`；列印／banner 優先 |
+| UI-GAP-01 | P1 | Emoji 作圖示（記錄庫、範例提示） | **已修**（2026-10-29）：改 SVG `.ui-ico` |
+| UI-GAP-02 | P1 | 行內 `style` 與 `--c-sub:#666` | **部分**（2026-10-29）：`.rec-card-sub`→`--muted`；`#startupDbBanner`→`.startup-db-banner*`；其餘行內 style 待收斂 |
 | UI-GAP-03 | P1 | 320px 整頁橫向溢出 | 依 `AGENTS.md` grid `minmax(0,1fr)`、`min-width:0`；對照 mobile-layout 7b／8b |
 | UI-GAP-04 | P1 | 觸控 44px | `@media (pointer:coarse)` 覆寫須在基礎規則**之後**（AGENTS 測試 7） |
 | UI-GAP-05 | P2 | 多處 `font-weight:600` 標題／頁籤 | CJK 規則偏好 400／700；**分批**替換，避免一次改全站渲染 |
@@ -244,3 +244,4 @@ Institution §9：版本單一來源 `package.json`；build 注入 `#appVer`／`
 | 版本 | 日期 | 說明 |
 |------|------|------|
 | v1.0 | 2026-10-29 | 初版：UI 盤點 RFC；無程式變更 |
+| v1.1 | 2026-10-29 | 對照：UI-GAP-01（記錄庫／範例提示 emoji→SVG）、UI-GAP-02（`.rec-card-sub` 改用 `--muted`）已於 `spi-spc.html` 實作；其餘缺口仍待 PR |

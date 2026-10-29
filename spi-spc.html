@@ -660,9 +660,23 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 }
 .rec-card-sub {
   font-size: 12px;
-  color: var(--c-sub, #666);
+  color: var(--muted);
   margin-top: 2px;
 }
+.ui-ico{display:inline-block;vertical-align:middle;flex-shrink:0;color:currentColor}
+.ui-ico--folder{width:18px;height:18px}
+.ui-ico--hint{width:20px;height:20px;color:var(--accent)}
+.chip-rec-lib{display:inline-flex;align-items:center;gap:6px;font-weight:500;cursor:pointer}
+.startup-db-banner{margin-bottom:12px;background:var(--accent-soft);border:1px solid var(--accent);display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:var(--r);flex-wrap:wrap;gap:10px}
+.startup-db-banner__main{display:flex;align-items:center;gap:10px;flex:1 1 300px;min-width:0}
+.startup-db-banner__body{min-width:0}
+.startup-db-banner__title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.startup-db-banner__title{color:var(--accent-ink);font-size:14px}
+.startup-db-banner__pill{font-size:11px;background:var(--surface)}
+.startup-db-banner__cloud{color:var(--ink);font-size:12px}
+.startup-db-banner__actions{gap:8px;margin:0;align-items:center}
+.startup-db-banner__btn{padding:6px 12px;font-size:13px}
+.startup-db-banner__dismiss{padding:6px 10px;font-size:12.5px;background:transparent;border:none;cursor:pointer;color:var(--muted)}
 .rec-card-body {
   font-size: 12.5px;
   line-height: 1.5;
@@ -711,12 +725,12 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.9.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.9.1</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
     <button type="button" class="chip chipBtn load-state" id="statePlace" data-state="idle" title="選取座標檔"><span class="light" aria-hidden="true"></span><span>座標檔：未套用</span></button>
-    <button type="button" class="chip chipBtn" id="btnOpenRecModal" title="開啟量測紀錄與座標檔資料庫，選取歷史檔案載入分析" style="cursor:pointer;font-weight:500;display:inline-flex;align-items:center;gap:6px">📂 記錄庫 ▾</button>
+    <button type="button" class="chip chipBtn chip-rec-lib" id="btnOpenRecModal" title="開啟量測紀錄與座標檔資料庫，選取歷史檔案載入分析"><svg class="ui-ico ui-ico--folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>記錄庫 ▾</button>
     <span class="chip" title="目前分析的試產回合" hidden>回合 <b id="srcName">範例資料</b> · <b id="srcBoards" class="num">—</b> 板 · <b id="srcPads" class="num">—</b> 焊墊</span>
     <div class="menuwrap" id="moreWrap" hidden>
       <button class="chip chipBtn" id="btnMore" aria-haspopup="menu" aria-expanded="false" aria-controls="moreMenu">更多 ▾</button>
@@ -811,22 +825,22 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 </div>
 
 <section class="panel" id="p-issues" role="tabpanel">
-  <div id="startupDbBanner" class="card" style="margin-bottom:12px;background:var(--accent-soft);border:1px solid var(--accent);display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:var(--r);flex-wrap:wrap;gap:10px">
-    <div style="display:flex;align-items:center;gap:10px;flex:1 1 300px;min-width:0">
-      <span style="font-size:20px" aria-hidden="true">💡</span>
-      <div style="min-width:0">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <b style="color:var(--accent-ink);font-size:14px">範例資料預覽</b>
-          <span class="pill" style="font-size:11px;background:var(--surface)">試產 1 · 鋼板 V1</span>
-          <span class="note" id="bannerCloudState" style="color:var(--ink);font-size:12px">連線確認中…</span>
+  <div id="startupDbBanner" class="card startup-db-banner">
+    <div class="startup-db-banner__main">
+      <svg class="ui-ico ui-ico--hint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14c.5-1.5.5-2 .5-3a4 4 0 1 0-8 0c0 1 .5 1.5.5 3"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+      <div class="startup-db-banner__body">
+        <div class="startup-db-banner__title-row">
+          <b class="startup-db-banner__title">範例資料預覽</b>
+          <span class="pill startup-db-banner__pill">試產 1 · 鋼板 V1</span>
+          <span class="note startup-db-banner__cloud" id="bannerCloudState">連線確認中…</span>
         </div>
         <div id="bannerRecentRuns" style="margin-top:6px;display:flex;flex-wrap:nowrap;overflow-x:auto;gap:6px;align-items:center" hidden></div>
       </div>
     </div>
-    <div class="row" style="gap:8px;margin:0;align-items:center">
-      <button type="button" class="primary" id="btnBannerLoadDb" style="padding:6px 12px;font-size:13px">📂 記錄庫</button>
-      <button type="button" id="btnBannerGoImport" style="padding:6px 12px;font-size:13px">匯入新檔</button>
-      <button type="button" id="btnBannerDismiss" title="略過提示並維持範例資料" style="padding:6px 10px;font-size:12.5px;background:transparent;border:none;cursor:pointer;color:var(--muted)">✕ 略過</button>
+    <div class="row startup-db-banner__actions">
+      <button type="button" class="primary chip-rec-lib startup-db-banner__btn" id="btnBannerLoadDb"><svg class="ui-ico ui-ico--folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>記錄庫</button>
+      <button type="button" class="startup-db-banner__btn" id="btnBannerGoImport">匯入新檔</button>
+      <button type="button" class="startup-db-banner__dismiss" id="btnBannerDismiss" title="略過提示並維持範例資料">✕ 略過</button>
     </div>
   </div>
   <div class="iss-top">
@@ -1143,7 +1157,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <div class="notice" id="aiNoticeBox" style="background:var(--surface2);padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:12.5px;color:var(--ink)">
       <p style="margin:0 0 6px"><b>送出前告知與資料隱私保護：</b></p>
       <ul style="margin:0 0 6px 18px;padding:0;line-height:1.6">
-        <li><b>服務商路徑：</b>由本站後端以 API Key 安全轉發至 OpenAI（<code>gpt-6.1-terra</code>，推理能力：<code>high</code>）。</li>
+        <li><b>服務商路徑：</b><span id="aiNoticeServicePath">由本站後端以 API Key 安全轉發至 OpenAI（<code>gpt-6.1-terra</code>，推理能力：<code>high</code>）。</span></li>
         <li><b>實際送出欄位：</b>試產回合名稱、量測指標、單位、規格窗、鋼板與階梯設定、樣本數與板數、整體平均與 σ、製程能力（Cp/Cpk/Pp/Ppk 及信賴區間）、判異點數與 Nelson 規則、問題清單（嚴重與警示卡片之事實現況與推論）。</li>
         <li><b>包含的識別資料：</b>板號清單（如序號）、最差焊墊 ID、問題事實中的焊墊名稱（如 U2-05）、試產回合名稱。</li>
         <li><b>AI Gateway 記錄設定：</b><span id="aiGatewayLogNotice">預設不保存提示詞與回應內容（已帶 <code>cf-aig-collect-log-payload: false</code>，僅留存 token 用量 metadata）。</span></li>
@@ -1507,7 +1521,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 
       <div class="sheet-sec-title">資料與設定</div>
       <div class="sheet-list">
-        <button type="button" class="sheet-row" id="mBtnOpenRecModal"><span>📂 記錄庫</span><span class="sheet-arrow">›</span></button>
+        <button type="button" class="sheet-row" id="mBtnOpenRecModal"><span style="display:inline-flex;align-items:center;gap:8px"><svg class="ui-ico ui-ico--folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>記錄庫</span><span class="sheet-arrow">›</span></button>
         <button type="button" class="sheet-row" data-mtab="data"><span>資料與規格</span><span class="sheet-arrow">›</span></button>
       </div>
 
@@ -1534,7 +1548,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   <div class="db-modal-panel">
     <div class="sheet-head" style="padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:var(--surface)">
       <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:18px">📂</span>
+        <svg class="ui-ico ui-ico--folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
         <h3 style="margin:0;font-size:16px">量測記錄與座標檔資料庫</h3>
         <span class="note" id="recPickerMode" style="font-size:12px"></span>
       </div>
@@ -8042,6 +8056,7 @@ function deAnonymizeText(text){
   return s;
 }
 const AI_CFG_KEY="spi-ai-config";
+/* @ai-providers-meta START */
 const AI_PROVIDERS_META={
   openai:{
     id:"openai",label:"OpenAI",defaultModel:"gpt-6.1-terra",
@@ -8065,6 +8080,7 @@ const AI_PROVIDERS_META={
     headerName:"X-Cursor-Key",inputId:"inAiKeyCursor",toggleId:"btnAiKeyToggleCursor",badgeId:"aiBadgeCursor"
   }
 };
+/* @ai-providers-meta END */
 const AI_EFFORT_LABELS={high:"高 (high)",medium:"中 (medium)",low:"低 (low)"};
 let AI_SERVER_HAS_KEY=false,AI_LAST_USAGE=null;
 const AI_SERVER_META={
@@ -8232,6 +8248,8 @@ function updateAiStatusLabels(cfgArg){
   if($("#aiEffortLabel"))$("#aiEffortLabel").textContent=effLabel;
   if($("#aiPriceLabel"))$("#aiPriceLabel").textContent=meta.priceText;
   if($("#aiCardSub"))$("#aiCardSub").textContent=`${meta.label} ${effModel}（推理強度：${effLabel}） · 將目前全部統計結果與交叉驗證送出，嚴格區分事實與推論`;
+  const noticePath=$("#aiNoticeServicePath");
+  if(noticePath)noticePath.innerHTML=`由本站後端以 API Key 安全轉發至 ${esc(meta.label)}（<code>${esc(effModel)}</code>，推理能力：<code>${esc(pCfg.effort)}</code>）。`;
 }
 function syncAiCfgInputs(){
   const cfg=loadAiCfg();
