@@ -176,17 +176,17 @@ Viewport：`<meta name="viewport" content="width=device-width, initial-scale=1, 
 | Success / Warning | `--ok` / `--warn` |
 | Focus ring | 依元件 CSS（改版時須全站一致，禁止 `outline:none` 無替代） |
 
-### 3.4 缺口清單（後續 PR 輸入；本 RFC 不修）
+### 3.4 缺口清單（後續 PR 輸入）
 
-| ID | 優先級 | 描述 | 建議方向 |
-|----|--------|------|----------|
-| UI-GAP-01 | P1 | Emoji 作圖示（記錄庫、範例提示） | **已修**（2026-10-29）：改 SVG `.ui-ico` |
-| UI-GAP-02 | P1 | 行內 `style` 與 `--c-sub:#666` | **部分**（2026-10-29）：`.rec-card-sub`→`--muted`；`#startupDbBanner`→`.startup-db-banner*`；其餘行內 style 待收斂 |
-| UI-GAP-03 | P1 | 320px 整頁橫向溢出 | 依 `AGENTS.md` grid `minmax(0,1fr)`、`min-width:0`；對照 mobile-layout 7b／8b |
-| UI-GAP-04 | P1 | 觸控 44px | `@media (pointer:coarse)` 覆寫須在基礎規則**之後**（AGENTS 測試 7） |
-| UI-GAP-05 | P2 | 多處 `font-weight:600` 標題／頁籤 | CJK 規則偏好 400／700；**分批**替換，避免一次改全站渲染 |
-| UI-GAP-06 | P2 | 對話框主要／次要按鈕順序 | Institution：確認／儲存**左**、取消**右** — 現況 **`VERIFY`**（例：`btnConfirmRevokeCurrent` 在 `btnCancelRevokeCurrent` 左，符合；其餘 modal 未逐一盤點） |
-| UI-GAP-07 | P2 | 容器扁平化 | 僅在具體 overflow／密度問題頁執行；禁止整頁再包 card |
+| ID | 優先級 | 描述 | 狀態 |
+|----|--------|------|------|
+| UI-GAP-01 | P1 | Emoji 作圖示（記錄庫、範例提示） | **已出貨** v10.9.1 |
+| UI-GAP-02 | P1 | 行內 `style` 與 `--c-sub:#666` | **部分** v10.9.1：`.rec-card-sub`、`#startupDbBanner`；其餘待 PR |
+| UI-GAP-03 | P1 | 320px 整頁橫向溢出 | 待 PR（`mobile-layout` 測 8 目前通過；真機 NOT TESTED） |
+| UI-GAP-04 | P1 | 觸控 44px 同權重順序 | 待 PR（測 7 通過） |
+| UI-GAP-05 | P2 | `font-weight:600` 與 CJK | 待 PR |
+| UI-GAP-06 | P2 | 對話框按鈕順序 | **VERIFY** 待逐 modal 盤點 |
+| UI-GAP-07 | P2 | 容器扁平化 | 待 PR（僅在具體溢出頁） |
 
 ---
 
@@ -244,4 +244,19 @@ Institution §9：版本單一來源 `package.json`；build 注入 `#appVer`／`
 | 版本 | 日期 | 說明 |
 |------|------|------|
 | v1.0 | 2026-10-29 | 初版：UI 盤點 RFC；無程式變更 |
-| v1.1 | 2026-10-29 | 對照：UI-GAP-01（記錄庫／範例提示 emoji→SVG）、UI-GAP-02（`.rec-card-sub` 改用 `--muted`）已於 `spi-spc.html` 實作；其餘缺口仍待 PR |
+| v1.1 | 2026-10-29 | 對照 v10.9.1 程式：UI-GAP-01／02 部分 |
+| v1.2 | 2026-10-29 | §3.4 狀態欄、§7 本輪收斂 |
+
+---
+
+## 7. 本輪收斂（2026-10-29）
+
+| 項目 | 結果 |
+|------|------|
+| 規格 | RFC-SPI-UI-20261029 草案；**未**建立 `design-system/` persist |
+| 已合併 `main` | `4e712f1` RFC 文件；`606f247` **v10.9.1** UI（SVG 圖示、token／橫幅 class） |
+| 自動化驗證 | `tests/ui.smoke.test.js`、`tests/mobile-layout.test.mjs` 通過 |
+| 未驗證 | iPhone Safari 真機 — **NOT TESTED** |
+| 下一 PR 建議 | UI-GAP-02 剩餘行內 style → UI-GAP-06 modal 盤點 → UI-GAP-05 字重（分批） |
+
+**與本 RFC 無關、勿混在同一 PR：** 工作區內 `cloudflare/ai.mjs`、`tests/step14.test.mjs` 等 WIP 會使全量 `npm test` 在 **D-20** 失敗；`tools/_*.mjs` 為除錯暫存，勿進 `dist/`。
