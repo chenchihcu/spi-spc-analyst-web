@@ -258,6 +258,9 @@ test('8. 版面回歸：最終發布巡檢（1440／820／390／320 × 明亮／
   // 隱式 auto 欄會被內容最小寬度撐開，max-width 單獨無效：分頁與格式說明的 grid 欄寬需為 minmax(0,1fr)
   assert.match(htmlSource, /\n\.panel\{[^}]*grid-template-columns:minmax\(0,1fr\)/, '.panel 欄寬需為 minmax(0,1fr)');
   assert.match(htmlSource, /\n\.vendor\{[^}]*grid-template-columns:minmax\(0,1fr\)/, '.vendor 欄寬需為 minmax(0,1fr)');
+  // AI 設定卡：nowrap 的計價基準 chip 會撐開隱式 auto 欄，320px 時整頁寬 350（v10.9.3 巡檢發現）
+  assert.match(htmlSource, /<\/small><\/h3><div style="display:grid;grid-template-columns:minmax\(0,1fr\);gap:12px"><div class="row"[^>]*><div[^>]*><span[^>]*>啟用服務商：/, 'AI 設定卡 grid 欄寬需為 minmax(0,1fr)');
+  assert.match(htmlSource, /<span class="chip" style="white-space:normal;min-width:0">計價基準：<b id="aiPriceLabel">/, '計價基準 chip 需可換行');
 
   // c. 觸控時，包住核取方塊／單選鈕的 label.row 熱區需 44px（核取方塊本身只有 24px）
   assert.match(htmlSource, /label\.row:has\(>input\[type=checkbox\]\),label\.row:has\(>input\[type=radio\]\)\{min-height:44px;min-width:44px\}/, '核取方塊 label 需有 44px 觸控高度與寬度');
@@ -293,7 +296,7 @@ test('9. 版面回歸：code review（v10.3.3）找到的問題', () => {
   assert.match(htmlSource, /<td><label class="row"><input type="radio" name="selZone"/, '區域選取單選鈕需包在 label.row 內');
   assert.match(htmlSource, /input\[type=password\]\{min-height:44px;min-width:44px;font-size:16px!important\}/, '密碼欄位需在觸控 44px 與 16px 防縮放規則內');
   assert.match(htmlSource, /return\{g,group:g,padDim,apDim,st:stLvl/, 'dfmTable0 需提供報告頁所需欄位別名');
-  for (const id of ['aiProviderSeg', 'inAiKey', 'inAiKeyAntigravity', 'inAiKeyCursor', 'selAiModel', 'inAiCustomModel', 'selAiEffort', 'inAiCustomEndpoint']) {
+  for (const id of ['aiProviderSeg', 'inAiKey', 'inAiKeyAntigravity', 'selAiModel', 'btnAiCheckModels', 'inAiCustomModel', 'selAiEffort', 'inAiCustomEndpoint']) {
     assert.match(htmlSource, new RegExp('id="' + id + '"'), 'AI 設定介面需有 #' + id);
   }
 });

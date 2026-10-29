@@ -742,7 +742,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.9.3</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.10.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -1170,7 +1170,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 </section>
 
 <section class="panel" id="p-ai" role="tabpanel" hidden>
-  <div class="card" id="aiSettingsCard"><h3 id="aiSettingsHead">API 金鑰、模型／推理強度與獨立配額設定 <small id="aiKeyBadge"><span class="pill warn">尚未設定金鑰</span></small></h3><div style="display:grid;gap:12px"><div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:13px;font-weight:600">啟用服務商：</span><div class="seg" id="aiProviderSeg" role="group" aria-label="選擇 AI 服務商" style="display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden"><button type="button" data-ai-prov="openai" aria-pressed="true">OpenAI</button><button type="button" data-ai-prov="antigravity" aria-pressed="false">Antigravity</button><button type="button" data-ai-prov="cursor" aria-pressed="false">Cursor</button></div></div><div id="aiAllProvidersSummary" class="row" style="gap:6px;flex-wrap:wrap;font-size:12px"></div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px"><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKey" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>OpenAI API Key</b></span><span id="aiBadgeOpenai" class="pill warn" style="font-size:11px;padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKey" placeholder="sk-proj-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggle" title="顯示或隱藏 OpenAI API Key">顯示</button></div></div><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKeyAntigravity" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>Antigravity API Key</b></span><span id="aiBadgeAntigravity" class="pill warn" style="font-size:11px;padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKeyAntigravity" placeholder="AIza... / agy-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggleAntigravity" title="顯示或隱藏 Antigravity API Key">顯示</button></div></div><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKeyCursor" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>Cursor API Key</b></span><span id="aiBadgeCursor" class="pill warn" style="font-size:11px;padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKeyCursor" placeholder="crsr_... / key-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggleCursor" title="顯示或隱藏 Cursor API Key">顯示</button></div></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap"><div class="field" style="flex:1 1 220px;min-width:0"><label for="selAiModel">模型選擇 (<span id="aiModelProvName">OpenAI</span>)</label><select id="selAiModel" style="width:100%"><option value="gpt-6.1-terra" selected>gpt-6.1-terra（旗艦深度推理 · 推薦）</option><option value="gpt-6.1-terra-mini">gpt-6.1-terra-mini（高速輕量推理）</option><option value="o4-mini">o4-mini（精準數理推理）</option><option value="gpt-5.4">gpt-5.4（通用旗艦）</option><option value="custom">自訂模型名稱…</option></select></div><div class="field" id="aiCustomModelField" hidden style="flex:1 1 180px;min-width:0"><label for="inAiCustomModel">自訂模型名稱</label><input type="text" id="inAiCustomModel" placeholder="例：gpt-6.1-terra" style="width:100%;font-family:var(--f-mono)"></div><div class="field" style="flex:1 1 200px;min-width:0"><label for="selAiEffort">推理強度 (Reasoning Effort)</label><select id="selAiEffort" style="width:100%"><option value="high" selected>高 (high) — 深度工程根因推理（推薦）</option><option value="medium">中 (medium) — 均衡推理深度與速度</option><option value="low">低 (low) — 快速重點摘要</option></select></div><div class="field" style="flex:1 1 220px;min-width:0"><label for="inAiCustomEndpoint">自訂 API 端點 (選填 https://)</label><input type="text" id="inAiCustomEndpoint" placeholder="預設使用官方端點" spellcheck="false" style="width:100%;font-family:var(--f-mono)"></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap;padding-top:4px;border-top:1px dashed var(--line)"><div style="font-size:12.5px;font-weight:600;color:var(--accent-ink);min-width:140px" id="aiLimitProvTitle">OpenAI 獨立配額上限：</div><div class="field"><label for="inAiDailyLim">每日次數上限 (次/日)</label><input type="number" id="inAiDailyLim" value="20" min="1" max="500" step="1" style="width:96px"></div><div class="field"><label for="inAiTokenLim">每月 Token 上限</label><input type="number" id="inAiTokenLim" value="500000" min="1000" max="10000000" step="10000" style="width:120px"></div><div class="field"><label for="inAiUsdLim">每月費用上限 (USD)</label><input type="number" id="inAiUsdLim" value="5.0" min="0.5" max="500" step="0.5" style="width:96px"></div><div class="row" style="gap:6px"><button type="button" class="primary" id="btnAiSaveCfg">儲存設定</button><button type="button" id="btnAiClearKey" title="清除目前所選服務商的金鑰">清除當前金鑰</button></div></div><div class="row" style="gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted)"><span class="chip">目前服務商：<b id="aiProviderLabel">OpenAI</b></span><span class="chip">模型：<b class="mono" id="aiModelLabel">gpt-6.1-terra</b></span><span class="chip">推理強度：<b class="mono" id="aiEffortLabel">高 (high)</b></span><span class="chip">計價基準：<b id="aiPriceLabel">輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens</b></span><span class="note" id="aiCfgMsg" role="status"></span></div><div class="grid2" style="gap:10px;margin-top:2px"><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;margin-bottom:6px"><b><span id="aiDailyBarProv">OpenAI</span> 今日呼叫次數 (<span id="aiUsageDayLabel">今日</span>)</b><span class="mono" id="aiDailyUsageText">0 / 20 次 (0%)</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiDailyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;margin-bottom:6px;gap:8px;flex-wrap:wrap"><b><span id="aiMonthlyBarProv">OpenAI</span> 本月累計用量 (<span id="aiUsageMonthLabel">本月</span>)</b><span class="mono" id="aiMonthlyUsageText">0 tokens · 預估 $0.00 / $5.00 USD</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiMonthlyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div></div></div></div><div class="card"><h3>AI 品質工程分析 <small id="aiCardSub">OpenAI gpt-6.1-terra（高推理強度） · 將目前全部統計結果與交叉驗證送出，嚴格區分事實與推論</small></h3>
+  <div class="card" id="aiSettingsCard"><h3 id="aiSettingsHead">API 金鑰、模型／推理強度與獨立配額設定 <small id="aiKeyBadge"><span class="pill warn">尚未設定金鑰</span></small></h3><div style="display:grid;grid-template-columns:minmax(0,1fr);gap:12px"><div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:13px;font-weight:600">啟用服務商：</span><div class="seg" id="aiProviderSeg" role="group" aria-label="選擇 AI 服務商" style="display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden"><button type="button" data-ai-prov="openai" aria-pressed="true">OpenAI</button><button type="button" data-ai-prov="antigravity" aria-pressed="false">Antigravity</button></div></div><div id="aiAllProvidersSummary" class="row" style="gap:6px;flex-wrap:wrap;font-size:12px"></div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px"><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKey" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>OpenAI API Key</b></span><span id="aiBadgeOpenai" class="pill warn" style="font-size:11px;padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKey" placeholder="sk-proj-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggle" title="顯示或隱藏 OpenAI API Key">顯示</button></div></div><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKeyAntigravity" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>Antigravity API Key</b></span><span id="aiBadgeAntigravity" class="pill warn" style="font-size:11px;padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKeyAntigravity" placeholder="AIza... / agy-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggleAntigravity" title="顯示或隱藏 Antigravity API Key">顯示</button></div></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap"><div class="field" style="flex:1 1 220px;min-width:0"><label for="selAiModel">模型選擇 (<span id="aiModelProvName">OpenAI</span>)</label><select id="selAiModel" style="width:100%"><option value="gpt-6.1-terra" selected>gpt-6.1-terra（旗艦深度推理 · 推薦）</option><option value="o4-mini">o4-mini（精準數理推理）</option><option value="gpt-5.4">gpt-5.4（通用旗艦）</option><option value="custom">自訂模型名稱…</option></select></div><div class="field" style="flex:0 0 auto"><button type="button" id="btnAiCheckModels" title="用目前服務商的 API Key 查詢實際可用的模型">檢查可用模型</button></div><div class="field" id="aiCustomModelField" hidden style="flex:1 1 180px;min-width:0"><label for="inAiCustomModel">自訂模型名稱</label><input type="text" id="inAiCustomModel" placeholder="例：gpt-6.1-terra" style="width:100%;font-family:var(--f-mono)"></div><div class="field" style="flex:1 1 200px;min-width:0"><label for="selAiEffort">推理強度 (Reasoning Effort)</label><select id="selAiEffort" style="width:100%"><option value="high" selected>高 (high) — 深度工程根因推理（推薦）</option><option value="medium">中 (medium) — 均衡推理深度與速度</option><option value="low">低 (low) — 快速重點摘要</option></select></div><div class="field" style="flex:1 1 220px;min-width:0"><label for="inAiCustomEndpoint">自訂 API 端點 (選填 https://)</label><input type="text" id="inAiCustomEndpoint" placeholder="預設使用官方端點" spellcheck="false" style="width:100%;font-family:var(--f-mono)"></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap;padding-top:4px;border-top:1px dashed var(--line)"><div style="font-size:12.5px;font-weight:600;color:var(--accent-ink);min-width:140px" id="aiLimitProvTitle">OpenAI 獨立配額上限：</div><div class="field"><label for="inAiDailyLim">每日次數上限 (次/日)</label><input type="number" id="inAiDailyLim" value="20" min="1" max="500" step="1" style="width:96px"></div><div class="field"><label for="inAiTokenLim">每月 Token 上限</label><input type="number" id="inAiTokenLim" value="500000" min="1000" max="10000000" step="10000" style="width:120px"></div><div class="field"><label for="inAiUsdLim">每月費用上限 (USD)</label><input type="number" id="inAiUsdLim" value="5.0" min="0.5" max="500" step="0.5" style="width:96px"></div><div class="row" style="gap:6px"><button type="button" class="primary" id="btnAiSaveCfg">儲存設定</button><button type="button" id="btnAiClearKey" title="清除目前所選服務商的金鑰">清除當前金鑰</button></div></div><div class="row" style="gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted)"><span class="chip">目前服務商：<b id="aiProviderLabel">OpenAI</b></span><span class="chip">模型：<b class="mono" id="aiModelLabel">gpt-6.1-terra</b></span><span class="chip">推理強度：<b class="mono" id="aiEffortLabel">高 (high)</b></span><span class="chip" style="white-space:normal;min-width:0">計價基準：<b id="aiPriceLabel">輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens</b></span><span class="note" id="aiCfgMsg" role="status"></span></div><div class="grid2" style="gap:10px;margin-top:2px"><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;margin-bottom:6px"><b><span id="aiDailyBarProv">OpenAI</span> 今日呼叫次數 (<span id="aiUsageDayLabel">今日</span>)</b><span class="mono" id="aiDailyUsageText">0 / 20 次 (0%)</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiDailyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;margin-bottom:6px;gap:8px;flex-wrap:wrap"><b><span id="aiMonthlyBarProv">OpenAI</span> 本月累計用量 (<span id="aiUsageMonthLabel">本月</span>)</b><span class="mono" id="aiMonthlyUsageText">0 tokens · 預估 $0.00 / $5.00 USD</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiMonthlyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div></div></div></div><div class="card"><h3>AI 品質工程分析 <small id="aiCardSub">OpenAI gpt-6.1-terra（高推理強度） · 將目前全部統計結果與交叉驗證送出，嚴格區分事實與推論</small></h3>
     <div class="notice" id="aiNoticeBox" style="background:var(--surface2);padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:12.5px;color:var(--ink)">
       <p style="margin:0 0 6px"><b>送出前告知與資料隱私保護：</b></p>
       <ul style="margin:0 0 6px 18px;padding:0;line-height:1.6">
@@ -8077,7 +8077,7 @@ const AI_CFG_KEY="spi-ai-config";
 const AI_PROVIDERS_META={
   openai:{
     id:"openai",label:"OpenAI",defaultModel:"gpt-6.1-terra",
-    models:[["gpt-6.1-terra","gpt-6.1-terra（旗艦深度推理 · 推薦）"],["gpt-6.1-terra-mini","gpt-6.1-terra-mini（高速輕量推理）"],["o4-mini","o4-mini（精準數理推理）"],["gpt-5.4","gpt-5.4（通用旗艦）"],["custom","自訂模型名稱…"]],
+    models:[["gpt-6.1-terra","gpt-6.1-terra（旗艦深度推理 · 推薦）"],["o4-mini","o4-mini（精準數理推理）"],["gpt-5.4","gpt-5.4（通用旗艦）"],["custom","自訂模型名稱…"]],
     defaultEndpoint:"https://api.openai.com/v1/chat/completions",
     priceText:"輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens",
     headerName:"X-OpenAI-Key",inputId:"inAiKey",toggleId:"btnAiKeyToggle",badgeId:"aiBadgeOpenai"
@@ -8088,22 +8088,14 @@ const AI_PROVIDERS_META={
     defaultEndpoint:"https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
     priceText:"輸入 $1.25 / 1M · 輸出 $5.00 / 1M tokens",
     headerName:"X-Antigravity-Key",inputId:"inAiKeyAntigravity",toggleId:"btnAiKeyToggleAntigravity",badgeId:"aiBadgeAntigravity"
-  },
-  cursor:{
-    id:"cursor",label:"Cursor",defaultModel:"gpt-6.1-terra",
-    models:[["gpt-6.1-terra","gpt-6.1-terra（Cursor 旗艦推理 · 推薦）"],["claude-opus-5-5","claude-opus-5-5（Claude 旗艦深度推理）"],["claude-sonnet-5-5","claude-sonnet-5-5（Claude 均衡高速）"],["gemini-3.1-pro-preview","gemini-3.1-pro-preview（Gemini 深度推理）"],["custom","自訂模型名稱…"]],
-    defaultEndpoint:"https://api.cursor.com/v1/chat/completions",
-    priceText:"輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens",
-    headerName:"X-Cursor-Key",inputId:"inAiKeyCursor",toggleId:"btnAiKeyToggleCursor",badgeId:"aiBadgeCursor"
   }
 };
 /* @ai-providers-meta END */
 const AI_EFFORT_LABELS={high:"高 (high)",medium:"中 (medium)",low:"低 (low)"};
 let AI_SERVER_HAS_KEY=false,AI_LAST_USAGE=null;
 const AI_SERVER_META={
-  openai:{hasServerKey:false,usage:null,limits:null},
-  antigravity:{hasServerKey:false,usage:null,limits:null},
-  cursor:{hasServerKey:false,usage:null,limits:null}
+  openai:{hasServerKey:false,usage:null,limits:null,availableModels:null},
+  antigravity:{hasServerKey:false,usage:null,limits:null,availableModels:null}
 };
 function normAiProvCfg(raw={},provId="openai"){
   const meta=AI_PROVIDERS_META[provId]||AI_PROVIDERS_META.openai;
@@ -8130,8 +8122,7 @@ function loadAiCfg(){
     const openaiSeed=pRaw.openai||{apiKey:c.apiKey,dailyReqLimit:c.dailyReqLimit,monthlyTokenLimit:c.monthlyTokenLimit,monthlyUsdLimit:c.monthlyUsdLimit};
     const providers={
       openai:normAiProvCfg(openaiSeed,"openai"),
-      antigravity:normAiProvCfg(pRaw.antigravity||{},"antigravity"),
-      cursor:normAiProvCfg(pRaw.cursor||{},"cursor")
+      antigravity:normAiProvCfg(pRaw.antigravity||{},"antigravity")
     };
     const cur=providers[activeProvider];
     return{
@@ -8146,7 +8137,7 @@ function loadAiCfg(){
     const defOpenai=normAiProvCfg({},"openai");
     return{
       activeProvider:"openai",
-      providers:{openai:defOpenai,antigravity:normAiProvCfg({},"antigravity"),cursor:normAiProvCfg({},"cursor")},
+      providers:{openai:defOpenai,antigravity:normAiProvCfg({},"antigravity")},
       apiKey:"",dailyReqLimit:20,monthlyTokenLimit:500000,monthlyUsdLimit:5.0
     };
   }
@@ -8172,7 +8163,6 @@ function snapshotAiInputsToCfg(cfg){
   const c=cfg||loadAiCfg();
   if($("#inAiKey"))c.providers.openai.apiKey=$("#inAiKey").value.trim();
   if($("#inAiKeyAntigravity"))c.providers.antigravity.apiKey=$("#inAiKeyAntigravity").value.trim();
-  if($("#inAiKeyCursor"))c.providers.cursor.apiKey=$("#inAiKeyCursor").value.trim();
   const p=c.activeProvider;
   const pCfg=c.providers[p];
   if($("#selAiModel"))pCfg.model=$("#selAiModel").value;
@@ -8207,7 +8197,7 @@ function updateAiKeyBadge(){
   const actSrv=AI_SERVER_META[act]&&AI_SERVER_META[act].hasServerKey;
   if(actCfg&&actCfg.apiKey){
     const m=actCfg.apiKey.length>10?actCfg.apiKey.slice(0,6)+"…"+actCfg.apiKey.slice(-4):"已填入";
-    b.innerHTML=`<span class="pill ok">${esc(actMeta.label)} 金鑰已就緒 (${esc(m)}) · 共 ${configuredCount}/3 組可用</span>`;
+    b.innerHTML=`<span class="pill ok">${esc(actMeta.label)} 金鑰已就緒 (${esc(m)}) · 共 ${configuredCount}/${Object.keys(AI_PROVIDERS_META).length} 組可用</span>`;
   }else if(actSrv||AI_SERVER_HAS_KEY){
     b.innerHTML=`<span class="pill ok">${esc(actMeta.label)} 使用伺服器金鑰</span>`;
   }else if(configuredCount>0){
@@ -8273,7 +8263,6 @@ function syncAiCfgInputs(){
   const act=cfg.activeProvider,meta=AI_PROVIDERS_META[act]||AI_PROVIDERS_META.openai,pCfg=cfg.providers[act];
   if($("#inAiKey"))$("#inAiKey").value=cfg.providers.openai.apiKey||"";
   if($("#inAiKeyAntigravity"))$("#inAiKeyAntigravity").value=cfg.providers.antigravity.apiKey||"";
-  if($("#inAiKeyCursor"))$("#inAiKeyCursor").value=cfg.providers.cursor.apiKey||"";
   $$("#aiProviderSeg [data-ai-prov]").forEach(btn=>{
     const on=btn.dataset.aiProv===act;
     btn.setAttribute("aria-pressed",on?"true":"false");
@@ -8281,7 +8270,9 @@ function syncAiCfgInputs(){
   });
   const selM=$("#selAiModel");
   if(selM){
-    selM.innerHTML=meta.models.map(([val,txt])=>`<option value="${esc(val)}">${esc(txt)}</option>`).join("");
+    const avail=AI_SERVER_META[act]&&AI_SERVER_META[act].availableModels;
+    const isAvail=v=>v==="custom"||!Array.isArray(avail)||avail.includes(v);
+    selM.innerHTML=meta.models.map(([val,txt])=>isAvail(val)?`<option value="${esc(val)}">${esc(txt)}</option>`:`<option value="${esc(val)}" disabled>${esc(txt)}（此金鑰不可用）</option>`).join("");
     const validVals=meta.models.map(x=>x[0]);
     selM.value=validVals.includes(pCfg.model)?pCfg.model:meta.defaultModel;
   }
@@ -8385,8 +8376,7 @@ if($("#selAiEffort")){
 }
 [
   ["btnAiKeyToggle","inAiKey"],
-  ["btnAiKeyToggleAntigravity","inAiKeyAntigravity"],
-  ["btnAiKeyToggleCursor","inAiKeyCursor"]
+  ["btnAiKeyToggleAntigravity","inAiKeyAntigravity"]
 ].forEach(([btnId,inId])=>{
   const b=$("#"+btnId);
   if(b)b.onclick=()=>{
@@ -8400,7 +8390,7 @@ if($("#btnAiSaveCfg"))$("#btnAiSaveCfg").onclick=async()=>{
   const cfg=snapshotAiInputsToCfg(loadAiCfg());
   saveAiCfg(cfg);syncAiCfgInputs();
   const actMeta=AI_PROVIDERS_META[cfg.activeProvider]||AI_PROVIDERS_META.openai;
-  if($("#aiCfgMsg"))$("#aiCfgMsg").textContent=`已儲存三組金鑰、模型／推理強度與 ${actMeta.label} 配額設定`;
+  if($("#aiCfgMsg"))$("#aiCfgMsg").textContent=`已儲存各服務商金鑰、模型／推理強度與 ${actMeta.label} 配額設定`;
   toast("已儲存 AI 金鑰、模型與使用量限制");
   if(typeof fetch==="function"){
     try{
@@ -8410,8 +8400,7 @@ if($("#btnAiSaveCfg"))$("#btnAiSaveCfg").onclick=async()=>{
         limits:{dailyReqLimit:pCfg.dailyReqLimit,monthlyTokenLimit:pCfg.monthlyTokenLimit,monthlyUsdLimit:pCfg.monthlyUsdLimit},
         providers:{
           openai:{limits:cfg.providers.openai},
-          antigravity:{limits:cfg.providers.antigravity},
-          cursor:{limits:cfg.providers.cursor}
+          antigravity:{limits:cfg.providers.antigravity}
         }
       };
       const r=await fetch("/api/analyze",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
@@ -8424,6 +8413,43 @@ if($("#btnAiSaveCfg"))$("#btnAiSaveCfg").onclick=async()=>{
       if(j.usage){AI_LAST_USAGE=j.usage;renderAiUsageUI(j.usage,pCfg,cfg.activeProvider)}
     }catch(e){}
   }
+};
+if($("#btnAiCheckModels"))$("#btnAiCheckModels").onclick=async()=>{
+  const btn=$("#btnAiCheckModels"),msg=$("#aiCfgMsg");
+  const cfg=snapshotAiInputsToCfg(loadAiCfg());saveAiCfg(cfg);
+  const act=cfg.activeProvider,meta=AI_PROVIDERS_META[act]||AI_PROVIDERS_META.openai,pCfg=cfg.providers[act];
+  const headers={"X-AI-Provider":act};
+  if(pCfg.apiKey){headers[meta.headerName]=pCfg.apiKey;headers["X-AI-Key"]=pCfg.apiKey}
+  if(pCfg.endpoint)headers["X-AI-Endpoint"]=pCfg.endpoint;
+  btn.disabled=true;btn.textContent="檢查中…";
+  try{
+    const r=await fetch("/api/analyze?models=1&provider="+encodeURIComponent(act),{headers});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok||!j.ok){
+      const note=`${meta.label} 模型檢查失敗：${j.error||"伺服器回應 "+r.status}`;
+      if(msg)msg.textContent=note;toast(note);return;
+    }
+    if(!Array.isArray(j.models)){
+      const note="自訂端點無法查詢模型清單，請自行確認模型名稱";
+      if(msg)msg.textContent=note;toast(note);return;
+    }
+    AI_SERVER_META[act].availableModels=j.models;
+    const presets=meta.models.map(x=>x[0]).filter(v=>v!=="custom");
+    const ok=presets.filter(v=>j.models.includes(v)),bad=presets.filter(v=>!j.models.includes(v));
+    let note=`${meta.label}：預設模型 ${ok.length}/${presets.length} 個可用`+(bad.length?`，不可用：${bad.join("、")}`:"");
+    if(pCfg.model==="custom"){
+      if(pCfg.customModel&&!j.models.includes(pCfg.customModel))note+=`；自訂模型 ${pCfg.customModel} 不在此金鑰的可用清單`;
+    }else if(!j.models.includes(pCfg.model)){
+      if(ok.length){pCfg.model=ok[0];note+=`；已改選 ${ok[0]}`}
+      else note+="；沒有可用的預設模型，請選「自訂模型名稱…」填入可用模型";
+      saveAiCfg(cfg);
+    }
+    syncAiCfgInputs();
+    if(msg)msg.textContent=note;toast(note);
+  }catch(e){
+    const note=`${meta.label} 模型檢查失敗：${e&&e.message||e}`;
+    if(msg)msg.textContent=note;toast(note);
+  }finally{btn.disabled=false;btn.textContent="檢查可用模型"}
 };
 if($("#btnAiClearKey"))$("#btnAiClearKey").onclick=()=>{
   const cfg=snapshotAiInputsToCfg(loadAiCfg());
@@ -8453,7 +8479,7 @@ async function analyzeViaApi(out,st){
   let fallbackNotice="";
   const hasKeyFor=p=>Boolean((cfg.providers[p]&&cfg.providers[p].apiKey)||(AI_SERVER_META[p]&&AI_SERVER_META[p].hasServerKey));
   if(!hasKeyFor(usedProv)){
-    const alt=["openai","antigravity","cursor"].find(p=>p!==usedProv&&hasKeyFor(p));
+    const alt=Object.keys(AI_PROVIDERS_META).find(p=>p!==usedProv&&hasKeyFor(p));
     if(alt){
       fallbackNotice=`（${AI_PROVIDERS_META[usedProv].label} 未填金鑰，已自動備援使用 ${AI_PROVIDERS_META[alt].label}）`;
       usedProv=alt;

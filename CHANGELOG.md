@@ -2,6 +2,14 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.10.0 — 2026-10-29 14:38:00（AI：移除 Cursor、檢查可用模型、404 修正指引）
+
+- **移除 Cursor 服務商**：`api.cursor.com` 沒有 `/v1/chat/completions` 路由（無金鑰 POST 即回 `404 Route POST:/v1/chat/completions not found`），此服務商從未能使用。前後端型錄、金鑰欄位、備援順序與配額設定只剩 OpenAI、Antigravity；舊設定仍送 `X-AI-Provider: cursor` 時 `/api/analyze` 回 `400`、`code=provider_removed`，不再呼叫上游。
+- **移除不存在的模型 `gpt-6.1-terra-mini`**：OpenAI 回 `404 model_not_found`。
+- **「檢查可用模型」按鈕**：AI 設定面板新增 `#btnAiCheckModels`，經 `GET /api/analyze?models=1&provider=…` 用目前金鑰查詢上游 `/models`；此金鑰不可用的預設模型在選單停用並標示「（此金鑰不可用）」，目前選取的模型不可用時自動改選第一個可用模型。自訂端點不是 `…/chat/completions` 形狀時回 `models:null`，請自行確認模型名稱。
+- **404 錯誤附修正指引**：模型不存在時提示按「檢查可用模型」；端點路由不存在時提示確認自訂 API 端點網址。
+- **AI 設定卡 320px 橫向溢出**：不換行的「計價基準」chip 撐開隱式 `auto` grid 欄，整頁寬 350px；grid 改 `minmax(0,1fr)`、chip 允許換行（`tests/mobile-layout.test.mjs` 測試 8b）。
+
 ## v10.9.3 — 2026-10-29 14:00:00（AI：Antigravity 上游 429 錯誤解析與短重試）
 
 - **Antigravity／Gemini 429 不再只顯示「回應 HTTP 429」**：`cloudflare/ai.mjs` 解析陣列或物件形狀的上游錯誤本文；`limit: 0` 時不重試並提示至 Google AI Studio 確認配額；短暫 429／503 在 4 秒內最多重試 3 次（尊重 `Retry-After`）。

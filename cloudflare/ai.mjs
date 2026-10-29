@@ -9,7 +9,10 @@ export const MAX_TOKENS = 16000;
 
 export const OPENAI_CHAT_URL = 'https://api.openai.com/v1/chat/completions';
 export const ANTIGRAVITY_CHAT_URL = 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions';
-export const CURSOR_CHAT_URL = 'https://api.cursor.com/v1/chat/completions';
+// Cursor 已移除：api.cursor.com 沒有 /v1/chat/completions 路由（無金鑰 POST 即回 404 Route not found）。
+export const REMOVED_PROVIDERS = {
+  cursor: 'Cursor 未提供 AI 對話 API，已從服務商清單移除；請改用 OpenAI 或 Antigravity',
+};
 
 // gpt-6.1-terra 定價（USD / 百萬 tokens）：輸入 $1.00、輸出（含推理）$5.00
 export const INPUT_PRICE_PER_M = 1.0;
@@ -21,7 +24,7 @@ export const PROVIDERS = {
     label: 'OpenAI',
     chatUrl: OPENAI_CHAT_URL,
     defaultModel: 'gpt-6.1-terra',
-    models: ['gpt-6.1-terra', 'gpt-6.1-terra-mini', 'o4-mini', 'gpt-5.4'],
+    models: ['gpt-6.1-terra', 'o4-mini', 'gpt-5.4'],
     headerKey: 'x-openai-key',
     inputPricePerM: 1.0,
     outputPricePerM: 5.0,
@@ -34,16 +37,6 @@ export const PROVIDERS = {
     models: ['gemini-3.1-pro-preview', 'gemini-3.0-flash', 'gpt-6.1-terra'],
     headerKey: 'x-antigravity-key',
     inputPricePerM: 1.25,
-    outputPricePerM: 5.0,
-  },
-  cursor: {
-    id: 'cursor',
-    label: 'Cursor',
-    chatUrl: CURSOR_CHAT_URL,
-    defaultModel: 'gpt-6.1-terra',
-    models: ['gpt-6.1-terra', 'claude-opus-5-5', 'claude-sonnet-5-5', 'gemini-3.1-pro-preview'],
-    headerKey: 'x-cursor-key',
-    inputPricePerM: 1.0,
     outputPricePerM: 5.0,
   },
 };
@@ -73,6 +66,10 @@ function normUser(req, userArg) {
   return raw.replace(/[^a-z0-9_.@-]/g, '_').slice(0, 64) || 'default';
 }
 
+function removedProviderError(raw) {
+  return REMOVED_PROVIDERS[String(raw || '').trim().toLowerCase()] || '';
+}
+
 function normProvider(raw) {
   const k = String(raw || '').trim().toLowerCase();
   return PROVIDERS[k] ? k : 'openai';
@@ -81,7 +78,6 @@ function normProvider(raw) {
 function getServerEnvKey(env, providerId) {
   if (!env) return '';
   if (providerId === 'antigravity') return String(env.ANTIGRAVITY_API_KEY || env.GEMINI_API_KEY || '').trim();
-  if (providerId === 'cursor') return String(env.CURSOR_API_KEY || '').trim();
   return String(env.OPENAI_API_KEY || env.ANTHROPIC_API_KEY || '').trim();
 }
 
@@ -222,7 +218,6 @@ function detectProviderFromHeaders(req) {
   const explicit = (req.headers.get('x-ai-provider') || '').trim().toLowerCase();
   if (PROVIDERS[explicit]) return explicit;
   if ((req.headers.get('x-antigravity-key') || '').trim()) return 'antigravity';
-  if ((req.headers.get('x-cursor-key') || '').trim()) return 'cursor';
   return 'openai';
 }
 
@@ -399,6 +394,12 @@ export function formatUpstreamFailureMessage(provLabel, status, extracted, didRe
   if (extracted.hasLimitZero || /limit:\s*0/i.test(extracted.message)) {
     return `${base}。此 API 金鑰對該模型額度為 0，請至 Google AI Studio 確認計費／配額，或改選其他模型／服務商。`;
   }
+  if (status === 404 && (extracted.code === 'model_not_found' || /does not exist|is not found/i.test(extracted.message))) {
+    return `${base}。此金鑰無法使用該模型，請在 AI 設定按「檢查可用模型」後改選。`;
+  }
+  if (status === 404 && /^Route \S+ not found/i.test(extracted.message)) {
+    return `${base}。此端點沒有 Chat Completions 路由，請確認自訂 API 端點網址。`;
+  }
   if (didRetry && (status === 429 || status === 503)) {
     return `${base}。已自動重試仍失敗，請稍後再試或改選其他服務商。`;
   }
@@ -454,6 +455,50 @@ async function fetchUpstreamWithRetry(targetUrl, headers, bodyPayload, signal, p
   return { res: null, error: `${provLabel} 回應 HTTP 429`, didRetry: true };
 }
 
+/** OpenAI 相容端點的模型清單網址：…/chat/completions → …/models；不是這個形狀的自訂端點回 null。 */
+export function modelsUrlFromChatUrl(chatUrl) {
+  let u;
+  try { u = new URL(chatUrl); } catch { return null; }
+  if (!/\/chat\/completions\/?$/.test(u.pathname)) return null;
+  u.pathname = u.pathname.replace(/\/chat\/completions\/?$/, '/models');
+  u.search = '';
+  return u.toString();
+}
+
+// 用使用者（或伺服器）金鑰查詢上游實際可用的模型，前端據此停用寫死型錄中不存在的模型。
+async function handleListModels(req, env, providerId) {
+  const provCfg = PROVIDERS[providerId];
+  const keyInfo = resolveApiKey(req, env, providerId);
+  if (keyInfo.error) return json({ ok: false, provider: providerId, error: keyInfo.error }, 400);
+  if (!keyInfo.apiKey) {
+    return json({ ok: false, provider: providerId, error: `請先填入 ${provCfg.label} API Key，再檢查可用模型` }, 400);
+  }
+  const epCheck = validateEndpointUrl(req.headers.get('x-ai-endpoint'), provCfg.chatUrl);
+  if (epCheck.error) return json({ ok: false, provider: providerId, error: epCheck.error }, 400);
+  const modelsUrl = modelsUrlFromChatUrl(epCheck.url);
+  if (!modelsUrl) return json({ ok: true, provider: providerId, models: null, reason: 'custom_endpoint' });
+
+  let res;
+  try {
+    res = await fetch(modelsUrl, { headers: { Authorization: `Bearer ${keyInfo.apiKey}` } });
+  } catch (e) {
+    return json({ ok: false, provider: providerId, error: `${provCfg.label} 模型清單查詢失敗：${e?.message || e}` }, 502);
+  }
+  const bodyText = await res.text();
+  if (!res.ok) {
+    const error = formatUpstreamFailureMessage(provCfg.label, res.status, extractUpstreamError(bodyText), false);
+    return json({ ok: false, provider: providerId, error }, 502);
+  }
+  let parsed = null;
+  try { parsed = JSON.parse(bodyText); } catch {}
+  const list = Array.isArray(parsed?.data) ? parsed.data : Array.isArray(parsed?.models) ? parsed.models : null;
+  if (!list) return json({ ok: false, provider: providerId, error: `${provCfg.label} 模型清單格式無法辨識` }, 502);
+  const models = [...new Set(
+    list.map((m) => String(m?.id || m?.name || '').replace(/^models\//, '').trim()).filter(Boolean),
+  )].sort();
+  return json({ ok: true, provider: providerId, models });
+}
+
 export async function handleAnalyze(req, env = {}, userArg = '') {
   if (env && env.AI_ENABLED === 'false') {
     return json({ error: '管理員已停用 AI 分析功能' }, 403);
@@ -463,7 +508,13 @@ export async function handleAnalyze(req, env = {}, userArg = '') {
 
   if (req.method === 'GET') {
     const reqUrl = new URL(req.url);
-    const activeProv = normProvider(reqUrl.searchParams.get('provider') || req.headers.get('x-ai-provider') || 'openai');
+    const rawProv = reqUrl.searchParams.get('provider') || req.headers.get('x-ai-provider') || 'openai';
+    if (reqUrl.searchParams.get('models') === '1') {
+      const removedMsg = removedProviderError(rawProv);
+      if (removedMsg) return json({ ok: false, error: removedMsg, code: 'provider_removed' }, 400);
+      return handleListModels(req, env, normProvider(rawProv));
+    }
+    const activeProv = normProvider(rawProv);
     const provCfg = PROVIDERS[activeProv];
     const providers = await readAllProvidersQuota(env?.DB, env, user);
     const activeInfo = providers[activeProv];
@@ -514,6 +565,9 @@ export async function handleAnalyze(req, env = {}, userArg = '') {
   }
 
   if (req.method !== 'POST') return json({ error: '只接受 GET、PUT 或 POST' }, 405);
+
+  const removedMsg = removedProviderError(req.headers.get('x-ai-provider'));
+  if (removedMsg) return json({ error: removedMsg, code: 'provider_removed' }, 400);
 
   const providerId = detectProviderFromHeaders(req);
   const provCfg = PROVIDERS[providerId];
