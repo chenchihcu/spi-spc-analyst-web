@@ -1,0 +1,192 @@
+{
+  "appVersion": "10.11.1",
+  "gitHead": "4534aa26e22dc67e3583ebc4b04d826b2de4e376",
+  "hashes": {
+    "rawB": "7b2ebd0c54c5eb4b0e041b26e68856e8f92370d39b4d1b83a276353e93098694",
+    "placement": "ee17ce0dd6914da67de91fbfd10e7613a9ebda43b4427e8f8aaaa4d85325959b",
+    "spec": "87eec342530a8b1a2a90d94f9360d346e670c485b733a8f3f2462d63eea36fed",
+    "userExport": "5de75f2127d9bd60c7f0aa7542b70d33e6fea33b39f9f83e5630004a0e6b38ae"
+  },
+  "baseline": {
+    "stencil_um": 120,
+    "groupMode": "comp",
+    "totals": {
+      "嚴重": 136,
+      "警示": 118,
+      "資訊": 6
+    },
+    "ruleCounts": {
+      "跨板重複不良焊墊（M-09）": 1,
+      "孤立極端焊墊（D-30）": 3,
+      "焊墊位置穩健 Cpk<1.00": 237,
+      "焊墊位置長期偏離（穩健 Cpk<1.00 且 |z|≥4）": 7,
+      "穩健 z 校準門檻（單板異常）": 3,
+      "Nelson 規則 1": 1,
+      "轉移效率 <90% 目標": 2,
+      "FastMCD 2D 雙變數離群（M-18）": 2,
+      "Nelson 規則 4": 2,
+      "刮刀方向檢定（D-64 迴歸校準）": 2
+    },
+    "robustCpkCardCount": 237,
+    "robustCpkLevels": {
+      "嚴重": 124,
+      "警示": 113
+    },
+    "recomputeRobustCount": 237,
+    "d30Hpct": [
+      {
+        "title": "高度%厚有 69 處孤立極端焊墊（B16/ED36-2、B16/ED36-1、B09/C416-1…）",
+        "level": "嚴重",
+        "n": 69
+      }
+    ]
+  },
+  "comparison90": {
+    "totals": {
+      "嚴重": 135,
+      "警示": 119,
+      "資訊": 6
+    },
+    "robustCpkLevels": {
+      "嚴重": 123,
+      "警示": 114
+    }
+  },
+  "pkg120": {
+    "totals": {
+      "嚴重": 19,
+      "警示": 17,
+      "資訊": 7
+    },
+    "ruleCounts": {
+      "跨板重複不良焊墊（M-09）": 1,
+      "焊墊位置穩健 Cpk<1.00": 20,
+      "焊墊位置長期偏離（穩健 Cpk<1.00 且 |z|≥4）": 7,
+      "穩健 z 校準門檻（單板異常）": 2,
+      "Nelson 規則 1": 1,
+      "孤立極端焊墊（D-30）": 3,
+      "轉移效率 <90% 目標": 2,
+      "FastMCD 2D 雙變數離群（M-18）": 3,
+      "Nelson 規則 4": 2,
+      "刮刀方向檢定（D-64 迴歸校準）": 2
+    },
+    "groupCount": 60
+  },
+  "robustCpkSample": [
+    {
+      "g": "B2",
+      "k": "volume",
+      "mc": 0.6756982425249795,
+      "lv": "warn",
+      "nPads": 4,
+      "nBoards": 20
+    },
+    {
+      "g": "C128",
+      "k": "volume",
+      "mc": 0.9148352037315974,
+      "lv": "warn",
+      "nPads": 2,
+      "nBoards": 20
+    },
+    {
+      "g": "C130",
+      "k": "volume",
+      "mc": 0.5436726980404125,
+      "lv": "ng",
+      "nPads": 2,
+      "nBoards": 20
+    },
+    {
+      "g": "C132",
+      "k": "volume",
+      "mc": 0.7535476535732174,
+      "lv": "warn",
+      "nPads": 2,
+      "nBoards": 20
+    },
+    {
+      "g": "C145",
+      "k": "volume",
+      "mc": 0.9808256508440175,
+      "lv": "warn",
+      "nPads": 2,
+      "nBoards": 20
+    }
+  ],
+  "robustMismatchCheck": {
+    "checked": 20,
+    "mismatch": 0,
+    "samples": []
+  },
+  "capHpct": {
+    "cpk": -0.5282940468865441,
+    "ci": [
+      -0.7509085508183961,
+      -0.3056795429546922
+    ],
+    "nb": 20,
+    "n": 40
+  },
+  "nelsonRule8Probe": {
+    "sameSignOnly": {
+      "z": [
+        1.2,
+        1.3,
+        1.1,
+        1.4,
+        1.2,
+        1.5,
+        1.1,
+        1.3
+      ],
+      "triggered": true,
+      "idx": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    "bothSides": {
+      "z": [
+        1.2,
+        -1.1,
+        1.3,
+        -1.2,
+        1.1,
+        -1.3,
+        1.2,
+        -1.1
+      ],
+      "triggered": true,
+      "idx": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    }
+  },
+  "stableSim": {
+    "nb": 25,
+    "nSeeds": 200,
+    "anyNgWarnRate": 0.08,
+    "ruleHitRates": {
+      "孤立極端焊墊（D-30）": 0.03,
+      "Nelson 規則 1": 0.05,
+      "刮刀方向檢定（D-64 迴歸校準）": 0.01,
+      "CUSUM h=5": 0.005
+    }
+  },
+  "specDownloadLine": "spi-spc.html ~9104: fn=`料號規格_${safeFn(rec.part)}_v${rec.ver}.json`",
+  "reportStencilLine": "renderReport #repSec1 / reportMd 使用 S.stencil"
+}
