@@ -2688,7 +2688,7 @@ function analyzeView(st,B){
   const series=st.chart==="imr"?imr.pts:st.chart==="p"?pc.pts:st.chart==="ewma"?ewma:st.chart==="cusum"?cuz:st.chart==="xbarr"?xr.pts:xs.pts;
   let nel;
   if(st.chart==="xbars"||!RULES.hasOwnProperty(st.chart))nel=B.nelX;
-  else{nel=nelson(series.map(p=>p.z),RULES[st.chart]||null);if(isZeroSd||xs.rejected||(st.chart==="xbarr"&&xr.rejected))nel=nelZero()}
+  else{nel=nelson(series.map(p=>p.z),RULES[st.chart]||null);if(isZeroSd||xs.rejected||(st.chart==="xbarr"&&xr.rejected)||(st.chart==="imr"&&imr.rejected))nel=nelZero()}
   const mode=st.capDistMode||"auto",th=st.pauseThreshold||15,cap=Object.assign({},B.cap);
   lazy(cap,"nonNormal",()=>B.nonNormalOf(mode));
   const A={m,sp:B.sp,rows,boards,byBoard:B.byBoard,N:B.N,gMean:B.gMean,overallSd:B.overallSd,sigmaW:B.sigmaW,sigmaLT:B.sigmaLT,mixed:B.mixed,nbar:B.nbar,xs,xr,imr,pc,ewma,cusum:B.cusum,series,nel,nelX:B.nelX,stable:B.stable,cap,hasSpec:B.hasSpec,unitMismatch:B.unitMismatch,
@@ -5836,8 +5836,8 @@ function renderStats(){
       $("#matrixTbl").innerHTML=head+`<tbody>`+body+`</tbody>`+foot;
     }
   }
-  const volSp=S.specs&&S.specs.volume,rows=S.rows.filter(r=>(isAllGrp(S.group)||r.group===S.group));
-  const sided=computeSidedPpmBlock(rows,volSp,"volume",{boards:[...new Set(rows.map(r=>r.board))]});
+  const curSp=!isAllGrp(S.group)?specOfGroup(S,S.group,S.metric):S.specs[S.metric],rows=S.rows.filter(r=>(isAllGrp(S.group)||r.group===S.group));
+  const sided=computeSidedPpmBlock(rows,curSp,S.metric,{boards:[...new Set(rows.map(r=>r.board))]});
   const fmtSide=formatSidedPpmBlock(sided,fmtPpm);
   if($("#sidedPpmKpis"))$("#sidedPpmKpis").innerHTML=kpi("低於下限 PPM",fmtSide.belowLslPpm,"")+kpi("高於上限 PPM",fmtSide.aboveUslPpm,"")+kpi("合併事件 DPMO",fmtSide.eventDpmo,"")+kpi("合併板 DPMO",fmtSide.boardDpmo,"");
   if($("#sidedPpmNote"))$("#sidedPpmNote").textContent=fmtSide.note||"";
@@ -6012,7 +6012,7 @@ function drawCtrl(id,mini){const A=S.A,c=S.chart,ng=css("--ng"),acc=css("--accen
   const ucl=c==="imr"?pts.map(()=>A.imr.ucl):pts.map(p=>p.ucl),lcl=c==="imr"?pts.map(()=>A.imr.lcl):pts.map(p=>p.lcl),cl=c==="imr"?A.imr.cl:c==="p"?A.pc.cl:A.xs.cl;
   const sig=c==="imr"?(A.imr.ucl-A.imr.cl)/3:null;
   const scale=c==="p"?100:1;   // P′ 圖以 % 顯示：資料、界限與分區線都要乘同一倍數
-  const zones=mini?[]:[1,2].flatMap(k=>[1,-1].map(sgn=>({label:"",data:pts.map((p,i)=>(cl+sgn*k*((c==="imr"?sig:(ucl[i]-cl)/3)))*scale),borderColor:css("--grid"),borderWidth:1,pointRadius:0,stepped:c==="p"?"middle":false,borderDash:[2,3]})));
+  const zones=mini?[]:[1,2].flatMap(k=>[1,-1].map(sgn=>({label:"",data:pts.map((p,i)=>{let v=cl+sgn*k*((c==="imr"?sig:(ucl[i]-cl)/3));if(c==="p")v=Math.max(0,Math.min(1,v));return v*scale}),borderColor:css("--grid"),borderWidth:1,pointRadius:0,stepped:c==="p"?"middle":false,borderDash:[2,3]})));
   mk(id,{type:"line",data:{labels:pts.map(p=>p.lab),datasets:[
     {label:"量測",data:pts.map(p=>p.v*scale),borderColor:s2,borderWidth:1.6,pointRadius:mini?2.5:3.5,pointBackgroundColor:pts.map((p,i)=>A.nel.flag.has(i)?ng:s2),pointBorderColor:pts.map((p,i)=>A.nel.flag.has(i)?ng:s2),pointRadius:pts.map((p,i)=>A.nel.flag.has(i)?(mini?4:5.5):(mini?2.5:3.5)),tension:0},
     {label:"UCL",data:ucl.map(v=>v*scale),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0,stepped:c==="p"?"middle":false},
@@ -6142,7 +6142,7 @@ function renderCap(){
         ? `Johnson ${nn.family}（AD p = ${f(nn.adP, 3)}）`
         : `Box-Cox（λ = ${nn.lambda}，AD p = ${f(nn.adP, 3)}）`;
       const ppkVal = f(nn.ppk);
-      const ppmVal = fmtPpm(nn.ppmExp || nn.ppmObs);
+      const ppmVal = fmtPpm(isFinite(nn.ppmExp) ? nn.ppmExp : nn.ppmObs);
       const isSkewed = Math.abs(A.sk.skew) > 0.5 || (A.ad && A.ad.p < 0.05);
       nnCard.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
         <div>
@@ -10335,7 +10335,8 @@ function renderReport(){
         const vals=S.rows.filter(r=>r[m]!=null).map(r=>r[m]);
         const mu=vals.length?mean(vals):NaN,sp=S.specs[m]||{},nel=(A.nelX||A.nel);
         const isFlag=nel&&nel.flag&&nel.flag.size>0&&S.metric===m;
-        return `<tr><td>${METRICS[m].label} <span class="note">${METRICS[m].unit}</span></td><td class="num mono">${f(mu,1)}</td><td class="num mono">${isFinite(A.xLcl)&&S.metric===m?f(A.xLcl,1):"—"}</td><td class="num mono">${isFinite(A.xUcl)&&S.metric===m?f(A.xUcl,1):"—"}</td><td class="num mono">${sp.lsl??"—"} ~ ${sp.usl??"—"}</td><td><span class="pill ${isFlag?'ng':'ok'}">${isFlag?'判異':'正常'}</span></td></tr>`
+        const curLcl=A.xs&&!A.xs.rejected&&A.xs.pts&&A.xs.pts[0]?A.xs.pts[0].lcl:NaN,curUcl=A.xs&&!A.xs.rejected&&A.xs.pts&&A.xs.pts[0]?A.xs.pts[0].ucl:NaN;
+        return `<tr><td>${METRICS[m].label} <span class="note">${METRICS[m].unit}</span></td><td class="num mono">${f(mu,1)}</td><td class="num mono">${isFinite(curLcl)&&S.metric===m?f(curLcl,1):"—"}</td><td class="num mono">${isFinite(curUcl)&&S.metric===m?f(curUcl,1):"—"}</td><td class="num mono">${sp.lsl??"—"} ~ ${sp.usl??"—"}</td><td><span class="pill ${isFlag?'ng':'ok'}">${isFlag?'判異':'正常'}</span></td></tr>`
       }).join("")}</tbody>
     </table></div>
     <h3 style="font-size:var(--fs-ui);margin:12px 0 6px">優先處理問題摘要（前 5 項）</h3>
@@ -10382,7 +10383,7 @@ function renderReport(){
     </table></div>${capT.total>capT.rows.length?`<p class="note">依 Cpk 由低到高列出前 ${capT.rows.length} 個群組（共 ${capT.total} 個）</p>`:""}
     ${histImgUrl?`<div style="text-align:center;margin-bottom:16px"><h4 style="font-size:var(--fs-ui);margin:0 0 6px">實測直方圖分佈</h4><img src="${histImgUrl}" style="width:100%;max-width:760px;height:auto;border:1px solid var(--line);border-radius:6px" alt="直方圖"></div>`:""}
     <p class="note">常態性檢定：Anderson-Darling A² = ${f(A.ad.A,3)}，p ${A.ad.p<.001?"< 0.001":"= "+f(A.ad.p,3)}（${adVerdict(A.ad)}）${A.sw&&A.sw.valid?`；Shapiro-Wilk W = ${f(A.sw.w,4)}，p ${A.sw.p<.001?"< 0.001":"= "+f(A.sw.p,3)}`:""}。</p>
-    ${(()=>{const volSp=S.specs.volume,rows=S.rows.filter(r=>(isAllGrp(S.group)||r.group===S.group)),sided=computeSidedPpmBlock(rows,volSp,"volume",{boards:A.boards}),fmt=formatSidedPpmBlock(sided,fmtPpm);return`<div class="tbl" style="margin-top:12px"><table><tbody>
+    ${(()=>{const curSp=A.sp,rows=S.rows.filter(r=>(isAllGrp(S.group)||r.group===S.group)),sided=computeSidedPpmBlock(rows,curSp,A.m,{boards:A.boards}),fmt=formatSidedPpmBlock(sided,fmtPpm);return`<div class="tbl" style="margin-top:12px"><table><tbody>
       <tr><th>低於下限 PPM</th><td class="num mono">${fmt.belowLslPpm}</td><th>高於上限 PPM</th><td class="num mono">${fmt.aboveUslPpm}</td></tr>
       <tr><th>合併事件 DPMO</th><td class="num mono">${fmt.eventDpmo}</td><th>合併板 DPMO</th><td class="num mono">${fmt.boardDpmo}</td></tr>
       ${fmt.note?`<tr><th>說明</th><td colspan="3">${esc(fmt.note)}</td></tr>`:""}

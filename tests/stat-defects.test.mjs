@@ -156,3 +156,91 @@ test("A1–A3 報告：直方圖有資料、管制圖為 X̄ 界限、能力表�
   assert.match(sec5, /\d+\.\d\d/, "能力表應有 Cp/Cpk 數值");
   assert.match(w.document.querySelector("#repSec4").textContent, /X̄ 圖（板平均/);
 });
+
+
+test("D1 報告 X̄ 管制狀態表：當前量測項目正確提取 LCL/UCL，不再恆為 —", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const html = fs.readFileSync(HTML, "utf8").replace(/<script src=[^>]+><\/script>/g, "");
+  const dom = new JSDOM(html, { runScripts: "dangerously", url: "https://spi.example/", beforeParse(w) {
+    w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === "measureText" ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
+    w.HTMLCanvasElement.prototype.toDataURL = () => "data:image/png;base64,AA==";
+    Object.defineProperty(w.HTMLElement.prototype, "offsetParent", { get() { return w.document.body; } });
+    w.Element.prototype.scrollIntoView = () => {}; w.matchMedia = () => ({ matches: false, addEventListener() {} }); w.ResizeObserver = class { observe() {} }; w.scrollTo = () => {};
+    w.Chart = class { constructor() {} destroy() {} static register() {} };
+    w.SPI_TEST_HOOK = {};
+  } });
+  const w = dom.window;
+  for (let i = 0; i < 200 && !(w.SPI_TEST_HOOK.renderReport && w.eval("typeof S!=='undefined'&&!!S.A")); i++) await tick(20);
+  assert.ok(w.SPI_TEST_HOOK.renderReport, "頁面未就緒");
+  w.SPI_TEST_HOOK.renderReport();
+  const tbl = w.document.querySelector("#repSec2 table");
+  assert.ok(tbl, "報告第二節應有五大判定項目表格");
+  const curMetricRow = Array.from(tbl.querySelectorAll("tbody tr")).find(tr => tr.cells[0].textContent.includes("體積"));
+  assert.ok(curMetricRow, "應有體積列");
+  const lclText = curMetricRow.cells[2].textContent.trim();
+  const uclText = curMetricRow.cells[3].textContent.trim();
+  assert.notEqual(lclText, "—", `當前指標之 LCL 不應為 "—"，實際：${lclText}`);
+  assert.notEqual(uclText, "—", `當前指標之 UCL 不應為 "—"，實際：${uclText}`);
+  assert.match(lclText, /^\d+\.\d$/, "LCL 應為數字格式");
+  assert.match(uclText, /^\d+\.\d$/, "UCL 應為數字格式");
+});
+
+test("D2 雙邊規格分側 PPM：支援非體積指標與群組規格覆寫", () => {
+  const rows = [
+    { board: "B1", group: "G1", volume: 100, height: 40, area: 100 },
+    { board: "B1", group: "G1", volume: 100, height: 160, area: 100 },
+    { board: "B2", group: "G1", volume: 100, height: 100, area: 100 },
+    { board: "B2", group: "G1", volume: 100, height: 100, area: 100 }
+  ];
+  const specH = { lsl: 50, usl: 150 };
+  const sided = c.computeSidedPpmBlock(rows, specH, "height", { boards: ["B1", "B2"] });
+  assert.equal(sided.ok, true);
+  assert.equal(sided.n, 4);
+  assert.equal(sided.belowLslPpm, 250000);
+  assert.equal(sided.aboveUslPpm, 250000);
+  assert.equal(sided.eventDpmo, 500000);
+  assert.equal(sided.boardDpmo, 500000);
+});
+
+test("D3 P' 圖分區線：低不良率下 -1σ/-2σ clamp 於 0% 以上", () => {
+  const rows = [];
+  for (let b = 1; b <= 20; b++) {
+    for (let i = 0; i < 50; i++) {
+      rows.push({ board: "B" + b, pad: "P" + i, group: "G", volume: (b === 1 && i === 0) ? 200 : 100, height: 120, area: 100 });
+    }
+  }
+  const s = st(rows, { chart: "p" });
+  s.A = c.analyze(s);
+  assert.equal(s.A.pc.cl > 0, true);
+  const cl = s.A.pc.cl, pts = s.A.pc.pts, ucl = pts.map(p => p.ucl), scale = 100, c_mode = "p";
+  const zones = [1, 2].flatMap(k => [1, -1].map(sgn => ({
+    data: pts.map((p, i) => {
+      let v = cl + sgn * k * ((ucl[i] - cl) / 3);
+      if (c_mode === "p") v = Math.max(0, Math.min(1, v));
+      return v * scale;
+    })
+  })));
+  for (const z of zones) {
+    for (const val of z.data) {
+      assert.ok(val >= 0, `P' 圖分區線不應小於 0%，實際：${val}`);
+    }
+  }
+});
+
+test("D4 I-MR 點數不足拒絕時抑制 Nelson 判異規則，回退為 nelZero()", () => {
+  const rows = [
+    { board: "B1", pad: "P1", group: "G", volume: 100, height: 120, area: 100 },
+    { board: "B2", pad: "P1", group: "G", volume: 150, height: 120, area: 100 },
+    { board: "B3", pad: "P1", group: "G", volume: 80, height: 120, area: 100 }
+  ];
+  const s = st(rows, { chart: "imr", pad: "P1" });
+  const A = c.analyze(s);
+  assert.equal(A.imr.rejected, true, "I-MR 應被拒絕");
+  assert.equal(A.nel.flag.size, 0, "Nelson 判異規則應被抑制為 nelZero()");
+  assert.ok(A.nel.rules.every(r => r.idx.length === 0), "所有規則的異常點索引應為空");
+});
+
+test("D5 非常態能力卡片：預估 PPM 為 0 時不短路回退至觀測超規數", () => {
+  const nn = { ppmExp: 0, ppmObs: 500 };
+  const ppmVal = isFinite(nn.ppmExp) ? nn.ppmExp : nn.ppmObs;
+  assert.equal(ppmVal, 0, "預估 PPM 為 0 時應取 0，不可短路回退至 500");
+});
