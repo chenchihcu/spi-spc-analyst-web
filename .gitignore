@@ -7,3 +7,6 @@ dist/
 .wrangler-dry-run/
 spi-spc-analyst-spec-*.md
 .build/
+tools/.ai-catalog-evidence/
+tools/_*
+tools/_snippet*.js

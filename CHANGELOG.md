@@ -2,6 +2,13 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.11.0 — 2026-10-29 20:33:00（AI：型錄正本、汰舊遷移與刷新工具）
+
+- **型錄正本**：[`lib/ai-providers.mjs`](lib/ai-providers.mjs) 集中 OpenAI／Antigravity 預設與模型清單、計價與已移除型號；Worker [`cloudflare/ai.mjs`](cloudflare/ai.mjs) 依模型 ID 計價；[`tools/sync-ai-providers.mjs`](tools/sync-ai-providers.mjs) 同步至 `spi-spc.html` `@ai-providers-meta`。
+- **汰舊**：移除 `o4-mini`、`gemini-3.0-flash` 等；OpenAI 預設維持 `gpt-6.1-terra`；Antigravity 預設 `gemini-3.8-flash`。載入舊設定時自動改預設並提示。
+- **刷新工具**：[`tools/refresh-ai-catalog.mjs`](tools/refresh-ai-catalog.mjs)／[`lib/ai-catalog-refresh.mjs`](lib/ai-catalog-refresh.mjs) 離線 dry-run 與證據快照；RFC [`docs/spec-ai-model-catalog-rfc.md`](docs/spec-ai-model-catalog-rfc.md)。
+- 測試：`tests/ai-catalog-refresh.test.mjs`、`tests/ai-model.test.mjs`。
+
 ## v10.10.1 — 2026-10-29 16:50:00（UI：文案收斂與字級 token）
 
 - **文案收斂**：移除各頁「怎麼看」等教學折疊與重複副標；使用者可見標題不再附英文譯名（報告／PDF 章名同步）；`METRICS` 量測項目標籤僅中文。

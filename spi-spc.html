@@ -744,7 +744,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.10.1</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.11.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -1165,7 +1165,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
       </details>
     </div>
     <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap"><div class="row"><button class="primary" id="btnAI">產生分析報告</button><button id="btnAIStop" hidden>停止</button><span class="note" id="aiState"></span></div><div class="row" id="aiResultTools" hidden><button type="button" id="btnAICopy">複製診斷結果</button><button type="button" id="btnAIMd">匯出 AI 診斷 .md</button></div></div>
-    <div class="ai-out" id="aiOut" style="margin-top:12px"><p class="note">按下按鈕後，gpt-6.1-terra（高推理強度）會審查系統偵測到的問題清單，並產生：結論摘要、逐項同意或存疑、可能漏抓的問題、原因推論與信心、驗證實驗、試產／DFM 建議。</p></div>
+    <div class="ai-out" id="aiOut" style="margin-top:12px"><p class="note" id="aiOutPlaceholder">按下按鈕後，依設定模型與推理強度會審查系統偵測到的問題清單，並產生：結論摘要、逐項同意或存疑、可能漏抓的問題、原因推論與信心、驗證實驗、試產／DFM 建議。</p></div>
   </div>
 </section>
 
@@ -2400,7 +2400,7 @@ function formatSidedPpmBlock(block, fmt = (v) => String(Math.round(v))) {
 /* @windows-parity END */
 /* Number.isFinite：空白座標欄解析為 null，全域 isFinite(null) 會當成 0 */
 const realXY=r=>Boolean(r&&!r.gridPos&&Number.isFinite(r.x)&&Number.isFinite(r.y));
-const S={rows:[],metrics:[],metric:"volume",group:ALL_GRP,chart:"xbars",relChart:"specScatter",pad:null,board:null,specSrc:"sample",partSpec:null,specDraft:null,specsG:null,sqDir:"Y",specs:JSON.parse(JSON.stringify(DEF_SPECS)),stencil:120,htol:{lo:75,hi:125},step:{on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]},selZone:1,wipe:5,aperture:{groups:{}},geometryPads:null,padCoverage:null,pendingVerify:false,runVendor:"generic",ovCapSnap:null,ovCapSnapKey:"",source:"範例資料",tab:"issues",F:[],issLv:"all",issCat:"all",issEnt:null,ctx:null,colorMode:"status",exag:20,ghost:true,bridgeWarn:true,csAxis:"X",selectedPad:null,A:null,ai:""};
+const S={rows:[],metrics:[],metric:"volume",group:ALL_GRP,chart:"xbars",relChart:"specScatter",pad:null,board:null,specSrc:"sample",partSpec:null,specDraft:null,specsG:null,sqDir:"Y",specs:JSON.parse(JSON.stringify(DEF_SPECS)),stencil:120,htol:{lo:75,hi:125},step:{on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]},selZone:1,wipe:5,aperture:{groups:{}},geometryPads:null,padCoverage:null,pendingVerify:false,runVendor:"generic",ovCapSnap:null,ovCapSnapKey:"",source:"範例資料",tab:"issues",F:[],issLv:"all",issCat:"all",issEnt:null,ctx:null,colorMode:"status",exag:20,ghost:true,bridgeWarn:true,csAxis:"X",selectedPad:null,A:null,ai:"",aiModel:""};
 loadSpiKbRules();
 
 /* 階梯鋼板：由上而下第一個符合的區域生效，否則用基礎厚度 */
@@ -8051,16 +8051,20 @@ const AI_CFG_KEY="spi-ai-config";
 const AI_PROVIDERS_META={
   openai:{
     id:"openai",label:"OpenAI",defaultModel:"gpt-6.1-terra",
-    models:[["gpt-6.1-terra","gpt-6.1-terra（旗艦深度推理 · 推薦）"],["o4-mini","o4-mini（精準數理推理）"],["gpt-5.4","gpt-5.4（通用旗艦）"],["custom","自訂模型名稱…"]],
+    models:[["gpt-6.1-terra","gpt-6.1-terra（推薦 · 均衡推理與成本）"],["gpt-6.1-sol","gpt-6.1-sol（較高能力 · 複雜工程推理）"],["gpt-6-astra","gpt-6-astra（旗艦 · 最高推理深度）"],["gpt-5.4","gpt-5.4（較早世代 · 仍可用）"],["custom","自訂模型名稱…"]],
     defaultEndpoint:"https://api.openai.com/v1/chat/completions",
-    priceText:"輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens",
+    priceText:"依所選模型計價（預設 terra：輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens）",
+    modelPricing:{"gpt-6.1-terra":{inputPricePerM:1,outputPricePerM:5},"gpt-6.1-sol":{inputPricePerM:2,outputPricePerM:10},"gpt-6-astra":{inputPricePerM:10,outputPricePerM:50},"gpt-5.4":{inputPricePerM:2.5,outputPricePerM:15}},
+    removedModels:["o4-mini","gpt-6.1-terra-mini"],
     headerName:"X-OpenAI-Key",inputId:"inAiKey",toggleId:"btnAiKeyToggle",badgeId:"aiBadgeOpenai"
   },
   antigravity:{
-    id:"antigravity",label:"Antigravity",defaultModel:"gemini-3.1-pro-preview",
-    models:[["gemini-3.1-pro-preview","gemini-3.1-pro-preview（AGY 深度推理 · 推薦）"],["gemini-3.0-flash","gemini-3.0-flash（高速工程診斷）"],["gpt-6.1-terra","gpt-6.1-terra（經 Antigravity 路由）"],["custom","自訂模型名稱…"]],
+    id:"antigravity",label:"Antigravity",defaultModel:"gemini-3.8-flash",
+    models:[["gemini-3.8-flash","gemini-3.8-flash（推薦 · 高速工程診斷）"],["gemini-4-argon","gemini-4-argon（旗艦 · 深度推理）"],["gemini-3.1-pro-preview","gemini-3.1-pro-preview（Pro 預覽 · 長上下文）"],["custom","自訂模型名稱…"]],
     defaultEndpoint:"https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-    priceText:"輸入 $1.25 / 1M · 輸出 $5.00 / 1M tokens",
+    priceText:"依所選模型計價（預設 3.8 Flash：輸入 $0.75 / 1M · 輸出 $3.75 / 1M tokens）",
+    modelPricing:{"gemini-3.8-flash":{inputPricePerM:0.75,outputPricePerM:3.75,pricingEffectiveUntil:"2026-12-31",pricingNext:{inputPricePerM:1.5,outputPricePerM:7.5}},"gemini-4-argon":{inputPricePerM:2,outputPricePerM:10,pricingEffectiveUntil:"2026-11-30",pricingNext:{inputPricePerM:4,outputPricePerM:20}},"gemini-3.1-pro-preview":{inputPricePerM:2,outputPricePerM:12}},
+    removedModels:["gemini-3.0-flash","gpt-6.1-terra"],
     headerName:"X-Antigravity-Key",inputId:"inAiKeyAntigravity",toggleId:"btnAiKeyToggleAntigravity",badgeId:"aiBadgeAntigravity"
   }
 };
@@ -8071,10 +8075,37 @@ const AI_SERVER_META={
   openai:{hasServerKey:false,usage:null,limits:null,availableModels:null},
   antigravity:{hasServerKey:false,usage:null,limits:null,availableModels:null}
 };
+let AI_CFG_MIGRATION_NOTICE="";
+function aiEffectivePricingRates(provId,modelId){
+  const meta=AI_PROVIDERS_META[provId]||AI_PROVIDERS_META.openai;
+  const id=(modelId||"").trim()||meta.defaultModel;
+  const row=(meta.modelPricing&&meta.modelPricing[id])||(meta.modelPricing&&meta.modelPricing[meta.defaultModel])||{inputPricePerM:1,outputPricePerM:5};
+  if(row.pricingEffectiveUntil&&row.pricingNext){
+    const end=Date.parse(row.pricingEffectiveUntil+"T23:59:59.999Z");
+    if(Date.now()>end)return row.pricingNext;
+  }
+  return {inputPricePerM:row.inputPricePerM,outputPricePerM:row.outputPricePerM};
+}
+function aiPricingLabel(provId,modelId){
+  const meta=AI_PROVIDERS_META[provId]||AI_PROVIDERS_META.openai;
+  const id=(modelId||"").trim()||meta.defaultModel;
+  const r=aiEffectivePricingRates(provId,id);
+  if(meta.modelPricing&&!meta.modelPricing[id]&&id!==meta.defaultModel&&(modelId||"").trim()){
+    return `自訂模型 · 估算依 ${meta.defaultModel} 費率（輸入 $${r.inputPricePerM} / 1M · 輸出 $${r.outputPricePerM} / 1M tokens）`;
+  }
+  return `輸入 $${r.inputPricePerM} / 1M · 輸出 $${r.outputPricePerM} / 1M tokens`;
+}
 function normAiProvCfg(raw={},provId="openai"){
   const meta=AI_PROVIDERS_META[provId]||AI_PROVIDERS_META.openai;
   const validModels=meta.models.map(x=>x[0]);
-  const m=typeof raw.model==="string"&&raw.model.trim()?raw.model.trim():meta.defaultModel;
+  const removed=meta.removedModels||[];
+  let m=typeof raw.model==="string"&&raw.model.trim()?raw.model.trim():meta.defaultModel;
+  const customRaw=typeof raw.customModel==="string"?raw.customModel.trim():"";
+  if(removed.includes(m)||(customRaw&&removed.includes(customRaw))){
+    const old=removed.includes(m)?m:customRaw;
+    AI_CFG_MIGRATION_NOTICE=(AI_CFG_MIGRATION_NOTICE?AI_CFG_MIGRATION_NOTICE+" ":"")+`［${meta.label}］模型 ${old} 已自推薦型錄移除，已改為 ${meta.defaultModel}。`;
+    m=meta.defaultModel;
+  }
   const isPreset=validModels.includes(m)&&m!=="custom";
   const eff=["high","medium","low"].includes(raw.effort)?raw.effort:"high";
   return{
@@ -8090,6 +8121,7 @@ function normAiProvCfg(raw={},provId="openai"){
 }
 function loadAiCfg(){
   try{
+    AI_CFG_MIGRATION_NOTICE="";
     const c=JSON.parse(localStorage.getItem(AI_CFG_KEY)||"{}")||{};
     const activeProvider=AI_PROVIDERS_META[c.activeProvider]?c.activeProvider:"openai";
     const pRaw=c.providers&&typeof c.providers==="object"?c.providers:{};
@@ -8099,14 +8131,17 @@ function loadAiCfg(){
       antigravity:normAiProvCfg(pRaw.antigravity||{},"antigravity")
     };
     const cur=providers[activeProvider];
-    return{
+    const cfg={
       activeProvider,
       providers,
       apiKey:cur.apiKey,
       dailyReqLimit:cur.dailyReqLimit,
       monthlyTokenLimit:cur.monthlyTokenLimit,
-      monthlyUsdLimit:cur.monthlyUsdLimit
+      monthlyUsdLimit:cur.monthlyUsdLimit,
+      migrationNotice:AI_CFG_MIGRATION_NOTICE
     };
+    if(AI_CFG_MIGRATION_NOTICE)saveAiCfg(cfg);
+    return cfg;
   }catch(e){
     const defOpenai=normAiProvCfg({},"openai");
     return{
@@ -8229,7 +8264,7 @@ function updateAiStatusLabels(cfgArg){
   if($("#aiLimitProvTitle"))$("#aiLimitProvTitle").textContent=meta.label+" 獨立配額上限：";
   if($("#aiModelLabel"))$("#aiModelLabel").textContent=effModel;
   if($("#aiEffortLabel"))$("#aiEffortLabel").textContent=effLabel;
-  if($("#aiPriceLabel"))$("#aiPriceLabel").textContent=meta.priceText;
+  if($("#aiPriceLabel"))$("#aiPriceLabel").textContent=aiPricingLabel(act,effModel);
   if($("#aiCardSub"))$("#aiCardSub").textContent=`${meta.label} ${effModel}（推理強度：${effLabel}） · 將目前全部統計結果與交叉驗證送出，嚴格區分事實與推論`;
   const noticePath=$("#aiNoticeServicePath");
   if(noticePath)noticePath.innerHTML=`由本站後端以 API Key 安全轉發至 ${esc(meta.label)}（<code>${esc(effModel)}</code>，推理能力：<code>${esc(pCfg.effort)}</code>）。`;
@@ -8265,6 +8300,8 @@ function syncAiCfgInputs(){
   if($("#inAiUsdLim"))$("#inAiUsdLim").value=pCfg.monthlyUsdLimit;
   updateAiKeyBadge();
   updateAiStatusLabels(cfg);
+  const mig=cfg.migrationNotice||AI_CFG_MIGRATION_NOTICE;
+  if(mig&&$("#aiCfgMsg"))$("#aiCfgMsg").textContent=mig;
   renderAiUsageUI(null,pCfg,act);
 }
 function initAiPage(){
@@ -8577,6 +8614,7 @@ async function analyzeViaApi(out,st){
     }
     S.ai=deAnonymizeText(text);if($("#aiResultTools"))$("#aiResultTools").hidden=!S.ai;
     const usedModelHdr=res.headers.get("X-AI-Model")||effModel;
+    S.aiModel=usedModelHdr;
     const usedEffortHdr=res.headers.get("X-AI-Reasoning-Effort")||effEffort;
     st.textContent=`完成 · ${meta.label} · 模型 ${usedModelHdr}（推理強度 ${usedEffortHdr}）${fallbackNotice} · 可至「分析報告」或「資料與規格」匯出含 AI 段落的報告`;
     try{const uHdr=res.headers.get("X-AI-Usage");if(uHdr){const uObj=JSON.parse(uHdr);uObj.dailyRequests=(uObj.dailyRequests||0)+1;AI_LAST_USAGE=uObj;if(AI_SERVER_META[usedProv])AI_SERVER_META[usedProv].usage=uObj;renderAiUsageUI(uObj,pCfg,usedProv)}}catch(e){}}
@@ -10255,6 +10293,8 @@ function renderReport(){
   const zCnt=S.step&&S.step.on?zoneCounts():null;
   const stepCovered=zCnt?Object.values(zCnt.c).reduce((a,b)=>a+b,0):0;
   const stepHtml=S.step&&S.step.on?`（階梯 ${S.step.zones.length} 區，涵蓋 ${stepCovered} 焊墊${stepCovered===0?' · <span style="color:var(--ng)">⚠️ 階梯區域未涵蓋任何焊墊</span>':""}）`:"";
+  const _repAiCfg=loadAiCfg();
+  const aiRepModel=S.aiModel||effectiveModelOf(_repAiCfg.providers[_repAiCfg.activeProvider],_repAiCfg.activeProvider);
 
   const s1=`<div class="rep-sec" id="repSec1">
     <div style="border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:20px">
@@ -10302,7 +10342,7 @@ function renderReport(){
     <div class="tbl" style="margin-bottom:16px"><table>
       <thead><tr><th>#</th><th>嚴重度</th><th>問題標題</th><th>核心事實</th><th>推論原因與建議動作</th></tr></thead>
       <tbody>${act5.length?act5.map(x=>`<tr><td class="mono">#${x.id}</td><td><span class="pill ${x.lv}">${LVL[x.lv]}</span></td><td><b>${esc(x.title)}</b><div class="note">${esc(x.cat)}</div></td><td style="font-size:var(--fs-caption)">${esc(x.facts[0]||"—")}</td><td style="font-size:var(--fs-caption)"><b>推論：</b>${esc(x.cause)}<br><b>動作：</b>${esc(x.action)}</td></tr>`).join(""):'<tr><td colspan="5" class="note">未偵測到需優先處置之問題</td></tr>'}</tbody>
-    </table></div>${S.ai?`<h3 style="font-size:var(--fs-ui);margin:12px 0 6px">AI 品質工程診斷摘要（gpt-6.1-terra）</h3><div class="ai-out" style="padding:10px 14px;background:var(--surface2);border-radius:8px;border:1px solid var(--line);margin-bottom:16px">${mdLite(S.ai)}</div>`:""}</div>`;
+    </table></div>${S.ai?`<h3 style="font-size:var(--fs-ui);margin:12px 0 6px">AI 品質工程診斷摘要（${esc(aiRepModel)}）</h3><div class="ai-out" style="padding:10px 14px;background:var(--surface2);border-radius:8px;border:1px solid var(--line);margin-bottom:16px">${mdLite(S.ai)}</div>`:""}</div>`;
 
   const s3=`<div class="rep-sec" id="repSec3">
     <h2 style="font-size:var(--fs-heading);border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">二、問題偵測清單（共 ${F.length} 項）</h2>

@@ -15,6 +15,7 @@ import {
   planUpstreamRetry,
   modelsUrlFromChatUrl,
 } from '../cloudflare/ai.mjs';
+import { lookupModelPricing } from '../lib/ai-providers.mjs';
 
 function createD1Stub() {
   const settings = new Map();
@@ -99,7 +100,8 @@ test('AI 預設模型為 gpt-6.1-terra 且推理能力為 high，GET 健康檢�
   assert.equal(DEFAULT_REASONING_EFFORT, 'high');
   assert.deepEqual(ALLOWED_EFFORTS, ['high', 'medium', 'low']);
   assert.deepEqual(Object.keys(PROVIDERS), ['openai', 'antigravity']);
-  assert.ok(!PROVIDERS.openai.models.includes('gpt-6.1-terra-mini'), 'gpt-6.1-terra-mini 已證實不存在，不可列入型錄');
+  assert.ok(!PROVIDERS.openai.models.includes('o4-mini'));
+  assert.ok(!PROVIDERS.openai.models.includes('gpt-6.1-terra-mini'));
 
   const res = await handleAnalyze(new Request('https://spi.example/api/analyze'), ENV, USER);
   const data = await res.json();
@@ -110,7 +112,7 @@ test('AI 預設模型為 gpt-6.1-terra 且推理能力為 high，GET 健康檢�
   assert.equal(data.hasServerKey, true);
   assert.deepEqual(data.limits, DEFAULT_LIMITS);
   assert.deepEqual(Object.keys(data.providers), ['openai', 'antigravity']);
-  assert.equal(data.providers.antigravity.defaultModel, 'gemini-3.1-pro-preview');
+  assert.equal(data.providers.antigravity.defaultModel, 'gemini-3.8-flash');
 });
 
 test('送往 OpenAI 的請求使用預設模型 gpt-6.1-terra、reasoning_effort: high 與足夠的 max_completion_tokens', async () => {
@@ -138,10 +140,10 @@ test('Antigravity 平台切換：正確轉發對應端點、預設模型與專�
   });
   assert.equal(rAgy.res.status, 200);
   assert.equal(rAgy.res.headers.get('X-AI-Provider'), 'antigravity');
-  assert.equal(rAgy.res.headers.get('X-AI-Model'), 'gemini-3.1-pro-preview');
+  assert.equal(rAgy.res.headers.get('X-AI-Model'), 'gemini-3.8-flash');
   assert.equal(rAgy.calls[0].url, ANTIGRAVITY_CHAT_URL);
   assert.equal(rAgy.calls[0].headers.Authorization, 'Bearer user-agy-key');
-  assert.equal(rAgy.calls[0].body.model, 'gemini-3.1-pro-preview');
+  assert.equal(rAgy.calls[0].body.model, 'gemini-3.8-flash');
 
   // 舊前端設定仍送 Cursor：api.cursor.com 沒有 Chat Completions 路由，必須在呼叫上游前擋下，不可默默改送 OpenAI
   const rCur = await postWithCapture(ENV, {
@@ -255,6 +257,18 @@ test('D1 各平台獨立使用量追蹤與雙維度限額攔截（OpenAI 額滿�
   assert.equal(r4.res.status, 429);
   const err4 = JSON.parse(r4.text);
   assert.equal(err4.code, 'monthly_token_limit_exceeded');
+});
+
+test('recordUsage 依 gpt-6-astra 模型計價：1M 輸入 tokens 約 $10 累加', async () => {
+  const DB = createD1Stub();
+  const envWithDb = { ...ENV, DB };
+  await postWithCapture(envWithDb, {
+    headers: { 'X-AI-Model': 'gpt-6-astra' },
+    usage: { prompt_tokens: 1_000_000, completion_tokens: 0, total_tokens: 1_000_000 },
+  });
+  const data = await (await handleAnalyze(new Request('https://spi.example/api/analyze'), envWithDb, USER)).json();
+  assert.equal(lookupModelPricing('openai', 'gpt-6-astra').inputPricePerM, 10);
+  assert.ok(data.usage.monthlyUsd >= 9.99, `預期約 $10，實際 ${data.usage.monthlyUsd}`);
 });
 
 test('extractUpstreamError 支援 Gemini 陣列與 OpenAI 物件', () => {

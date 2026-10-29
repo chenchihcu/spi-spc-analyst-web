@@ -1,4 +1,10 @@
 import { validatePayload, buildMessages, SYSTEM_PROMPT, InputError } from '../lib/analyze-core.mjs';
+import {
+  OPENAI_CHAT_URL,
+  ANTIGRAVITY_CHAT_URL,
+  PROVIDERS,
+  lookupModelPricing,
+} from '../lib/ai-providers.mjs';
 
 // 預設模型為 OpenAI gpt-6.1-terra（可用環境變數 AI_MODEL 或請求標頭 X-AI-Model 覆寫），推理強度預設為 high。
 // max_completion_tokens 需容納高強度推理 tokens 與約 600–900 字繁中工程診斷回覆。
@@ -7,39 +13,15 @@ export const DEFAULT_REASONING_EFFORT = 'high';
 export const ALLOWED_EFFORTS = ['high', 'medium', 'low'];
 export const MAX_TOKENS = 16000;
 
-export const OPENAI_CHAT_URL = 'https://api.openai.com/v1/chat/completions';
-export const ANTIGRAVITY_CHAT_URL = 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions';
+export { OPENAI_CHAT_URL, ANTIGRAVITY_CHAT_URL, PROVIDERS };
 // Cursor 已移除：api.cursor.com 沒有 /v1/chat/completions 路由（無金鑰 POST 即回 404 Route not found）。
 export const REMOVED_PROVIDERS = {
   cursor: 'Cursor 未提供 AI 對話 API，已從服務商清單移除；請改用 OpenAI 或 Antigravity',
 };
 
-// gpt-6.1-terra 定價（USD / 百萬 tokens）：輸入 $1.00、輸出（含推理）$5.00
-export const INPUT_PRICE_PER_M = 1.0;
-export const OUTPUT_PRICE_PER_M = 5.0;
-
-export const PROVIDERS = {
-  openai: {
-    id: 'openai',
-    label: 'OpenAI',
-    chatUrl: OPENAI_CHAT_URL,
-    defaultModel: 'gpt-6.1-terra',
-    models: ['gpt-6.1-terra', 'o4-mini', 'gpt-5.4'],
-    headerKey: 'x-openai-key',
-    inputPricePerM: 1.0,
-    outputPricePerM: 5.0,
-  },
-  antigravity: {
-    id: 'antigravity',
-    label: 'Antigravity',
-    chatUrl: ANTIGRAVITY_CHAT_URL,
-    defaultModel: 'gemini-3.1-pro-preview',
-    models: ['gemini-3.1-pro-preview', 'gemini-3.0-flash', 'gpt-6.1-terra'],
-    headerKey: 'x-antigravity-key',
-    inputPricePerM: 1.25,
-    outputPricePerM: 5.0,
-  },
-};
+const defaultOpenAiRates = lookupModelPricing('openai', DEFAULT_MODEL);
+export const INPUT_PRICE_PER_M = defaultOpenAiRates.inputPricePerM;
+export const OUTPUT_PRICE_PER_M = defaultOpenAiRates.outputPricePerM;
 
 export const DEFAULT_LIMITS = {
   dailyReqLimit: 20,
@@ -195,11 +177,12 @@ async function saveUserLimits(db, user, limits, provider = 'openai') {
   return cleanLim;
 }
 
-async function recordUsage(db, keys, inTokens, outTokens, nowMs = Date.now(), provCfg = PROVIDERS.openai) {
+async function recordUsage(db, keys, inTokens, outTokens, nowMs = Date.now(), provCfg = PROVIDERS.openai, modelId = provCfg.defaultModel) {
   if (!db || typeof db.prepare !== 'function') return;
   const inT = Math.max(0, Math.round(Number(inTokens) || 0));
   const outT = Math.max(0, Math.round(Number(outTokens) || 0));
-  const ucost = Math.round(inT * provCfg.inputPricePerM + outT * provCfg.outputPricePerM);
+  const rates = lookupModelPricing(provCfg.id, modelId, new Date(nowMs));
+  const ucost = Math.round(inT * rates.inputPricePerM + outT * rates.outputPricePerM);
   const upsert = `INSERT INTO stats(key, value, updated) VALUES (?, ?, ?) ON CONFLICT(key) DO UPDATE SET value = stats.value + excluded.value, updated = excluded.updated`;
   try {
     const stmts = [
@@ -711,7 +694,7 @@ export async function handleAnalyze(req, env = {}, userArg = '') {
 
         const inTok = usageReported?.prompt_tokens ?? usageReported?.input_tokens ?? estInputTokens;
         const outTok = usageReported?.completion_tokens ?? usageReported?.output_tokens ?? Math.max(50, Math.ceil(outChars / 2));
-        await recordUsage(env?.DB, keys, inTok, outTok, Date.now(), provCfg);
+        await recordUsage(env?.DB, keys, inTok, outTok, Date.now(), provCfg, model);
       } catch (e) {
         if (e?.name !== 'AbortError') {
           controller.enqueue(enc.encode(`\n\n［AI 分析失敗：${e?.status ? e.status + ' ' : ''}${e?.message || e}］`));
