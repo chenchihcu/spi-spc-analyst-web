@@ -6,7 +6,7 @@
 
 - **移除 Cursor 服務商**：`api.cursor.com` 沒有 `/v1/chat/completions` 路由（無金鑰 POST 即回 `404 Route POST:/v1/chat/completions not found`），此服務商從未能使用。前後端型錄、金鑰欄位、備援順序與配額設定只剩 OpenAI、Antigravity；舊設定仍送 `X-AI-Provider: cursor` 時 `/api/analyze` 回 `400`、`code=provider_removed`，不再呼叫上游。
 - **移除不存在的模型 `gpt-6.1-terra-mini`**：OpenAI 回 `404 model_not_found`。
-- **「檢查可用模型」按鈕**：AI 設定面板新增 `#btnAiCheckModels`，經 `GET /api/analyze?models=1&provider=…` 用目前金鑰查詢上游 `/models`；此金鑰不可用的預設模型在選單停用並標示「（此金鑰不可用）」，目前選取的模型不可用時自動改選第一個可用模型。自訂端點不是 `…/chat/completions` 形狀時回 `models:null`，請自行確認模型名稱。
+- **「檢查可用模型」按鈕**：AI 設定面板新增 `#btnAiCheckModels`，經 `GET /api/analyze?models=1&provider=…` 用目前金鑰查詢上游 `/models`；此金鑰不可用的預設模型在選單停用並標示「（此金鑰不可用）」，目前選取的模型不可用時自動改選第一個可用模型。查詢結果綁定當時的服務商、金鑰與端點：任一項之後變更，舊清單即失效；查詢期間若已切換服務商或改了金鑰，結果不套用，也不覆蓋新設定。自訂端點不是 `…/chat/completions` 形狀時回 `models:null`，請自行確認模型名稱。
 - **404 錯誤附修正指引**：模型不存在時提示按「檢查可用模型」；端點路由不存在時提示確認自訂 API 端點網址。
 - **AI 設定卡 320px 橫向溢出**：不換行的「計價基準」chip 撐開隱式 `auto` grid 欄，整頁寬 350px；grid 改 `minmax(0,1fr)`、chip 允許換行（`tests/mobile-layout.test.mjs` 測試 8b）。
 

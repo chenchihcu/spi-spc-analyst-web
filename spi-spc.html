@@ -8153,6 +8153,8 @@ function saveAiCfg(cfg){
     localStorage.setItem(AI_CFG_KEY,JSON.stringify(cfg));
   }catch(e){}
 }
+// 可用模型清單綁定查詢時的服務商＋金鑰＋端點；任一項變更後清單失效，不再據此停用選項
+function aiModelSig(provId,pCfg){return provId+"|"+((pCfg&&pCfg.apiKey)||"")+"|"+((pCfg&&pCfg.endpoint)||"")}
 function effectiveModelOf(pCfg,provId){
   const meta=AI_PROVIDERS_META[provId]||AI_PROVIDERS_META.openai;
   if(!pCfg)return meta.defaultModel;
@@ -8270,7 +8272,8 @@ function syncAiCfgInputs(){
   });
   const selM=$("#selAiModel");
   if(selM){
-    const avail=AI_SERVER_META[act]&&AI_SERVER_META[act].availableModels;
+    const av=AI_SERVER_META[act]&&AI_SERVER_META[act].availableModels;
+    const avail=av&&av.sig===aiModelSig(act,pCfg)?av.models:null;
     const isAvail=v=>v==="custom"||!Array.isArray(avail)||avail.includes(v);
     selM.innerHTML=meta.models.map(([val,txt])=>isAvail(val)?`<option value="${esc(val)}">${esc(txt)}</option>`:`<option value="${esc(val)}" disabled>${esc(txt)}（此金鑰不可用）</option>`).join("");
     const validVals=meta.models.map(x=>x[0]);
@@ -8418,6 +8421,7 @@ if($("#btnAiCheckModels"))$("#btnAiCheckModels").onclick=async()=>{
   const btn=$("#btnAiCheckModels"),msg=$("#aiCfgMsg");
   const cfg=snapshotAiInputsToCfg(loadAiCfg());saveAiCfg(cfg);
   const act=cfg.activeProvider,meta=AI_PROVIDERS_META[act]||AI_PROVIDERS_META.openai,pCfg=cfg.providers[act];
+  const sig=aiModelSig(act,pCfg);
   const headers={"X-AI-Provider":act};
   if(pCfg.apiKey){headers[meta.headerName]=pCfg.apiKey;headers["X-AI-Key"]=pCfg.apiKey}
   if(pCfg.endpoint)headers["X-AI-Endpoint"]=pCfg.endpoint;
@@ -8433,17 +8437,21 @@ if($("#btnAiCheckModels"))$("#btnAiCheckModels").onclick=async()=>{
       const note="自訂端點無法查詢模型清單，請自行確認模型名稱";
       if(msg)msg.textContent=note;toast(note);return;
     }
-    AI_SERVER_META[act].availableModels=j.models;
+    AI_SERVER_META[act].availableModels={sig,models:j.models};
     const presets=meta.models.map(x=>x[0]).filter(v=>v!=="custom");
     const ok=presets.filter(v=>j.models.includes(v)),bad=presets.filter(v=>!j.models.includes(v));
     let note=`${meta.label}：預設模型 ${ok.length}/${presets.length} 個可用`+(bad.length?`，不可用：${bad.join("、")}`:"");
-    if(pCfg.model==="custom"){
-      if(pCfg.customModel&&!j.models.includes(pCfg.customModel))note+=`；自訂模型 ${pCfg.customModel} 不在此金鑰的可用清單`;
-    }else if(!j.models.includes(pCfg.model)){
-      if(ok.length){pCfg.model=ok[0];note+=`；已改選 ${ok[0]}`}
+    // 查詢期間使用者可能已切換服務商、換金鑰或端點：以最新設定為準，只在三者都沒變時才改選模型
+    const cur=snapshotAiInputsToCfg(loadAiCfg()),curP=cur.providers[act];
+    if(cur.activeProvider!==act||aiModelSig(act,curP)!==sig){
+      note=`${meta.label} 的設定在檢查期間已變更，本次結果不套用，請重新檢查`;
+    }else if(curP.model==="custom"){
+      if(curP.customModel&&!j.models.includes(curP.customModel))note+=`；自訂模型 ${curP.customModel} 不在此金鑰的可用清單`;
+    }else if(!j.models.includes(curP.model)){
+      if(ok.length){curP.model=ok[0];note+=`；已改選 ${ok[0]}`}
       else note+="；沒有可用的預設模型，請選「自訂模型名稱…」填入可用模型";
-      saveAiCfg(cfg);
     }
+    saveAiCfg(cur);
     syncAiCfgInputs();
     if(msg)msg.textContent=note;toast(note);
   }catch(e){

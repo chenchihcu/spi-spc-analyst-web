@@ -296,6 +296,10 @@ test('9. 版面回歸：code review（v10.3.3）找到的問題', () => {
   assert.match(htmlSource, /<td><label class="row"><input type="radio" name="selZone"/, '區域選取單選鈕需包在 label.row 內');
   assert.match(htmlSource, /input\[type=password\]\{min-height:44px;min-width:44px;font-size:16px!important\}/, '密碼欄位需在觸控 44px 與 16px 防縮放規則內');
   assert.match(htmlSource, /return\{g,group:g,padDim,apDim,st:stLvl/, 'dfmTable0 需提供報告頁所需欄位別名');
+  // 檢查可用模型：結果綁定服務商＋金鑰＋端點；回應時以最新設定為準，設定已變更就不套用（PR #81 review）
+  assert.match(htmlSource, /availableModels=\{sig,models:j\.models\}/, '可用模型清單需綁定查詢簽章');
+  assert.match(htmlSource, /av\.sig===aiModelSig\(act,pCfg\)\?av\.models:null/, '金鑰或端點變更後不可再套用舊清單');
+  assert.match(htmlSource, /const cur=snapshotAiInputsToCfg\(loadAiCfg\(\)\),curP=cur\.providers\[act\];\r?\n\s*if\(cur\.activeProvider!==act\|\|aiModelSig\(act,curP\)!==sig\)/, '回應時需比對最新設定');
   for (const id of ['aiProviderSeg', 'inAiKey', 'inAiKeyAntigravity', 'selAiModel', 'btnAiCheckModels', 'inAiCustomModel', 'selAiEffort', 'inAiCustomEndpoint']) {
     assert.match(htmlSource, new RegExp('id="' + id + '"'), 'AI 設定介面需有 #' + id);
   }
