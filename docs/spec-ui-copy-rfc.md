@@ -1,7 +1,7 @@
 # RFC-SPI-UI-COPY-20261029：分析頁文案收斂與中文名稱
 
 **文件編號**：RFC-SPI-UI-COPY-20261029  
-**狀態**：已核准（隨 v10.9.4 實作）  
+**狀態**：已發布（**v10.10.1**，2026-10-29；`main` `0ccab90`／`1ea272c`）  
 **範圍**：[`spi-spc.html`](../spi-spc.html) 使用者可見字串；不含統計核心、API、程式註解。
 
 ## 1. 目標與非目標
@@ -55,5 +55,11 @@
 
 ## 5. 驗收
 
-- `node --test tests/ui-copy.test.mjs tests/ui.smoke.test.js`
+- `node --test tests/ui-copy.test.mjs tests/type-scale.test.mjs tests/ui.smoke.test.js`
 - build 產物目視：問題偵測、進階分析、分析報告無教學段、章名無英文譯名。
+
+## 6. 收斂紀錄
+
+- 正式站登入頁已顯示 v10.10.1（build 注入時間）；D1 遠端 migration 無待套用。
+- 發版前曾移除 `analyzeViaApi` 殘留本機除錯 `fetch`（語法錯誤導致 jsdom 整頁初始化失敗）。
+- 登入後資料庫畫面／API 200：發版當次 **NOT TESTED**（無帳密）；未登入 `/api/records` 為 401。

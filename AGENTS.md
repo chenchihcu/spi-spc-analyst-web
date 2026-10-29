@@ -11,6 +11,9 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
 - **部署驗證要走過資料庫路徑**：登入頁顯示新版本只代表靜態資產已更新。至少確認一個登入後的資料庫畫面或 API 回 200；無法登入時回報「資料庫路徑未驗證」，不可寫成部署成功。
   - 檢查：驗收紀錄寫明走過的頁面或 API 與 HTTP 狀態。
   - 出處：同上事故；當時只看登入頁版本即回報成功。
+- **雲端部署以 Cloudflare 正式環境為準**：重現、除錯與驗收走正式 Worker 的頁面與 API（含 D1／R2）。不用只有靜態檔、沒有 Worker API 的本機預覽代替。本機測試與 `wrangler dev` 可輔助，不能把靜態預覽的結果寫成雲端已驗證。
+  - 檢查：驗收紀錄寫明正式站 URL、走過的頁面或 API 與 HTTP 狀態。只開了靜態檔伺服器時寫「雲端路徑未驗證」。
+  - 出處：2026-10-29 AI 分析；埠 8770 的靜態預覽沒有 `/api/analyze`，不能代表正式站。
 - **合併失敗先自行修復再重試，不等使用者要求**：已核准合併的 PR，`gh pr merge` 失敗時先讀錯誤輸出，依下列分類修正，再重跑本 PR 原本通過的關卡（`npm test`、`npm run release-check`、CI）。全部通過就仍在原核准範圍內，直接重試合併，不需要再問。
   - 與 main 衝突（`gh pr view --json mergeStateStatus` 為 `DIRTY`）：在工作分支 `git merge origin/main`。版本檔（`package.json`、`package-lock.json`、`lib/version.mjs`、`spi-spc.html` 的 `#appVer`、`CHANGELOG.md`；`#appBuilt` 固定為預設值，由 build 注入）先採 main 的內容，再把本 PR 的版本改成 main 版本的下一號，保留本 PR 的 CHANGELOG 條目；`npm test` 通過後 push，再合併。
   - `--match-head-commit` 一律用 `gh pr view --json headRefOid` 的完整 40 碼 SHA（短 SHA 會被 GraphQL 拒絕）。
