@@ -2,6 +2,15 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.11.1 — 2026-10-29 22:06:00（修復：統計計算錯誤、圖表繪製防護與報告界限）
+
+- **五大判定項目 X̄ 管制狀態表**：修復報告讀取不存在的屬性導致 LCL/UCL 永遠顯示「—」，改為由當前 X̄ 管制圖點列正確提取界限。
+- **雙邊規格分側 PPM**：解耦硬編碼的 `"volume"` 指標與全板規格，依目前選取指標（如 height、area）與群組覆寫規格動態計算低於下限／高於上限 PPM 及 DPMO。
+- **P' 圖（Laney）分區線防護**：修正極低不良率下負向分區虛線（-1σ/-2σ）繪製在 0% 以下且穿透 LCL 的圖表繪製錯誤，加入 `[0, 1]` 數值保護。
+- **I-MR 判異抑制**：補充單一焊墊點數不足 5 片被拒絕時之 Nelson 判異抑制條件，優雅回退為 `nelZero()`。
+- **非常態能力卡片**：修復理論預估 PPM 為 0 時因 falsy 短路誤顯示實際觀測超規數的問題。
+- 測試：`tests/stat-defects.test.mjs` 追加 D1–D5 回歸單元測試。
+
 ## v10.11.0 — 2026-10-29 20:33:00（AI：型錄正本、汰舊遷移與刷新工具）
 
 - **型錄正本**：[`lib/ai-providers.mjs`](lib/ai-providers.mjs) 集中 OpenAI／Antigravity 預設與模型清單、計價與已移除型號；Worker [`cloudflare/ai.mjs`](cloudflare/ai.mjs) 依模型 ID 計價；[`tools/sync-ai-providers.mjs`](tools/sync-ai-providers.mjs) 同步至 `spi-spc.html` `@ai-providers-meta`。
