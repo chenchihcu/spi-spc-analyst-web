@@ -71,6 +71,8 @@ test('3. 主頁 Head Meta 與 CSS Tokens (spi-spc.html)', () => {
   assert.match(htmlSource, /<meta\s+name="viewport"[^>]*content="[^"]*viewport-fit=cover[^"]*"/i, 'viewport 需包含 viewport-fit=cover');
   assert.doesNotMatch(htmlSource, /user-scalable\s*=\s*no/i, '主頁不可包含 user-scalable=no');
   assert.doesNotMatch(htmlSource, /maximum-scale\s*=\s*1/i, '主頁不可包含 maximum-scale=1');
+  assert.doesNotMatch(htmlSource, /📂|💡/, '記錄庫與提示不可使用 emoji 圖示（RFC UI-GAP-01）');
+  assert.match(htmlSource, /id="recEditSave"[\s\S]{0,120}id="recEditCancel"/, '#recEditModal 儲存須在取消左側（Institution 對話框順序）');
 
   // b. Tokens in :root
   assert.match(htmlSource, /--tap-min:\s*44px;/i, '需定義 --tap-min');
