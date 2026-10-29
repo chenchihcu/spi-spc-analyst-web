@@ -147,7 +147,7 @@ test('[D-10] no_coords: 空間分布與問題地圖顯示不適用，無空間�
   const xv = A.xv.rows.find(x => x.k === '空間分布');
   assert.ok(xv, '應有空間分布項目');
   assert.equal(xv.st, 'na');
-  assert.equal(xv.ev, '不適用（無座標）');
+  assert.equal(xv.ev, '不適用（缺座標）');
   const issues = JSON.parse(w.eval('JSON.stringify(detectIssues(S))'));
   const spatialIssues = issues.filter(iss => iss.cat === '空間分布');
   assert.equal(spatialIssues.length, 0, '無座標時不得出現空間相關的問題卡');
@@ -156,7 +156,7 @@ test('[D-10] no_coords: 空間分布與問題地圖顯示不適用，無空間�
   await tick(40);
   const heatSub = d.querySelector('#heatSub');
   if (heatSub) {
-    assert.match(heatSub.textContent, /不適用（無座標）/);
+    assert.match(heatSub.textContent, /不適用（缺座標）/);
   }
 });
 

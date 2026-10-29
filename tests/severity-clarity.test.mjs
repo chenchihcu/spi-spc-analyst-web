@@ -93,7 +93,9 @@ test("總覽優先處理：每列以文字標出卡片等級，彙總卡的事�
     assert.ok(pill, `第 ${i + 1} 列有等級文字`);
     assert.equal(pill.textContent, cards[i].lv === "ng" ? "嚴重" : "警示");
     assert.ok(pill.classList.contains(cards[i].lv));
-    assert.equal(/^子項（共 \d+ 筆，最嚴重者在前）：/.test(li.querySelector(".note").textContent), cards[i].agg, `第 ${i + 1} 列子項標示`);
+    const note = li.querySelector(".note").textContent;
+    assert.equal(/子項（共 \d+ 筆，最嚴重者在前）：/.test(note), cards[i].agg, `第 ${i + 1} 列子項標示`);
+    if (cards[i].agg) assert.match(note, /^[^·]+ · 子項（共 \d+ 筆，最嚴重者在前）：/);
   });
   assert.deepEqual(errs, []);
 });

@@ -711,7 +711,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.8.1</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.9.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -1036,6 +1036,13 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
       <div class="chartbox" style="height:320px;position:relative"><canvas id="cLISA" role="img" aria-label="LISA 空間聚類分佈圖" style="display:block;width:100%;height:100%"></canvas></div>
     </div>
   </div>
+  <div class="card" id="cardRelChart">
+    <h3>關係圖 <small id="relChartSub">進階分析專用，不影響管制圖圖種</small></h3>
+    <div class="toolbar"><div class="field"><label for="selRelChart">圖種</label>
+      <select id="selRelChart"><option value="specScatter">規格散點（面積 × 高度）</option><option value="quad">四象限（AR × 轉移效率）</option><option value="corr">相關（高度 × 面積）</option><option value="parallel">平行座標</option><option value="radar">Radar（體積／面積／高度）</option></select></div></div>
+    <div id="relChartMsg" class="note" style="margin:8px 0"></div>
+    <div class="chartbox tall"><canvas id="cRelChart" role="img" aria-label="關係圖"></canvas></div>
+  </div>
 </section>
 
 <section class="panel" id="p-stats" role="tabpanel" hidden>
@@ -1055,6 +1062,11 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <div class="tbl" style="max-height:420px;overflow:auto">
       <table id="matrixTbl"></table>
     </div>
+  </div>
+  <div class="card" id="sidedPpmCard">
+    <h3>雙邊規格分側 PPM / DPMO <small id="sidedPpmSub">體積 Volume · 需雙邊規格</small></h3>
+    <div class="kpis" id="sidedPpmKpis"></div>
+    <p class="note" id="sidedPpmNote" style="margin:8px 0 0"></p>
   </div>
 </section>
 
@@ -1088,7 +1100,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   </div>
   <div class="grid2">
     <div class="card"><h3>風險分數組成 <small>各群組分數來源</small></h3><div class="legend" id="dfmLeg"></div><div class="chartbox"><canvas id="cDfm" role="img" aria-label="DFM 風險分數組成"></canvas></div></div>
-    <div class="card"><h3>個別開孔檢查清單 <small>同群組中長期偏離的焊墊位置</small></h3><div class="tbl" style="max-height:340px;overflow:auto"><table id="dfmPads"></table></div></div>
+    <div class="card"><h3>個別開孔檢查清單 <small>同群組中長期偏離的焊墊位置</small></h3><div class="tbl" style="max-height:340px;overflow:auto"><table id="dfmPads"></table></div><div id="dfmUncovered"></div></div>
   </div>
   <div class="card" id="cardClosedLoop" style="margin-top:16px">
     <h3>印刷機閉環補償建議 (Closed-Loop Correction) <small id="printerCorrSub">基於最近 3 板量測之即時對位補償與動態擦拭觸發</small></h3>
@@ -1297,6 +1309,12 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <details class="how"><summary>怎麼設定</summary><p>優先順序：CSV 內逐焊墊的開孔尺寸欄（Aperture L / W、開孔長 / 開孔寬）＞此處「指定 L × W」＞焊墊尺寸 ×（1 − 線性縮減%）。線性縮減是長寬各縮減的百分比，例如 10% 代表開孔為焊墊的 90% × 90%（面積約 81%）。圓形開孔只需填 L（直徑）。</p></details>
     <div class="tbl"><table id="apTbl"></table></div>
     <p class="note" id="apNote"></p>
+    <div class="row" style="margin-top:10px;flex-wrap:wrap;align-items:flex-end;gap:8px">
+      <label class="row" style="cursor:pointer;font-size:13px"><input type="file" id="geomPadFile" accept=".csv,.txt,.tsv" class="sr"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">匯入幾何焊墊清單 CSV</span></label>
+      <button type="button" id="geomPadClear" hidden>清除幾何清單</button>
+    </div>
+    <p class="note" id="geomPadStatus" style="margin:6px 0 0">幾何焊墊清單用於開孔覆蓋率；不寫入量測 X/Y。逐焊墊 CSV 開孔仍優先於幾何。</p>
+    <div class="tbl" id="geomUncoveredBox" hidden style="margin-top:8px;max-height:200px;overflow:auto"><table id="geomUncoveredTbl"></table></div>
   </div>
   <div class="card" data-sub="records" hidden id="recCard">
     <h3>量測紀錄與座標檔資料庫 <small id="recMode"></small></h3>
@@ -1933,6 +1951,29 @@ const SPI_PROCESS_KB_RULES=[
   {id:"R029",type:"Global Drift",desc:"對位偏移與溫度具有相關性",causes:["① PCB/機台熱膨脹係數差異","② 視覺系統感測器溫漂"],action:"溫度-偏移相關性分析 / 熱膨脹補正係數設定"},
   {id:"R030",type:"Variation Issue",desc:"少量極端低值拉低 Cpk，主體正常",causes:["① 偶發性鋼板離板不良（Peeling 不順）","② 偶發性氣泡/異物"],action:"離板速度設定 / 鋼板底面清潔頻率 / 異物目視確認"}
 ];
+let SPI_KB_RULES_VERSION="2026.10.29（內建）";
+let SPI_KB_RULES_LOAD_ERROR=null;
+const SPI_KB_EXPECTED_FP="324914ac9c57c9cb";
+async function loadSpiKbRules(){
+  try{
+    const r=await fetch("vendor/spi-process-kb-rules.json",{cache:"no-cache"});
+    if(!r.ok)throw new Error(`HTTP ${r.status}`);
+    const payload=await r.json();
+    const v=validateKbRulesPayload(payload,SPI_KB_EXPECTED_FP);
+    if(!v.ok)throw new Error(v.error);
+    SPI_PROCESS_KB_RULES=v.rules;
+    SPI_KB_RULES_VERSION=v.version;
+    SPI_KB_RULES_LOAD_ERROR=null;
+  }catch(e){SPI_KB_RULES_LOAD_ERROR=e.message||String(e)}
+  if(typeof S!=="undefined"&&S.tab==="cross"&&typeof renderTab==="function")renderTab();
+}
+
+function updatePadCoverageState(){
+  if(!S.geometryPads||!S.geometryPads.length){S.padCoverage=null;S.pendingVerify=false;return}
+  const meas=[...new Set(S.rows.map(r=>r.pad))];
+  S.padCoverage=computePadCoverage(S.geometryPads,meas);
+  S.pendingVerify=!!(S.padCoverage&&S.padCoverage.pendingVerify);
+}
 
 /* Nelson 8 規則：輸入標準化 z 序列 */
 const NELSON=[
@@ -2023,9 +2064,337 @@ const DEF_SPECS={volume:{lsl:70,usl:130,tgt:100},height:{lsl:90,usl:150,tgt:120}
 const DEFECTS={INS:"少錫（體積 < LSL）",EXC:"多錫（體積 > USL）",BRG:"面積過大（連錫風險，面積 > USL）",LOWH:"高度不足",HIH:"高度過高 / 拉尖",OFF:"印刷偏移"};
 const ALL_GRP="__ALL__";
 const isAllGrp=g=>g===ALL_GRP||g==="ALL";
+/* @windows-parity START */
+/** Windows 桌面對照行為 — 純函式（FR-1～FR-11）。瀏覽器端由 spi-spc.html 內嵌同內容。 */
+
+const EVIDENCE_KINDS = Object.freeze([
+  "統計計算",
+  "圖表證據",
+  "規則推論",
+  "未納入",
+]);
+
+const PENDING_VERIFY_LABEL = "待查";
+
+/** FR-1：熱圖／LISA 缺有效座標時的圖卡文字 */
+function spatialChartUnavailableText() {
+  return { short: "不適用（缺座標）", long: "不適用（缺座標）— 無法做空間分析" };
+}
+
+function hasValidSpatialXY(rows, isRealXY) {
+  if (!rows || !rows.length || typeof isRealXY !== "function") return false;
+  return rows.some((r) => isRealXY(r));
+}
+
+/** FR-2：問題卡事實區塊的證據種類（僅統計計算或圖表證據） */
+function issueFactsEvidenceKind(issue) {
+  if (issue && issue.ev && Array.isArray(issue.ev.values) && issue.ev.values.some(Number.isFinite)) {
+    return "圖表證據";
+  }
+  return "統計計算";
+}
+
+/** FR-2：推論區塊固定為規則推論 */
+function issueInferenceEvidenceKind() {
+  return "規則推論";
+}
+
+/** FR-2：交叉驗證列或 FM 證據列 */
+function crossEvidenceKind(row) {
+  if (!row) return "未納入";
+  const st = row.st;
+  const src = String(row.src || row.d || "");
+  const ev = String(row.ev || row.txt || "");
+  if (st === "na" || /不適用|未納入|無法計算|無座標|資料不足/.test(ev)) return "未納入";
+  if (/熱圖|LISA|散佈|圖表|Moran|空間聚類/.test(src + ev)) return "圖表證據";
+  if (/知識庫|規則 R\d+|SPI 製程/.test(src + ev)) return "規則推論";
+  return "統計計算";
+}
+
+function evidenceKindBadge(kind) {
+  const k = EVIDENCE_KINDS.includes(kind) ? kind : "未納入";
+  return k;
+}
+
+/** FR-3：報告「資料範圍揭露」空間段落 */
+function reportSpatialExclusionLines(hasXY) {
+  if (hasXY) return [];
+  return [
+    "空間熱圖：未納入 — 本回合無有效焊墊 X/Y 座標",
+    "LISA 空間自相關：未納入 — 本回合無有效焊墊 X/Y 座標",
+  ];
+}
+
+/** FR-4：散佈圖分析筆數 vs 顯示筆數 */
+function scatterDisplayDisclosure(analysisCount, displayCount) {
+  const a = Math.max(0, analysisCount | 0);
+  const d = Math.max(0, displayCount | 0);
+  if (d >= a) return null;
+  return {
+    analysisCount: a,
+    displayCount: d,
+    text: `分析筆數 ${a.toLocaleString()} · 圖上顯示 ${d.toLocaleString()}（已抽樣）`,
+    reportText: `交叉驗證高度×面積散佈：分析筆數 ${a.toLocaleString()}，圖上顯示 ${d.toLocaleString()}（已抽樣）`,
+  };
+}
+
+/** FR-5：總覽 CPK KPI 快照（僅切頁時沿用） */
+function overviewCpkSnapshotKey(st) {
+  if (!st) return "";
+  return JSON.stringify([
+    st.metric,
+    st.group,
+    st.specs,
+    st.specSrc,
+    st.specsG,
+    st.stencil,
+    st.htol,
+    st.step,
+    st.rows && st.rows.length,
+    st.pendingVerify,
+  ]);
+}
+
+function formatOverviewCpkKpi(cap, pendingVerify) {
+  if (pendingVerify) {
+    return { value: PENDING_VERIFY_LABEL, sub: "開孔覆蓋率未滿，能力指標待現場查核", cls: "warn" };
+  }
+  if (!cap || !Number.isFinite(cap.cpk)) {
+    return { value: "—", sub: cap && cap.reason ? cap.reason : "未設定規格", cls: "" };
+  }
+  return { value: cap.cpk, sub: "", cls: "" };
+}
+
+/** FR-6：知識庫 JSON 載入 */
+function validateKbRulesPayload(payload, expectedFingerprint) {
+  if (!payload || typeof payload !== "object") {
+    return { ok: false, error: "規則檔格式不正確" };
+  }
+  if (expectedFingerprint && payload.fingerprint && payload.fingerprint !== expectedFingerprint) {
+    return { ok: false, error: "規則檔指紋不符，無法載入" };
+  }
+  if (!Array.isArray(payload.rules) || !payload.rules.length) {
+    return { ok: false, error: "規則檔沒有規則清單" };
+  }
+  const version = String(payload.version || "").trim();
+  if (!version) return { ok: false, error: "規則檔缺少版本" };
+  return { ok: true, version, rules: payload.rules, fingerprint: payload.fingerprint || null };
+}
+
+/** FR-7：問題卡／總覽優先問題的量測項目標籤 */
+function issueMetricLabel(issue, metricsMap) {
+  const m = issue && issue.metric;
+  if (!m) return "—";
+  const meta = metricsMap && metricsMap[m];
+  return meta && meta.short ? meta.short : m;
+}
+
+function issueCollapsedSummary(issue, metricsMap) {
+  const metric = issueMetricLabel(issue, metricsMap);
+  const fact = String((issue && issue.facts && issue.facts[0]) || "").split(/[，,；;]/)[0];
+  const clip = fact.length > 36 ? fact.slice(0, 36) + "…" : fact;
+  return `${metric} · ${clip}`;
+}
+
+/** FR-8：關係圖軸與既有圖重複檢查 */
+const REL_CHART_TYPES = Object.freeze([
+  "specScatter",
+  "quad",
+  "corr",
+  "parallel",
+  "radar",
+]);
+
+const RESERVED_AXIS_KEYS = new Set([
+  "height,area",
+  "area,height",
+  "ar,te",
+  "area_ratio,transfer",
+  "corr_matrix",
+]);
+
+function relChartAxisKey(kind, opts = {}) {
+  if (kind === "specScatter") return `${opts.x || "volume"},${opts.y || "height"}`;
+  if (kind === "quad") return "ar,te";
+  if (kind === "corr") return "corr_matrix";
+  if (kind === "parallel") return (opts.dims || []).join(",");
+  if (kind === "radar") return (opts.dims || []).join(",");
+  return kind;
+}
+
+function relChartDuplicateReason(kind, opts = {}) {
+  const key = relChartAxisKey(kind, opts);
+  if (kind === "specScatter" && (key === "area,height" || key === "height,area")) {
+    return "與交叉驗證「高度 × 面積」散佈軸相同，不另繪製";
+  }
+  if (kind === "quad") return "與進階分析「面積比 × 轉移效率」軸相同，不另繪製";
+  if (kind === "corr") return "與進階分析「量測項目相關矩陣」相同，不另繪製";
+  if (RESERVED_AXIS_KEYS.has(key)) return "與既有圖軸相同，不另繪製";
+  return null;
+}
+
+function relChartCollinearityReject(dims, conditionNumber, threshold = 1e12) {
+  if (!(conditionNumber > threshold)) return null;
+  return `選定特徵共線（條件數 ${conditionNumber.toExponential(1)}），Hotelling 會拒絕計算，無法繪製可判讀的${dims.length > 2 ? " Radar" : "相關"}圖`;
+}
+
+/** FR-9：幾何焊墊清單覆蓋率（分母＝幾何相異焊墊，時間篩選不縮分母） */
+function normPadKeyForCoverage(pad) {
+  return String(pad || "").trim().toUpperCase();
+}
+
+function computePadCoverage(geometryPadKeys, measuredPadKeys) {
+  const denom = new Set((geometryPadKeys || []).map(normPadKeyForCoverage).filter(Boolean));
+  const meas = new Set((measuredPadKeys || []).map(normPadKeyForCoverage).filter(Boolean));
+  if (!denom.size) {
+    return { rate: null, pendingVerify: false, uncovered: [], reason: "尚未匯入幾何焊墊清單" };
+  }
+  const uncovered = [];
+  for (const p of denom) if (!meas.has(p)) uncovered.push(p);
+  uncovered.sort();
+  const hit = denom.size - uncovered.length;
+  const rate = hit / denom.size;
+  return {
+    rate,
+    pendingVerify: rate < 1,
+    uncovered,
+    covered: hit,
+    total: denom.size,
+    reason: rate >= 1 ? null : `幾何焊墊 ${denom.size} 個，量測涵蓋 ${hit} 個（${(rate * 100).toFixed(1)}%）`,
+  };
+}
+
+function parseGeometryPadListCsv(text) {
+  const lines = String(text || "")
+    .replace(/^\uFEFF/, "")
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+  if (!lines.length) return { ok: false, error: "空檔", pads: [] };
+  const head = lines[0].split(/[,;\t]/).map((h) => h.trim().toLowerCase());
+  let padCol = head.findIndex((h) => /^(pad|padid|焊墊|pin|pinnumber)$/.test(h));
+  if (padCol < 0) padCol = 0;
+  const pads = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(/[,;\t]/);
+    const p = cols[padCol];
+    if (p) pads.push(String(p).trim());
+  }
+  if (!pads.length) return { ok: false, error: "找不到焊墊欄位或沒有資料列", pads: [] };
+  return { ok: true, pads: [...new Set(pads.map(normPadKeyForCoverage))] };
+}
+
+function gateKpiPendingVerify(pendingVerify, numericValue, formatter) {
+  if (pendingVerify) return PENDING_VERIFY_LABEL;
+  if (numericValue == null || !Number.isFinite(numericValue)) return "—";
+  return typeof formatter === "function" ? formatter(numericValue) : String(numericValue);
+}
+
+/** FR-10：立榮／振順豐子板柏拉圖分組 */
+function paretoGroupKey(refdes, vendor) {
+  const raw = String(refdes || "未知").trim();
+  if (vendor === "lirong" || vendor === "zsf") {
+    const m = raw.match(/^(.+?)([_-])(\d+)$/);
+    if (m) return { key: `${m[1]}${m[2]}${m[3]}`, suffix: m[3], subpanel: m[3] };
+  }
+  return { key: raw, suffix: null, subpanel: null };
+}
+
+function aggregateParetoByVendor(defRows, vendor, countFn) {
+  const counts = {};
+  const count = typeof countFn === "function" ? countFn : (r) => (r.codes ? r.codes.length : 1);
+  for (const r of defRows || []) {
+    const ref = r.comp || r.refdes || "未知";
+    const { key } = paretoGroupKey(ref, vendor);
+    counts[key] = (counts[key] || 0) + count(r);
+  }
+  return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+}
+
+/** FR-11：雙邊規格分側 PPM / DPMO */
+function isTwoSidedSpec(spec) {
+  if (!spec) return false;
+  return Number.isFinite(spec.lsl) && Number.isFinite(spec.usl) && spec.usl > spec.lsl;
+}
+
+function computeSidedPpmBlock(rows, spec, metric, { boards = null } = {}) {
+  if (!isTwoSidedSpec(spec)) {
+    return {
+      ok: false,
+      reason: "單邊或未設定雙邊規格，分側 PPM 不可算",
+      belowLslPpm: null,
+      aboveUslPpm: null,
+      eventDpmo: null,
+      boardDpmo: null,
+    };
+  }
+  const vals = (rows || []).filter((r) => r[metric] != null && Number.isFinite(r[metric]));
+  if (!vals.length) {
+    return {
+      ok: false,
+      reason: "有效樣本為 0，不可算",
+      belowLslPpm: null,
+      aboveUslPpm: null,
+      eventDpmo: null,
+      boardDpmo: null,
+    };
+  }
+  const n = vals.length;
+  let below = 0;
+  let above = 0;
+  for (const r of vals) {
+    const x = r[metric];
+    if (x < spec.lsl) below++;
+    if (x > spec.usl) above++;
+  }
+  const belowLslPpm = (below / n) * 1e6;
+  const aboveUslPpm = (above / n) * 1e6;
+  const events = below + above;
+  const eventDpmo = (events / n) * 1e6;
+  let boardDpmo = null;
+  if (boards && boards.length) {
+    let badBoards = 0;
+    for (const b of boards) {
+      const br = vals.filter((r) => r.board === b);
+      if (!br.length) continue;
+      if (br.some((r) => r[metric] < spec.lsl || r[metric] > spec.usl)) badBoards++;
+    }
+    boardDpmo = (badBoards / boards.length) * 1e6;
+  }
+  return {
+    ok: true,
+    reason: null,
+    belowLslPpm,
+    aboveUslPpm,
+    eventDpmo,
+    boardDpmo,
+    n,
+  };
+}
+
+function formatSidedPpmBlock(block, fmt = (v) => String(Math.round(v))) {
+  if (!block || !block.ok) {
+    return {
+      belowLslPpm: "不可算",
+      aboveUslPpm: "不可算",
+      eventDpmo: "不可算",
+      boardDpmo: "不可算",
+      note: block && block.reason ? block.reason : "不可算",
+    };
+  }
+  return {
+    belowLslPpm: fmt(block.belowLslPpm),
+    aboveUslPpm: fmt(block.aboveUslPpm),
+    eventDpmo: fmt(block.eventDpmo),
+    boardDpmo: block.boardDpmo != null ? fmt(block.boardDpmo) : "—",
+    note: "",
+  };
+}
+/* @windows-parity END */
 /* Number.isFinite：空白座標欄解析為 null，全域 isFinite(null) 會當成 0 */
 const realXY=r=>Boolean(r&&!r.gridPos&&Number.isFinite(r.x)&&Number.isFinite(r.y));
-const S={rows:[],metrics:[],metric:"volume",group:ALL_GRP,chart:"xbars",pad:null,board:null,specSrc:"sample",partSpec:null,specDraft:null,specsG:null,sqDir:"Y",specs:JSON.parse(JSON.stringify(DEF_SPECS)),stencil:120,htol:{lo:75,hi:125},step:{on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]},selZone:1,wipe:5,aperture:{groups:{}},source:"範例資料",tab:"issues",F:[],issLv:"all",issCat:"all",issEnt:null,ctx:null,colorMode:"status",exag:20,ghost:true,bridgeWarn:true,csAxis:"X",selectedPad:null,A:null,ai:""};
+const S={rows:[],metrics:[],metric:"volume",group:ALL_GRP,chart:"xbars",relChart:"specScatter",pad:null,board:null,specSrc:"sample",partSpec:null,specDraft:null,specsG:null,sqDir:"Y",specs:JSON.parse(JSON.stringify(DEF_SPECS)),stencil:120,htol:{lo:75,hi:125},step:{on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]},selZone:1,wipe:5,aperture:{groups:{}},geometryPads:null,padCoverage:null,pendingVerify:false,runVendor:"generic",ovCapSnap:null,ovCapSnapKey:"",source:"範例資料",tab:"issues",F:[],issLv:"all",issCat:"all",issEnt:null,ctx:null,colorMode:"status",exag:20,ghost:true,bridgeWarn:true,csAxis:"X",selectedPad:null,A:null,ai:""};
+loadSpiKbRules();
 
 /* 階梯鋼板：由上而下第一個符合的區域生效，否則用基礎厚度 */
 function zoneOf(r,st){if(!st.step||!st.step.on)return null;for(const z of st.step.zones){if(!(z.t>0))continue;
@@ -2345,7 +2714,7 @@ function crossValidate(A){
     ev:`組內殘差 r = ${A.rHA.toFixed(3)}（未扣除群組 r = ${A.msa.r.toFixed(3)}）${A.rHA<.9?"；三項量測相互不吻合，先確認 SPI 程式內的鋼板厚度（含階梯區）設定是否與此處一致，再確認基準面校正與 GR&R":"，三項量測互相佐證"}`});
   if(!isNaN(A.rX)&&!isNaN(A.rY))X.push({k:"空間分布",src:"熱圖 + 位置相關",st:Math.max(Math.abs(A.rX),Math.abs(A.rY||0))<.15?"ok":"warn",
     ev:`與 X 座標 r = ${A.rX.toFixed(2)}、Y 座標 r = ${(A.rY||0).toFixed(2)}${[["X",A.rX],["Y",A.rY||0]].filter(([,r])=>Math.abs(r)>=.15).map(([ax])=>`；${ax} 方向有梯度（${ax===A.sqDir?"沿刮刀行程":"垂直刮刀行程"}）`).join("")}；使用筆數 n=${A.coordN}；未扣除元件群組差異，以問題偵測的空間分析為準`});
-  else X.push({k:"空間分布",src:"熱圖 + 位置相關",st:"na",ev:"不適用（無座標）"});
+  else X.push({k:"空間分布",src:"熱圖 + 位置相關",st:"na",ev:spatialChartUnavailableText().short});
   const inter=[...A.xOut].filter(b=>A.pOut.has(b)),uni=new Set([...A.xOut,...A.pOut]);
   X.push({k:"板別交叉",src:"X̄ 圖 vs P′ 圖",st:uni.size===0?"ok":inter.length===uni.size?"ok":inter.length?"warn":"warn",
     ev:uni.size===0?"兩圖皆無越界板":`X̄ 異常：${[...A.xOut].join("、")||"無"}；P′ 圖越界：${[...A.pOut].join("、")||"無"}；重疊 ${inter.length} 片`});
@@ -5018,9 +5387,24 @@ function issuesXlsx(F){
   ]);
 }
 
-if(typeof module!=="undefined")module.exports={rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,areaRatio,maxThkForAR,detectIssues,overallVerdict,compareRuns,dfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level};
+function fmKbEsc(s){return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function fmKbHeadHtml(){
+  if(typeof SPI_KB_RULES_LOAD_ERROR!=="undefined"&&SPI_KB_RULES_LOAD_ERROR)return `<p class="pill warn" style="margin:0 0 8px">SPI 製程對應知識庫規則無法載入：${fmKbEsc(SPI_KB_RULES_LOAD_ERROR)}</p>`;
+  const ver=typeof SPI_KB_RULES_VERSION!=="undefined"?SPI_KB_RULES_VERSION:"";
+  return `<p class="note" style="margin:0 0 8px">SPI 製程對應知識庫規則 <span class="mono">v${fmKbEsc(ver)}</span></p>`;
+}
+function fmKbDetailsHtml(ruleIds){
+  if(!ruleIds||!ruleIds.length)return "";
+  const body=ruleIds.map(rid=>{const rObj=SPI_PROCESS_KB_RULES.find(x=>x.id===rid);
+    if(!rObj)return `<div><b class="mono">${fmKbEsc(rid)}</b></div>`;
+    return `<div style="margin:4px 0"><b class="mono">${fmKbEsc(rid)}</b>（${fmKbEsc(rObj.type)}）：${fmKbEsc(rObj.desc)}<br><span style="color:var(--muted)">原因：${rObj.causes.map(fmKbEsc).join("；")}｜建議：${fmKbEsc(rObj.action)}</span></div>`}).join("");
+  return `<div style="margin-top:6px;padding:6px 10px;background:var(--surface2);border-radius:4px;font-size:12px"><b style="color:var(--ink)">SPI 製程對應知識庫規則：</b>${body}</div>`;
+}
+
+if(typeof module!=="undefined")module.exports={rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,areaRatio,maxThkForAR,detectIssues,overallVerdict,compareRuns,dfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml};
 </script>
 <script>
+
 "use strict";
 if(typeof document!=="undefined")(function(){
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
@@ -5045,6 +5429,7 @@ function syncControls(){
   const groups=[...new Set(S.rows.map(r=>r.group))];
   fillSelect($("#selGroup"),[["ALL","全部元件"],...groups.map(g=>[g,g])],S.group);
   $("#selChart").value=S.chart;
+  if($("#selRelChart"))$("#selRelChart").value=S.relChart||"specScatter";
   if($("#selXrSize"))$("#selXrSize").value=String(S.xrSize||"4");
   if($("#selXrMode"))$("#selXrMode").value=S.xrMode||"board";
   const sp=S.specs[S.metric];
@@ -5069,7 +5454,7 @@ function syncControls(){
 $("#railSpecBtn").onclick=()=>{setTab("data");setSub("import");const el=$("#inStencil2");if(el){el.closest(".card").scrollIntoView({block:"start"});scrollBy(0,-stickyH()-8);el.focus({preventScroll:true})}};
 /* ---------- 階梯鋼板區域 ---------- */
 const ZCOL=["#3D6E8F","#B5652B","#7A5BA6","#2C7A4C","#B5487A","#8A7A2C"];
-function persist(){saveRunsSoon();try{localStorage.setItem("spi-stencil",JSON.stringify({t:S.stencil,lo:S.htol.lo,hi:S.htol.hi,step:S.step,aperture:S.aperture}))}catch(e){}}
+function persist(){saveRunsSoon();try{localStorage.setItem("spi-stencil",JSON.stringify({t:S.stencil,lo:S.htol.lo,hi:S.htol.hi,step:S.step,aperture:S.aperture,geometryPads:S.geometryPads}))}catch(e){}}
 /* ---------- 開孔設定 ---------- */
 function renderAperture(){const groups=[...new Set(S.rows.map(r=>r.group))],b0=S.rows[0]&&S.rows[0].board,hasCsv=S.rows.some(r=>r.apL!=null);
   $("#apTbl").innerHTML=`<thead><tr><th>元件群組</th><th class="num">焊墊尺寸 mm</th><th>開孔形狀</th><th>線性縮減 %</th><th>指定 L × W mm</th><th class="num">實際開孔 mm</th><th class="num">鋼板 µm</th><th class="num">面積比 AR</th><th class="num">寬厚比</th><th class="num">AR≥0.66 最大厚度</th><th>判讀</th></tr></thead><tbody>`+groups.map(g=>{
@@ -5085,7 +5470,18 @@ function renderAperture(){const groups=[...new Set(S.rows.map(r=>r.group))],b0=S
       <td><span class="pill ${st}">${st==="ok"?"正常":st==="warn"?"注意":"風險"}</span> <span class="note">${tip}</span></td></tr>`}).join("")+"</tbody>";
   $("#apNote").textContent=(hasCsv?"資料內含逐焊墊開孔尺寸，已優先採用。":"")+(S.rows.some(r=>r.dimAssumed)?"資料未提供焊墊尺寸，以 0.7 mm 方形估算，建議直接填寫「指定 L × W」。":"")+" 寬厚比 = 開孔最短邊 ÷ 鋼板厚度（IPC-7525 建議 ≥ 1.5）。";
   $$("#apTbl [data-g]").forEach(el=>el.onchange=()=>{const g=el.dataset.g,c=S.aperture.groups[g]=S.aperture.groups[g]||{},k=el.dataset.f;
-    if(k==="shape")c.shape=el.value;else{const v=parseFloat(el.value);if(el.value===""||!isFinite(v))delete c[k];else c[k]=v}persist();recompute()})}
+    if(k==="shape")c.shape=el.value;else{const v=parseFloat(el.value);if(el.value===""||!isFinite(v))delete c[k];else c[k]=v}persist();recompute()});
+  renderGeomPadStatus()}
+function renderGeomPadStatus(){
+  const st=$("#geomPadStatus"),box=$("#geomUncoveredBox"),tbl=$("#geomUncoveredTbl"),clr=$("#geomPadClear");
+  if(!st)return;
+  if(!S.geometryPads||!S.geometryPads.length){st.textContent="尚未匯入幾何焊墊清單；覆蓋率未啟用。";if(box)box.hidden=true;if(clr)clr.hidden=true;return}
+  const c=S.padCoverage||computePadCoverage(S.geometryPads,[...new Set(S.rows.map(r=>r.pad))]);
+  st.textContent=c.reason||`幾何焊墊 ${c.total} 個 · 覆蓋 ${(c.rate*100).toFixed(1)}%${c.pendingVerify?" · 能力 KPI 標示待查":""}`;
+  if(clr)clr.hidden=false;
+  if(box&&tbl&&c.uncovered&&c.uncovered.length){box.hidden=false;tbl.innerHTML=`<thead><tr><th>未涵蓋焊墊</th></tr></thead><tbody>`+c.uncovered.slice(0,200).map(p=>`<tr><td class="mono">${esc(p)}</td></tr>`).join("")+(c.uncovered.length>200?`<tr><td class="note">…另有 ${c.uncovered.length-200} 個</td></tr>`:"")+"</tbody>"}
+  else if(box)box.hidden=true;
+}
 function boardBounds(){const[xa,xb]=minMax(S.rows,r=>r.x),[ya,yb]=minMax(S.rows,r=>r.y);return{x0:xa-3,x1:xb+3,y0:ya-3,y1:yb+3}}
 function zoneRect(z){if(z.mode!=="group")return{x0:Math.min(z.x0,z.x1),x1:Math.max(z.x0,z.x1),y0:Math.min(z.y0,z.y1),y1:Math.max(z.y0,z.y1)};
   const ps=S.rows.filter(r=>r.group===z.group&&r.board===S.rows[0].board);if(!ps.length)return null;
@@ -5242,6 +5638,7 @@ function recompute(noRender){if(!specReady(S)){S.A=null;S.F=[];F_SIG=null;if(!no
   if(need){if(F_SIG!==null&&S.F.rowsRef===S.rows)saveRunsSoon(); /* 規格、鋼板等設定改變時保存回合設定 */
     w=S.rows.length>WORKER_MIN&&detWorker();if(w)startWorkerDetect(w,sig)}   // 先送出背景偵測，與下面主執行緒的圖表分析同時進行
   S.A=perfSpan("analyze",()=>analyze(S));
+  updatePadCoverageState();
   if(need){if(!w)detectSync(sig);else for(const r of S.rows)if(r.height!=null)r.hpct=+(r.height/padThk(r,S)*100).toFixed(1)}
   fillSelect($("#selPad"),S.A.pads.map(p=>[p,p]),S.A.imr.pad);S.pad=S.A.imr.pad;applyScope();
   const bDef=new Map(S.A.byBoard.map(x=>[x.board,x.defects]));
@@ -5343,7 +5740,7 @@ function renderIssues(){const F=S.F||[],c={ng:0,warn:0,info:0};F.forEach(x=>c[x.
   $$("#issFilter [data-lv]").forEach(b=>b.onclick=()=>{S.issLv=b.dataset.lv;renderIssues()});$$("#issFilter [data-cat]").forEach(b=>b.onclick=()=>{S.issCat=b.dataset.cat;renderIssues()});
   const L=issueList(),byId=Object.fromEntries(F.map(x=>[x.id,x]));
   /* 卡片預設收合成一行：嚴重度、標題、關鍵數字、迷你趨勢圖；點一下展開事實、推論、佐證與前往按鈕 */
-  const keyFact=x=>{const t=String(x.facts[0]||"");const c=t.split(/[，,；;]/)[0];const p=x.pads&&x.pads!=="不適用"?` · 焊墊 ${x.pads.split("; ").slice(0,2).join(", ")}${x.pads.split("; ").length>2?"…":""}`:"";return (c.length>42?c.slice(0,42)+"…":c)+p};
+  const keyFact=x=>issueCollapsedSummary(x,METRICS);
   const spark=x=>{const v=evSvg(x.ev,x.lv);return v?v.replace(/^<div class="ev-cap">[\s\S]*?<\/div>/,"").replace('<svg class="ev"','<svg class="iss-spark" aria-hidden="true"').replace(/ role="img" aria-label="[^"]*"/,""):""};
   const isBoardInf = Boolean(S.boardInferred || (S.rows && S.rows.some(r=>r.boardInferred)));
   const isBoardCard = x => Boolean(isBoardInf && ((x.cat && (x.cat.includes("X̄") || x.cat.includes("板"))) || (x.boards && x.boards !== "全部" && x.boards !== "—")));
@@ -5353,9 +5750,9 @@ function renderIssues(){const F=S.F||[],c={ng:0,warn:0,info:0};F.forEach(x=>c[x.
       ${spark(x)}<span class="iss-chev" aria-hidden="true">▾</span></summary>
     <div class="iss-detail">
     <div class="iss-head"><span class="cat">${esc(x.cat)}</span><span class="pill na">${esc(x.rule_id||"")} · ${esc(x.rule_name||"")}</span>${isBoardCard(x)?'<span class="pill warn">推定子群組，僅供參考</span>':""}${x.corrob.length?`<span class="pill na">佐證 ${x.corrob.length}</span>`:""}${x.same_phenomenon&&x.same_phenomenon.length?`<span class="pill na">同一現象 ${x.same_phenomenon.length}</span>`:""}<span class="pill na">信心 ${esc(x.conf)}</span></div>
-    <div class="note" style="margin:4px 0 6px;display:flex;flex-wrap:wrap;gap:6px 14px"><span><b>量測項目：</b>${esc(x.metric)}</span><span><b>板號：</b>${esc(x.boards)}</span><span><b>子板：</b>${esc(x.subboard)}</span><span><b>元件群組：</b>${esc(x.group)}</span><span><b>元件位號：</b>${esc(x.refdes)}</span><span><b>焊墊：</b>${esc(x.pads)}</span><span><b>觀測值：</b>${esc(x.observed)}</span><span><b>界限／規格：</b>${esc(x.limit)}</span><span><b>z／統計量：</b>${esc(x.z)}</span><span><b>p 值：</b>${esc(x.p)}</span></div>
+    <div class="note" style="margin:4px 0 6px;display:flex;flex-wrap:wrap;gap:6px 14px"><span><b>量測項目：</b>${esc(x.metric)}</span><span><b>板號：</b>${esc(x.boards)}</span><span><b>子板：</b>${esc(x.subboard)}</span><span><b>元件群組：</b>${esc(x.group)}</span><span><b>元件位號：</b>${esc(x.refdes)}</span><span><b>焊墊：</b>${esc(x.pads)}</span><span><b>觀測值：</b>${esc(x.observed)}</span><span><b>界限／規格：</b>${esc(x.limit)}</span><span><b>z／統計量：</b>${esc(x.z)}</span><span><b>p 值：</b>${esc(x.p)}</span><span><b>事實證據：</b>${esc(issueFactsEvidenceKind(x))}</span><span><b>推論證據：</b>${esc(issueInferenceEvidenceKind())}</span></div>
     <div class="iss-body"><div style="display:grid;gap:6px;min-width:0"><div><span class="lbl">事實</span><ul>${x.facts.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>
-      <p class="inf"><span class="lbl">推論</span>${esc(x.cause)}</p>
+      <p class="inf"><span class="lbl">推論</span>${esc(x.cause)}${String(x.cause||"").includes("需現場驗證")?"":"（需現場驗證）"}</p>
       <p class="inf"><span class="lbl">建議動作</span>${esc(x.action)}</p>
       ${x.explained_pads&&x.explained_pads.length?`<p class="note" style="margin:0"><b>已解釋焊墊（D-30）：</b>${esc(x.explained_pads.join("；"))}</p>`:""}</div>
       <div style="min-width:0">${evSvg(x.ev,x.lv)}</div></div>
@@ -5379,20 +5776,16 @@ function fmLine(){const Me=S.F&&S.F.meta,el=$("#fmLine");if(!el)return;if(!Me||!
   $("#fmGo").onclick=()=>setTab("cross")}
 function renderFM(){const Me=S.F&&S.F.meta,box=$("#fmCard");if(!box)return;box.hidden=!(Me&&Me.modes&&Me.modes.length);if(box.hidden)return;
   const cls={"可能":"ng","證據矛盾":"warn","待確認":"warn","未見跡象":"ok","資料不足":"na"};
-  const ev=(e,ok)=>`<li>${ok?"✓":"✗"} <b>${e.d}</b>：${esc(e.txt)}${e.ref&&e.ref.length?" "+e.ref.slice(0,4).map(i=>`<button class="linkbtn" data-fmjump="${i}">#${i}</button>`).join(" "):""}</li>`;
+  const kbHead=typeof fmKbHeadHtml==="function"?fmKbHeadHtml():"";
+  const ev=(e,ok)=>`<li>${ok?"✓":"✗"} （${esc(crossEvidenceKind({d:e.d,txt:e.txt,st:ok?"ok":"na"}))}） <b>${e.d}</b>：${esc(e.txt)}${e.ref&&e.ref.length?" "+e.ref.slice(0,4).map(i=>`<button class="linkbtn" data-fmjump="${i}">#${i}</button>`).join(" "):""}</li>`;
   const act=Me.modes.filter(m=>m.verdict==="可能"||m.verdict==="證據矛盾"||m.verdict==="待確認"),rest=Me.modes.filter(m=>!act.includes(m));
   $("#fmRest").innerHTML=rest.length?`未見跡象：${rest.filter(m=>m.verdict==="未見跡象").map(m=>esc(m.name.split("（")[0])).join("、")||"—"}${rest.some(m=>m.verdict==="資料不足")?`　｜　資料不足：${rest.filter(m=>m.verdict==="資料不足").map(m=>`${esc(m.name.split("（")[0])}（${esc(m.need)}）`).join("、")}`:""}`:"";
-  $("#fmTbl").innerHTML=!act.length?'<p class="note">沒有任何失效模式出現證據</p>':act.map(m=>{
+  $("#fmTbl").innerHTML=kbHead+(!act.length?'<p class="note">沒有任何失效模式出現證據</p>':act.map(m=>{
     const ruleBadges = m.rules&&m.rules.length ? ` <span class="mono note" style="font-size:11px">[${m.rules.join("、")}]</span>` : "";
-    const kbDetails = m.rules&&m.rules.length ? `<div style="margin-top:6px;padding:6px 10px;background:var(--surface2);border-radius:4px;font-size:12px"><b style="color:var(--ink)">SPI 製程對應知識庫規則：</b>` +
-      m.rules.map(rid => {
-        const rObj = SPI_PROCESS_KB_RULES.find(x => x.id === rid);
-        if (!rObj) return `<div><b class="mono">${rid}</b></div>`;
-        return `<div style="margin:4px 0"><b class="mono">${rid}</b>（${rObj.type}）：${esc(rObj.desc)}<br><span style="color:var(--muted)">原因：${rObj.causes.join("；")}｜建議：${esc(rObj.action)}</span></div>`;
-      }).join("") + `</div>` : "";
+    const kbDetails = typeof fmKbDetailsHtml==="function"?fmKbDetailsHtml(m.rules):"";
     return `<details class="fm"><summary><span class="pill ${cls[m.verdict]}">${m.verdict}</span><b>${esc(m.name)}</b>${ruleBadges}<span class="note">${m.dims.length?"支持面向："+m.dims.join("、"):""}${m.con.length?"　矛盾 "+m.con.length+" 項":""}</span></summary>
       <div class="fm-body"><p class="note" style="margin:0 0 4px">可能原因：${esc(m.cause)}${m.key?`　｜　必要面向：${m.key}`:""}</p><ul>${m.sup.map(e=>ev(e,1)).join("")}${m.con.map(e=>ev(e,0)).join("")}</ul>${kbDetails}</div></details>`;
-  }).join("");
+  }).join(""));
   $$("#fmTbl [data-fmjump]").forEach(b=>b.onclick=()=>{setTab("issues");setTimeout(()=>flashIssue(+b.dataset.fmjump),60)})}
 function issuesMd(){return`# SPI 問題偵測清單\n\n- 版本：${APP.ver} · 系統更新 ${APP.built} · 產生時間：${fmtNowUtc8()}\n- 資料來源：${S.source}；鋼板 ${S.stencil} µm${S.step.on?"（階梯）":""}\n\n`+S.F.map(x=>`## #${x.no}［${x.level}］${x.title}\n\n- 面向：${x.category}｜規則：${x.rule_id}（${x.rule_name}）｜量測項目：${x.metric}\n- 板號：${x.boards}｜子板：${x.subboard}｜元件群組：${x.group}｜元件位號：${x.refdes}｜焊墊：${x.pads}\n- 觀測值：${x.observed}｜界限／規格：${x.limit}｜z：${x.z}｜p：${x.p}\n- 事實：\n${x.facts.map(t=>"  - "+t).join("\n")}\n- 推論（信心 ${x.confidence}）：${x.inference}\n- 建議動作：${x.action}\n- 跨面向佐證：${x.corroborated_by.length?x.corroborated_by.map(i=>"#"+i).join("、"):"無"}${x.same_phenomenon.length?`；同一現象：${x.same_phenomenon.map(i=>"#"+i).join("、")}`:""}${x.explained_pads.length?`；已解釋焊墊：${x.explained_pads.join("；")}`:""}\n`).join("\n")+fmMd()}
 function fmMd(){const Me=S.F&&S.F.meta;if(!Me||!Me.modes)return"";
@@ -5437,6 +5830,11 @@ function renderStats(){
       $("#matrixTbl").innerHTML=head+`<tbody>`+body+`</tbody>`+foot;
     }
   }
+  const volSp=S.specs&&S.specs.volume,rows=S.rows.filter(r=>(isAllGrp(S.group)||r.group===S.group));
+  const sided=computeSidedPpmBlock(rows,volSp,"volume",{boards:[...new Set(rows.map(r=>r.board))]});
+  const fmtSide=formatSidedPpmBlock(sided,fmtPpm);
+  if($("#sidedPpmKpis"))$("#sidedPpmKpis").innerHTML=kpi("低於下限 PPM",fmtSide.belowLslPpm,"")+kpi("高於上限 PPM",fmtSide.aboveUslPpm,"")+kpi("合併事件 DPMO",fmtSide.eventDpmo,"")+kpi("合併板 DPMO",fmtSide.boardDpmo,"");
+  if($("#sidedPpmNote"))$("#sidedPpmNote").textContent=fmtSide.note||"";
 }
 const nextFrame=f=>window.requestAnimationFrame?requestAnimationFrame(f):setTimeout(f,16);
 /* 分析鎖定：回合尚未套用使用者定義的料號規格（範例資料除外）時，只開放「資料與規格」與「我的分享」 */
@@ -5454,6 +5852,7 @@ function renderTabInner(){const fn=({issues:renderIssues,overview:renderOverview
 $("#selMetric").onchange=e=>{S.metric=e.target.value;syncControls();recompute()};
 $("#selGroup").onchange=e=>{S.group=e.target.value;recompute()};
 $("#selChart").onchange=e=>{S.chart=e.target.value;applyScope();recompute()};
+if($("#selRelChart"))$("#selRelChart").onchange=e=>{S.relChart=e.target.value;if(S.tab==="adv")renderRelChartUI()};
 if($("#selXrSize"))$("#selXrSize").onchange=e=>{S.xrSize=+e.target.value;recompute()};
 if($("#selXrMode"))$("#selXrMode").onchange=e=>{S.xrMode=e.target.value;recompute()};
 $("#selPad").onchange=e=>{S.pad=e.target.value;recompute()};
@@ -5545,15 +5944,22 @@ function renderOverview(){
   $("#verdict").className="verdict "+ov.level;$("#vTitle").textContent=msg[0]+"（整體判定："+ov.label+"）";
   $("#vText").textContent=(ov.reasons&&ov.reasons.length?ov.reasons.join("；"):"未見需立即處置的訊號。")+(A.worst&&A.worst.defects?` 最差板 ${A.worst.board}，不良焊墊 ${A.worst.defects} 個。`:"");
   const defTot=A.defRows.length,padTot=S.rows.filter(r=>isAllGrp(S.group)||r.group===S.group).length;
+  const snapKey=overviewCpkSnapshotKey(S);
+  const cpkLive=formatOverviewCpkKpi(A.cap,S.pendingVerify);
+  if(!S.ovCapSnap||S.ovCapSnapKey!==snapKey){S.ovCapSnap=cpkLive;S.ovCapSnapKey=snapKey}
+  const cpkShow=S.ovCapSnap;
+  const cpkVal=S.pendingVerify?PENDING_VERIFY_LABEL:(A.cap&&isFinite(A.cap.cpk)?f(A.cap.cpk):cpkShow.value);
+  const cpkSub=S.pendingVerify?(cpkShow.sub||"開孔覆蓋率未滿"):A.cap?(A.cap.reason||((A.stable?"":"製程未穩定，僅供參考 · ")+(A.cap.mixed?`${A.cap.worst} · 規格 ${f(A.cap.lsl,0)} – ${f(A.cap.usl,0)} ${u}`:`規格 ${A.sp.lsl} – ${A.sp.usl} ${u}`))):"未設定規格";
+  const defPpm=S.pendingVerify?PENDING_VERIFY_LABEL:fmtPpm(Math.round(defTot/padTot*1e6));
   $("#kpis").innerHTML=kpi("平均 "+METRICS[A.m].short,f(A.gMean,1)+`<small style="font-size:15px"> ${u}</small>`,`σ 整體 ${f(A.overallSd,2)} · 組內 ${f(A.sigmaW,2)}`)
-    +kpi("CPK"+(A.cap&&A.cap.mixed?"（最差群組）":""),A.cap&&isFinite(A.cap.cpk)?f(A.cap.cpk):"—",A.cap?(A.cap.reason||((A.stable?"":"製程未穩定，僅供參考 · ")+(A.cap.mixed?`${A.cap.worst} · 規格 ${f(A.cap.lsl,0)} – ${f(A.cap.usl,0)} ${u}`:`規格 ${A.sp.lsl} – ${A.sp.usl} ${u}`))):"未設定規格",A.cap?capCls(A.cap.cpk):"")
+    +kpi("CPK"+(A.cap&&A.cap.mixed?"（最差群組）":""),cpkVal,cpkSub,S.pendingVerify?"warn":(A.cap?capCls(A.cap.cpk):""))
     +kpi("PPK"+(A.cap&&A.cap.mixed?"（最差群組）":""),A.cap&&isFinite(A.cap.ppk)?f(A.cap.ppk):"—",A.cap?(A.cap.reason||((A.stable?"":"製程未穩定，僅供參考 · ")+"長期 σ")):"",A.cap?capCls(A.cap.ppk):"")
     +kpi("判異點數",(A.nelX||A.nel).flag.size,`X̄ 圖 ${(A.nelX||A.nel).rules.filter(r=>r.idx.length&&r.id!==7).length} 條 Nelson 規則觸發`,(A.nelX||A.nel).flag.size?"ng":"ok")
-    +kpi("不良 PPM（全部判定項目）",fmtPpm(Math.round(defTot/padTot*1e6)),`不良焊墊 ${defTot} 處（全部判定項目）`,defTot?"warn":"ok")
+    +kpi("不良 PPM（全部判定項目）",defPpm,`不良焊墊 ${defTot} 處（全部判定項目）`,S.pendingVerify?"warn":(defTot?"warn":"ok"))
     +kpi("樣本",A.N.toLocaleString(),`${A.boards.length} 片板 · ${A.pads.length} 個焊墊位置`);
   $("#ovChartSub").textContent=chartName()+" · "+METRICS[A.m].short;
   /* 卡片等級以文字 pill 標示（不只靠色條）；跨板彙總卡的事實是單一子項，標「子項」並附子項數，避免把子項等級誤讀成卡片等級 */
-  const acts=S.F.filter(x=>x.lv!=="info").slice(0,4).map(x=>({lv:x.lv,t:`#${x.id} ${x.title}`,d:(isAgg(x)?`子項（共 ${x.sig.rows.length} 筆，最嚴重者在前）：`:"")+x.facts[0]+"。推論："+x.cause,btn:GOLAB[x.go&&x.go.tab]||"查看",go:()=>goto(x.go,x)}));
+  const acts=S.F.filter(x=>x.lv!=="info").slice(0,4).map(x=>({lv:x.lv,t:`#${x.id} ${x.title}`,d:`${issueMetricLabel(x,METRICS)} · `+(isAgg(x)?`子項（共 ${x.sig.rows.length} 筆，最嚴重者在前）：`:"")+x.facts[0]+"。推論："+x.cause,btn:GOLAB[x.go&&x.go.tab]||"查看",go:()=>goto(x.go,x)}));
   $("#acts").innerHTML=acts.length?acts.map((a,i)=>`<li><span class="lv" style="background:var(--${a.lv})"></span><div><b><span class="pill ${a.lv}">${a.lv==="ng"?"嚴重":"警示"}</span> ${esc(a.t)}</b><div class="note">${esc(a.d)}</div></div><button data-act="${i}">${a.btn}</button></li>`).join(""):'<li><span class="lv" style="background:var(--ok)"></span><div><b>目前無需處置</b><div class="note">持續監控即可；換線或加錫膏後再檢視一次 EWMA。</div></div><span></span></li>';
   $$("#acts [data-act]").forEach(b=>b.onclick=()=>acts[+b.dataset.act].go());
   drawCtrl("cOvCtrl",true);drawPareto("cOvPareto");
@@ -5629,7 +6035,7 @@ function renderControl(){
     p:["P′ 圖（每板不良率 %，Laney）",""],
     ewma:["EWMA 圖（λ = 0.2，L = 3）",""],
     cusum:["CUSUM 圖（k = 0.5σ，h = 5σ）",""]}[c]||["管制圖",""];
-  $("#ctrlTitle").textContent=t[0];$("#ctrl2Title").textContent=t[1];$("#ctrl2Card").hidden=!t[1];$("#ctrlHow").textContent=HOW[c]||"";
+  $("#ctrlTitle").textContent=t[0]+` · ${METRICS[S.metric].label}`;$("#ctrl2Title").textContent=t[1];$("#ctrl2Card").hidden=!t[1];$("#ctrlHow").textContent=HOW[c]||"";
   const cl=c==="imr"?A.imr.cl:c==="p"?A.pc.cl*100:c==="xbarr"?(A.xr&&A.xr.cl):A.xs.cl;
   const ewOut=A.ewma.filter(p=>p.v>p.ucl||p.v<p.lcl).map(p=>p.lab),cuOut=A.cusum.pts.filter(p=>p.cp>A.cusum.h||p.cm>A.cusum.h).map(p=>p.lab),cuStart=A.cusum.pts.findIndex(p=>p.cp>A.cusum.h||p.cm>A.cusum.h);
   const warnText = A.xs.subgroupWarning ? ` · <span class="note">${A.xs.subgroupWarning}</span>` : "";
@@ -5703,11 +6109,12 @@ function renderCap(){
   const pre=cap?(A.stable?"":"製程未穩定，僅供參考 · ")+(cap.mixed?`最差群組 ${cap.worst} · `:""):"";
   $("#capGrp").hidden=!(cap&&cap.mixed);
   const specTitle = METRICS[A.m].short;
-  if(cap&&cap.mixed)$("#capGrpTbl").innerHTML=`<thead><tr><th>元件群組</th><th>n</th><th>平均</th><th>規格${cap.perGroupSpec?"（含群組覆寫）":""}</th><th>Cp</th><th>Cpk</th><th>Cpk 95% 信賴區間（以板數計）</th><th>Ppk</th><th>預估 PPM</th><th>超規 PPM（${specTitle}）</th></tr></thead><tbody>`+cap.groups.map(g=>`<tr><td>${esc(g.g)}</td><td class="mono">${g.n}</td><td class="mono">${f(g.mu,1)}</td><td class="mono">${f(g.lsl,0)}–${f(g.usl,0)}</td><td class="mono">${isFinite(g.cp)?f(g.cp):"—"}</td><td class="mono"><span class="pill ${capCls(g.cpk)}">${isFinite(g.cpk)?f(g.cpk):"—"}</span></td><td class="mono">${isFinite(g.ci[0])?f(g.ci[0])+" – "+f(g.ci[1]):(g.reason?esc(g.reason):"—")}</td><td class="mono">${isFinite(g.ppk)?f(g.ppk):"—"}</td><td class="mono">${isFinite(g.ppmExp)?fmtPpm(g.ppmExp):"—"}</td><td class="mono">${isFinite(g.ppmObs)?fmtPpm(g.ppmObs):"—"}</td></tr>`).join("")+"</tbody>";
+  const pv=S.pendingVerify,gCpk=v=>pv?PENDING_VERIFY_LABEL:(isFinite(v)?f(v):"—"),gPpm=v=>pv?PENDING_VERIFY_LABEL:(isFinite(v)?fmtPpm(v):"—");
+  if(cap&&cap.mixed)$("#capGrpTbl").innerHTML=`<thead><tr><th>元件群組</th><th>n</th><th>平均</th><th>規格${cap.perGroupSpec?"（含群組覆寫）":""}</th><th>Cp</th><th>Cpk</th><th>Cpk 95% 信賴區間（以板數計）</th><th>Ppk</th><th>預估 PPM</th><th>超規 PPM（${specTitle}）</th></tr></thead><tbody>`+cap.groups.map(g=>`<tr><td>${esc(g.g)}</td><td class="mono">${g.n}</td><td class="mono">${f(g.mu,1)}</td><td class="mono">${f(g.lsl,0)}–${f(g.usl,0)}</td><td class="mono">${isFinite(g.cp)?f(g.cp):"—"}</td><td class="mono"><span class="pill ${pv?"warn":capCls(g.cpk)}">${gCpk(g.cpk)}</span></td><td class="mono">${isFinite(g.ci[0])?f(g.ci[0])+" – "+f(g.ci[1]):(g.reason?esc(g.reason):"—")}</td><td class="mono">${isFinite(g.ppk)?f(g.ppk):"—"}</td><td class="mono">${gPpm(g.ppmExp)}</td><td class="mono">${gPpm(g.ppmObs)}</td></tr>`).join("")+"</tbody>";
   const unitWarn = A.unitMismatch ? `<div class="pill warn" style="margin-bottom:8px">⚠️ 疑似單位不符（規格中心距資料平均 >10σ 或 |Cpk|>50）</div>` : "";
   const cpkPpkNotice = (cap && isFinite(cap.sw) && cap.sw > cap.sl) ?   /* 與卡片上的 Cp/Pp 同一群組比較 */ `<div class="note" style="margin-bottom:8px">ℹ️ 組內變異大於整體變異（Cpk < Ppk）：板間差異很小，或子群組內混了不同元件（請確認元件群組欄）。</div>` : "";
-  const capCards = cap && isFinite(cap.cpk) ? (
-    kpi("CP",f(cap.cp),pre+"短期潛在能力",capCls(cap.cp))+kpi("CPK",f(cap.cpk),pre+`短期實際能力 · 95% 信賴區間 ${f(cap.ci[0])} – ${f(cap.ci[1])}（以 ${cap.nb} 片板計）`,capCls(cap.cpk))+kpi("PP",f(cap.pp),"長期潛在能力",capCls(cap.pp))+kpi("PPK",f(cap.ppk),"長期實際能力",capCls(cap.ppk))+capPpmCards(cap,specTitle)
+  const capCards = cap && (S.pendingVerify||isFinite(cap.cpk)) ? (
+    kpi("CP",S.pendingVerify?PENDING_VERIFY_LABEL:f(cap.cp),pre+"短期潛在能力",S.pendingVerify?"warn":capCls(cap.cp))+kpi("CPK",S.pendingVerify?PENDING_VERIFY_LABEL:f(cap.cpk),pre+`短期實際能力 · 95% 信賴區間 ${f(cap.ci[0])} – ${f(cap.ci[1])}（以 ${cap.nb} 片板計）`,S.pendingVerify?"warn":capCls(cap.cpk))+kpi("PP",f(cap.pp),"長期潛在能力",capCls(cap.pp))+kpi("PPK",f(cap.ppk),"長期實際能力",capCls(cap.ppk))+(S.pendingVerify?kpi("預估 PPM",PENDING_VERIFY_LABEL,"開孔覆蓋率未滿","warn")+kpi(`超規 PPM（${specTitle}）`,PENDING_VERIFY_LABEL,"開孔覆蓋率未滿","warn"):capPpmCards(cap,specTitle))
   ) : cap && cap.reason === "無規格" ? (
     kpi("CP","無規格","未設定規格界限")+kpi("CPK","無規格","未設定規格界限")+kpi("PP","無規格","未設定規格界限")+kpi("PPK","無規格","未設定規格界限")+kpi("預估 PPM","無規格","未設定規格界限")+kpi(`超規 PPM（${specTitle}）`,"無規格","未設定規格界限")
   ) : cap && cap.reason ? (
@@ -5806,12 +6213,8 @@ function drawPareto(id, dim){
   dim = dim || (document.getElementById("selParetoDim") ? document.getElementById("selParetoDim").value : "defect");
   let P = [];
   if (dim === "refdes") {
-    const counts = {};
-    for (const r of S.A.defRows) {
-      const key = r.comp || r.refdes || "未知";
-      counts[key] = (counts[key] || 0) + (r.codes ? r.codes.length : 1);
-    }
-    P = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+    const vendor=S.runVendor||($("#selVendor")&&$("#selVendor").value)||"generic";
+    P=aggregateParetoByVendor(S.A.defRows,vendor);
   } else if (dim === "group") {
     const counts = {};
     for (const r of S.A.defRows) {
@@ -5874,15 +6277,17 @@ function drawPareto(id, dim){
 /* ---------- 交叉驗證 ---------- */
 function renderCross(){
   if(!hasData()){
-    $("#xvTbl").innerHTML='<tbody><tr><td colspan="4" class="note">尚未載入量測資料。</td></tr></tbody>';
+    $("#xvTbl").innerHTML='<tbody><tr><td colspan="5" class="note">尚未載入量測資料。</td></tr></tbody>';
     $("#scSub").textContent="";$("#overlap").innerHTML='<p class="note">尚無資料</p>';
     return;
   }
   const A=S.A,lab={ok:"一致 / 正常",warn:"警示",ng:"異常",na:"無法判定"};renderFM();
-  $("#xvTbl").innerHTML=`<thead><tr><th>驗證面向</th><th>證據來源</th><th>判定</th><th>依據（事實）</th></tr></thead><tbody>`+A.xv.rows.map(x=>`<tr><td>${x.k}</td><td class="note">${x.src}</td><td><span class="pill ${x.st}">${lab[x.st]}</span></td><td>${x.ev}</td></tr>`).join("")+"</tbody>";
+  $("#xvTbl").innerHTML=`<thead><tr><th>驗證面向</th><th>證據種類</th><th>證據來源</th><th>判定</th><th>依據（事實）</th></tr></thead><tbody>`+A.xv.rows.map(x=>`<tr><td>${x.k}</td><td>${esc(crossEvidenceKind(x))}</td><td class="note">${x.src}</td><td><span class="pill ${x.st}">${lab[x.st]}</span></td><td>${x.ev}</td></tr>`).join("")+"</tbody>";
   const hv=S.rows.filter(r=>(isAllGrp(S.group)||r.group===S.group)&&r.height!=null&&r.area!=null),step=Math.max(1,Math.floor(hv.length/1500));
   const ok=[],bad=[],cl=clsOf(S);hv.forEach((r,i)=>{if(i%step&&!cl(r).length)return;(cl(r).length?bad:ok).push({x:r.area,y:r.height,r})});   // 分類結果與分析共用快取
-  $("#scSub").textContent=!A.msa?"":A.msa.derived?"機台體積由面積×高度計算，相關性不具佐證意義":`體積 vs 高度×面積 組內 r = ${f(A.rHA,3)}`;
+  S.scatterDisclosure=scatterDisplayDisclosure(hv.length,ok.length+bad.length);
+  const scBase=!A.msa?"":A.msa.derived?"機台體積由面積×高度計算，相關性不具佐證意義":`體積 vs 高度×面積 組內 r = ${f(A.rHA,3)}`;
+  $("#scSub").textContent=[scBase,S.scatterDisclosure?S.scatterDisclosure.text:""].filter(Boolean).join(" · ");
   mk("cScatter",{type:"scatter",data:{datasets:[{data:ok,pointRadius:1.8,backgroundColor:css("--series2")+"99"},{data:bad,pointRadius:3.5,pointStyle:"triangle",backgroundColor:css("--ng")}]},
     options:baseOpts({scales:{x:{type:"linear",title:{display:true,text:"面積 Area (%)",color:css("--muted"),font:{size:11}},ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:10}},grid:{color:css("--grid")}},y:{title:{display:true,text:"高度 Height (µm)",color:css("--muted"),font:{size:11}},ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:10}},grid:{color:css("--grid")}}},
       plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`${i.raw.r.board} ${i.raw.r.pad}  面積 ${i.raw.x}%  高度 ${i.raw.y}µm`}}}})});
@@ -5898,12 +6303,13 @@ function renderCross(){
 function divColor(t){const lo=[61,110,143],mid=hex2rgb(css("--surface2")),hi=[200,90,40];const a=t<0?lo:hi,k=Math.min(1,Math.abs(t));return`rgb(${mid.map((m,i)=>Math.round(m+(a[i]-m)*k)).join(",")})`}
 function hex2rgb(h){h=h.replace("#","");if(h.length===3)h=h.split("").map(c=>c+c).join("");return[0,2,4].map(i=>parseInt(h.substr(i,2),16))}
 function drawHeat(){const A=S.A,cv=$("#heat"),ctx=cv.getContext("2d"),W=cv.width,H=cv.height,pad=24;
-  if(!A.rows.some(realXY)){
+  if(!hasValidSpatialXY(A.rows,realXY)){
+    const na=spatialChartUnavailableText();
     ctx.clearRect(0,0,W,H);ctx.fillStyle=css("--surface2");ctx.fillRect(0,0,W,H);
     ctx.fillStyle=css("--muted");ctx.font="20px IBM Plex Mono";ctx.textAlign="center";
-    ctx.fillText("不適用（無座標）",W/2,H/2);ctx.textAlign="left";
-    $("#heatSub").textContent="不適用（無座標）";
-    $("#heatLeg").innerHTML='<span class="note">不適用（無座標）</span>';
+    ctx.fillText(na.short,W/2,H/2);ctx.textAlign="left";
+    $("#heatSub").textContent=na.short;
+    $("#heatLeg").innerHTML=`<span class="note">${esc(na.long)}</span>`;
     return;
   }
   const[xa,xb]=minMax(A.rows,r=>r.x),[ya,yb]=minMax(A.rows,r=>r.y),x0=xa-3,x1=xb+3,y0=ya-3,y1=yb+3,sc=Math.min((W-2*pad)/(x1-x0),(H-2*pad)/(y1-y0));
@@ -5983,6 +6389,38 @@ function renderAdv(){
   renderMorphologyUI();
   renderPauseDecayUI();
   renderLISAUI();
+  renderRelChartUI();
+}
+
+function renderRelChartUI(){
+  const kind=S.relChart||($("#selRelChart")&&$("#selRelChart").value)||"specScatter",msgEl=$("#relChartMsg");
+  if($("#selRelChart"))$("#selRelChart").value=kind;
+  if(!hasData()){if(msgEl)msgEl.textContent="尚未載入量測資料。";mk("cRelChart",{type:"scatter",data:{labels:[],datasets:[]},options:baseOpts()});return}
+  const A=S.A,dup=relChartDuplicateReason(kind,{x:kind==="specScatter"?"volume":"area",y:"height",dims:["volume","area","height"]});
+  if(dup){if(msgEl)msgEl.textContent=dup;mk("cRelChart",{type:"scatter",data:{labels:[],datasets:[]},options:baseOpts({plugins:{title:{display:true,text:dup,color:css("--muted")}}})});return}
+  const rows=S.rows.filter(r=>(isAllGrp(S.group)||r.group===S.group));
+  if(kind==="parallel"||kind==="radar"){
+    const dims=["volume","area","height"],pts=rows.filter(r=>dims.every(k=>r[k]!=null&&isFinite(r[k])));
+    if(pts.length<10){if(msgEl)msgEl.textContent="樣本不足";return}
+    const mat=dims.map(k=>pts.map(r=>r[k]));
+    const reject=relChartCollinearityReject(dims,1); /* 繪圖前僅檢查選項；共線拒絕在 Hotelling 路徑另判 */
+    if(kind==="radar"){
+      const g=rows[0]&&rows[0].group||"ALL",sample=pts.slice(0,Math.min(8,pts.length));
+      mk("cRelChart",{type:"radar",data:{labels:dims.map(k=>METRICS[k].short),datasets:sample.map((r,i)=>({label:r.pad,data:dims.map(k=>r[k]),borderColor:ZCOL[i%ZCOL.length],backgroundColor:ZCOL[i%ZCOL.length]+"33"}))},options:baseOpts({plugins:{legend:{display:true,position:"bottom"}}})});
+      if(msgEl)msgEl.textContent=`Radar · ${sample.length} 個焊墊示意`;
+      return;
+    }
+    if(msgEl)msgEl.textContent=`平行座標 · n=${pts.length}`;
+    mk("cRelChart",{type:"line",data:{labels:pts.slice(0,200).map((_,i)=>String(i)),datasets:dims.map((k,i)=>({label:METRICS[k].short,data:pts.slice(0,200).map(r=>r[k]),borderColor:ZCOL[i%ZCOL.length],borderWidth:1.2,pointRadius:0}))},options:baseOpts()});
+    return;
+  }
+  if(kind==="specScatter"){
+    const data=rows.filter(r=>r.volume!=null&&r.height!=null).slice(0,2000).map(r=>({x:r.volume,y:r.height,r}));
+    mk("cRelChart",{type:"scatter",data:{datasets:[{data,pointRadius:2,backgroundColor:css("--series2")+"99"}]},options:baseOpts({scales:{x:{title:{display:true,text:"體積 Volume (%)"}},y:{title:{display:true,text:"高度 Height (µm)"}}}})});
+    if(msgEl)msgEl.textContent="規格散點 · 體積 × 高度";
+    return;
+  }
+  if(msgEl)msgEl.textContent=relChartDuplicateReason(kind)||"";
 }
 
 function getT2BoardsData(rows, dims){
@@ -6173,15 +6611,23 @@ function renderPauseDecayUI(){
 
 function renderLISAUI(){
   const A = S.A;
-  const sa = (A && A.spatialAutocorr) || { valid: false, reason: "有效座標數不足" };
   const msgEl = $("#lisaMsg");
   const subEl = $("#lisaSub");
   const cv = $("#cLISA");
   if (!msgEl || !cv) return;
-
+  if (!A || !hasValidSpatialXY(A.rows, realXY)) {
+    const na = spatialChartUnavailableText();
+    if (subEl) subEl.textContent = na.long;
+    msgEl.innerHTML = `<span class="pill na">不適用</span> <span class="note">${esc(na.long)}</span>`;
+    const ctx0 = cv.getContext("2d");
+    if (ctx0) ctx0.clearRect(0, 0, cv.width, cv.height);
+    return;
+  }
+  const sa = A.spatialAutocorr || { valid: false, reason: "有效座標數不足" };
   if (!sa.valid) {
-    if (subEl) subEl.textContent = "座標或資料不足，無法計算空間自相關";
-    msgEl.innerHTML = `<span class="pill na">未啟用</span> <span class="note">${esc(sa.reason)}</span>`;
+    const na = spatialChartUnavailableText();
+    if (subEl) subEl.textContent = sa.reason || na.long;
+    msgEl.innerHTML = `<span class="pill na">不適用</span> <span class="note">${esc(sa.reason || na.long)}</span>`;
     const ctx = cv.getContext("2d");
     if (ctx) ctx.clearRect(0, 0, cv.width, cv.height);
     return;
@@ -6369,6 +6815,8 @@ function renderDfm(){const D=dfmTable(S);DFM=D;const r=curRun();
     options:baseOpts({indexAxis:"y",plugins:{legend:{display:false},vlines:{lines:[{v:2,c:css("--warn"),t:"中"},{v:4,c:css("--ng"),t:"高"}]}},scales:{x:{stacked:true,ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:10}},grid:{color:css("--grid")},title:{display:true,text:"風險分數",color:css("--muted"),font:{size:11}}},y:{stacked:true,ticks:{color:css("--muted"),font:{size:11}},grid:{display:false}}}})});
   const PF=S.F.filter(x=>x.cat==="焊墊位置");
   $("#dfmPads").innerHTML=PF.length?`<thead><tr><th>群組／項目</th><th>焊墊與數值</th></tr></thead><tbody>${PF.map(x=>`<tr><td>${esc(x.title)}</td><td class="note">${x.facts.map(esc).join("<br>")}</td></tr>`).join("")}</tbody>`:'<tbody><tr><td class="note">沒有長期偏離的個別焊墊位置。</td></tr></tbody>';
+  const unc=S.padCoverage&&S.padCoverage.uncovered;
+  {const el=$("#dfmUncovered");if(el)el.innerHTML=unc&&unc.length?`<p class="note" style="margin-top:10px"><b>未涵蓋焊墊（幾何清單）：</b><span class="mono">${unc.slice(0,40).map(p=>esc(p)).join("、")}${unc.length>40?` …共 ${unc.length} 個`:""}</span></p>`:"";}
   renderClosedLoopUI();
 }
 function dfmRows(){return DFM||dfmTable(S)}
@@ -6999,7 +7447,7 @@ const esc=x=>String(x??"").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&
 const clone=o=>JSON.parse(JSON.stringify(o));
 const withHpct=m=>m.includes("height")&&!m.includes("hpct")?[...m.slice(0,m.indexOf("height")+1),"hpct",...m.slice(m.indexOf("height")+1)]:m;
 const DEF_ZONES=()=>({on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]});
-function snapCfg(){return clone({specs:S.specs,specSrc:S.specSrc,partSpec:S.partSpec,specDraft:S.specDraft,specsG:S.specsG,sqDir:S.sqDir,stencil:S.stencil,htol:S.htol,step:S.step,aperture:S.aperture,wipe:S.wipe})}
+function snapCfg(){return clone({specs:S.specs,specSrc:S.specSrc,partSpec:S.partSpec,specDraft:S.specDraft,specsG:S.specsG,sqDir:S.sqDir,stencil:S.stencil,htol:S.htol,step:S.step,aperture:S.aperture,wipe:S.wipe,geometryPads:S.geometryPads})}
 /* 範例資料的回合設定：內建示範規格（不需使用者定義即可分析） */
 function sampleCfg(){const c=snapCfg();c.specSrc="sample";c.partSpec=null;c.specDraft=null;c.specsG=null;if(S.specSrc!=="sample"){c.specs=clone(DEF_SPECS);c.stencil=120;c.htol={lo:75,hi:125}}return c}
 function curRun(){return (S.runs&&S.runs.find(r=>r.id===S.runId))||null}
@@ -7104,11 +7552,8 @@ function parsePlacement(t,unit="mm",selectedSide=""){const n=t.head.map(normH),c
   if(iR<0||iX<0||iY<0)throw new Error("座標檔需要位號（RefDes）與 X、Y 欄位");
   if(!["mm","mil","inch"].includes(unit))throw new Error("請選擇座標單位");
   if(!["TOP","BOT","BOTH"].includes(selectedSide))throw new Error("請選擇座標檔面別");
-  const isInch=t.head.some(h=>/\((inch|in)\)/i.test(h)||/_in$/i.test(h));
-  const isMil=t.head.some(h=>/\(mil\)/i.test(h)||/_mil$/i.test(h));
-  const isMm=t.head.some(h=>/\(mm\)/i.test(h)||/_mm$/i.test(h));
-  const hinted=isInch?"inch":isMil?"mil":isMm?"mm":"";
-  if(hinted&&hinted!==unit)throw new Error(`欄名標示 ${hinted}，與選取的 ${unit} 不一致`);
+  const declared=headerPlaceUnit(t.head);
+  if(declared==="conflict"||(declared&&declared!==unit))throw new Error(declared==="conflict"?"座標單位與欄名不一致":`欄名標示 ${declared}，與選取的 ${unit} 不一致`);
   if(selectedSide==="BOTH"&&iL<0)throw new Error("雙面座標檔必須有面別欄位");
   const k=unit==="mil"?0.0254:unit==="inch"?25.4:1,items=[],seen=new Map();
   t.data.forEach((r,i)=>{if(r.every(v=>!String(v??"").trim()))return;
@@ -7223,7 +7668,7 @@ let PLACE=null;
 function placeLoad(){try{const s=JSON.parse(localStorage.getItem("spi-place")||"null");if(s&&s.tab&&s.unit&&s.side){PLACE={recId:s.recId||null,part:s.part||"",rev:s.rev||"",name:s.name,tab:s.tab,side:s.side,unit:s.unit,res:parsePlacement(s.tab,s.unit,s.side)};$("#placePart").value=PLACE.part;$("#placeRev").value=PLACE.rev;$("#placeUnit").value=s.unit;$("#placeSide").value=s.side}}catch(e){PLACE=null}}
 function placeSave(){try{if(PLACE)localStorage.setItem("spi-place",JSON.stringify({recId:PLACE.recId,part:PLACE.part,rev:PLACE.rev,name:PLACE.name,tab:PLACE.tab,unit:PLACE.unit,side:PLACE.side}));else localStorage.removeItem("spi-place")}catch(e){}}
 function placeShow(){const st=$("#placeState");$("#placeClear").hidden=!PLACE;if(!PLACE){st.textContent="未套用受控座標檔";return}
-  const r=PLACE.res,declared=headerPlaceUnit(PLACE.tab.head);st.textContent=`料號 ${PLACE.part} 版次 ${PLACE.rev} · ${PLACE.name}：${r.items.length} 個元件（TOP ${r.top}、BOT ${r.bot}），單位 ${r.unit}${declared?`（欄名標示 ${declared}）`:"（登錄時選擇）"}；無焊墊座標${r.warn?`；⚠️ ${r.warn}`:""}`}
+  const r=PLACE.res,declared=headerPlaceUnit(PLACE.tab.head),declaredText=declared==="conflict"?"（欄名單位互相衝突）":declared?`（欄名標示 ${declared}）`:"（登錄時選擇）";st.textContent=`料號 ${PLACE.part} 版次 ${PLACE.rev} · ${PLACE.name}：${r.items.length} 個元件（TOP ${r.top}、BOT ${r.bot}），單位 ${r.unit}${declaredText}；無焊墊座標${r.warn?`；⚠️ ${r.warn}`:""}`}
 function vendorUI(){
   const v=$("#selVendor").value,isWideV=v==="lirong"||v==="zsf";
   $("#sideField").hidden=false;$("#placeRow").hidden=false;$("#vendorNote").hidden=!isWideV;
@@ -7292,14 +7737,14 @@ async function saveControlledPlacement(fl,part,rev,side,unit){
 }
 function headerPlaceUnit(head){const xy=head.filter(h=>/^(?:x|y|center[xy]|mid[xy]|pos[xy]|[xy]pos|location[xy])/i.test(String(h).trim()));
   const found=new Set(xy.flatMap(h=>/\bmil\b|_mil|\(mil\)/i.test(h)?["mil"]:/\binch\b|\(in\)|_in\b/i.test(h)?["inch"]:/\bmm\b|_mm\b/i.test(h)?["mm"]:[]));
-  return found.size===1?[...found][0]:""}
+  return found.size===1?[...found][0]:found.size>1?"conflict":""}
 /* 座標檔：先填產品料號與版本才能上傳；讀取成功後原始檔存入資料庫，再拿來對應位置 */
 $("#placeIn").onchange=async e=>{const fl=e.target.files[0];e.target.value="";if(!fl)return;
   const part=safeId($("#placePart").value),rev=safeId($("#placeRev").value),side=$("#placeSide").value;
   const near=partNear(part,knownParts());if(near&&near.near&&!window.confirm(`料號 ${part} 與既有料號 ${near.near} 相近。確認是新料號並存入？`))return;
   const fail=er=>{busy(false);LOAD_ERROR.place=er.message;updateLoadStates();$("#placeState").innerHTML=`<span class="err">${esc(er.message)}</span>`};
   let unit=$("#placeUnit").value;
-  if(!unit){try{unit=headerPlaceUnit(csvTable(decodeBytes(new Uint8Array(await readBuf(fl)))).head);if(unit){$("#placeUnit").value=unit;$("#placeState").textContent=`欄名標示單位 ${unit}，已預選；請確認登錄資料`}}catch(er){return fail(er)}}
+  if(!unit){try{const declared=headerPlaceUnit(csvTable(decodeBytes(new Uint8Array(await readBuf(fl)))).head);if(declared==="conflict")throw new Error("座標單位與欄名不一致");if(declared){unit=declared;$("#placeUnit").value=unit;$("#placeState").textContent=`欄名標示單位 ${unit}，已預選；請確認登錄資料`}}catch(er){return fail(er)}}
   busy(true,"正在驗證並存入座標檔…");saveControlledPlacement(fl,part,rev,side,unit).then(({rec,tab,res})=>{
     busy(false);PLACE={recId:rec.id,part:rec.part,rev:rec.rev,name:rec.name,tab,res,unit,side};placeSave();placeShow();LOAD_ERROR.place="";updateLoadStates();reconvert();recPartNote();
     toast(`已存入座標檔 ${part} ${rev}：${res.items.length} 個元件`)}).catch(fail)};
@@ -8461,7 +8906,7 @@ async function openRecord(rec, opt = {}){busy(true,"正在從資料庫取回原�
       noPlace=true;note="當時沒有使用座標檔，這次也不套用"
     }
 
-    $("#selVendor").value=[...$("#selVendor").options].some(o=>o.value===rec.vendor)?rec.vendor:"generic";$("#selSide").value=rec.side||"";vendorUI();
+    $("#selVendor").value=[...$("#selVendor").options].some(o=>o.value===rec.vendor)?rec.vendor:"generic";S.runVendor=$("#selVendor").value;$("#selSide").value=rec.side||"";vendorUI();
     setSub("import");busy(false);
     /* 來源紀錄只交給緊接著的這一次匯入；讀檔失敗時不留給下一次手動匯入 */
     if(/\.xlsx$/i.test(rec.name)){
@@ -9131,7 +9576,7 @@ function setupRecPicker() {
       } else {
         if ($("#upPlacePart")) $("#upPlacePart").placeholder = `檔名提示：${clean.slice(0,32)}（請確認料號）`;
       }
-      if(!$("#upPlaceUnit").value){readBuf(f).then(buf=>{const declared=headerPlaceUnit(csvTable(decodeBytes(new Uint8Array(buf))).head);if(declared){$("#upPlaceUnit").value=declared;$("#upPlaceState").textContent=`欄名標示單位 ${declared}，已預選；請確認正式登錄資料`}}).catch(er=>{$("#upPlaceState").textContent=`預覽失敗：${er.message}`})}
+      if(!$("#upPlaceUnit").value){readBuf(f).then(buf=>{const declared=headerPlaceUnit(csvTable(decodeBytes(new Uint8Array(buf))).head);if(declared==="conflict"){$("#upPlaceState").textContent="座標單位與欄名不一致";return}if(declared){$("#upPlaceUnit").value=declared;$("#upPlaceState").textContent=`欄名標示單位 ${declared}，已預選；請確認正式登錄資料`}}).catch(er=>{$("#upPlaceState").textContent=`預覽失敗：${er.message}`})}
     };
   }
 
@@ -9768,7 +10213,12 @@ function renderReport(){
       <tbody>${capT.rows.map(g=>`<tr><td><b>${esc(g.g)}</b></td><td class="num mono">${g.n}</td><td class="num mono">${g.nb??"—"}</td><td class="num mono">${f(g.mu,1)}</td><td class="num mono">${f(g.sw,2)}</td><td class="num mono">${f(g.sl,2)}</td><td class="num mono">${isFinite(g.cp)?f(g.cp,2):"—"}</td><td class="num mono"><b>${isFinite(g.cpk)?f(g.cpk,2):"—"}</b></td><td class="num mono">${isFinite(g.pp)?f(g.pp,2):"—"}</td><td class="num mono">${isFinite(g.ppk)?f(g.ppk,2):"—"}</td><td class="num mono">${fmtPpm(g.ppmObs)}</td></tr>`).join("")||'<tr><td colspan="11" class="note">無規格或資料不足，無法計算</td></tr>'}</tbody>
     </table></div>${capT.total>capT.rows.length?`<p class="note">依 Cpk 由低到高列出前 ${capT.rows.length} 個群組（共 ${capT.total} 個）</p>`:""}
     ${histImgUrl?`<div style="text-align:center;margin-bottom:16px"><h4 style="font-size:13px;margin:0 0 6px">實測直方圖分佈</h4><img src="${histImgUrl}" style="width:100%;max-width:760px;height:auto;border:1px solid var(--line);border-radius:6px" alt="直方圖"></div>`:""}
-    <p class="note">常態性檢定：Anderson-Darling A² = ${f(A.ad.A,3)}，p ${A.ad.p<.001?"< 0.001":"= "+f(A.ad.p,3)}（${adVerdict(A.ad)}）${A.sw&&A.sw.valid?`；Shapiro-Wilk W = ${f(A.sw.w,4)}，p ${A.sw.p<.001?"< 0.001":"= "+f(A.sw.p,3)}`:""}。</p></div>`;
+    <p class="note">常態性檢定：Anderson-Darling A² = ${f(A.ad.A,3)}，p ${A.ad.p<.001?"< 0.001":"= "+f(A.ad.p,3)}（${adVerdict(A.ad)}）${A.sw&&A.sw.valid?`；Shapiro-Wilk W = ${f(A.sw.w,4)}，p ${A.sw.p<.001?"< 0.001":"= "+f(A.sw.p,3)}`:""}。</p>
+    ${(()=>{const volSp=S.specs.volume,rows=S.rows.filter(r=>(isAllGrp(S.group)||r.group===S.group)),sided=computeSidedPpmBlock(rows,volSp,"volume",{boards:A.boards}),fmt=formatSidedPpmBlock(sided,fmtPpm);return`<div class="tbl" style="margin-top:12px"><table><tbody>
+      <tr><th>低於下限 PPM</th><td class="num mono">${fmt.belowLslPpm}</td><th>高於上限 PPM</th><td class="num mono">${fmt.aboveUslPpm}</td></tr>
+      <tr><th>合併事件 DPMO</th><td class="num mono">${fmt.eventDpmo}</td><th>合併板 DPMO</th><td class="num mono">${fmt.boardDpmo}</td></tr>
+      ${fmt.note?`<tr><th>說明</th><td colspan="3">${esc(fmt.note)}</td></tr>`:""}
+    </tbody></table></div>`})()}</div>`;
 
   const P=Object.entries(S.A.pareto||{}).sort((a,b)=>b[1]-a[1]);
   let paretoImgUrl="";
@@ -9816,6 +10266,7 @@ function renderReport(){
       <tbody>${dfmData.map(d=>`<tr><td><b>${esc(d.group)}</b></td><td class="num mono">${esc(d.padDim)}</td><td class="num mono">${esc(d.apDim)}</td><td class="num mono">${d.thk}</td><td class="num mono">${f(d.ar,2)}</td><td class="num mono">${f(d.asp,2)}</td><td><span class="pill ${d.st}">${d.st==='ok'?'正常':d.st==='warn'?'注意':'風險'}</span></td><td class="num mono">${f(d.tmax,0)} µm</td></tr>`).join("")}</tbody>
     </table></div></div>`;
 
+  const hasXY=hasValidSpatialXY(S.rows,realXY),spEx=reportSpatialExclusionLines(hasXY);
   const s9=`<div class="rep-sec" id="repSec9">
     <h2 style="font-size:17px;border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">八、資料範圍揭露與未納入證據 (Data Scope & Exclusions)</h2>
     <div class="tbl" style="margin-bottom:16px"><table><tbody>
@@ -9824,6 +10275,8 @@ function renderReport(){
       <tr><th>板號推定狀態</th><td colspan="3">${S.rows.some(r=>r.boardAssumed)?"部分板號為推定":"板號完整，無推定缺失"}</td></tr>
       <tr><th>刮刀方向狀態</th><td colspan="3">${S.sqDir?`刮刀方向設定為 ${S.sqDir} 向`:"依板序奇偶推定"}</td></tr>
       <tr><th>焊墊座標狀態</th><td colspan="3">${PLACE?`已套用元件中心座標檔：${esc(PLACE.part)} ${esc(PLACE.rev)}；無焊墊座標`:"未套用獨立座標檔（採用資料內建座標或相對位置）"}</td></tr>
+      ${spEx.length?`<tr><th>空間證據</th><td colspan="3">${spEx.map(l=>esc(l)).join("<br>")}</td></tr>`:""}
+      ${S.scatterDisclosure?`<tr><th>散佈抽樣揭露</th><td colspan="3">${esc(S.scatterDisclosure.reportText)}</td></tr>`:""}
     </tbody></table></div></div>`;
 
   const s10=`<div class="rep-sec" id="repSec10">
@@ -10483,7 +10936,7 @@ window.addEventListener("popstate",e=>{
 });
 S.runs=[];S.cmpA=1;S.cmpB=2;S.aoiBw=10;S.grr=null;
 try{const sv=JSON.parse(localStorage.getItem("spi-stencil")||"null");if(sv&&sv.t){S.stencil=sv.t;S.htol={lo:sv.lo||75,hi:sv.hi||125};S.specs.height={lsl:+(S.stencil*S.htol.lo/100).toFixed(1),usl:+(S.stencil*S.htol.hi/100).toFixed(1),tgt:S.stencil};S.specs.hpct={lsl:S.htol.lo,usl:S.htol.hi,tgt:100};
-  if(sv.step&&Array.isArray(sv.step.zones)){S.step=sv.step;S.selZone=(sv.step.zones[0]||{}).id}if(sv.aperture&&sv.aperture.groups)S.aperture=sv.aperture}}catch(e){}
+  if(sv.step&&Array.isArray(sv.step.zones)){S.step=sv.step;S.selZone=(sv.step.zones[0]||{}).id}if(sv.aperture&&sv.aperture.groups)S.aperture=sv.aperture;if(Array.isArray(sv.geometryPads))S.geometryPads=sv.geometryPads}}catch(e){}
 initRuns(false);
 restoreRuns().then(()=>meP).then(j=>{if((j||HAS_API)&&window.DecompressionStream)return openShareFromUrl()});
 const PHONE_MQ = "(max-width:600px), (pointer:coarse) and (max-height:500px)";
@@ -10608,7 +11061,9 @@ if($("#mBtnTheme"))$("#mBtnTheme").onclick=()=>{if(typeof moreSheetCtrl!=="undef
 setupRecPicker();
 updateStartupDbBanner();
 /* 測試用：只有測試在載入前設定 window.SPI_TEST_HOOK 時才公開內部函式 */
-if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,placeSizeErr,placeUnitWarn,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart});
+if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,renderLISAUI,renderRelChartUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart});
+if($("#geomPadFile"))$("#geomPadFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{const p=parseGeometryPadListCsv(rd.result);if(!p.ok){toast("幾何焊墊清單："+p.error);e.target.value="";return}S.geometryPads=p.pads;persist();updatePadCoverageState();recompute();renderGeomPadStatus();toast(`已匯入 ${p.pads.length} 個幾何焊墊`);e.target.value=""};rd.readAsText(f)});
+if($("#geomPadClear"))$("#geomPadClear").onclick=()=>{S.geometryPads=null;S.padCoverage=null;S.pendingVerify=false;persist();updatePadCoverageState();recompute();renderGeomPadStatus()};
 const initHash=(location.hash||"").slice(1);
 if(ALL_TABS.includes(initHash))setTab(initHash,true);
 })();

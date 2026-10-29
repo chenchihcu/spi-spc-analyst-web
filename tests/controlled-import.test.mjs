@@ -7,6 +7,16 @@ const fixtureRoot = 'C:/Users/user/Documents/x3000 spidata';
 const samplePlace = `${fixtureRoot}/X3000 V5座標檔.csv`;
 const sampleSpi = `${fixtureRoot}/301-000100124 TOP 量測紀錄.csv`;
 
+test('欄名單位與選取單位不一致，或同一檔出現兩種單位時拒絕', () => {
+  const mismatch = validatePlacement(parseCsv('RefDes,X mm,Y mm,Layer\nU1,10,20,TOP\nU2,30,40,TOP\n'), { side: 'TOP', unit: 'mil' });
+  assert.equal(mismatch.code, 'unit_conflict');
+  assert.equal(mismatch.error, '座標單位與欄名不一致');
+  const conflict = validatePlacement(parseCsv('RefDes,X(mm),Y(mil),Layer\nU1,10,20,TOP\nU2,30,40,TOP\n'), { side: 'TOP', unit: 'mm' });
+  assert.equal(conflict.code, 'unit_conflict');
+  const plain = validatePlacement(parseCsv('RefDes,X,Y,Layer\nU1,10,20,TOP\nU2,30,40,TOP\n'), { side: 'TOP', unit: 'mm' });
+  assert.equal(plain.items.length, 2);
+});
+
 test('座標單位明確為 mm，不依座標數值大小猜 mil', () => {
   const result = validatePlacement(parseCsv('RefDes,X,Y,Layer\nU1,6921.22,2524.37,L1-TOP\n'), { side: 'TOP', unit: 'mm' });
   assert.equal(result.items[0].x, 6921.22);

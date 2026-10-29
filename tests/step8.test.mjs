@@ -369,4 +369,9 @@ test("前端座標檔登錄守衛 placeSizeErr 與伺服器 placementSizeError �
   }
   // 讀取既有紀錄仍只提示、不阻擋（parsePlacement 不拋錯）
   assert.match(H.placeUnitWarn([{ x: 0, y: 0 }, { x: 7431, y: 4761 }], "mm"), /疑似實際單位為 mil/);
+  assert.equal(H.headerPlaceUnit(["X mm", "Y mm", "RefDes"]), "mm");
+  assert.equal(H.headerPlaceUnit(["X(mm)", "Y(mil)", "RefDes"]), "conflict");
+  assert.throws(() => H.parsePlacement({ head: ["RefDes", "X mm", "Y mm", "Layer"], data: [["U1", "10", "20", "TOP"], ["U2", "30", "40", "TOP"]] }, "mil", "TOP"), /欄名標示 mm/);
+  assert.throws(() => H.parsePlacement({ head: ["RefDes", "X(mm)", "Y(mil)", "Layer"], data: [["U1", "10", "20", "TOP"], ["U2", "30", "40", "TOP"]] }, "mm", "TOP"), /座標單位與欄名不一致/);
+  assert.equal(H.parsePlacement({ head: ["RefDes", "X", "Y", "Layer"], data: [["U1", "10", "20", "TOP"], ["U2", "30", "40", "TOP"]] }, "mm", "TOP").items.length, 2);
 });
