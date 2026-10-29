@@ -1,0 +1,16 @@
+{
+  "nelson4_all_nan_hits": [],
+  "poisson_independent": {
+    "k20_l1": 1.587527601073263e-19,
+    "k1000_l1000": 0.5042052441800837,
+    "k5_l1": 0.00365984682734371
+  },
+  "xbar_point_diffs": [],
+  "xbar_max_diff": 0,
+  "xbar_n_diffs": 0,
+  "gMean_board_vs_all": {
+    "all_pads": 107.86563785144777,
+    "mean_of_board_means": 107.86563785144774,
+    "delta": 2.842170943040401e-14
+  }
+}
