@@ -1,0 +1,158 @@
+{
+  "sha": "db17c7bae687ec141511ee52828b2ad61fd50606",
+  "m03": {
+    "wide": {
+      "cpk": 637.9336818980481,
+      "centerDistOverSd": 1.0531698185319718,
+      "m03Cards": 0
+    },
+    "shift": {
+      "m03Cards": 1,
+      "title": "疑似單位不符（規格中心距資料平均 >10σ）"
+    }
+  },
+  "morph": {
+    "bridge": {
+      "values": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      "unit": "%",
+      "perBoardCounts": [
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "peak": {
+      "values": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      "unit": "µm",
+      "perBoardCounts": [
+        0,
+        3,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "pause": {
+      "values": [
+        100,
+        100,
+        73.8,
+        100,
+        100,
+        100
+      ],
+      "boardMeans": [
+        150,
+        120,
+        90,
+        130,
+        110,
+        100
+      ],
+      "avgDrop": "前板 B06 停線 25 分鐘 → 首板 B03"
+    }
+  },
+  "rule7": {
+    "rule7Hits": 15,
+    "otherRuleHits": [],
+    "stable": true,
+    "flagSize": 0,
+    "crossValidateControl": "X̄ 圖 8 條規則皆未觸發"
+  },
+  "center6": {
+    "chartCenter": 102.33333333333333,
+    "chartMuDirect": 102.33333333333333,
+    "cardCenter": 101,
+    "chartRules": [],
+    "nelsonCards": [],
+    "nelXRules": []
+  },
+  "center25": {
+    "chartCenter": 104.77756906188128,
+    "cardCenter": 100.33784753703156,
+    "chartTriggered": [
+      1,
+      2,
+      5,
+      6,
+      8
+    ],
+    "nelXTriggered": [
+      1,
+      2,
+      5,
+      6,
+      8
+    ],
+    "stable": false,
+    "nelsonCardCount": 1,
+    "nelsonCardRules": [
+      "體積 X̄ 圖觸發 Nelson 規則 1（B10）"
+    ]
+  },
+  "ad": {
+    "n": 6000,
+    "step": 2,
+    "interleaved": {
+      "A": 439.01988153999594,
+      "p": 1
+    },
+    "sortedSample": {
+      "A": 160.71405359569292,
+      "p": 5.407929604951023e-190
+    },
+    "fullData": {
+      "A": 321.4622945177261,
+      "p": 1
+    }
+  },
+  "d30Hpct": {
+    "title": "高度%厚有 69 處孤立極端焊墊（B16/ED36-2、B16/ED36-1、B09/C416-1…）",
+    "level": "嚴重"
+  },
+  "spatial_py": {
+    "r": 0.5417063353146213,
+    "app_df": 28,
+    "app_t": 3.4101240297439612,
+    "app_p": 0.001989861975226545,
+    "fe_df": 19,
+    "fe_t": 2.8091049163295168,
+    "fe_p": 0.01119923124566608,
+    "app_would_card": false,
+    "fe_would_card": false,
+    "perm_p_two_sided": 1.0
+  },
+  "ad_py": {
+    "interleaved_sample": {
+      "A": 0.0005744428085508907,
+      "p": 0.9999984511141342
+    },
+    "sorted_sample": {
+      "A": 64.23022573293144,
+      "p": 4.3222249535989624e-126
+    },
+    "full_sorted": {
+      "A": 128.48867014138452,
+      "p": 2.2340537585848466e-185
+    },
+    "step": 2
+  }
+}

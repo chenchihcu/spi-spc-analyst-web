@@ -1,0 +1,13 @@
+{
+  "userTitle": "高度%厚有 70 處孤立極端焊墊（B16/ED36-2、B16/ED36-1、B09/C416-1…）",
+  "genTitle": "高度%厚有 69 處孤立極端焊墊（B16/ED36-2、B16/ED36-1、B09/C416-1…）",
+  "userPadTokens": 8,
+  "genPadTokens": 8,
+  "onlyInUserExport": [
+    "另 60 個"
+  ],
+  "onlyInReplay": [
+    "另 59 個"
+  ],
+  "note": "Export pads field may truncate with '等 N 處'; counts from title are authoritative for user (70) vs replay (69)"
+}
