@@ -153,6 +153,7 @@ test('8. Duo 雙欄 Panel 顯示調度邏輯與切換', { skip: !JSDOM && '未�
     beforeParse(w) {
       w.SPI_TEST_HOOK = {};
       w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === 'measureText' ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
+      w.HTMLCanvasElement.prototype.toDataURL = () => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
       w.matchMedia = (query) => ({ matches: false, addEventListener() {} });
       w.ResizeObserver = class { observe() {} };
       w.scrollTo = () => {};
@@ -205,6 +206,7 @@ test('9. PR 3 主從事件匯流排 spc:duo-pad-select 與跨欄聯動', { skip:
     beforeParse(w) {
       w.SPI_TEST_HOOK = {};
       w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === 'measureText' ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
+      w.HTMLCanvasElement.prototype.toDataURL = () => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
       w.matchMedia = (query) => ({ matches: false, addEventListener() {} });
       w.ResizeObserver = class { observe() {} };
       w.scrollTo = () => {};
@@ -241,6 +243,7 @@ test('10. PR 3 WebGL 資源防護與 Web-Perf 記憶體凍結守衛', { skip: !J
     beforeParse(w) {
       w.SPI_TEST_HOOK = {};
       w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === 'measureText' ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
+      w.HTMLCanvasElement.prototype.toDataURL = () => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
       w.matchMedia = (query) => ({ matches: false, addEventListener() {} });
       w.ResizeObserver = class { observe() {} };
       w.scrollTo = () => {};
@@ -261,4 +264,88 @@ test('10. PR 3 WebGL 資源防護與 Web-Perf 記憶體凍結守衛', { skip: !J
 
   // 檢查選取卡片高亮樣式
   assert.match(htmlSource, /\.iss-card\.duo-selected\{[^}]*outline:\s*2px solid var\(--accent\)!important/i, '需定義 .iss-card.duo-selected 高亮外框');
+});
+
+test('11. PR 4 Tabletop 筆電懸停姿態 (DUO-GAP-08)', { skip: !JSDOM && '未安裝 jsdom' }, async () => {
+  // a. CSS 規則檢驗
+  assert.match(htmlSource, /body\.duo-mode\.duo-tabletop\s+\.panel\.duo-pane-left\{[^}]*width:100%!important/, 'Tabletop 模式下左欄需寬度 100%');
+  assert.match(htmlSource, /body\.duo-mode\.duo-tabletop\s+\.panel\.duo-pane-right\{[^}]*margin-top:var\(--duo-hinge-width,20px\)!important/, 'Tabletop 模式下右欄需有 20px 鉸鏈間隔');
+  assert.match(htmlSource, /body\.duo-mode\.duo-tabletop\s+\.thumb-btn\{[^}]*min-height:48px!important/, 'Tabletop 姿態下觸控按鈕需擴大至 48px');
+
+  // b. JSDOM 姿態調度檢驗
+  const dom = new JSDOM(htmlSource.replace(/<script src=[^>]+><\/script>/g, ''), {
+    runScripts: 'dangerously',
+    url: 'https://example.test/',
+    beforeParse(w) {
+      w.SPI_TEST_HOOK = {};
+      w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === 'measureText' ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
+      w.HTMLCanvasElement.prototype.toDataURL = () => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+      w.matchMedia = () => ({ matches: false, addEventListener() {} });
+      w.ResizeObserver = class { observe() {} };
+      w.scrollTo = () => {};
+      w.Chart = class { constructor() {} destroy() {} static register() {} static defaults = { font: {} }; };
+    },
+  });
+
+  const hook = dom.window.SPI_TEST_HOOK;
+  const { S, toggleDuoMode, setDuoPosture } = hook;
+  toggleDuoMode(true);
+
+  // 切換為 tabletop 姿態
+  setDuoPosture('tabletop');
+  assert.equal(S.duo.posture, 'tabletop', 'S.duo.posture 應為 tabletop');
+  assert.equal(dom.window.document.body.classList.contains('duo-tabletop'), true, 'body 需帶有 duo-tabletop 類別');
+
+  // 切換回 book 姿態
+  setDuoPosture('book');
+  assert.equal(S.duo.posture, 'book', 'S.duo.posture 應為 book');
+  assert.equal(dom.window.document.body.classList.contains('duo-tabletop'), false, 'body 需移除 duo-tabletop 類別');
+});
+
+test('12. PR 4 雙頁對開書本報表排版 (Two-Page Spread, DUO-GAP-09)', { skip: !JSDOM && '未安裝 jsdom' }, async () => {
+  // a. CSS 雙頁排版規則檢驗
+  assert.match(htmlSource, /body\.duo-mode\s+\.rep-book-spread\{[^}]*grid-template-columns:minmax\(0,1fr\) minmax\(0,1fr\)!important/i, '雙欄模式下報表需為雙頁對開網格');
+  assert.match(htmlSource, /body\.duo-mode\s+\.rep-book-spread\{[^}]*gap:var\(--duo-hinge-width,20px\)!important/i, '雙頁報表需在中縫留有 20px 鉸鏈間距');
+  assert.match(htmlSource, /body\.duo-mode\s+\.panel\.duo-pane-full\{display:block!important;width:100%!important/i, '需支援滿版跨屏 .duo-pane-full');
+
+  // b. JSDOM 報表左右對開結構檢驗
+  const dom = new JSDOM(htmlSource.replace(/<script src=[^>]+><\/script>/g, ''), {
+    runScripts: 'dangerously',
+    url: 'https://example.test/',
+    beforeParse(w) {
+      w.SPI_TEST_HOOK = {};
+      w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === 'measureText' ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
+      w.HTMLCanvasElement.prototype.toDataURL = () => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+      w.matchMedia = () => ({ matches: false, addEventListener() {} });
+      w.ResizeObserver = class { observe() {} };
+      w.scrollTo = () => {};
+      w.Chart = class { constructor() {} destroy() {} static register() {} static defaults = { font: {} }; };
+    },
+  });
+
+  const hook = dom.window.SPI_TEST_HOOK;
+  const { S, toggleDuoMode, setTab } = hook;
+  toggleDuoMode(true);
+  setTab('report');
+
+  const d = dom.window.document;
+  const pReport = d.querySelector('#p-report');
+  assert.equal(pReport.hidden, false, '#p-report 應顯示');
+  assert.equal(pReport.classList.contains('duo-pane-full'), true, '#p-report 於 Duo 模式下應具有 duo-pane-full 滿版類別');
+
+  const spread = d.querySelector('#repBookSpread');
+  assert.ok(spread, '需存在 #repBookSpread 雙頁展開容器');
+  const leftPage = d.querySelector('#repPageLeft');
+  const rightPage = d.querySelector('#repPageRight');
+  assert.ok(leftPage, '需存在左頁容器 #repPageLeft');
+  assert.ok(rightPage, '需存在右頁容器 #repPageRight');
+});
+
+test('13. PR 4 觸覺回饋微動效與左欄緊湊表格 (DUO-GAP-11, DUO-GAP-13)', () => {
+  // a. DUO-GAP-11 按鈕按壓微動效
+  assert.match(htmlSource, /\.duo-toggle-btn:active\{transform:scale\(0\.96\)!important\}/i, '頂部按鈕需有 scale(0.96) 動效');
+  assert.match(htmlSource, /\.thumb-btn:active\{[^}]*transform:scale\(0\.96\)!important/i, '拇指按鈕需有 scale(0.96) 動效');
+
+  // b. DUO-GAP-13 緊湊表格內距
+  assert.match(htmlSource, /body\.duo-mode\s+\.duo-pane-left\s+\.tbl\s+td\{[^}]*padding:5px 6px!important/i, '左欄表格單元格內距需緊湊化至 5px 6px');
 });

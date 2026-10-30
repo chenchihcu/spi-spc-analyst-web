@@ -648,19 +648,90 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 }
 
 /* ---------- iPhone Duo 雙欄導航外殼與單手拇指 Dock ---------- */
-.duo-toggle-btn{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.duo-toggle-btn{display:inline-flex;align-items:center;gap:6px;cursor:pointer;transition:transform 0.08s ease,background 0.15s ease!important}
 .duo-toggle-btn.active{background:var(--accent-soft)!important;color:var(--accent)!important;border-color:var(--accent)!important}
+.duo-toggle-btn:active{transform:scale(0.96)!important}
 body.duo-mode{overflow-x:hidden}
 body.duo-mode nav.mtab{display:none!important}
 body.duo-mode .panel.duo-pane-left{display:grid!important;width:calc((100% - var(--duo-hinge-width,20px)) / 2)!important;float:left!important;clear:left!important;min-width:0!important;box-sizing:border-box!important}
 body.duo-mode .panel.duo-pane-right{display:grid!important;width:calc((100% - var(--duo-hinge-width,20px)) / 2)!important;float:right!important;clear:right!important;min-width:0!important;box-sizing:border-box!important;border-left:1px solid var(--line)!important;padding-left:14px!important}
+body.duo-mode .panel.duo-pane-full{display:block!important;width:100%!important;float:none!important;clear:both!important;min-width:0!important;box-sizing:border-box!important}
 body.duo-mode::after{content:"";display:table;clear:both}
+
+/* DUO-GAP-13: 雙欄左欄緊湊表格與漸層溢出優化 */
+body.duo-mode .duo-pane-left .tbl th,
+body.duo-mode .duo-pane-left .tbl td{
+  padding:5px 6px!important;
+  font-size:var(--fs-caption,12px)!important;
+}
+
+/* DUO-GAP-08: Tabletop 筆電懸停姿態 (90°~120° 半折疊上下分割) */
+body.duo-mode.duo-tabletop .panel.duo-pane-left{
+  display:block!important;
+  width:100%!important;
+  float:none!important;
+  max-height:calc(50vh - var(--duo-hinge-width,20px) / 2 - 32px)!important;
+  overflow-y:auto!important;
+  border-bottom:2px solid var(--line)!important;
+  padding-bottom:12px!important;
+}
+body.duo-mode.duo-tabletop .panel.duo-pane-right{
+  display:block!important;
+  width:100%!important;
+  float:none!important;
+  margin-top:var(--duo-hinge-width,20px)!important;
+  border-left:none!important;
+  padding-left:0!important;
+  max-height:calc(50vh - var(--duo-hinge-width,20px) / 2 - 32px)!important;
+  overflow-y:auto!important;
+}
+body.duo-mode.duo-tabletop .duo-thumb-dock button,
+body.duo-mode.duo-tabletop .thumb-btn{
+  min-height:48px!important;
+  min-width:48px!important;
+}
+
+/* DUO-GAP-09: 雙頁對開書本報表排版 (Two-Page Book Spread) */
+.rep-book-spread{display:block;width:100%}
+.rep-page{display:block;width:100%}
+body.duo-mode .rep-book-spread{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  gap:var(--duo-hinge-width,20px)!important;
+  align-items:start!important;
+  width:100%!important;
+}
+body.duo-mode.duo-tabletop .rep-book-spread{
+  grid-template-columns:1fr!important;
+}
+body.duo-mode .rep-page{
+  min-width:0!important;
+  background:#ffffff!important;
+  border-radius:4px!important;
+  padding:24px 20px!important;
+  box-shadow:0 2px 12px rgba(0,0,0,0.08)!important;
+  box-sizing:border-box!important;
+}
+body.duo-mode #reportPreviewWrap{
+  padding:10px 0!important;
+  background:transparent!important;
+}
+body.duo-mode .report-preview{
+  max-width:100%!important;
+  padding:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+@media print{
+  .rep-book-spread{display:block!important}
+  .rep-page{display:block!important;box-shadow:none!important;padding:0!important}
+}
 
 .duo-thumb-dock{display:none;position:fixed;bottom:calc(var(--safe-b) + 12px);left:calc(var(--safe-l) + 12px);right:calc(var(--safe-r) + 12px);z-index:50;justify-content:space-between;pointer-events:none}
 body.duo-mode .duo-thumb-dock{display:flex!important}
 .duo-thumb-dock>div{pointer-events:auto;display:flex;align-items:center;gap:6px;background:var(--c-bar);backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);border:1px solid var(--line);border-radius:999px;padding:4px 8px;box-shadow:0 4px 16px rgba(0,0,0,0.12)}
-.thumb-btn{min-width:44px;min-height:44px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:var(--fs-ui);font-weight:500;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.thumb-btn:active{background:var(--line)}
+.thumb-btn{min-width:44px;min-height:44px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:var(--fs-ui);font-weight:500;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform 0.08s ease,background 0.15s ease!important}
+.thumb-btn:active{background:var(--line);transform:scale(0.96)!important}
 .thumb-label{font-size:var(--fs-caption);font-weight:600;color:var(--muted);padding:0 6px}
 .iss-card.duo-selected{outline:2px solid var(--accent)!important;background:var(--surface2)!important}
 
@@ -6003,14 +6074,14 @@ const nextFrame=f=>window.requestAnimationFrame?requestAnimationFrame(f):setTime
 /* 分析鎖定：回合尚未套用使用者定義的料號規格（範例資料除外）時，只開放「資料與規格」與「我的分享」 */
 const GATE_OPEN=["data","shares"];
 const gateOn=t=>!specReady(S)&&!GATE_OPEN.includes(t);
-function showPanels(t){const lock=gateOn(t);if(lock){$$(".panel").forEach(p=>p.hidden=p.id!=="p-gate");renderGate();return lock}if(S.duo&&S.duo.active){const leftId="p-"+(S.duo.leftTab||t),rightId="p-"+(S.duo.rightTab||"sim3d");$$(".panel").forEach(p=>{const isL=(p.id===leftId),isR=(p.id===rightId);p.hidden=!isL&&!isR;p.classList.toggle("duo-pane-left",isL);p.classList.toggle("duo-pane-right",isR)});return false}$$(".panel").forEach(p=>{p.hidden=p.id!==("p-"+t);p.classList.remove("duo-pane-left","duo-pane-right")});return false}
+function showPanels(t){const lock=gateOn(t);if(lock){$$(".panel").forEach(p=>p.hidden=p.id!=="p-gate");renderGate();return lock}if(S.duo&&S.duo.active){if(t==="report"||S.duo.leftTab==="report"){$$(".panel").forEach(p=>{const isRep=(p.id==="p-report");p.hidden=!isRep;p.classList.toggle("duo-pane-full",isRep);p.classList.remove("duo-pane-left","duo-pane-right")});return false}const leftId="p-"+(S.duo.leftTab||t),rightId="p-"+(S.duo.rightTab||"sim3d");$$(".panel").forEach(p=>{const isL=(p.id===leftId),isR=(p.id===rightId);p.hidden=!isL&&!isR;p.classList.toggle("duo-pane-left",isL);p.classList.toggle("duo-pane-right",isR);p.classList.remove("duo-pane-full")});return false}$$(".panel").forEach(p=>{p.hidden=p.id!==("p-"+t);p.classList.remove("duo-pane-left","duo-pane-right","duo-pane-full")});return false}
 function renderGate(){const part=runPart();$("#gateMsg").textContent=part
   ?`此回合（料號 ${part}）尚未套用你定義的料號規格。好壞判定、製程能力與所有分析都依你定義並存檔的規格計算；請先到「資料與規格 → 規格設定」確認規格並按「儲存為新版本」。`
   :"此回合沒有產品料號，無法定義料號規格。請從資料庫重新開啟量測紀錄，或重新匯入並填寫產品料號。"}
 $("#btnGateSpec").onclick=()=>{setTab("data");setSub("import");gotoSpecCard();const el=$("#btnSpecSave");if(el&&!el.disabled)el.focus({preventScroll:true})};
 $("#btnGateRuns").onclick=()=>{setTab("data");setSub("runs")};
 function renderTab(){if(RENDER_HOLD)return;if(showPanels(S.tab))return;perfSpan("render:"+S.tab,renderTabInner);nextFrame(enhancePanel)}
-function renderTabByName(k){const fn=({issues:renderIssues,overview:renderOverview,compare:renderCompare,dfm:renderDfm,lab:renderLab,control:renderControl,capability:renderCap,sim3d:render3D,cross:renderCross,adv:renderAdv,stats:renderStats,ai:()=>{},report:renderReport,data:()=>{renderSpecTbl();renderZones();renderAperture();renderRuns();if(S.sub==="records")renderRecords(true)}})[k];if(fn)fn()} function renderTabInner(){if(S.duo&&S.duo.active){renderTabByName(S.duo.leftTab||S.tab);if(S.duo.rightTab&&S.duo.rightTab!==S.duo.leftTab)renderTabByName(S.duo.rightTab)}else renderTabByName(S.tab)}
+function renderTabByName(k){const fn=({issues:renderIssues,overview:renderOverview,compare:renderCompare,dfm:renderDfm,lab:renderLab,control:renderControl,capability:renderCap,sim3d:render3D,cross:renderCross,adv:renderAdv,stats:renderStats,ai:()=>{},report:renderReport,data:()=>{renderSpecTbl();renderZones();renderAperture();renderRuns();if(S.sub==="records")renderRecords(true)}})[k];if(fn)fn()} function renderTabInner(){if(S.duo&&S.duo.active){if(S.tab==="report"||S.duo.leftTab==="report"||S.duo.rightTab==="report"){renderTabByName("report");return}renderTabByName(S.duo.leftTab||S.tab);if(S.duo.rightTab&&S.duo.rightTab!==S.duo.leftTab)renderTabByName(S.duo.rightTab)}else renderTabByName(S.tab)}
 
 $("#selMetric").onchange=e=>{S.metric=e.target.value;syncControls();recompute()};
 $("#selGroup").onchange=e=>{S.group=e.target.value;recompute()};
@@ -10789,7 +10860,9 @@ function renderReport(){
       <p><b>4. 缺字檢核紀錄：</b>全文字元皆符合 Noto Sans TC 嵌入字型，無缺字。</p>
     </div></div>`;
 
-  prev.innerHTML=s1+s2+s3+s4+s5+s6+s7+s8+s9+s10;
+  const p1=`<div class="rep-page rep-page-left" id="repPageLeft">${s1}${s2}${s3}${s4}${s5}</div>`;
+  const p2=`<div class="rep-page rep-page-right" id="repPageRight">${s6}${s7}${s8}${s9}${s10}</div>`;
+  prev.innerHTML=`<div class="rep-book-spread" id="repBookSpread">${p1}${p2}</div>`;
   syncReportVisibility();
 }
 
@@ -11578,21 +11651,23 @@ function toggleDuoMode(forceState){if(!S.duo)return;const next=(typeof forceStat
 function updateDuoThumbDock(){const dock=$("#duoThumbDock");if(!dock)return;const rTab=S.duo?.rightTab||"sim3d",rLabels={sim3d:"3D",control:"管制圖",capability:"能力",cross:"交叉佐證",adv:"進階"};const lbl=$("#duoRightTabLabel");if(lbl)lbl.textContent=rLabels[rTab]||rTab;const bList=(S.rows&&S.rows.length)?[...new Set(S.rows.map(r=>r.board))].sort((a,b)=>a-b):[];const tot=bList.length||1,curIdx=S.board!=null?Math.max(1,bList.indexOf(S.board)+1):1;const curEl=$("#duoCurBoard"),totEl=$("#duoTotBoards");if(curEl)curEl.textContent=String(curIdx);if(totEl)totEl.textContent=String(tot)}
 function changeDuoBoard(delta){if(!S.rows||!S.rows.length)return;const bList=[...new Set(S.rows.map(r=>r.board))].sort((a,b)=>a-b);if(!bList.length)return;let idx=S.board!=null?bList.indexOf(S.board):0;if(idx<0)idx=0;idx=Math.max(0,Math.min(bList.length-1,idx+delta));S.board=bList[idx];updateDuoThumbDock();recompute()}
 function cycleDuoRightTab(){const cycle=["sim3d","cross","control","capability","adv"];const cur=S.duo?.rightTab||"sim3d";let idx=cycle.indexOf(cur);setDuoTab("right",cycle[(idx+1)%cycle.length])}
-function setupDuoPostureDetector(){const duoMq1=window.matchMedia&&window.matchMedia("(horizontal-viewport-segments: 2)");const duoMq2=window.matchMedia&&window.matchMedia("(min-width: 800px) and (max-width: 960px) and (max-height: 720px)");const check=()=>{const isDuo=Boolean((duoMq1&&duoMq1.matches)||(duoMq2&&duoMq2.matches));if(isDuo&&(!S.duo||!S.duo.active)){toggleDuoMode(true)}else if(!isDuo&&S.duo&&S.duo.active&&!S.duo.manualOverride){toggleDuoMode(false)}};if(duoMq1&&duoMq1.addEventListener)duoMq1.addEventListener("change",check);if(duoMq2&&duoMq2.addEventListener)duoMq2.addEventListener("change",check);check()}
-if($("#duoToggleBtn"))$("#duoToggleBtn").onclick=()=>{if(S.duo)S.duo.manualOverride=true;toggleDuoMode()};
-if($("#duoPrevBoardBtn"))$("#duoPrevBoardBtn").onclick=()=>changeDuoBoard(-1);
-if($("#duoNextBoardBtn"))$("#duoNextBoardBtn").onclick=()=>changeDuoBoard(1);
-if($("#duoRightTabBtn"))$("#duoRightTabBtn").onclick=cycleDuoRightTab;
+function triggerDuoHaptic(){if(typeof navigator!=="undefined"&&navigator.vibrate){try{navigator.vibrate(10)}catch(e){}}}
+function setDuoPosture(posture){if(!S.duo)return;S.duo.posture=posture;const isTabletop=(posture==="tabletop");document.body.classList.toggle("duo-tabletop",isTabletop);if(S.duo.active){showPanels(S.tab)}}
+function setupDuoPostureDetector(){const duoMq1=window.matchMedia&&window.matchMedia("(horizontal-viewport-segments: 2)");const duoMq2=window.matchMedia&&window.matchMedia("(min-width: 800px) and (max-width: 960px) and (max-height: 720px)");const tableMq1=window.matchMedia&&window.matchMedia("(vertical-viewport-segments: 2)");const tableMq2=window.matchMedia&&window.matchMedia("(min-height: 800px) and (max-height: 960px) and (max-width: 720px)");const check=()=>{const isTabletop=Boolean((tableMq1&&tableMq1.matches)||(tableMq2&&tableMq2.matches));const isDuo=Boolean((duoMq1&&duoMq1.matches)||(duoMq2&&duoMq2.matches))||isTabletop;if(isDuo&&(!S.duo||!S.duo.active)){toggleDuoMode(true)}else if(!isDuo&&S.duo&&S.duo.active&&!S.duo.manualOverride){toggleDuoMode(false)}if(S.duo&&S.duo.active){setDuoPosture(isTabletop?"tabletop":"book")}};if(duoMq1&&duoMq1.addEventListener)duoMq1.addEventListener("change",check);if(duoMq2&&duoMq2.addEventListener)duoMq2.addEventListener("change",check);if(tableMq1&&tableMq1.addEventListener)tableMq1.addEventListener("change",check);if(tableMq2&&tableMq2.addEventListener)tableMq2.addEventListener("change",check);check()}
+if($("#duoToggleBtn"))$("#duoToggleBtn").onclick=()=>{triggerDuoHaptic();if(S.duo)S.duo.manualOverride=true;toggleDuoMode()};
+if($("#duoPrevBoardBtn"))$("#duoPrevBoardBtn").onclick=()=>{triggerDuoHaptic();changeDuoBoard(-1)};
+if($("#duoNextBoardBtn"))$("#duoNextBoardBtn").onclick=()=>{triggerDuoHaptic();changeDuoBoard(1)};
+if($("#duoRightTabBtn"))$("#duoRightTabBtn").onclick=()=>{triggerDuoHaptic();cycleDuoRightTab()};
 function suspendDuoSim3D(){if(typeof stopPlay==="function")stopPlay();if(T&&T.raf){if(typeof cancelAnimationFrame==="function")cancelAnimationFrame(T.raf);else if(typeof window!=="undefined"&&window.cancelAnimationFrame)window.cancelAnimationFrame(T.raf);T.raf=0}}
 function setupDuoEventBus(){window.addEventListener("spc:duo-pad-select",e=>{const d=e.detail;if(!d)return;if(d.issue&&d.issue.id){$$(".iss-card").forEach(el=>el.classList.remove("duo-selected"));const c=$("#iss-"+d.issue.id);if(c)c.classList.add("duo-selected")}const sched=window.requestIdleCallback?requestIdleCallback:(fn=>setTimeout(fn,16));sched(()=>{if(S.duo&&S.duo.active){const rTab=S.duo.rightTab;if(rTab==="sim3d"&&typeof render3D==="function"){render3D()}else if(rTab==="cross"&&typeof selectPadForProfile==="function"){const row=S.rows.find(r=>(!d.pad||r.pad===d.pad)&&(!d.board||r.board===d.board));if(row)selectPadForProfile(row)}else if(rTab==="control"&&typeof renderControl==="function"){renderControl()}else if(rTab==="capability"&&typeof renderCap==="function"){renderCap()}}})})}
-if($("#duoSwapPaneBtn"))$("#duoSwapPaneBtn").onclick=swapDuoPanes;
+if($("#duoSwapPaneBtn"))$("#duoSwapPaneBtn").onclick=()=>{triggerDuoHaptic();swapDuoPanes()};
 setupDuoEventBus();
 setupDuoPostureDetector();
 setupRecPicker();
 updateStartupDbBanner();
 /* 測試用：只有測試在載入前設定 window.SPI_TEST_HOOK 時才公開內部函式 */
 if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{importSearchMatch,renderImportSourceSummary,updateImportWorkflow,showImportValidationError,clearImportValidationError});
-if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,renderLISAUI,renderRelChartUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,suspendDuoSim3D,setupDuoEventBus});
+if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,renderLISAUI,renderRelChartUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus});
 if($("#geomPadFile"))$("#geomPadFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{const p=parseGeometryPadListCsv(rd.result);if(!p.ok){toast("幾何焊墊清單："+p.error);e.target.value="";return}S.geometryPads=p.pads;persist();updatePadCoverageState();recompute();renderGeomPadStatus();toast(`已匯入 ${p.pads.length} 個幾何焊墊`);e.target.value=""};rd.readAsText(f)});
 if($("#geomPadClear"))$("#geomPadClear").onclick=()=>{S.geometryPads=null;S.padCoverage=null;S.pendingVerify=false;persist();updatePadCoverageState();recompute();renderGeomPadStatus()};
 const initHash=(location.hash||"").slice(1);
