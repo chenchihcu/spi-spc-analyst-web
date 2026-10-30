@@ -275,6 +275,29 @@ test('8. 版面回歸：最終發布巡檢（1440／820／390／320 × 明亮／
   assert.doesNotMatch(leg, /<span style="color:/, '圖例文字不可直接套系列色');
 });
 
+test('8f. 色彩回歸：手動深色 LISA 與剖面圖例、畫線共用色彩 token', () => {
+  const manualDark = htmlSource.match(/:root\[data-theme="dark"\]\{([^}]*)\}/)?.[1];
+  assert.ok(manualDark, '需有手動深色主題 token 區');
+  for (const [name, value] of [["--lisa-hh", "#F87171"], ["--lisa-ll", "#60A5FA"], ["--lisa-lh", "#BAE6FD"],
+    ["--lisa-hl", "#FB923C"], ["--lisa-ns", "#64748B"]])
+    assert.match(manualDark, new RegExp(`${name}:${value};`), `手動深色主題須定義 ${name}`);
+
+  const root = htmlSource.match(/:root\{([^}]*)\}/)?.[1] || '';
+  const profileTokens = ["--cs-baseline", "--cs-aperture", "--cs-stencil", "--cs-target", "--cs-limit", "--cs-substrate", "--cs-paste", "--cs-label"];
+  for (const name of profileTokens) assert.match(root, new RegExp(`${name}:`), `需定義截面色彩 token ${name}`);
+
+  const drawStart = htmlSource.indexOf('function drawCrossSectionProfile(r)');
+  const drawEnd = htmlSource.indexOf('\nfunction selectPadForProfile(r)', drawStart);
+  assert.ok(drawStart >= 0 && drawEnd > drawStart, '需能定位剖面繪圖函式');
+  const draw = htmlSource.slice(drawStart, drawEnd);
+  const legend = htmlSource.match(/\$\("#csLegend"\)\.innerHTML=`([^`]*)`/)?.[1] || '';
+  for (const name of profileTokens.filter(name => name !== "--cs-label")) {
+    assert.match(draw, new RegExp(`css\\("${name}"\\)`), `剖面畫線需使用 ${name}`);
+    assert.match(legend, new RegExp(name), `剖面圖例需使用 ${name}`);
+  }
+  assert.match(draw, /css\("--cs-label"\)/, '空狀態文字需使用主題相容的文字 token');
+});
+
 test('9. 版面回歸：code review（v10.3.3）找到的問題', () => {
   const at = (s) => { const i = htmlSource.indexOf(s); assert.ok(i >= 0, `找不到 CSS：${s}`); return i; };
 
