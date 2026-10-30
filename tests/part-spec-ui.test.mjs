@@ -90,13 +90,17 @@ test("流程：鋼板厚度必填 → 未定義規格時鎖定 → 驗證與草�
   assert.equal($("#inImpStencil").getAttribute("aria-invalid"), "true");
   assert.equal(w.eval("S.runs.length"), 2, "未填厚度不建立回合");
 
-  // 2. 填厚度後套用：料號沒有規格 → 回合鎖定、導向規格設定
-  $("#inImpStencil").value = "120";
+  // 2. 匯入厚度先與目前回合分開；按套用後才帶入新回合
+  change(w, $("#inImpStencil"), 100);
+  assert.equal(w.eval("S.stencil"), 120, "修改待匯入厚度不改變目前回合");
+  assert.equal($("#inStencil2").value, "120");
   await $("#btnApply").onclick();
   assert.ok(await until(() => w.eval("S.runs.length") === 3));
   assert.equal(w.eval("S.specSrc"), "none"); assert.equal(w.eval("S.A"), null, "未定義規格不計算");
   assert.equal(w.eval("S.tab"), "data", "導向資料與規格");
-  assert.equal(w.eval("S.stencil"), 120);
+  assert.equal(w.eval("S.stencil"), 100);
+  assert.equal($("#inStencil2").value, "100", "套用匯入後，厚度帶入本回合設定欄");
+  assert.equal($("label[for=inStencil2]").textContent, "本回合鋼板厚度 µm");
   assert.match($("#partSpecBar").textContent, /料號 NEW-1.*尚未定義規格，分析已鎖定/);
   assert.match($("#specSrcNote").textContent, /內建起始值，尚未存檔、不會用於判定/);
   $("[data-tab=issues]").click();
@@ -111,8 +115,8 @@ test("流程：鋼板厚度必填 → 未定義規格時鎖定 → 驗證與草�
   assert.match($("#specTblErr").textContent, /體積：LSL 必須小於 USL/);
   assert.equal(w.eval("S.specDraft&&S.specDraft.dirty"), false, "不合格的值不寫入草稿");
   // 高度用 µm 輸入 → 換成鋼板厚度 %
-  change(w, $("#sp-height-lsl"), 96);
-  assert.equal(w.eval("S.specDraft.specs.hpct.lsl"), 80, "96 µm ÷ 120 µm = 80%");
+  change(w, $("#sp-height-lsl"), 80);
+  assert.equal(w.eval("S.specDraft.specs.hpct.lsl"), 80, "80 µm ÷ 100 µm = 80%");
   change(w, $("#sp-volume-lsl"), 75);
   assert.equal(w.eval("S.specDraft.dirty"), true);
   assert.match($("#partSpecBar").textContent, /已修改，尚未存成新版本/);
@@ -122,13 +126,13 @@ test("流程：鋼板厚度必填 → 未定義規格時鎖定 → 驗證與草�
   $("#btnSpecSave").click();
   assert.equal($("#specSaveModal").hidden, false);
   assert.equal($("#specSaveDefault").checked, true, "第一版預設勾選設為預設");
-  assert.match($("#specSaveTarget").textContent, /料號 NEW-1 · 鋼板厚度 120 µm/);
+  assert.match($("#specSaveTarget").textContent, /料號 NEW-1 · 鋼板厚度 100 µm/);
   $("#specSaveNote").value = "依加工廠規格";
   await $("#specSaveOk").onclick();
   assert.equal($("#specSaveModal").hidden, true);
   assert.equal(w.eval("S.specSrc"), "part");
   assert.deepEqual(J(w, "{ver:S.partSpec.ver,isDefault:S.partSpec.isDefault,part:S.partSpec.part,note:S.partSpec.note}"), { ver: 1, isDefault: true, part: "NEW-1", note: "依加工廠規格" });
-  assert.equal(w.eval("S.specs.volume.lsl"), 75); assert.equal(w.eval("S.specs.height.lsl"), 96);
+  assert.equal(w.eval("S.specs.volume.lsl"), 75); assert.equal(w.eval("S.specs.height.lsl"), 80);
   assert.equal(w.eval("S.specDraft"), null);
   assert.ok(await until(() => w.eval("!!S.A")), "解鎖後開始分析");
   assert.match($("#partSpecBar").textContent, /料號 NEW-1 · v1（預設）/);
@@ -140,7 +144,7 @@ test("流程：鋼板厚度必填 → 未定義規格時鎖定 → 驗證與草�
   await $("#btnApply").onclick();
   assert.ok(await until(() => w.eval("S.runs.length") === 4));
   assert.equal(w.eval("S.specSrc"), "part"); assert.equal(w.eval("S.partSpec.ver"), 1);
-  assert.equal(w.eval("S.stencil"), 120, "沿用規格存檔時的鋼板厚度");
+  assert.equal(w.eval("S.stencil"), 100, "沿用規格存檔時的鋼板厚度");
   assert.equal(w.eval("S.tab"), "issues", "有規格時直接進入分析");
 
   // 6. 群組覆寫 → 存 v2（不設預設）
@@ -211,7 +215,16 @@ test("流程：鋼板厚度必填 → 未定義規格時鎖定 → 驗證與草�
   const csv = w.eval("SPI_TEST_HOOK.issuesCsv(S.F)").split("\n");
   assert.ok(csv[0].endsWith(",spec_source")); assert.match(csv[1], /料號規格 NEW-1 v1/);
 
-  // 10. 範例回合仍可直接分析
+  // 10. 調整本回合厚度只更新回合分析，不回寫資料庫的匯入厚度
+  assert.equal($("#inImpStencil").value, "100", "匯入欄保留當時使用的厚度");
+  change(w, $("#inStencil2"), 130);
+  assert.equal(w.eval("S.stencil"), 130, "本回合設定立即套用新厚度");
+  assert.equal($("#inImpStencil").value, "100", "調整本回合不改動匯入厚度欄");
+  const savedImportMeta = cloud.db.prepare("SELECT meta FROM records WHERE kind = 'spi' AND part = 'NEW-1'").all().map(({ meta }) => JSON.parse(meta));
+  assert.equal(savedImportMeta.length, 2);
+  assert.ok(savedImportMeta.every((meta) => meta.stencil === 100), "不可變資料庫紀錄仍保存匯入時厚度");
+
+  // 11. 範例回合仍可直接分析
   w.eval("SPI_TEST_HOOK.switchRun(S.runs[0].id)");
   assert.equal(w.eval("S.specSrc"), "sample"); assert.ok(w.eval("!!S.A"));
   assert.deepEqual(errs, []);

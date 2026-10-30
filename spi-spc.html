@@ -766,7 +766,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.12.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.12.1</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -1292,7 +1292,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
         <div class="tbl" style="max-height:300px;overflow:auto"><table id="mapTbl"></table></div>
         <div id="mapPrev" class="note"></div>
         <h4 class="imp-step-title">④ 產品與量測中繼資料</h4>
-        <div class="row recrow" id="recRow"><div class="field"><label for="inLot">批號（選填）</label><input type="text" id="inLot" maxlength="64" placeholder="例：L2410-01"></div><div class="field"><label for="inPart">產品料號（必填）</label><input type="text" id="inPart" class="mono" list="partList" autocomplete="off" maxlength="64" placeholder="例：301-000100124" aria-describedby="inPartHint inPartError"><span class="note" id="inPartHint" aria-live="polite"></span><span class="note" id="inPartError" aria-live="polite"></span></div><div class="field"><label for="inRev">正式版次（必填）</label><input type="text" id="inRev" maxlength="32" placeholder="例：V5" aria-describedby="inRevError"><span class="note" id="inRevError" aria-live="polite"></span></div><div class="field"><label for="inWorkOrder">製令工單（與量測日期至少填一項）</label><input type="text" id="inWorkOrder" maxlength="64" aria-describedby="inWorkOrderError"><span class="note" id="inWorkOrderError" aria-live="polite"></span></div><div class="field"><label for="inMeasuredDate">量測日期（與製令工單至少填一項）</label><input type="date" id="inMeasuredDate" aria-describedby="inMeasuredDateError"><span class="note" id="inMeasuredDateError" aria-live="polite"></span></div><div class="field"><label for="inImpStencil">鋼板厚度 µm（必填）</label><input type="number" id="inImpStencil" min="30" max="300" step="1" list="stencilList" placeholder="例：120" required aria-required="true" aria-describedby="inImpStencilError"><span class="note" id="inImpStencilError" aria-live="polite"></span></div><div class="field"><label for="inSupplierWo">廠商工單號</label><input type="text" id="inSupplierWo" maxlength="64" placeholder="例：SWO-202410-01"></div><div class="field"><label for="inOutsourceWo">外包工單號</label><input type="text" id="inOutsourceWo" maxlength="64" placeholder="例：OWO-88912"></div><span class="note" id="recNote" role="status" aria-live="polite" style="align-self:center;max-width:52ch"></span></div>
+        <div class="row recrow" id="recRow"><div class="field"><label for="inLot">批號（選填）</label><input type="text" id="inLot" maxlength="64" placeholder="例：L2410-01"></div><div class="field"><label for="inPart">產品料號（必填）</label><input type="text" id="inPart" class="mono" list="partList" autocomplete="off" maxlength="64" placeholder="例：301-000100124" aria-describedby="inPartHint inPartError"><span class="note" id="inPartHint" aria-live="polite"></span><span class="note" id="inPartError" aria-live="polite"></span></div><div class="field"><label for="inRev">正式版次（必填）</label><input type="text" id="inRev" maxlength="32" placeholder="例：V5" aria-describedby="inRevError"><span class="note" id="inRevError" aria-live="polite"></span></div><div class="field"><label for="inWorkOrder">製令工單（與量測日期至少填一項）</label><input type="text" id="inWorkOrder" maxlength="64" aria-describedby="inWorkOrderError"><span class="note" id="inWorkOrderError" aria-live="polite"></span></div><div class="field"><label for="inMeasuredDate">量測日期（與製令工單至少填一項）</label><input type="date" id="inMeasuredDate" aria-describedby="inMeasuredDateError"><span class="note" id="inMeasuredDateError" aria-live="polite"></span></div><div class="field"><label for="inImpStencil">匯入鋼板厚度 µm（必填）</label><input type="number" id="inImpStencil" min="30" max="300" step="1" list="stencilList" placeholder="例：120" required aria-required="true" aria-describedby="inImpStencilError"><span class="note" id="inImpStencilError" aria-live="polite"></span></div><div class="field"><label for="inSupplierWo">廠商工單號</label><input type="text" id="inSupplierWo" maxlength="64" placeholder="例：SWO-202410-01"></div><div class="field"><label for="inOutsourceWo">外包工單號</label><input type="text" id="inOutsourceWo" maxlength="64" placeholder="例：OWO-88912"></div><span class="note" id="recNote" role="status" aria-live="polite" style="align-self:center;max-width:52ch"></span></div>
         <p class="note" id="impSaveNotice" style="margin:6px 0;max-width:70ch">正式匯入須連線登入、選取有效受控座標檔；待管理者判定的新檔不納入預設分析。</p>
         <h4 class="imp-step-title">⑤ 檢查預覽與套用</h4>
         <div class="row"><label class="row" style="font-size:var(--fs-ui)"><input type="radio" name="impMode" value="new" checked> 新增為新回合</label><input type="text" id="inRunName" aria-label="新回合名稱" placeholder="回合名稱，例：試產 2 · 鋼板 V2" style="min-width:min(100%,220px)">
@@ -1302,7 +1302,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <div class="card">
       <h3>規格設定 </h3>
       <div class="row" style="margin-bottom:10px">
-        <div class="field"><label for="inStencil2">鋼板厚度 µm</label><input type="number" id="inStencil2" list="stencilList" min="30" max="300" step="1"><datalist id="stencilList"><option value="80"><option value="100"><option value="110"><option value="120"><option value="130"><option value="150"></datalist></div>
+        <div class="field"><label for="inStencil2">本回合鋼板厚度 µm</label><input type="number" id="inStencil2" list="stencilList" min="30" max="300" step="1"><datalist id="stencilList"><option value="80"><option value="100"><option value="110"><option value="120"><option value="130"><option value="150"></datalist></div>
         <div class="field"><label for="selSqDir">刮刀行程方向</label><select id="selSqDir"><option value="Y">沿 PCB Y 方向</option><option value="X">沿 PCB X 方向</option></select></div>
         <div class="field"><label for="inWipe2">每幾片擦拭一次</label><input type="number" id="inWipe2" min="2" max="50" step="1"></div>
       </div>
@@ -5543,9 +5543,9 @@ function syncControls(){
   const stepWarn=(S.step&&S.step.on&&S.step.zones.length>0&&stepCovered===0)?" ⚠️ 階梯區域未涵蓋任何焊墊。":"";
   $("#stencilNote").textContent=(!specReady(S)?`鋼板厚度 ${S.stencil} µm；高度規格尚未定義，請在下方規格表以鋼板厚度 % 填寫並儲存。`:S.step.on?`階梯鋼板啟用：基礎厚度 ${S.stencil} µm，各區域厚度見下方設定；高度依各焊墊所在區域厚度 × ${S.htol.lo}% ~ ${S.htol.hi}% 判定。`:`高度規格 = 厚度 × ${S.htol.lo}% ~ ${S.htol.hi}% → ${f(hs.lsl,0)} ~ ${f(hs.usl,0)} µm，目標 ${S.stencil} µm。`)
     +(isFinite(hpm)?` 目前資料平均高度為所在區域厚度的 ${f(hpm*100,0)}%`+(Math.abs(hpm-1)>.2?"，差距大，請確認厚度輸入是否正確。":"。"):"")
-    +stepWarn+" 階梯厚度影響高度%厚、高度規格、面積比、寬厚比與體積預測；體積 % 本身由機台計算，不會改寫。";
+    +stepWarn+" 階梯厚度影響高度%厚、高度規格、面積比、寬厚比與體積預測；體積 % 本身由機台計算，不會改寫。匯入厚度只在按「套用匯入」時帶入本回合；修改本欄不改寫資料庫中的匯入紀錄。";
   $("#chkStep").checked=S.step.on;
-  $("label[for=inStencil2]").textContent=S.step.on?"基礎鋼板厚度 µm":"鋼板厚度 µm";
+  $("label[for=inStencil2]").textContent=S.step.on?"本回合基礎鋼板厚度 µm":"本回合鋼板厚度 µm";
   $("#railSum").textContent=`${S.stencil} µm${S.step.on?`（階梯 ${S.step.zones.length} 區，涵蓋 ${stepCovered} 焊墊）`:""} · ${(METRICS[S.metric]||{}).short||""} ${specReady(S)?`${sp.lsl}–${sp.usl}`:"規格未定義"}`;
   renderRuns();
   $("#selSqDir").value=S.sqDir||"Y";$("#inWipe2").value=S.wipe;$("#inWipe").value=S.wipe;
