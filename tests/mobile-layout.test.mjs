@@ -344,3 +344,16 @@ test('9. 版面回歸：code review（v10.3.3）找到的問題', () => {
     assert.match(htmlSource, new RegExp('id="' + id + '"'), 'AI 設定介面需有 #' + id);
   }
 });
+
+test('10. 問題地圖列限制在容器內', () => {
+  const groupRule = htmlSource.match(/\.pmap-cells\.pmap-groups\{[^}]*\}/)?.[0];
+  assert.ok(groupRule, '元件群組需有獨立格線規則');
+  assert.match(groupRule, /grid-auto-flow:\s*row/, '桌機與平板元件群組需逐列填入格線');
+  assert.match(groupRule, /grid-template-columns:\s*repeat\(auto-fill,minmax\(44px,1fr\)\)/, '元件群組欄數需依容器寬度換行');
+  assert.match(htmlSource, /class="pmap-cells pmap-groups"/, '元件群組需套用獨立格線樣式');
+
+  const mobileRules = htmlSource.match(/@media \(max-width:720px\)\{\r?\n([\s\S]*?)\r?\n\}/)?.[1];
+  assert.ok(mobileRules, '需有可定位的窄螢幕問題地圖規則');
+  assert.match(mobileRules, /\.pmap-cells\.pmap-boards\{[^}]*grid-auto-flow:\s*row/, '窄螢幕各板格需逐列換行，避免撐開頁面');
+  assert.match(mobileRules, /\.pmap-cells\.pmap-groups\{[^}]*display:flex;[^}]*overflow-x:auto/, '窄螢幕元件群組需保留容器內橫向捲動');
+});
