@@ -182,6 +182,6 @@ RFC 的 UI/UX 審核本身未修改程式；後續問題地圖修正另由 PR #8
 - **VERIFIED — 測試情境**：`npm test` 共 438 項通過，涵蓋成功保存及回讀、欄位對應與必填錯誤、受控座標要求、搜尋、非管理者上傳回 403、原始檔指紋不符、座標檔缺失，以及歷史規格來源未知。測試使用本機 DOM／API harness，未連接 Production D1／R2。
 - **NOT VERIFIED — 最終 UI build 矩陣**：本次合併後 build 已檢查實測 1440／821／389 CSS px × 明暗主題、14 主分頁及 4 資料子分頁，共 108 狀態，整頁 scrollWidth === clientWidth；821／389 不代表指定的 820／390。先前瀏覽器驗收曾連到其他 build，且視口縮放未校準；不將該結果視為本候選的 144 狀態驗收。最終 build 的四種寬度、明暗主題、選單、設定及對話框仍待驗證。錯誤摘要焦點與觸控樣式有自動化回歸測試；實體觸控、iPhone 與螢幕閱讀器為 **NOT TESTED**。
 - **VERIFIED — 同步前完整關卡**：`npm run test:slow` 7/7 通過；`npm run release-check` exit 0、438 項測試通過，版本、CHANGELOG、文件、相依、機密掃描及靜態控制項標籤均為 PASS。整體為 **NEEDS REVIEW**，因 debug 掃描保留 2 處既有 `console` 輸出警告。`npm run build:cloudflare` 成功，產生 `index.html`、`vendor/`、`_headers`，HTML 959,527 bytes；build 時間 2026-10-30 15:21:24（UTC+8）。
-- **NOT VERIFIED — 發布與正式路徑**：本紀錄只涵蓋本機 build 與模擬測試。PR 尚未合併，Cloudflare Production 未部署本次 commit；正式 Worker 版本、登入後資料庫 API／畫面 HTTP 200、資料保存與下載均待核准合併後驗證。LCP／CLS／INP 未量測。
+- **NOT VERIFIED — 發布與正式路徑**：本紀錄只涵蓋本機 build 與模擬測試。Draft PR #91 尚未合併，Cloudflare Production 未部署本次 commit；正式 Worker 版本、登入後資料庫 API／畫面 HTTP 200、資料保存與下載均待核准合併後驗證。LCP／CLS／INP 未量測。
 
-- **同步後關卡**：mobile-layout 12/12 通過，diff --check 無錯誤；完整 release-check 已啟動，結果待回報，不以同步前測試取代本次結果。
+- **同步後關卡**：mobile-layout 12/12 通過，diff --check 無錯誤；完整 release-check exit 0，55 個測試檔共 439 項通過；版本、CHANGELOG、文件、相依、機密掃描及 115 個控制項標籤檢查均 PASS。整體 NEEDS REVIEW，保留 2 處既有 console 輸出警告。
