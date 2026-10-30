@@ -388,12 +388,12 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 .rail-fields{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:flex-end}
 
 @media (max-width:600px), (pointer:coarse) and (max-height:500px){
+  :root{--navbar-h:76px}
   html,body{-webkit-text-size-adjust:100%}
   body{font-size:var(--fs-body-mobile)!important;line-height:1.5;padding-bottom:calc(var(--tabbar-h) + var(--safe-b) + 24px)!important}
   .tabs-bar,nav.tabs{display:none!important}
   #moreWrap{display:none!important}
   .brand .tag{display:none!important}
-  .brand .ver{display:none!important}
   header.top .toprow .chip{display:none!important}
 
   header.top{
@@ -411,10 +411,12 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     align-items:center;
     justify-content:center;
   }
-  .brand{justify-content:center;width:100%;gap:8px;flex-wrap:nowrap}
+  .brand{justify-content:center;width:100%;column-gap:8px;row-gap:2px;flex-wrap:wrap}
   .brand .mitcorp-logo{height:16px}
   .brand .brand-sep{height:14px}
   .brand h1{font-size:var(--fs-nav-title)!important;font-weight:600!important;line-height:44px;margin:0;text-align:center}
+  .brand .ver{flex:0 0 100%;min-width:0;max-width:100%;font-size:var(--fs-caption)!important;line-height:1.2;text-align:center;white-space:normal;overflow-wrap:anywhere}
+  .brand .ver .num{white-space:nowrap}
 
   .sticky{position:sticky!important;top:calc(var(--navbar-h) + var(--safe-t))!important;z-index:15;background:var(--bg)}
   .rail{padding:4px 0;border-bottom:0.5px solid var(--line);display:block}
@@ -581,10 +583,12 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   #p-issues>details.how{order:5}
 }
 @media (pointer:coarse) and (max-height:500px){
-  header.top{height:calc(36px + var(--safe-t))!important}
+  :root{--navbar-h:52px}
+  header.top{height:calc(var(--navbar-h) + var(--safe-t))!important}
   .brand .mitcorp-logo{height:14px}
   .brand h1{line-height:36px!important}
-  .sticky{top:calc(36px + var(--safe-t))!important}
+  .brand .ver{line-height:12px}
+  .sticky{top:calc(var(--navbar-h) + var(--safe-t))!important}
   .rail{padding:3px 0!important}
 }
 
