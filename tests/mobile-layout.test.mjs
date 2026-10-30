@@ -242,6 +242,22 @@ test('7. 版面回歸：同權重 CSS 的先後順序、flex 壓縮與行內高�
   assert.match(htmlSource, /\n\.toc button\{[^}]*flex-shrink:0/, '本頁目錄按鈕不可被壓縮');
   assert.match(htmlSource, /#p-issues>#issFilter>\*\{flex-shrink:0\}/, '手機問題篩選 chip 不可被壓縮');
 
+  // g. 手機頁首顯示版本與建置時間，另列一行並保留完整時間字串
+  const mobileStart = htmlSource.indexOf('@media (max-width:600px), (pointer:coarse) and (max-height:500px){');
+  const landscapeStart = htmlSource.indexOf('@media (pointer:coarse) and (max-height:500px){');
+  assert.ok(mobileStart >= 0 && landscapeStart > mobileStart, '需有行動版與短版橫向 CSS 區塊');
+  const mobileCss = htmlSource.slice(mobileStart, landscapeStart);
+  assert.doesNotMatch(mobileCss, /\.brand \.ver\{display:none/, '手機版不可隱藏版本欄位');
+  assert.match(mobileCss, /:root\{--navbar-h:76px\}/, '手機版頂欄高度需為 76px');
+  assert.match(mobileCss, /\.brand\{[^}]*row-gap:2px[^}]*flex-wrap:wrap/, '品牌列需允許版本另起一行');
+  assert.match(mobileCss, /\.brand \.ver\{[^}]*flex:0 0 100%[^}]*white-space:normal[^}]*overflow-wrap:anywhere/, '版本列需佔滿第二行並可換行');
+  assert.match(mobileCss, /\.brand \.ver \.num\{white-space:nowrap\}/, '版本號與完整更新時間不可在數字中斷行');
+  assert.match(mobileCss, /\.sticky\{[^}]*top:calc\(var\(--navbar-h\) \+ var\(--safe-t\)\)/, '黏性內容需跟隨行動版頂欄高度');
+  const landscapeCss = htmlSource.slice(landscapeStart);
+  assert.match(landscapeCss, /:root\{--navbar-h:52px\}/, '短版橫向頂欄高度需為 52px');
+  assert.match(landscapeCss, /header\.top\{height:calc\(var\(--navbar-h\) \+ var\(--safe-t\)\)!important\}/, '短版橫向頁首需使用高度變數');
+  assert.match(landscapeCss, /\.sticky\{top:calc\(var\(--navbar-h\) \+ var\(--safe-t\)\)!important/, '短版橫向黏性內容需跟隨頁首高度');
+
   // f. 欄位容器是直向 flex，flex-basis 會變成高度：版本欄位不可用 flex 基準寬
   const rev = htmlSource.match(/<input[^>]*id="placeRev"[^>]*>/)[0];
   assert.doesNotMatch(rev, /flex:/, '#placeRev 不可設定 flex（會變成 90px 高）');

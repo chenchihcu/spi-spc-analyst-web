@@ -199,11 +199,11 @@ test('步驟 7 (D-07 & 第 7 節): 11 組視口矩陣 data-layout 判定與 CSS 
     );
   }
 
-  // 手機橫向 932×430 頂部黏性高度 <= 96px (36 + 50 = 86px) 與 .mtab 橫向安全區 padding
+  // 手機橫向 932×430 頂部黏性高度由 --navbar-h 壓縮至 52px，與 .mtab 橫向安全區 padding
   assert.match(
     htmlSource,
-    /@media\s*\(pointer:\s*coarse\)\s+and\s+\(max-height:\s*500px\)\s*\{[\s\S]*?header\.top\s*\{[^}]*height:\s*calc\(36px\s*\+\s*var\(--safe-t\)\)/i,
-    '手機橫向 header.top 高度應壓縮至 36px（與 .sticky 合計 <= 96px）'
+    /@media\s*\(pointer:\s*coarse\)\s+and\s+\(max-height:\s*500px\)\s*\{[\s\S]*?--navbar-h:\s*52px[\s\S]*?header\.top\s*\{[^}]*height:\s*calc\(var\(--navbar-h\)\s*\+\s*var\(--safe-t\)\)/i,
+    '手機橫向 header.top 與 .sticky 應共用 52px 的 --navbar-h'
   );
   assert.match(
     htmlSource,
