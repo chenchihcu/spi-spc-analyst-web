@@ -244,3 +244,125 @@ test("D5 非常態能力卡片：預估 PPM 為 0 時不短路回退至觀測超
   const ppmVal = isFinite(nn.ppmExp) ? nn.ppmExp : nn.ppmObs;
   assert.equal(ppmVal, 0, "預估 PPM 為 0 時應取 0，不可短路回退至 500");
 });
+
+test("D-M03: |Cpk| > 50 即使規格中心未超過 10σ 也要產生單位不符卡", () => {
+  const rows = [];
+  for (let b = 1; b <= 25; b++) for (const volume of [99, 100, 101])
+    rows.push({ board: `B${String(b).padStart(2, "0")}`, pad: `P${volume}`, comp: `P${volume}`, group: "G", volume, height: 120, area: 100 });
+  const specs = JSON.parse(JSON.stringify(c.DEF_SPECS));
+  specs.volume = { lsl: -1800, usl: 2000, tgt: 100 };
+  const S = st(rows, { specs });
+  const A = c.analyze(S);
+  assert.ok(Math.abs(A.cap.cpk - 633.3333) < 0.01, `反例需重現 Cpk 約 633.33，實得 ${A.cap.cpk}`);
+  const issue = c.detectIssues(S).find(x => x.rule_id === "M-03 單位不符");
+  assert.ok(issue, "|Cpk| > 50 必須觸發 M-03");
+  assert.match(issue.rule_name, /\|Cpk\|>50/);
+  assert.ok(issue.facts.some(x => /Cpk/.test(x)), "卡片需呈現觸發規則的 Cpk 證據");
+});
+
+test("D-AD: 超過 4000 筆時，列順序變換不改變 Anderson–Darling 結論", () => {
+  let seed = 7319;
+  const rnd = () => ((seed = (1664525 * seed + 1013904223) >>> 0) + 0.5) / 4294967296;
+  const normalValues = [];
+  for (let i = 0; i < 4000; i++) {
+    let sum = 0;
+    for (let j = 0; j < 12; j++) sum += rnd();
+    normalValues.push(sum - 6);
+  }
+  const exponentialValues = Array.from({ length: 4000 }, () => -Math.log(rnd()));
+  const values = [];
+  for (let i = 0; i < 4000; i++) values.push(normalValues[i], exponentialValues[i]);
+  const rowsFor = xs => xs.map((volume, i) => ({ board: `B${Math.floor(i / 100) + 1}`, pad: `P${i}`, comp: `P${i}`, group: "G", volume, height: 120 + i % 5, area: 100 + i % 5 }));
+  const A = c.analyze(st(rowsFor(values)));
+  const B = c.analyze(st(rowsFor(values.slice(1).concat(values[0]))));
+  assert.equal(A.ad.sampled, 4000);
+  assert.equal(B.ad.sampled, 4000);
+  assert.equal(A.ad.A, B.ad.A, "A² 必須只依樣本值，不依輸入列位置");
+  assert.equal(A.ad.p, B.ad.p, "p 值必須只依樣本值，不依輸入列位置");
+  assert.equal(A.xv.rows.find(x => x.k === "常態性").st, B.xv.rows.find(x => x.k === "常態性").st);
+});
+
+test("D-R7: 只有 Nelson 規則 7 時，摘要明確顯示低變異警訊而非未觸發", () => {
+  const z = [0.39970568963326525, -0.862040838226676, -0.1013269067276269, -0.744498452078551, -0.661023699073121,
+    -0.4477773355320096, 0.6554959328379483, -0.0074705631472170575, -0.11420027031563218, 0.21997522339224818,
+    0.48363933297805495, -0.014352352079004094, 0.17607804690487694, -0.06405330877751114, -0.30887053557671607];
+  const nelX = c.nelson(z);
+  assert.deepEqual(Array.from(nelX.rules.filter(r => r.idx.length), r => r.id), [7]);
+  const rows = z.map((v, i) => ({ board: `B${i + 1}`, pad: "P1", comp: "P1", group: "G", volume: 100 + v, height: 120 + i * 0.01, area: 100 + i * 0.01 }));
+  const A = c.analyze(st(rows));
+  A.nelX = nelX;
+  const summary = c.crossValidate(A).rows.find(x => x.k === "管制狀態");
+  assert.equal(summary.st, "warn");
+  assert.match(summary.ev, /規則 7/);
+  assert.match(summary.ev, /不列為製程失穩/);
+  assert.doesNotMatch(summary.ev, /皆未觸發/);
+});
+
+test("D-SPACE: 群組置中後的空間偏相關自由度扣除群組效果", () => {
+  const rows = [];
+  for (let b = 0; b < 10; b++) for (let g = 0; g < 3; g++) for (let p = 0; p < 20; p++) {
+    const x = (p % 10) * 5, y = Math.floor(p / 10) * 5;
+    const noise = (((p * 7) % 11) - 5) * 0.5;
+    rows.push({ board: `B${b + 1}`, pad: `G${g}-P${p}`, comp: `G${g}`, group: `G${g}`, x, y,
+      volume: 90 + g * 20 + x * 0.5 + y * 0.12 + noise + ((b % 3) - 1) * 0.2, height: 120, area: 100 });
+  }
+  const issue = c.detectIssues(st(rows)).find(x => x.rule_id.startsWith("空間偏相關") && x.metric === "體積");
+  assert.ok(issue, "合成座標梯度需產生空間偏相關卡");
+  assert.match(issue.z, /df = 56/, "n=60、3 個群組估計效果及 1 個斜率，自由度應為 60−3−1=56");
+});
+
+test("D-XBAR: 25 板樣本數不等時，X̄ 圖與 Nelson 卡使用同一加權總平均和規則", () => {
+  const means = [-0.03200873977039009, -0.7153201182372868, -0.9299620600650087, -0.47056447621434927, -0.8342999551678076,
+    -0.6503820777870715, -0.49709215166512877, -0.7804447775706649, -0.7475894769886509, -0.07431758241727948,
+    -0.3035069709876552, 0.11985174287110567, -0.19516100140754133, 0.3628164096735418, 0.21218805422540754,
+    -0.3665263829752803, -1.0281890021869913, -0.9861722220666707, -0.9317986915120855, -0.25599010195583105,
+    -0.4682436134899035, -0.4239359558559954, -0.39240301924292, -0.16041315998882055, 0.2900482373079285];
+  const counts = [2, 3, 1, 5, 4, 1, 1, 1, 11, 1, 1, 20, 1, 35, 34, 35, 13, 1, 1, 1, 4, 1, 1, 1, 1];
+  const rows = [];
+  for (let i = 0; i < means.length; i++) for (let j = 0; j < counts[i]; j++)
+    rows.push({ board: `B${String(i + 1).padStart(2, "0")}`, pad: `P${j}`, comp: `P${j}`, group: "G",
+      volume: 100 + means[i], height: 120 + (j % 2) * 0.01, area: 100 + (j % 3) * 0.01 });
+  const S = st(rows, { chart: "xbars" });
+  const A = c.analyze(S);
+  const cards = c.detectIssues(S).filter(x => x.category === "管制圖規則" && x.metric === "體積");
+  const cardRules = Array.from(new Set(Array.from(cards, x => Number(x.rule_id.match(/(\d+)$/)[1])))).sort((a, b) => a - b);
+  const chartRules = Array.from(A.nelX.rules.filter(r => r.idx.length && r.id !== 7), r => r.id).sort((a, b) => a - b);
+  assert.ok(Math.abs(A.xs.cl - c.mean(rows.map(r => r.volume))) < 1e-10, "X̄ 中心線應為依各板量測數加權的總平均");
+  assert.deepEqual(chartRules, cardRules, `X̄ 圖觸發 ${chartRules.join(",")}，卡片觸發 ${cardRules.join(",")}`);
+  assert.equal(chartRules.length, 5, "此 25 板反例在共用中心線下應有 5 條規則");
+});
+
+test("D-EVIDENCE: 形貌與停線迷你圖按板顯示觀測值，不複製全批統計量", () => {
+  const boardBridge = [2, 1, 0], boardPeak = [0, 1, 2];
+  const morphRows = [];
+  for (let b = 0; b < 3; b++) for (let p = 0; p < 6; p++) morphRows.push({
+    board: `M${b + 1}`, pad: `P${p}`, comp: `P${p}`, group: "G", volume: 95 + b * 2 + p * 0.1, height: 120, area: 100,
+    bridgemargin: p < boardBridge[b] ? 20 : 35, peaking: p < boardPeak[b] ? 40 : 10
+  });
+  const morph = c.detectIssues(st(morphRows));
+  const bridge = morph.find(x => x.rule_id === "形貌缺陷 橋接餘裕");
+  const peak = morph.find(x => x.rule_id === "形貌缺陷 脫模拉尖");
+  assert.deepEqual(Array.from(bridge.ev.values), boardBridge, "橋接小圖應為各板真實風險焊墊數");
+  assert.deepEqual(Array.from(peak.ev.values), boardPeak, "拉尖小圖應為各板真實超標焊墊數");
+
+  const means = [95, 105, 100, 110, 90, 102, 99, 104, 101, 75], pauseRows = [];
+  for (let b = 0; b < means.length; b++) for (let p = 0; p < 5; p++) pauseRows.push({
+    board: `P${String(b + 1).padStart(2, "0")}`, pad: `P${p}`, comp: `P${p}`, group: "G", ts: (b < 9 ? b : 39) * 60000,
+    volume: means[b], height: 120, area: 100
+  });
+  const pause = c.detectIssues(st(pauseRows)).find(x => x.rule_id === "停線時效 PauseDecay");
+  assert.ok(pause, "停線後體積下降資料需產生停線卡");
+  assert.deepEqual(Array.from(pause.ev.values), means, "停線小圖應顯示各板實際體積平均，不使用 100% 合成基準");
+
+  const lisaRows = [];
+  for (let y = 0; y < 10; y++) for (let x = 0; x < 10; x++) {
+    const hot = (x < 5 && y < 5) || (x >= 5 && y >= 5);
+    lisaRows.push({ board: "L1", pad: `P${y * 10 + x}`, comp: `P${y * 10 + x}`, group: "G", x: x * 5, y: y * 5,
+      volume: (hot ? 120 : 80) + ((x * 3 + y) % 7), height: 120, area: 100 });
+  }
+  const lisa = c.detectIssues(st(lisaRows)).find(x => x.rule_id === "空間自相關 MoranLISA");
+  assert.ok(lisa, "空間群聚資料需產生 LISA 摘要卡");
+  assert.equal(lisa.ev.type, "bars", "LISA 摘要小圖應顯示實測焊墊殘差");
+  assert.equal(lisa.ev.values.length, 10, "LISA 小圖應顯示前 10 個實際焊墊值");
+  assert.ok(new Set(lisa.ev.values).size > 1, "LISA 小圖不可將全域 Moran's I 複製成板序列");
+});
