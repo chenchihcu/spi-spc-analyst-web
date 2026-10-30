@@ -91,6 +91,10 @@ test('3. 主頁 Head Meta 與 CSS Tokens (spi-spc.html)', () => {
   assert.doesNotMatch(htmlSource, /html\s*\{[^}]*overflow-x:\s*hidden/i, '不可在 html 使用 overflow-x:hidden');
 });
 
+test('問題地圖的手機網格依列自動排版，避免多板格形成隱式欄而撐寬頁面', () => {
+  assert.match(htmlSource, /\.pmap-cells\.pmap-boards\{[^}]*grid-auto-flow:\s*row/i);
+});
+
 test('4. 行動版 DOM 結構與分頁控制 (JSDOM 驗證)', { skip: !JSDOM && '未安裝 jsdom' }, async () => {
   const dom = new JSDOM(htmlSource.replace(/<script src=[^>]+><\/script>/g, ''), {
     runScripts: 'dangerously',
@@ -245,6 +249,24 @@ test('7. 版面回歸：同權重 CSS 的先後順序、flex 壓縮與行內高�
   // f. 欄位容器是直向 flex，flex-basis 會變成高度：版本欄位不可用 flex 基準寬
   const rev = htmlSource.match(/<input[^>]*id="placeRev"[^>]*>/)[0];
   assert.doesNotMatch(rev, /flex:/, '#placeRev 不可設定 flex（會變成 90px 高）');
+
+  // g. 登入後主頁的版本資訊在手機標題列換到第二行，並保留 sticky 內容與對話框的頂部偏移
+  const mobileStart = at('@media (max-width:600px), (pointer:coarse) and (max-height:500px){');
+  const shortStart = at('\n@media (pointer:coarse) and (max-height:500px){');
+  const mobile = htmlSource.slice(mobileStart, shortStart);
+  const versionRule = mobile.match(/\.brand \.ver\{([^}]*)\}/)?.[1] || '';
+  assert.match(mobile, /:root\{--navbar-h:76px\}/, '手機標題列需為版本資訊預留換行高度');
+  assert.match(versionRule, /flex:0 0 100%/, '手機版本資訊需獨佔第二行');
+  assert.match(versionRule, /white-space:normal/, '手機版本資訊需可換行');
+  assert.match(versionRule, /overflow-wrap:anywhere/, '最窄螢幕不可被版本資訊撐出橫向溢出');
+  assert.match(mobile, /\.brand \.ver \.num\{white-space:nowrap\}/, '日期時間數值需保持完整，不在日期與時分秒中間斷行');
+  assert.doesNotMatch(mobile, /\.brand \.ver\{[^}]*display:none/, '手機主畫面不可隱藏版本資訊');
+  assert.match(mobile, /\.sticky\{position:sticky!important;top:calc\(var\(--navbar-h\) \+ var\(--safe-t\)\)!important;/,
+    '手機內容 sticky 偏移需跟隨新增的標題列高度');
+  const short = htmlSource.slice(shortStart, htmlSource.indexOf('\n}', shortStart));
+  assert.match(short, /:root\{--navbar-h:52px\}/, '短螢幕觸控版需使用較緊湊的兩行標題列');
+  assert.match(short, /\.sticky\{top:calc\(var\(--navbar-h\) \+ var\(--safe-t\)\)!important\}/,
+    '短螢幕觸控版 sticky 偏移需跟隨標題列高度');
 });
 
 test('8. 版面回歸：最終發布巡檢（1440／820／390／320 × 明亮／深色）找到的問題', () => {

@@ -12,7 +12,7 @@ const ROOT = path.join(__dirname, '..');
 const htmlSource = fs.readFileSync(path.join(ROOT, 'spi-spc.html'), 'utf8');
 const headersSource = fs.readFileSync(path.join(ROOT, '_headers'), 'utf8');
 
-function createDom({ width = 1280, height = 800, coarse = false, threeRendererThrows = false, cloud = null } = {}) {
+function createDom({ width = 1280, height = 800, coarse = false, threeRendererThrows = false, cloud = null, fetchImpl = null } = {}) {
   const virtualConsole = new VirtualConsole();
   const cleanHtml = htmlSource.replace(/<script src=[^>]+><\/script>/g, '');
   let curWidth = width;
@@ -140,6 +140,7 @@ function createDom({ width = 1280, height = 800, coarse = false, threeRendererTh
         }
         return new Response('{}', { status: 200 });
       };
+      if (fetchImpl) window.fetch = fetchImpl;
       if (cloud) installBrowserCloud(window, cloud);
     },
   });
@@ -199,11 +200,11 @@ test('步驟 7 (D-07 & 第 7 節): 11 組視口矩陣 data-layout 判定與 CSS 
     );
   }
 
-  // 手機橫向 932×430 頂部黏性高度 <= 96px (36 + 50 = 86px) 與 .mtab 橫向安全區 padding
+  // 手機橫向 932×430 頂部黏性高度由 --navbar-h 壓縮至 52px，與 .mtab 橫向安全區 padding
   assert.match(
     htmlSource,
-    /@media\s*\(pointer:\s*coarse\)\s+and\s+\(max-height:\s*500px\)\s*\{[\s\S]*?header\.top\s*\{[^}]*height:\s*calc\(36px\s*\+\s*var\(--safe-t\)\)/i,
-    '手機橫向 header.top 高度應壓縮至 36px（與 .sticky 合計 <= 96px）'
+    /@media\s*\(pointer:\s*coarse\)\s+and\s+\(max-height:\s*500px\)\s*\{[\s\S]*?--navbar-h:\s*52px[\s\S]*?header\.top\s*\{[^}]*height:\s*calc\(var\(--navbar-h\)\s*\+\s*var\(--safe-t\)\)/i,
+    '手機橫向 header.top 與 .sticky 應共用 52px 的 --navbar-h'
   );
   assert.match(
     htmlSource,
@@ -223,6 +224,71 @@ test('步驟 7 (D-07 & 第 7 節): 11 組視口矩陣 data-layout 判定與 CSS 
     '無彈窗規範下 .sheet-backdrop 必須隱藏'
   );
 
+  dom.window.close();
+});
+
+test('步驟 7 (D-53): 匯入流程狀態、錯誤導引、來源說明與共用搜尋', async () => {
+  const dom = createDom();
+  const { document, SPI_TEST_HOOK: hook } = dom.window;
+  await hook.RecDB.ready;
+  const csv = 'Board,Pad,Component,Package,Volume(%),Height(um),Area(%)\nB1,P1,U1,QFN,100,120,100\nB1,P2,U1,QFN,102,121,99\nB2,P1,U1,QFN,98,119,101\nB2,P2,U1,QFN,101,120,100';
+
+  hook.startImport(csv, 'incoming.csv');
+  assert.equal(document.querySelector('[data-flow-step="file"]').dataset.state, 'done');
+  assert.equal(document.querySelector('[data-flow-step="mapping"]').dataset.state, 'done');
+  assert.match(document.getElementById('impSourceSummary').textContent, /伺服器指紋會在保存時建立並驗證/);
+  assert.match(document.getElementById('impSourceSummary').textContent, /尚未形成歷史規格快照/);
+  assert.equal(hook.importSearchMatch({ supplierWo: 'SUP-001', name: 'spi.csv' }, 'sup-001'), true);
+  assert.equal(hook.importSearchMatch({ supplierWo: 'SUP-001', name: 'spi.csv' }, 'missing'), false);
+
+  document.getElementById('selSide').value = 'TOP';
+  await document.getElementById('btnApply').onclick();
+  const summary = document.getElementById('impValidationSummary');
+  assert.equal(summary.hidden, false);
+  assert.match(summary.textContent, /請填寫料號、版次/);
+  assert.equal(document.getElementById('inPart').getAttribute('aria-invalid'), 'true');
+  assert.match(document.getElementById('inPartError').textContent, /產品料號/);
+  const jump = summary.querySelector('[data-import-error-jump]');
+  assert.equal(jump.hidden, false);
+  jump.click();
+  assert.equal(document.activeElement, document.getElementById('inPart'), '錯誤摘要按鈕應將焦點移到第一個必填欄位');
+
+  document.getElementById('inPart').value = 'PART-01';
+  document.getElementById('inRev').value = 'V1';
+  document.getElementById('inWorkOrder').value = 'WO-001';
+  await document.getElementById('btnApply').onclick();
+  assert.match(document.getElementById('recNote').textContent, /有效受控座標檔/);
+  assert.match(summary.textContent, /有效受控座標檔/);
+  assert.equal(document.getElementById('btnSelectPlace').getAttribute('aria-invalid'), 'true');
+  assert.match(document.getElementById('btnSelectPlaceError').textContent, /同料號、版次與面別/);
+
+  hook.startImport('Board,Pad,Component\nB1,P1,U1\nB2,P1,U1', 'without-measurement.csv');
+  assert.equal(document.querySelector('[data-flow-step="mapping"]').dataset.state, 'error');
+  assert.equal(document.getElementById('btnApply').disabled, true);
+  assert.match(document.getElementById('impFlowStatus').textContent, /找不到數值欄位/);
+  dom.window.close();
+});
+
+test('步驟 7 (D-54): 開啟已存紀錄時呈現完整檔案指紋與未知歷史規格來源', async () => {
+  const cloud = await createCloudHarness();
+  const csv = 'Board,Pad,Component,Package,Volume(%),Height(um),Area(%)\nB1,P1,U1,QFN,100,120,100\nB1,P2,U1,QFN,102,121,99\nB2,P1,U1,QFN,98,119,101\nB2,P2,U1,QFN,101,120,100';
+  const place = await cloud.upload({ kind: 'place', part: 'PART-54', rev: 'V1', side: 'TOP', unit: 'mm', name: 'layout-54.csv' },
+    'RefDes,X,Y,Layer\nU1,1,2,TOP\n');
+  const rec = await cloud.upload({
+    kind: 'spi', lot: 'LOT-54', part: 'PART-54', rev: 'V1', side: 'TOP',
+    workOrder: 'WO-54', placeId: place.id, vendor: 'generic', name: 'measured-54.csv', stencil: 120,
+  }, csv);
+  const dom = createDom({ cloud });
+  const { document, SPI_TEST_HOOK: hook } = dom.window;
+  await hook.RecDB.ready;
+
+  await hook.openRecord(rec);
+  const summary = document.getElementById('impSourceSummary');
+  assert.equal(summary.hidden, false);
+  assert.match(summary.textContent, /measured-54\.csv/);
+  assert.ok(summary.textContent.includes(rec.sha256), '來源摘要應顯示完整 SHA-256');
+  assert.match(summary.textContent, /原始規格來源未知/);
+  assert.match(summary.textContent, /本次規格/);
   dom.window.close();
 });
 
@@ -408,5 +474,24 @@ test('步驟 7 (D-19 & D-52): 觸控裝置 hitRadius: 24、toast <= 4s 含關閉
   assert.equal(dupNotice.hidden, false, '409 重複上傳後 #impDupNotice 必須持續顯示（hidden=false）');
   assert.match(dupNotice.textContent, /這個檔案已存過.*admin@example\.test/, '#impDupNotice 應包含既有紀錄上傳者與說明');
 
+  dom.window.close();
+});
+
+test('FR-6: 載入驗證後的知識庫規則不應因覆寫常數失敗', async () => {
+  const payload = JSON.parse(fs.readFileSync(path.join(ROOT, 'vendor', 'spi-process-kb-rules.json'), 'utf8'));
+  let fetchCount = 0;
+  const dom = createDom({
+    fetchImpl: async url => {
+      assert.equal(url, 'vendor/spi-process-kb-rules.json');
+      fetchCount++;
+      return { ok: true, json: async () => payload };
+    },
+  });
+  const { SPI_TEST_HOOK } = dom.window;
+  await SPI_TEST_HOOK.loadSpiKbRules();
+
+  assert.ok(fetchCount > 0, '應向既有規則檔來源發出載入請求');
+  assert.equal(SPI_TEST_HOOK.getSpiKbRulesLoadError(), null);
+  assert.deepEqual(Array.from(SPI_TEST_HOOK.getSpiKbRules(), rule => rule.id), payload.rules.map(rule => rule.id));
   dom.window.close();
 });
