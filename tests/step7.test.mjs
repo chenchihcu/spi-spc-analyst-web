@@ -269,7 +269,7 @@ test('步驟 7 (D-53): 匯入流程狀態、錯誤導引、來源說明與共用
   dom.window.close();
 });
 
-test('步驟 7 (D-54): 開啟已存紀錄時呈現完整檔案指紋與未知歷史規格來源', async () => {
+test('步驟 7 (D-54): 開啟已存紀錄時呈現完整檔案指紋並區分未指定與未知歷史規格', async () => {
   const cloud = await createCloudHarness();
   const csv = 'Board,Pad,Component,Package,Volume(%),Height(um),Area(%)\nB1,P1,U1,QFN,100,120,100\nB1,P2,U1,QFN,102,121,99\nB2,P1,U1,QFN,98,119,101\nB2,P2,U1,QFN,101,120,100';
   const place = await cloud.upload({ kind: 'place', part: 'PART-54', rev: 'V1', side: 'TOP', unit: 'mm', name: 'layout-54.csv' },
@@ -287,6 +287,14 @@ test('步驟 7 (D-54): 開啟已存紀錄時呈現完整檔案指紋與未知歷
   assert.equal(summary.hidden, false);
   assert.match(summary.textContent, /measured-54\.csv/);
   assert.ok(summary.textContent.includes(rec.sha256), '來源摘要應顯示完整 SHA-256');
+  assert.match(summary.textContent, /匯入時未指定已存規格/);
+  assert.doesNotMatch(summary.textContent, /原始規格來源未知/);
+  assert.match(summary.textContent, /不自動套用目前預設/);
+  assert.match(summary.textContent, /本次分析選用/);
+
+  // 舊紀錄沒有保存 specContext，仍顯示未知，不能與新紀錄的未指定混淆。
+  const legacyMeta = typeof rec.meta === 'string' ? JSON.parse(rec.meta) : rec.meta || {};
+  await hook.openRecord({ ...rec, specContext: null, meta: { ...legacyMeta, specContext: undefined } });
   assert.match(summary.textContent, /原始規格來源未知/);
   assert.match(summary.textContent, /本次規格/);
   dom.window.close();

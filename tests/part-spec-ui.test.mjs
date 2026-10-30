@@ -154,7 +154,7 @@ test("流程：鋼板厚度必填 → 未定義規格時鎖定 → 驗證與草�
   change(w, d.querySelector('#specGrpTbl input[data-q="lsl"]'), 70);
   assert.equal(w.eval("S.specDraft.groups.U2.volume.lsl"), 70);
   $("#btnSpecSave").click();
-  assert.equal($("#specSaveDefault").checked, true); $("#specSaveDefault").checked = false;
+  assert.equal($("#specSaveDefault").checked, false, "歷史引用不保存可變的目前預設旗標"); $("#specSaveDefault").checked = false;
   await $("#specSaveOk").onclick();
   assert.equal(w.eval("S.partSpec.ver"), 2); assert.equal(w.eval("S.partSpec.isDefault"), false);
   assert.equal(w.eval("S.specsG.U2.volume.lsl"), 70); assert.equal(w.eval("S.specsG.U2.area.lsl"), 70, "群組未覆寫項目補全板值");
@@ -227,5 +227,31 @@ test("流程：鋼板厚度必填 → 未定義規格時鎖定 → 驗證與草�
   // 11. 範例回合仍可直接分析
   w.eval("SPI_TEST_HOOK.switchRun(S.runs[0].id)");
   assert.equal(w.eval("S.specSrc"), "sample"); assert.ok(w.eval("!!S.A"));
+
+  // 11. 預設改成 v2 後重開已用 v1 的量測，仍載入伺服器保存的 v1 歷史快照。
+  const versions = JSON.parse(JSON.stringify(await w.SPI_TEST_HOOK.RecDB.specsFor("NEW-1")));
+  const v2 = versions.find(x => x.ver === 2);
+  await w.SPI_TEST_HOOK.RecDB.setDefaultSpec(v2.id);
+  const records = JSON.parse(JSON.stringify(await w.SPI_TEST_HOOK.RecDB.list()));
+  const saved = records.find(x => x.lot === "L2");
+  assert.equal(saved.specContext.ver, 1);
+  assert.equal(saved.stencil, 100);
+  const beforeOpen = w.eval("S.runs.length");
+  await w.SPI_TEST_HOOK.openRecord(saved, { autoApply: true });
+  assert.ok(await until(() => w.eval("S.runs.length") === beforeOpen + 1));
+  assert.equal(w.eval("S.specSrc"), "part");
+  assert.equal(w.eval("S.partSpec.ver"), 1, "不受目前預設 v2 影響");
+  assert.equal(w.eval("S.partSpec.source"), "historical");
+  assert.match($("#partSpecBar").textContent, /歷史引用/);
+
+  // 12. 模擬沒有歷史快照的舊紀錄：不得自動套用目前預設，並保持分析鎖定。
+  const legacy = records.find(x => x.lot === "L1");
+  assert.equal(legacy.stencil, 100, "雲端已存厚度從 metadata 還原");
+  await w.SPI_TEST_HOOK.openRecord({ ...legacy, meta: { ...legacy.meta, specContext: undefined }, specContext: null }, { autoApply: true });
+  assert.ok(await until(() => w.eval("S.runs.length") === beforeOpen + 2), "歷史載入未完成：" + JSON.stringify({ legacyId: legacy?.id, note: $("#recNote").textContent, parseError: $("#parseErr").textContent }));
+  assert.equal(w.eval("S.specSrc"), "none");
+  assert.equal(w.eval("S.specContextState"), "historical_missing");
+  assert.equal(w.eval("S.partSpec"), null);
+  assert.match($("#partSpecBar").textContent, /歷史規格未保存，分析已鎖定/);
   assert.deepEqual(errs, []);
 });

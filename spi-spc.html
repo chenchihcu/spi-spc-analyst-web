@@ -770,7 +770,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.12.2</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.12.3</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -2448,7 +2448,7 @@ function formatSidedPpmBlock(block, fmt = (v) => String(Math.round(v))) {
 /* @windows-parity END */
 /* Number.isFinite：空白座標欄解析為 null，全域 isFinite(null) 會當成 0 */
 const realXY=r=>Boolean(r&&!r.gridPos&&Number.isFinite(r.x)&&Number.isFinite(r.y));
-const S={rows:[],metrics:[],metric:"volume",group:ALL_GRP,chart:"xbars",relChart:"specScatter",pad:null,board:null,specSrc:"sample",partSpec:null,specDraft:null,specsG:null,sqDir:"Y",specs:JSON.parse(JSON.stringify(DEF_SPECS)),stencil:120,htol:{lo:75,hi:125},step:{on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]},selZone:1,wipe:5,aperture:{groups:{}},geometryPads:null,padCoverage:null,pendingVerify:false,runVendor:"generic",ovCapSnap:null,ovCapSnapKey:"",source:"範例資料",tab:"issues",F:[],issLv:"all",issCat:"all",issEnt:null,ctx:null,colorMode:"status",exag:20,ghost:true,bridgeWarn:true,csAxis:"X",selectedPad:null,A:null,ai:"",aiModel:""};
+const S={rows:[],metrics:[],metric:"volume",group:ALL_GRP,chart:"xbars",relChart:"specScatter",pad:null,board:null,specSrc:"sample",partSpec:null,specDraft:null,specContextState:"none",specsG:null,sqDir:"Y",specs:JSON.parse(JSON.stringify(DEF_SPECS)),stencil:120,htol:{lo:75,hi:125},step:{on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]},selZone:1,wipe:5,aperture:{groups:{}},geometryPads:null,padCoverage:null,pendingVerify:false,runVendor:"generic",ovCapSnap:null,ovCapSnapKey:"",source:"範例資料",tab:"issues",F:[],issLv:"all",issCat:"all",issEnt:null,ctx:null,colorMode:"status",exag:20,ghost:true,bridgeWarn:true,csAxis:"X",selectedPad:null,A:null,ai:"",aiModel:""};
 loadSpiKbRules();
 
 /* 階梯鋼板：由上而下第一個符合的區域生效，否則用基礎厚度 */
@@ -5263,7 +5263,7 @@ function overallVerdict(st,F){
 /* 判定規格來源（報告、PDF、AI 資料與各匯出檔共用同一段文字） */
 function specSrcText(){
   if(S.specSrc==="sample")return"示範規格（範例資料，非使用者定義）";
-  const p=S.partSpec;if(S.specSrc==="part"&&p)return`料號規格 ${p.part} v${p.ver}（SHA-256 ${String(p.sha||"").slice(0,12)}）${p.stencilRef&&p.stencilRef!==S.stencil?`；規格存檔時鋼板厚度 ${p.stencilRef} µm，本回合 ${S.stencil} µm`:""}${(rp=>rp&&rp!==p.part?`；⚠ 規格料號 ${p.part} 與本回合料號 ${rp} 不同`:"")(typeof runPart==="function"?runPart():"")}`;   // runPart 屬 UI 區段；核心單獨載入（Worker／測試）時不存在
+  const p=S.partSpec;if(S.specSrc==="part"&&p)return`料號規格 ${p.part} v${p.ver}（SHA-256 ${String(p.sha||"").slice(0,12)}）${p.source==="historical"?"（歷史引用）":p.source==="analysis_selected"?"（本次分析選用）":p.source==="captured"?"（本筆量測已保存）":""}${p.stencilRef&&p.stencilRef!==S.stencil?`；規格存檔時鋼板厚度 ${p.stencilRef} µm，本回合 ${S.stencil} µm`:""}${(rp=>rp&&rp!==p.part?`；⚠ 規格料號 ${p.part} 與本回合料號 ${rp} 不同`:"")(typeof runPart==="function"?runPart():"")}`;   // runPart 屬 UI 區段；核心單獨載入（Worker／測試）時不存在
   return"尚未套用料號規格";
 }
 const ISS_CSV_COLS=["no","level","category","title","rule_id","rule_name","metric","boards","subboard","group","refdes","pads","observed","limit","z","p","facts","inference","confidence","action","corroborated_by","same_phenomenon","explained_pads","spec_source"];
@@ -7471,7 +7471,9 @@ function renderSpecTbl(){const sm=S.specSrc==="sample",part=runPart(),v=specView
   const draftPill=dirty?' <span class="pill warn">已修改，尚未存成新版本</span>':"";
   $("#partSpecBar").innerHTML=sm?'<span class="pill ok">示範規格</span> <span class="note">範例資料使用內建示範規格，僅供操作示範；匯入自己的量測紀錄後，規格須由你定義並存成料號規格。</span>'
     :!part?'<span class="pill ng">此回合沒有產品料號</span> <span class="note">無法定義料號規格，分析已鎖定。請從資料庫重新開啟，或重新匯入並填寫產品料號。</span>'
-    :S.specSrc==="part"&&ps?`料號 <b>${esc(ps.part)}</b> · v${ps.ver}${ps.isDefault?"（預設）":""} · SHA-256 <span class="mono">${esc(String(ps.sha||"").slice(0,12))}</span>… · ${esc(ps.user||"")} · ${esc(fmtTime(ps.created))}${draftPill}`
+    :S.specSrc==="part"&&ps?`料號 <b>${esc(ps.part)}</b> · v${ps.ver}${ps.isDefault?"（預設）":""} · SHA-256 <span class="mono">${esc(String(ps.sha||"").slice(0,12))}</span>…${ps.user||ps.created?` · ${esc(ps.user||"")} · ${esc(fmtTime(ps.created))}`:""}${ps.source==="historical"?' <span class="pill ok">歷史引用</span>':ps.source==="analysis_selected"?' <span class="pill warn">本次分析選用</span>':ps.source==="captured"?' <span class="pill ok">本筆量測已保存</span>':""}${draftPill}`
+    :S.specContextState==="historical_missing"?`料號 <b>${esc(part)}</b> <span class="pill warn">歷史規格未保存，分析已鎖定</span> <span class="note">不套用目前預設；可從版本清單明確選版，並標示為本次分析選用。</span>${draftPill}`
+    :S.specContextState==="unassigned"?`料號 <b>${esc(part)}</b> <span class="pill warn">尚未定義規格，分析已鎖定</span> <span class="note">此量測未指定已存版本；請先明確選用或建立規格。</span>${draftPill}`
     :`料號 <b>${esc(part)}</b> <span class="pill warn">尚未定義規格，分析已鎖定</span>${draftPill}`;
   $("#btnSpecSave").disabled=sm||!part||(S.specSrc==="part"&&!!ps&&!dirty);$("#btnSpecDiscard").disabled=sm||!S.specDraft;$("#btnSpecVers").disabled=sm||!part;
   $("#specSrcNote").textContent=sm?"":S.specSrc==="part"&&ps?"修改下表後按「儲存為新版本」才會生效；存檔前分析仍使用目前套用的版本。"
@@ -7501,15 +7503,25 @@ function closeModal(id){const m=$("#"+id);if(m.hidden)return;m.classList.remove(
 function askDiscard(msg){return new Promise(ok=>{const m=$("#specConfirmModal");let done=false;$("#specConfirmMsg").textContent=msg;
   m._onClose=()=>{if(!done){done=true;ok(false)}};$("#specConfirmOk").onclick=()=>{done=true;closeModal("specConfirmModal");ok(true)};openModal("specConfirmModal","[data-close]")})}
 /* 套用一個已存檔的料號規格版本（rec 來自資料庫紀錄，spec 為已驗證的規格檔） */
-const partSpecInfo=(rec,spec,groups)=>({id:rec.id,part:rec.part,ver:rec.ver||0,sha:rec.sha256,isDefault:!!rec.isDefault,user:rec.user||"",created:rec.created||0,note:spec.note||"",stencilRef:spec.stencilRef,groups});
+const partSpecInfo=(rec,spec,groups,source="saved")=>({id:rec.id,part:rec.part,ver:rec.ver||0,sha:rec.sha256,isDefault:!!rec.isDefault,user:rec.user||"",created:rec.created||0,note:spec.note||"",stencilRef:spec.stencilRef,groups,source});
 function gotoSpecCard(){const el=$("#partSpecBar");if(el&&el.scrollIntoView){el.closest(".card").scrollIntoView({block:"start"});scrollBy(0,-stickyH()-8)}}
 function useSpec(rec,spec){const st=partSpecToState(spec,S.stencil);S.specSrc="part";S.specs=st.specs;S.htol=st.htol;S.specsG=st.specsG;
-  S.partSpec=partSpecInfo(rec,spec,st.groups);S.specDraft=null;
+  S.partSpec=partSpecInfo(rec,spec,st.groups,"analysis_selected");S.specContextState="analysis_selected";S.specDraft=null;
   saveRunsSoon();syncControls();recompute()}
 /* 取回版本並驗證指紋與內容 */
 async function loadSpecRec(rec){const g=await RecDB.get(rec);if(!g.ok)throw new Error(`規格 v${rec.ver} 的指紋與存檔時不同，已停止套用`);
   const sc=partSpecBodyCheck(g.bytes,{part:rec.part});if(sc.error)throw new Error(sc.error);return sc.spec}
 async function defaultSpecFor(part){if(!part)return null;const def=(await RecDB.specsFor(part)).find(x=>x.isDefault);return def?{rec:def,spec:await loadSpecRec(def)}:null}
+/* 重開量測只讀伺服器保存的歷史規格快照；舊紀錄沒有快照時不可套用目前預設。 */
+async function savedSpecForRecord(rec){let meta=rec&&rec.meta;if(typeof meta==="string"){try{meta=JSON.parse(meta)}catch(e){meta={}}}
+  const ctx=rec?.specContext||meta?.specContext;
+  if(!ctx)return{ps:null,state:"historical_missing"};
+  if(ctx.state==="unassigned")return{ps:null,state:"unassigned"};
+  if(ctx.state!=="captured"||!/^[A-Za-z0-9_-]{22}$/.test(ctx.id||"")||!Number.isSafeInteger(ctx.ver)||ctx.ver<1||!/^[a-f0-9]{64}$/.test(ctx.sha256||"")||!ctx.snapshot||typeof ctx.snapshot!=="object")
+    throw new Error("量測紀錄的歷史規格引用格式不可驗證，已停止套用");
+  const enc=partSpecEncode(ctx.snapshot);if(enc.error||enc.spec.part!==rec.part||partSpecCanon(ctx.snapshot)!==partSpecCanon(enc.spec))throw new Error(enc.error||"歷史規格內容或料號不可驗證，已停止套用");
+  if((await sha256Hex(enc.bytes))!==ctx.sha256)throw new Error("量測紀錄的歷史規格快照指紋不符，已停止套用");
+  return{ps:{rec:{id:ctx.id,part:rec.part,ver:ctx.ver,sha256:ctx.sha256,isDefault:false,user:"",created:0},spec:enc.spec,source:"historical"},state:"historical"}}
 async function savePartSpec(note,makeDefault){const part=runPart(),d=specDraft();
   const enc=partSpecEncode(stateToPartSpec(part,d,S.stencil,note));if(enc.error)throw new Error(enc.error);
   let rec;try{rec=await RecDB.create({kind:"spec",part,name:`規格_${part}.json`,note:enc.spec.note,basedOn:S.partSpec?S.partSpec.id:"",makeDefault},enc.bytes)}
@@ -7538,14 +7550,14 @@ const esc=x=>String(x??"").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&
 const clone=o=>JSON.parse(JSON.stringify(o));
 const withHpct=m=>m.includes("height")&&!m.includes("hpct")?[...m.slice(0,m.indexOf("height")+1),"hpct",...m.slice(m.indexOf("height")+1)]:m;
 const DEF_ZONES=()=>({on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]});
-function snapCfg(){return clone({specs:S.specs,specSrc:S.specSrc,partSpec:S.partSpec,specDraft:S.specDraft,specsG:S.specsG,sqDir:S.sqDir,stencil:S.stencil,htol:S.htol,step:S.step,aperture:S.aperture,wipe:S.wipe,geometryPads:S.geometryPads})}
+function snapCfg(){return clone({specs:S.specs,specSrc:S.specSrc,partSpec:S.partSpec,specDraft:S.specDraft,specContextState:S.specContextState,specsG:S.specsG,sqDir:S.sqDir,stencil:S.stencil,htol:S.htol,step:S.step,aperture:S.aperture,wipe:S.wipe,geometryPads:S.geometryPads})}
 /* 範例資料的回合設定：內建示範規格（不需使用者定義即可分析） */
-function sampleCfg(){const c=snapCfg();c.specSrc="sample";c.partSpec=null;c.specDraft=null;c.specsG=null;if(S.specSrc!=="sample"){c.specs=clone(DEF_SPECS);c.stencil=120;c.htol={lo:75,hi:125}}return c}
+function sampleCfg(){const c=snapCfg();c.specSrc="sample";c.partSpec=null;c.specDraft=null;c.specContextState="none";c.specsG=null;if(S.specSrc!=="sample"){c.specs=clone(DEF_SPECS);c.stencil=120;c.htol={lo:75,hi:125}}return c}
 function curRun(){return (S.runs&&S.runs.find(r=>r.id===S.runId))||null}
 function runState(run){return run.id===S.runId?{...S}:{...S,rows:run.rows,metrics:run.metrics,...clone(run.cfg)}}
 function addRun(name,rows,metrics,cfg,info){name=safeId(name)||"未命名回合";const id=Math.max(0,...S.runs.map(r=>r.id))+1;S.runs.push({id,name,rows,metrics:withHpct(metrics),cfg:cfg||snapCfg(),info:info||null,aoi:null,_rawRows:rows});return id}
 function switchRun(id){const c=curRun();if(c)c.cfg=snapCfg();const n=S.runs.find(r=>r.id===id);if(!n)return;
-  S.runId=id;S.rows=n.rows;S._rawRows=n._rawRows||n.rows;S.timeFilter=null;S.partialBoards=null;S.metrics=n.metrics;S.source=n.name;S.issEnt=null;S.ctx=null;S.specSrc="none";S.partSpec=null;S.specDraft=null;S.specsG=null;S.sqDir="Y";Object.assign(S,clone(n.cfg));delete S.specsCustom;S.group="ALL";S.board=null;S.pad=null;
+  S.runId=id;S.rows=n.rows;S._rawRows=n._rawRows||n.rows;S.timeFilter=null;S.partialBoards=null;S.metrics=n.metrics;S.source=n.name;S.issEnt=null;S.ctx=null;S.specSrc="none";S.partSpec=null;S.specDraft=null;S.specContextState="none";S.specsG=null;S.sqDir="Y";Object.assign(S,clone(n.cfg));delete S.specsCustom;S.group="ALL";S.board=null;S.pad=null;
   LOAD_ERROR.spi="";
   /* 規格一律由使用者定義：舊版的機台推估、自訂、工單、AOI 建議窗回合一律視為未定義（鎖定到套用料號規格為止）；範例資料用示範規格 */
   if(n.sample)S.specSrc="sample";else if(S.specSrc!=="part"||!S.partSpec||!S.partSpec.id){S.specSrc="none";S.partSpec=null;S.specsG=null}
@@ -7797,9 +7809,9 @@ function recFields(){if(!IMP)return;const rec=IMP.rec,demo=IMP.demo;$("#recRow")
   recPartNote()}
 /* 料號已有預設規格時，以規格存檔時的鋼板厚度預填（仍可修改；不覆蓋使用者已填的值） */
 let THK_SEQ=0;
-async function prefillImpThk(){const el=$("#inImpStencil"),part=safeId($("#inPart").value),seq=++THK_SEQ;if(!el||el.value||!part)return;
-  try{const def=(await RecDB.specsFor(part)).find(x=>x.isDefault);if(seq!==THK_SEQ||el.value||!def)return;const sp=await loadSpecRec(def);
-    if(seq===THK_SEQ&&!el.value&&thkOk(sp.stencilRef)){el.value=sp.stencilRef;if(IMP&&IMP.conv&&IMP.conv.hPct)reconvertThk();updateImportWorkflow()}}catch(e){}}
+async function prefillImpThk(){const el=$("#inImpStencil"),part=safeId($("#inPart").value),seq=++THK_SEQ,source=IMP;if(!el||el.value||!part||source?.rec)return;
+  try{const def=(await RecDB.specsFor(part)).find(x=>x.isDefault);if(IMP!==source||seq!==THK_SEQ||el.value||!def)return;const sp=await loadSpecRec(def);
+    if(IMP===source&&seq===THK_SEQ&&!el.value&&thkOk(sp.stencilRef)){el.value=sp.stencilRef;if(IMP&&IMP.conv&&IMP.conv.hPct)reconvertThk();updateImportWorkflow()}}catch(e){}}
 function reconvertThk(){if(!IMP||!IMP.conv||!IMP.conv.hPct||!thkOk(impThk())||IMP.conv.thk===impThk())return;try{convertImp(true);previewImport()}catch(e){$("#parseErr").textContent=e.message}}
 function recPartNote(){const n=$("#recNote");if(!IMP||IMP.demo){n.textContent="";return}if(IMP.rec){n.textContent=`來自資料庫的原始檔（${IMP.rec.user}，${fmtTime(IMP.rec.created)}），套用時不會重複存檔`;return}
   partHint("#inPart","#inPartHint");
@@ -7884,8 +7896,10 @@ function renderImportSourceSummary(){const box=$("#impSourceSummary");if(!box)re
     placeId?(PLACE?.recId===placeId?PLACE.part+" "+PLACE.rev+" "+PLACE.side+"（已載入原引用）":"來源紀錄有座標引用，但原檔目前未載入或無法驗證；不套用目前選取座標"):source?"原紀錄未記錄座標引用；不套用目前選取座標":PLACE?PLACE.part+" "+PLACE.rev+" "+PLACE.side+"（目前選取）":"尚未選取受控座標檔";
   const identity=source?[source.lot?"批號 "+source.lot:"",source.part?"料號 "+source.part:"",source.rev?"版次 "+source.rev:"",source.side?source.side+" 面":""].filter(Boolean).join("｜")||"歷史資料來源":"料號 "+($("#inPart")?.value||"待填")+"｜版次 "+($("#inRev")?.value||"待填");
   const lifecycle=source?(source.lifecycle==="active"?"有效":source.lifecycle==="pending_review"?"待管理者判定":source.lifecycle==="superseded"?"已被修正":"舊資料・未受控"):"尚未保存";
-  const historicalSpec=source?"未保存歷史規格版本 ID／指紋，原始規格來源未知。":"尚未形成歷史規格快照。";
-  box.innerHTML="<b>來源與資料脈絡</b><dl class=\"imp-source-grid\"><dt>紀錄識別</dt><dd>"+esc(identity)+"｜"+esc(lifecycle)+"</dd><dt>原始檔</dt><dd>"+esc(file)+"</dd><dt>檔案指紋</dt><dd>"+esc(fingerprint)+"</dd><dt>座標引用</dt><dd>"+esc(place)+"</dd><dt>歷史規格</dt><dd>"+esc(historicalSpec)+"</dd><dt>本次規格</dt><dd>套用時依現有規則查詢；結果另見「規格設定」，不代表歷史原值。</dd></dl>";box.hidden=false}
+  const context=source?.specContext||source?.meta?.specContext;
+  const historicalSpec=!source?"尚未形成歷史規格快照。":context?.state==="captured"?"已保存版本 v"+context.ver+"（ID "+context.id+"，SHA-256 "+context.sha256+"）；套用時驗證快照。":context?.state==="unassigned"?"匯入時未指定已存規格。":"未保存歷史規格版本 ID／指紋，原始規格來源未知。";
+  const currentSpec=current.rec?(context?.state==="captured"?"使用當時保存的快照；驗證失敗即停止，不回退目前預設。":"不自動套用目前預設；請在載入後明確選版，標示為本次分析選用。"):"新匯入會讀取目前預設規格；有選用版本時由伺服器保存快照，未指定時保持分析鎖定。";
+  box.innerHTML="<b>來源與資料脈絡</b><dl class=\"imp-source-grid\"><dt>紀錄識別</dt><dd>"+esc(identity)+"｜"+esc(lifecycle)+"</dd><dt>原始檔</dt><dd>"+esc(file)+"</dd><dt>檔案指紋</dt><dd>"+esc(fingerprint)+"</dd><dt>座標引用</dt><dd>"+esc(place)+"</dd><dt>歷史規格</dt><dd>"+esc(historicalSpec)+"</dd><dt>本次規格</dt><dd>"+esc(currentSpec)+"</dd></dl>";box.hidden=false}
 function updateImportWorkflow(){
   const root=$("#impFlowSteps"),summary=$("#impFlowStatus");
   if(!root||!summary)return;
@@ -7936,13 +7950,13 @@ $("#btnSaveProfile").onclick=()=>{if(!IMP)return;const name=safeId($("#inProfile
 const impThk=()=>{const v=parseFloat(($("#inImpStencil")||{}).value);return isFinite(v)?v:NaN};
 const thkOk=t=>isFinite(t)&&t>=30&&t<=300;
 /* 新回合的設定：料號有預設版就套用；沒有就鎖定到使用者定義並儲存為止 */
-function newRunCfg(thk,ps){const c=snapCfg();c.stencil=thk;c.specDraft=null;
-  if(ps){const st=partSpecToState(ps.spec,thk);Object.assign(c,{specSrc:"part",specs:st.specs,htol:st.htol,specsG:st.specsG,partSpec:partSpecInfo(ps.rec,ps.spec,st.groups)})}
+function newRunCfg(thk,ps,contextState=ps?"captured":"none"){const c=snapCfg();c.stencil=thk;c.specDraft=null;c.specContextState=contextState;
+  if(ps){const st=partSpecToState(ps.spec,thk);Object.assign(c,{specSrc:"part",specs:st.specs,htol:st.htol,specsG:st.specsG,partSpec:partSpecInfo(ps.rec,ps.spec,st.groups,ps.source||"captured")})}
   else Object.assign(c,{specSrc:"none",partSpec:null,specsG:null});return c}
 $("#btnApply").onclick=async()=>{if(!IMP||!IMP.res)return;const I0=IMP,demo=!!I0.demo,ti=$("#inImpStencil");let thk=demo?S.stencil:impThk();
   if(ti)ti.removeAttribute("aria-invalid");
   // 伺服器完成原始檔、受控座標與位號驗證後，才建立正式分析回合。
-  let src=null,ps=null;
+  let src=null,ps=null,specContextState="none",reusedExisting=false;
   const dn=$("#impDupNotice");if(dn){dn.hidden=true;dn.textContent=""}
   if(!demo){const lot=safeId($("#inLot").value),part=safeId($("#inPart").value),rev=safeId($("#inRev").value),
     workOrder=safeId($("#inWorkOrder").value),measuredDate=$("#inMeasuredDate").value,
@@ -7956,8 +7970,10 @@ $("#btnApply").onclick=async()=>{if(!IMP||!IMP.res)return;const I0=IMP,demo=!!I0
     if(!I0.rec&&!["TOP","BOT"].includes(impSide)){showImportFieldError("selSide","請選擇 TOP 或 BOT 面。");$("#recNote").innerHTML='<span class="err">請選擇量測面別</span>';$("#selSide").focus();return}
     if(!I0.rec&&(!PLACE?.recId||PLACE.part!==part||PLACE.rev!==rev||!PLACE.res.items.some(x=>x.side===impSide))){showImportFieldError("btnSelectPlace","請選擇同料號、版次與面別的有效受控座標檔。");$("#recNote").innerHTML='<span class="err">請選擇同料號、版次與面別的有效受控座標檔</span>';$("#btnSelectPlace").focus();return}
     if(RecDB.mode!=="cloud"&&!I0.rec){$("#recNote").innerHTML='<span class="err">正式新匯入必須連線並登入</span>';return}
-    busy(true,"正在讀取料號規格…");
-    try{ps=await defaultSpecFor(IMP.rec?IMP.rec.part:part)}catch(e){toast("無法取回料號規格："+e.message+"；此回合需重新套用規格")}
+    busy(true,"正在讀取量測所用規格…");
+    try{if(IMP.rec){const saved=await savedSpecForRecord(IMP.rec);ps=saved.ps;specContextState=saved.state}
+      else{ps=await defaultSpecFor(part);specContextState=ps?"captured":"unassigned"}}
+    catch(e){busy(false);$("#recNote").innerHTML='<span class="err">'+esc("無法驗證量測所用規格："+e.message+"；已停止套用")+'</span>';LOAD_ERROR.spi=e.message;updateLoadStates();return}
     busy(false);if(IMP!==I0)return;
     // 鋼板厚度未填時，沿用該料號預設規格存檔時的厚度；兩者都沒有就要求填寫
     if(!thkOk(thk)&&ps&&thkOk(ps.spec.stencilRef)){thk=ps.spec.stencilRef;if(ti)ti.value=thk}
@@ -7966,21 +7982,23 @@ $("#btnApply").onclick=async()=>{if(!IMP||!IMP.res)return;const I0=IMP,demo=!!I0
     if(IMP.conv&&IMP.conv.hPct&&IMP.conv.thk!==thk){try{convertImp(true);previewImport()}catch(e){$("#parseErr").textContent=e.message;return}if(!IMP.res)return}
     if(IMP.rec){if(IMP.rec.lifecycle==="pending_review"){$("#recNote").innerHTML='<span class="err">待判定紀錄不能套用到正式分析</span>';return}src=IMP.rec}
     else{busy(true,"正在存入資料庫…");
-      const qSnap=computeQualitySnapshot(I0.res,ps?{...S,...newRunCfg(thk,ps)}:null);
+      const qSnap=computeQualitySnapshot(I0.res,ps?{...S,...newRunCfg(thk,ps,"captured")}:null);
       const unmatched=[...new Set([...(I0.conv?.place?.missing||[]),...(I0.res?.info?.place?.missing||[])])].sort();
       if(unmatched.length&&!window.confirm(`以下 ${unmatched.length} 個位號在 ${impSide} 座標中找不到：\n${unmatched.join("、")}\n\n確認仍要匯入？這些量測保留在非位置統計，沒有座標。`)){busy(false);return}
-      try{src=await RecDB.create({kind:"spi",lot,part,rev,workOrder,measuredDate,supplierWo,outsourceWo,side:impSide,vendor:$("#selVendor").value,name:safeId(I0.name)||"量測紀錄.csv",rows:I0.res.rows.length,boards:I0.res.info.boards,pads:I0.res.info.pads,placeId:PLACE.recId,unmatchedRefs:unmatched,unmatchedConfirmed:!!unmatched.length,stencil:thk,...(qSnap?{qualitySnapshot:qSnap}:{}),...(I0.reimportOf?{sourceLegacyId:I0.reimportOf.id}:{})},I0.bytes)}
+      try{src=await RecDB.create({kind:"spi",lot,part,rev,workOrder,measuredDate,supplierWo,outsourceWo,side:impSide,vendor:$("#selVendor").value,name:safeId(I0.name)||"量測紀錄.csv",rows:I0.res.rows.length,boards:I0.res.info.boards,pads:I0.res.info.pads,placeId:PLACE.recId,...(ps?{specId:ps.rec.id}:{}),unmatchedRefs:unmatched,unmatchedConfirmed:!!unmatched.length,stencil:thk,...(qSnap?{qualitySnapshot:qSnap}:{}),...(I0.reimportOf?{sourceLegacyId:I0.reimportOf.id}:{})},I0.bytes)}
       catch(e){if(e.code==="unmatched_confirmation"&&e.missing?.length){busy(false);$("#recNote").textContent=`伺服器查出 ${e.missing.length} 個無座標位號：${e.missing.join("、")}。請核對座標檔與面別後重新套用。`;return}
         if(/^legacy_source_/.test(e.code||"")){busy(false);$("#recNote").innerHTML=`<span class="err">${esc(e.code==="legacy_source_mismatch"?"原始檔與舊紀錄不同，已停止":e.code==="legacy_source_missing"?"找不到要重新匯入的舊紀錄，請重新整理資料庫":"這筆紀錄不是舊量測紀錄，不能重新受控匯入")}；未建立回合</span>`;return}
-        if(e.existing){src=await recFind(e.existing).catch(()=>null);if(src){const changed=[["製令工單",workOrder,src.workOrder],["量測日期",measuredDate,src.measuredDate],["批號",lot,src.lot],["廠商工單",supplierWo,src.supplierWo],["外包工單",outsourceWo,src.outsourceWo]].filter(([,a,b])=>(a||"")!==(b||""));
+        if(e.existing){src=await recFind(e.existing).catch(()=>null);if(src){reusedExisting=true;const changed=[["製令工單",workOrder,src.workOrder],["量測日期",measuredDate,src.measuredDate],["批號",lot,src.lot],["廠商工單",supplierWo,src.supplierWo],["外包工單",outsourceWo,src.outsourceWo]].filter(([,a,b])=>(a||"")!==(b||""));
           const diff=changed.length?`；本次填寫與既有紀錄不同：${changed.map(([label,a,b])=>`${label}「${a||"未提供"}」／既有「${b||"未提供"}」`).join("、")}。請由管理者在資料庫修改並保留稽核。`:"";
           const dupMsg=`這個檔案已存過（${src.user}，${fmtTime(src.created)}），已開啟既有紀錄${diff}`;if(dn){dn.hidden=false;dn.textContent=dupMsg}$("#recNote").textContent=dupMsg;toast("已開啟既有量測紀錄")}}
         if(!src){busy(false);$("#recNote").innerHTML=`<span class="err">無法存入資料庫：${esc(e.message)}；未建立回合</span>`;LOAD_ERROR.spi=e.message;updateLoadStates();return}}
       busy(false);if(IMP!==I0)return;
+      if(src){try{const saved=await savedSpecForRecord(src);if(!reusedExisting&&((ps&&saved.ps?.rec.id!==ps.rec.id)||(!ps&&saved.state!=="unassigned")))throw new Error("伺服器回傳的規格歷史引用與本次選用版本不同");ps=saved.ps;specContextState=saved.state}
+        catch(e){$("#recNote").innerHTML='<span class="err">'+esc("量測紀錄已保存，但規格歷史引用不可驗證；已停止套用："+e.message)+'</span>';LOAD_ERROR.spi=e.message;updateLoadStates();return}}
       if(src.lifecycle==="pending_review"){$("#recNote").textContent="量測檔已保存為待管理者判定；尚未套用正式分析";toast("已保存待管理者判定的量測紀錄");await renderRecords(true);return}
       if(I0.reimportOf&&src.sourceLegacyId===I0.reimportOf.id)toast("已建立受控紀錄，可在資料庫按「驗證」查看對應證明")}
     try{localStorage.setItem("spi-last-part",part)}catch(e){}}
-  const cfg=demo?sampleCfg():newRunCfg(thk,ps),locked=cfg.specSrc==="none",partNo=src?src.part:"";
+  const cfg=demo?sampleCfg():newRunCfg(thk,ps,specContextState),locked=cfg.specSrc==="none",partNo=src?src.part:"";
   const{rows,metrics}=IMP.res,info={...IMP.res.info,src:src?srcInfo(src):null,...(IMP.conv&&IMP.conv.hPct?{hPctThk:IMP.conv.thk}:{})},mode=(document.querySelector("input[name=impMode]:checked")||{}).value,name=safeId($("#inRunName").value)||safeId(IMP.name);
   IMPORT_FLOW_RESULT=demo?"範例資料已載入並開始分析。":locked?"資料已保存；請完成規格設定後開始分析。":"資料已保存並開始分析。";
   runBusy(`正在分析 ${rows.length.toLocaleString()} 筆資料…`,()=>{
@@ -7988,7 +8006,7 @@ $("#btnApply").onclick=async()=>{if(!IMP||!IMP.res)return;const I0=IMP,demo=!!I0
     else{const id=addRun(name,rows,metrics,cfg,info);if(demo)S.runs.find(r=>r.id===id).sample=true;switchRun(id)}});
   $("#mapBox").hidden=true;IMP=null;IMPORT_FLOW_COMPLETE=true;IMPORT_FLOW_PHASE="";updateImportWorkflow();
   if(locked){setTab("data");setSub("import");gotoSpecCard();toast(`料號 ${partNo} 尚無料號規格：請確認規格表後按「儲存為新版本」，分析才會開始`)}
-  else{setTab("issues");if(ps)toast(`已套用料號 ${ps.rec.part} 的預設規格 v${ps.rec.ver}`)}})};
+  else{setTab("issues");if(ps)toast(`已套用料號 ${ps.rec.part} 規格 v${ps.rec.ver}${ps.source==="historical"?"（歷史引用）":""}`)}})};
 const applyImportHandler=$("#btnApply").onclick;
 $("#btnApply").onclick=async function(event){clearImportValidationError();clearImportFieldErrors();IMPORT_FLOW_PHASE="apply";updateImportWorkflow();try{return await applyImportHandler.call(this,event)}finally{IMPORT_FLOW_PHASE="";const message=$("#parseErr")?.textContent||$("#recNote")?.querySelector(".err")?.textContent||"";if(message)showImportValidationError(message,document.activeElement);updateImportWorkflow()}};
 $("#btnRead").onclick=()=>startImport($("#pasteIn").value,"貼上資料.csv");
@@ -9100,6 +9118,7 @@ function recCheck(m){const c=(v,n)=>String(v??"").replace(/[<>"'`&\u0000-\u001f\
   if(!o.part)return{error:"請填寫產品料號"};
   if(m.kind==="spi"){
     o.lot=c(m.lot,64);o.rev=c(m.rev,32);o.workOrder=c(m.workOrder,64);o.measuredDate=c(m.measuredDate,10);
+    if(m.specId!=null&&m.specId!==""){if(typeof m.specId!=="string"||!/^[A-Za-z0-9_-]{22}$/.test(m.specId))return{error:"料號規格版本代碼格式不正確"};o.specId=m.specId}else delete o.specId;
     if(!o.rev||!o.workOrder&&!o.measuredDate)return{error:"請填寫正式版次，以及製令工單或量測日期"};
     if(!/^[A-Za-z0-9_-]{22}$/.test(m.placeId||""))return{error:"請選擇受控座標檔"};
     if(m.qualitySnapshot)o.qualitySnapshot=m.qualitySnapshot;
@@ -9154,8 +9173,9 @@ const LocalRec={db:null,
   async audit(){return(await this.tx(["log"],"readonly",t=>this.req(t.objectStore("log").getAll()))).reverse().slice(0,500)}};
 function newRecId(){const b=crypto.getRandomValues(new Uint8Array(16));return btoa(String.fromCharCode(...b)).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
 function recordView(r){let meta={};try{meta=typeof r.meta==="string"?JSON.parse(r.meta):r.meta||{}}catch(e){}
+  r={...r,stencil:r.stencil??meta.stencil??0};
   let unmatched=[];try{unmatched=typeof r.unmatched_refs==="string"?JSON.parse(r.unmatched_refs):r.unmatchedRefs||[]}catch(e){}
-  return{...r,meta,placeId:r.placeId||r.place_id||"",workOrder:r.workOrder||r.work_order||"",measuredDate:r.measuredDate||r.measured_date||"",supplierWo:r.supplierWo||meta.supplierWo||"",outsourceWo:r.outsourceWo||meta.outsourceWo||"",note:r.note??meta.note??"",unit:r.unit||meta.unit||"",comps:r.comps||meta.comps||0,boards:r.boards||meta.boards||0,pads:r.pads||meta.pads||0,qualitySnapshot:r.qualitySnapshot||meta.qualitySnapshot||null,unmatchedRefs:unmatched,placeProof:meta.placeProof&&typeof meta.placeProof==="object"?meta.placeProof:null,sourceLegacyId:r.sourceLegacyId||meta.sourceLegacyId||""}}
+  return{...r,meta,placeId:r.placeId||r.place_id||"",workOrder:r.workOrder||r.work_order||"",measuredDate:r.measuredDate||r.measured_date||"",supplierWo:r.supplierWo||meta.supplierWo||"",outsourceWo:r.outsourceWo||meta.outsourceWo||"",note:r.note??meta.note??"",unit:r.unit||meta.unit||"",comps:r.comps||meta.comps||0,boards:r.boards||meta.boards||0,pads:r.pads||meta.pads||0,qualitySnapshot:r.qualitySnapshot||meta.qualitySnapshot||null,unmatchedRefs:unmatched,placeProof:meta.placeProof&&typeof meta.placeProof==="object"?meta.placeProof:null,specContext:meta.specContext&&typeof meta.specContext==="object"?meta.specContext:null,sourceLegacyId:r.sourceLegacyId||meta.sourceLegacyId||""}}
 var RecDB={mode:"local",me:"本機",isAdmin:false,cache:null,ready:null,
   async jfetch(url,opt){const r=await fetch(url,{cache:"no-store",...opt});const j=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(j.error||("HTTP "+r.status));Object.assign(e,{existing:j.existing,status:r.status,code:j.code,missing:j.missing,wrongSide:j.wrongSide,detail:j.detail});throw e}return j},
   async list(){await this.ready;let l;if(this.mode==="cloud"){
@@ -9229,7 +9249,7 @@ async function saveBytes(filename,u8){const d=window.claude&&await window.claude
   if(d){await d.save({filename,data:new Blob([u8])});return}
   const url=URL.createObjectURL(new Blob([u8],{type:"application/octet-stream"})),a=document.createElement("a");a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 /* 回合帶的來源資訊（批號、料號、原始檔指紋），顯示在回合清單、列印頁首與報告 */
-function srcInfo(r){return{id:r.id,lot:r.lot||"",part:r.part,rev:r.rev||"",workOrder:r.workOrder||r.work_order||"",measuredDate:r.measuredDate||r.measured_date||"",supplierWo:r.supplierWo||"",outsourceWo:r.outsourceWo||"",side:r.side||"",name:r.name,sha256:r.sha256,user:r.user,created:r.created,store:RecDB.mode,lifecycle:r.lifecycle||"legacy",unmatchedRefs:r.unmatchedRefs||[],placeId:r.placeId||r.place_id||"",placePart:PLACE&&PLACE.recId&&(PLACE.recId===r.placeId||PLACE.recId===r.place_id)?PLACE.part:"",placeRev:PLACE&&PLACE.recId&&(PLACE.recId===r.placeId||PLACE.recId===r.place_id)?PLACE.rev:""}}
+function srcInfo(r){const sc=r.specContext||r.meta?.specContext;return{id:r.id,lot:r.lot||"",part:r.part,rev:r.rev||"",workOrder:r.workOrder||r.work_order||"",measuredDate:r.measuredDate||r.measured_date||"",supplierWo:r.supplierWo||"",outsourceWo:r.outsourceWo||"",side:r.side||"",name:r.name,sha256:r.sha256,user:r.user,created:r.created,store:RecDB.mode,lifecycle:r.lifecycle||"legacy",unmatchedRefs:r.unmatchedRefs||[],placeId:r.placeId||r.place_id||"",specContext:sc&&typeof sc==="object"?{state:sc.state,id:sc.id||"",ver:sc.ver||0,sha256:sc.sha256||""}:null,placePart:PLACE&&PLACE.recId&&(PLACE.recId===r.placeId||PLACE.recId===r.place_id)?PLACE.part:"",placeRev:PLACE&&PLACE.recId&&(PLACE.recId===r.placeId||PLACE.recId===r.place_id)?PLACE.rev:""}}
 const runSrc=r=>r&&r.info&&r.info.src||null;
 let LOAD_ERROR={spi:"",place:""};
 function updateLoadStates(){const run=curRun(),src=runSrc(run),unmatched=src?.unmatchedRefs||[];

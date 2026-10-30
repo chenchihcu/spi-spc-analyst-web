@@ -57,6 +57,27 @@ async function verifiedPlacement(repo, place) {
   return { sha256: file.sha256, shaOk: true, unit, parsed };
 }
 
+/* 規格歷史快照只從已存版本原檔產生；不接受用戶端自行提供的快照。 */
+async function verifiedSpecSnapshot(repo, id, part) {
+  const rec = await repo.getRecord(id);
+  if (!rec || rec.kind !== 'spec') return { error: '找不到已存的料號規格版本', status: 422 };
+  if (rec.part !== part) return { error: '料號規格版本與量測料號不同', status: 422 };
+  const ver = parseMeta(rec).ver;
+  if (!Number.isSafeInteger(ver) || ver < 1 || !/^[a-f0-9]{64}$/.test(rec.sha256 || ''))
+    return { error: '料號規格版本中繼資料不可驗證', status: 409 };
+  const file = await repo.getRecordFile(id);
+  if (!file) return { error: '料號規格原始檔不可讀取', status: 409 };
+  let raw;
+  try { raw = gunzipSync(new Uint8Array(await file.arrayBuffer()), { maxOutputLength: MAX_SPEC_RAW }); }
+  catch { return { error: '料號規格原始檔解壓失敗或超過上限', status: 409 }; }
+  const sha256 = createHash('sha256').update(raw).digest('hex');
+  if (sha256 !== rec.sha256 || (rec.bytes != null && raw.length !== rec.bytes))
+    return { error: '料號規格原始檔指紋不符，已停止建立量測紀錄', status: 409 };
+  const checked = checkSpecBody(raw, { part });
+  if (checked.error) return { error: `料號規格原始檔驗證失敗：${checked.error}`, status: 409 };
+  return { specContext: { state: 'captured', id: rec.id, ver, sha256, snapshot: checked.spec } };
+}
+
 const sideCovered = (placeSide, side) => placeSide === 'BOTH' ? side === 'TOP' || side === 'BOT' : !!side && side === placeSide;
 
 /* 對應證明：重算兩份原檔指紋、身分與位號對應，並與上傳時的快照比對（RFC-SPI-PROOF-20261028 §5.2） */
@@ -230,7 +251,7 @@ async function handleRecordsApi(req, repo, user, env) {
     }
 
     let bytes = rawBytes || bodyBuf.length, sha256 = clientSha, specNote = null;
-    let verified = null, related = [], proof = null;
+    let verified = null, related = [], proof = null, specContext = null;
     // 料號規格：伺服器解壓並驗證本體（格式、數值、標準化、料號一致），指紋由伺服器計算
     if (chk.meta.kind === 'spec') {
       let raw;
@@ -258,6 +279,11 @@ async function handleRecordsApi(req, repo, user, env) {
         const sizeErr = placementSizeError(verified.items, chk.meta.unit);
         if (sizeErr) return json(sizeErr, 422);
       } else {
+        if (chk.meta.specId) {
+          const captured = await verifiedSpecSnapshot(repo, chk.meta.specId, chk.meta.part);
+          if (captured.error) return json({ error: captured.error }, captured.status);
+          specContext = captured.specContext;
+        } else specContext = { state: 'unassigned' };
         if (!chk.meta.rev || !chk.meta.side || !chk.meta.placeId || (!chk.meta.workOrder && !chk.meta.measuredDate))
           return json({ error: '請選擇正式料號、版次、面別與受控座標，並填寫製令工單或量測日期' }, 422);
         if (chk.meta.measuredDate && !validDate(chk.meta.measuredDate)) return json({ error: '量測日期格式或日期不正確' }, 422);
@@ -288,16 +314,18 @@ async function handleRecordsApi(req, repo, user, env) {
     }
 
     const now = Date.now();
+    const recordMeta = { ...chk.meta };
+    delete recordMeta.specId;
     const rec = {
       id: randomBytes(16).toString('base64url'),
-      ...chk.meta,
+      ...recordMeta,
       ...(specNote != null ? { note: specNote } : {}),
       bytes,
       gz_bytes: bodyBuf.length,
       sha256,
       user,
       created: now,
-      ...(proof ? { meta: { placeProof: { ...proof, at: now }, ...(chk.meta.sourceLegacyId ? { sourceLegacyId: chk.meta.sourceLegacyId } : {}) } } : {}),
+      ...(proof ? { meta: { placeProof: { ...proof, at: now }, ...(specContext ? { specContext } : {}), ...(chk.meta.sourceLegacyId ? { sourceLegacyId: chk.meta.sourceLegacyId } : {}) } } : {}),
       ...(chk.meta.kind === 'spec' ? {} : {
         validationSource: 'server_verified', lifecycle: related.length ? 'pending_review' : 'active',
         ...(chk.meta.kind === 'place' ? { comps: verified.items.length, sides: verified.sides, factor: verified.factor, formatVersion: verified.formatVersion }

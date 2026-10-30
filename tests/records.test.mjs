@@ -60,6 +60,11 @@ test("必填欄位：量測紀錄需批號與料號，座標檔需料號與版�
   assert.equal(checkMeta({ kind: "place", part: "X3000", rev: "V5", comps: 1000 }).meta.rev, "V5");
   assert.equal(checkMeta(spi({ lot: "<b>L1</b>" })).meta.lot, "bL1/b");
   assert.equal(checkMeta(spi({ placeId: "bad" })).meta.placeId, "");
+  const specId = "A".repeat(22);
+  assert.equal(checkMeta(spi({ specId }), { controlled: true }).meta.specId, specId, "受控量測可引用已存規格版本");
+  assert.match(checkMeta(spi({ specId: "bad" }), { controlled: true }).error, /規格版本代碼/);
+  assert.match(checkMeta(spi({ specId }), { controlled: false }).error, /規格版本代碼/, "舊處理器拒收受控規格引用");
+  assert.equal(checkMeta(spi({ specId, specContext: { state: "captured", snapshot: {} } }), { controlled: true }).meta.specContext, undefined, "快照欄位不接受用戶端提交");
   assert.equal(checkMeta(spi({ stencil: 120 })).meta.stencil, 120, "匯入時填寫的鋼板厚度存入紀錄");
   assert.equal(checkMeta(spi({ stencil: 9999 })).meta.stencil, 0, "超出 30–300 µm 不存");
 });

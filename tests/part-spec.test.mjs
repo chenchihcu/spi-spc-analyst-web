@@ -104,7 +104,7 @@ function makeD1() {
     async batch(list) { sqlite.exec("BEGIN"); try { const out = []; for (const s of list) out.push(await s.run()); sqlite.exec("COMMIT"); return out; } catch (e) { sqlite.exec("ROLLBACK"); throw e; } },
   };
 }
-const r2 = () => { const m = new Map(); return { m, put: async (k, v) => m.set(k, v), get: async (k) => (m.has(k) ? { body: m.get(k) } : null), delete: async (k) => m.delete(k) }; };
+const r2 = () => { const m = new Map(); return { m, put: async (k, v) => m.set(k, v), get: async (k) => (m.has(k) ? { body: m.get(k), arrayBuffer: async () => new Uint8Array(m.get(k)).buffer } : null), delete: async (k) => m.delete(k) }; };
 let seq = 0;
 const newId = () => ("id" + String(++seq).padStart(20, "0")).slice(0, 22);
 const specRec = (o, extra = {}) => { const b = body(o); return { rec: { id: newId(), kind: "spec", part: o.part, name: "料號規格.json", note: o.note, basedOn: "", makeDefault: false, bytes: b.length, sha256: sha(b), user: "a@x.tw", created: Date.now() + seq, ...extra }, gz: gzipSync(b) }; };
@@ -198,7 +198,7 @@ test("D1：版本列表依版本號排序（建立時間相同也不錯序）；
 /* ---------- Worker 路由（含登入） ---------- */
 test("Worker：POST 料號規格由伺服器驗證本體與指紋；specs_for 列出版本；PATCH set_default_spec 切換預設", async () => {
   const AUTH = { AUTH_USERS: JSON.stringify({ "local@example.com": "pepper-hmac-sha256$600000$" + "0".repeat(64) }), AUTH_PEPPER: "p".repeat(40), AUTH_SECRET: "s".repeat(40), AUTH_KDF_ITER: "600000" };
-  const db = makeD1(), env = { ...AUTH, DB: db, BLOBS: r2(), ASSETS: { fetch: async () => new Response("") } };
+  const db = makeD1(), blobs = r2(), env = { ...AUTH, INITIAL_ADMIN_USER: "local@example.com", DB: db, BLOBS: blobs, ASSETS: { fetch: async () => new Response("") } };
   const cookie = `${COOKIE}=${await issueToken(env, "local@example.com")}`;
   const U = "https://spi.example.test/api/records";
   const post = (b, meta, shaHdr = sha(b)) => handleRequest(new Request(U, { method: "POST", body: gzipSync(b), headers: { cookie, origin: "https://spi.example.test", "content-type": "application/gzip", "x-raw-bytes": String(b.length), "x-raw-sha256": shaHdr, "x-rec-meta": encodeURIComponent(JSON.stringify(meta)) } }), env);
@@ -219,8 +219,35 @@ test("Worker：POST 料號規格由伺服器驗證本體與指紋；specs_for �
   const sw = await handleRequest(new Request(U, { method: "PATCH", body: JSON.stringify({ action: "set_default_spec", id: v2.id }), headers: { cookie, origin: "https://spi.example.test", "content-type": "application/json" } }), env);
   assert.equal(sw.status, 200, await sw.clone().text());
   assert.deepEqual(defaults(db, "301-000100124"), [v2.id]);
-  // 量測紀錄列表（預設 kind=spi）不會混入料號規格
-  assert.equal((await (await handleRequest(new Request(U, { headers: { cookie } }), env)).json()).records.length, 0);
+  // 即使目前預設已切到 v2，量測明確選用 v1 時仍保存 v1 的伺服器快照。
+  const placeRaw = Buffer.from("RefDes,X,Y,Layer\nU1,10,20,L1-TOP\n");
+  const place = (await (await post(placeRaw, { kind: "place", part: "301-000100124", rev: "V1", side: "TOP", unit: "mm", name: "coords.csv" })).json()).record;
+  const measurement = Buffer.from("Board,RefDes,Pad,Volume\nB1,U1,1,100\n");
+  const measured = await post(measurement, { kind: "spi", part: "301-000100124", lot: "L1", rev: "V1", side: "TOP", vendor: "generic", placeId: place.id, workOrder: "WO-1", specId: v1.id });
+  assert.equal(measured.status, 201, await measured.clone().text());
+  const measurementRec = (await measured.json()).record;
+  const stored = await db.sqlite.prepare("SELECT meta FROM records WHERE id=?").get(measurementRec.id);
+  const ctx = JSON.parse(stored.meta).specContext;
+  assert.deepEqual([ctx.state, ctx.id, ctx.ver, ctx.sha256], ["captured", v1.id, 1, v1.sha256]);
+  assert.equal(ctx.snapshot.note, "合成測試");
+  assert.equal(ctx.snapshot.specs.volume.lsl, 70);
+
+  // 沒有選版的新量測清楚標記未指定；損壞／跨料號引用都 fail-closed。
+  const unassignedRaw = Buffer.from("Board,RefDes,Pad,Volume\nB1,U1,1,101\n");
+  const unassigned = await post(unassignedRaw, { kind: "spi", part: "301-000100124", lot: "L2", rev: "V1", side: "TOP", vendor: "generic", placeId: place.id, workOrder: "WO-2" });
+  assert.equal(unassigned.status, 201, await unassigned.clone().text());
+  const unassignedRec = (await unassigned.json()).record;
+  const unassignedCtx = JSON.parse((await db.sqlite.prepare("SELECT meta FROM records WHERE id=?").get(unassignedRec.id)).meta).specContext;
+  assert.deepEqual(unassignedCtx, { state: "unassigned" });
+  assert.equal((await post(Buffer.from("Board,RefDes,Pad,Volume\nB1,U1,1,102\n"), { kind: "spi", part: "301-000100124", lot: "L3", rev: "V1", side: "TOP", vendor: "generic", placeId: place.id, workOrder: "WO-3", specId: "bad" })).status, 400);
+  const other = (await (await post(body(spec("OTHER")), { kind: "spec", part: "OTHER", makeDefault: false })).json()).record;
+  const cross = await post(Buffer.from("Board,RefDes,Pad,Volume\nB1,U1,1,103\n"), { kind: "spi", part: "301-000100124", lot: "L4", rev: "V1", side: "TOP", vendor: "generic", placeId: place.id, workOrder: "WO-4", specId: other.id });
+  assert.equal(cross.status, 422); assert.match((await cross.json()).error, /料號規格版本與量測料號不同/);
+  blobs.m.set("records/" + v1.id, gzipSync(Buffer.from("tampered")));
+  const corrupt = await post(Buffer.from("Board,RefDes,Pad,Volume\nB1,U1,1,104\n"), { kind: "spi", part: "301-000100124", lot: "L5", rev: "V1", side: "TOP", vendor: "generic", placeId: place.id, workOrder: "WO-5", specId: v1.id });
+  assert.equal(corrupt.status, 409); assert.match((await corrupt.json()).error, /指紋不符/);
+  // 量測紀錄列表（預設 kind=spi）不會混入料號規格。
+  assert.equal((await (await handleRequest(new Request(U, { headers: { cookie } }), env)).json()).records.length, 2);
 });
 
 /* ---------- 本機模式（IndexedDB）與雲端行為對等 ---------- */

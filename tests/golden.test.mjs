@@ -126,14 +126,27 @@ async function openHistoricalFixture(dom, filename, expectedRows, autoApply = tr
     tx.onerror = () => reject(tx.error);
   });
   await hook.openRecord(rec, { autoApply });
-  if (autoApply) for (let i = 0; i < 100 && w.eval('S.rows.length') !== expectedRows; i++) await tick(20);
+  if (autoApply) {
+    for (let i = 0; i < 100 && w.eval('S.rows.length') !== expectedRows; i++) await tick(20);
+    await selectHistoricalAnalysisSpec(w);
+  }
   return rec;
+}
+
+async function selectHistoricalAnalysisSpec(w) {
+  assert.equal(w.eval('S.specSrc'), 'none', '無快照歷史紀錄先保持鎖定，不自動套預設');
+  assert.equal(w.eval('S.specContextState'), 'historical_missing');
+  const version = (await w.SPI_TEST_HOOK.RecDB.specsFor('PART-GOLDEN'))[0];
+  assert.ok(version, '合成規格版本應存在');
+  w.SPI_TEST_HOOK.useSpec(version, await w.SPI_TEST_HOOK.loadSpecRec(version));
+  assert.equal(w.eval('S.partSpec.source'), 'analysis_selected', '明確選版只代表本次分析');
 }
 
 async function applyHistoricalPreview(dom, expectedRows) {
   const w = dom.window;
   w.document.querySelector('#btnApply').click();
   for (let i = 0; i < 100 && w.eval('S.rows.length') !== expectedRows; i++) await tick(20);
+  await selectHistoricalAnalysisSpec(w);
 }
 
 // 金標測試骨架 (M-04, TV-21)

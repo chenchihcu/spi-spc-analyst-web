@@ -177,8 +177,8 @@ RFC 的 UI/UX 審核本身未修改程式；後續問題地圖修正另由 PR #8
 | V-01 | P1：問題偵測頁修正後整頁溢出 | **not verified** | 以 PR #88 候選 build 在 1440／820／390／320 CSS px 重跑問題頁；確認每個視口 `documentElement.scrollWidth === clientWidth`，地圖群組／板號列的局部捲動符合設計。 |
 | V-02 | P1：完整視口、主題與資產／規格介面 | **not verified** | 以候選 build 在 1440／820／390／320 CSS px 和明亮／深色模式檢查資料匯入、座標／量測選取、資料庫列表、規格表單及版本視窗；逐項記錄溢出、截斷、局部捲動與狀態可辨識結果。此前 320 px 量測曾逾時；本次正式站重現成功不等於全矩陣已通過。 |
 | V-03 | P1：鍵盤、焦點、觸控與輔助技術 | **not verified** | 以鍵盤走訪主要表單、篩選、地圖格、選取視窗及規格版本視窗；驗證 Tab 順序、可見焦點、關閉後焦點返回、錯誤／選取狀態的可讀性和至少 44px 觸控熱區。螢幕閱讀器及 iPhone 真機結果須標明實際裝置／組合。 |
-| V-04 | P1：歷史量測的規格版本引用 | **not verified** | 唯讀核對 schema、建立／載入 API、序列化內容及歷史紀錄畫面，確認量測是否持久保存當時的規格版本 ID／指紋快照。若契約沒有此資料，先記錄缺口並提案；不得測試時寫入或把最新版說成原始規格。 |
-| V-05 | P1：正式 Worker 部署來源身份 | **not verified** | 讀取 Cloudflare deployment metadata，確認 Worker 部署版本、Git 提交 SHA 和候選提交的對應關係；僅以頁面版本字串不能通過此項。部署或正式站變更不在本次授權範圍。 |
+| V-04 | P1：歷史量測的規格版本引用 | **本機契約 verified；staging not verified** | Worker/UI 已新增 snapshot 建立與載入驗證。Node 22 的規格契約、UI 與隔離測試 17/17 通過；安裝缺依賴已解除。仍須 staging 寫入讀回、D1/R2 關聯與清除後稽核證據，不能把本機測試當作雲端持久化驗收。 |
+| V-05 | P1：正式 Worker 部署來源身份 | **not verified** | Cloudflare Git repository/environment/branch 曾唯讀核對為 production/main；仍需部署後核對 Worker version ID、部署狀態、提交 SHA 對應與登入後資料庫路徑。正式發布已獲使用者明確要求，但須等本計畫所有必要 gate 通過才可推送觸發。 |
 | V-06 | P2：LCP／CLS／INP 瀏覽器 trace | **not verified** | 使用 Chrome DevTools／Lighthouse 等實際 trace 工具，在候選 build 以代表性資料重現初次載入、篩選、展開問題卡及再顯示；附工具版本、瀏覽器、視口、資料規模與 trace，記錄量測值，不估算指標。 |
 | V-07 | P2：獨立安裝與 release-check 差異根因 | **not verified** | 建立不共用 `node_modules` junction 的乾淨 worktree，依鎖檔執行 `npm ci`、`npm test` 和 `npm run release-check`；再於保留原始變更的環境重現曾出現的 28 項失敗，列出失敗測試並比對 Node／依賴／工作樹差異。當前 bugfix 分支 434 項測試通過、release-check exit 0 但為 `NEEDS REVIEW`（2 處診斷 console 輸出），不能單獨解釋另一工作樹的 28 項失敗。 |
 
@@ -188,3 +188,44 @@ RFC 的 UI/UX 審核本身未修改程式；後續問題地圖修正另由 PR #8
 - 沒有推估 LCP／CLS／INP，也沒有把 `NEEDS REVIEW` 說成 release-check 全面通過。
 - 歷史規格引用、部署身份與視覺驗收保持唯讀／候選 build 的範圍；未授權的正式站部署和資料寫入不列為本次步驟。
 - PR #88 的候選修正只處理問題地圖呈現，不改問題偵測演算法、量測資料、API 或資料庫 schema。
+
+### 3.5 量測規格歷史引用候選實作與自我審查（2026-10-30，歷史執行紀錄）
+
+#### 候選變更
+
+- 本輪追加確認：歷史紀錄缺少鋼板厚度時，prefillImpThk 仍曾讀取目前預設厚度，可能改變高度百分比換算；已取消此路徑並加入匯入身份比對，避免非同步舊回覆污染新匯入。歷史快照套用訊息也已移除「預設」誤稱。
+- 本輪 Node 24 窄驗證：spec-history-isolation 與 records 合計 17/17 通過、候選 build 成功、4 段 inline script 解析成功。這些只證明快照讀取與厚度預填的隔離行為，不能取代完整 Worker/UI 或 staging 驗收。
+- Worker 只接受量測建立請求中的規格版本 ID；伺服器讀取並驗證已存規格的類型、料號、版次、原始檔大小／SHA-256 與標準化內容，再把 immutable snapshot 寫入既有 records.meta，沒有新增 endpoint 或 schema migration。
+- 新紀錄未選已存規格時標記為未指定；打開有快照的量測讀取當時版本；缺少快照的舊紀錄不查目前預設，維持分析鎖定，待使用者明確選版後標示「本次分析選用」。
+- 重複量測命中舊紀錄時改讀取該紀錄的既有規格來源，不保留匯入當下的現行預設作為替代規格。
+
+#### 自我審查
+
+- 後續 RCA：recordView 未還原 meta.stencil，已以窄測試重現 undefined 與已存 88 µm 不符，修正映射後通過。Node 22 規格 UI 長流程與快照隔離合計 5/5 通過；golden 受影響案例在明確選版後 13/13 通過（同次規格 UI 舊斷言失敗已由後續測試修正）。Node 22 build 與 staging Wrangler dry-run 均通過，但厚度讀回修正後仍須重跑打包與完整 release gate。安裝已解除，不能再把缺 node_modules 當成現行阻擋；Node 24 npm ci 與 Node 22 測試的環境差異仍保留。
+- 安裝阻擋解除後的新結果（取代下列歷史缺依賴現況）：使用者在 Node 24.14.0 下完成 npm ci，本輪已確認 saxes 等套件存在；官方 Node 22.23.4 完整測試為 437 項、430 通過、7 失敗、0 略過。7 項分別是 6 個 golden 歷史 fixture 仍依賴自動套預設，以及 1 個 UI 案例預期快照保存目前預設旗標；已將 fixture 改為先斷言鎖定、再明確選版，保留原分析斷言，並重跑受影響測試。全套尚未重新通過，不作發布證據。npm audit 的 3 項警示位於 Wrangler/Miniflare/undici 開發依賴鏈，omit=dev 掃描為 0；未執行 force 修復或升級依賴。
+- Cloudflare 現況唯讀補證：目前登入帳戶的 Workers 和 Pages 共 7 個專案，搜尋 spi-spc-analyst-staging 顯示 No projects found；D1 清單仍有 spi-spc-staging，UUID 與 staging 設定相符；R2 清單仍有 spi-spc-record-staging。因此目前阻擋是 staging Worker 入口無可用應用，不能將本機設定存在視為 staging 已就緒。未建立或修改遠端資源。正式 Worker 清單另顯示較新的 fix(data): contain import preview and restore picker focus 部署紀錄；整合前須重新取得主線與部署 SHA，舊基準不再足以支持發布。
+- 失敗拆查補充：cf-budget 的 E-3／F-2 均在 import wrangler 時失敗，尚未執行 rows_read 斷言；同檔另兩項通過。api HTTP 案例缺 @anthropic-ai/sdk、auth 測試缺 @netlify/blobs、cloudflare 測試缺 saxes；這些已確認為依賴載入錯誤，不能當作已重現產品邏輯缺陷，也不能因此跳過原 gate。api 另有一項因缺 jsdom 略過。尚未把這些原因外推為全部 40 項失敗的共同根因。
+- 用戶端提交的快照不會成為伺服器可信資料；規格引用以伺服器讀回原檔及指紋為準。
+- 沒有回填舊資料，也沒有把目前預設或最新版偽裝成歷史引用；新建時拒絕損壞或不可讀的規格原檔，載入時快照損壞或跨料號即停止操作。
+- 待覆核量測仍在分析前被擋下；本次未改動權限、不可變原檔、稽核或雲端 fail-closed 行為，也未改資料庫 schema。
+- 驗證結果：候選 node tools/build-cloudflare.mjs 在主機 Node 24.14.0 通過；tests/records.test.mjs 15/15、tests/verdict-sim.test.mjs（RUN_SLOW=1）7/7 通過。Worker／UI／規格測試組因缺少 saxes 而載入失敗（NOT PASS）。Node 22 獨立 npm ci 被執行審核閘門拒絕，沒有使用替代路徑安裝相依；release-check exit 1／Overall BLOCKED，測試階段回報 40 項失敗。已直接確認的 saxes 載入錯誤不能解釋其他所有失敗，尚未逐項定位。
+- 更正 staging 配置結論：受 Git 追蹤的 wrangler.staging.jsonc 已定義獨立 spi-spc-analyst-staging Worker、spi-spc-staging D1 與 spi-spc-record-staging R2。先前只檢查根設定便判定 staging 配置缺失，證據不足，撤回該結論。歷史驗收紀錄不代表資源現況；本輪 Chrome 唯讀開啟既有 staging HTTPS 網址，顯示 Cloudflare「There is nothing here yet」／Page not found，尚無可用應用或候選版本證據，也不能據此斷定 Worker 已刪除。
+- Wrangler deploy dry-run、staging 資源現況／權限與 UAT 仍未驗證。候選本機 build 的 file: URL 被瀏覽器政策拒絕，且明確禁止繞過；未執行候選視口／主題矩陣或 LCP／CLS／INP trace。既有 staging HTTPS 基準檢視沒有部署候選或寫入資料。
+- 因必要 gate 未能執行，本次不推送、不觸發 Cloudflare Git 部署，也未寫入 staging 或 production 資料。下一步是由允許的執行環境完成 Node 22 lockfile 安裝與全套 gate，再使用核准的候選瀏覽器方式完成 UI／效能驗收和 staging UAT。
+
+### 3.6 主線整合後驗收（2026-10-31）
+
+本節為本次候選的目前狀態；§3.5 保留執行歷史，當中的缺依賴、舊基準及測試失敗不能當作現行結果。
+
+- **FACT / verified — 來源與隔離**：候選工作樹為 spi-spec-history-main，分支 work/measurement-spec-history-main，以 origin/main 的 631560938cdbe894f977715c6fff903b2ec4098c 建立。原 work/measurement-spec-history 工作樹及變更保留。候選版本為 v10.12.3，保留主線 v10.12.0–v10.12.2 的匯入步驟、錯誤摘要、來源資訊、窄版欄寬與焦點返回。
+- **FACT / verified — 安裝條件**：使用者已在原工作樹以 Node 24.14.0 執行 npm ci。兩個工作樹的 lockfile 相依圖忽略根版本號後相同；新工作樹透過 junction 共用該 node_modules，測試執行器為官方 Node 22.23.4。這不等於新工作樹已獨立完成 Node 22 npm ci。開發工具依賴的 3 項 audit 警示仍存在，omit=dev 掃描為 0；未強制升級依賴。
+- **FACT / verified — 本機子系統**：Node 22 執行 spec-history-isolation、part-spec 與 part-spec-ui，17/17 通過。涵蓋伺服器快照、預設換版後讀回原版、跨料號與損壞指紋拒絕、未指定／歷史缺失鎖定、鋼板厚度讀回及非同步匯入隔離。本機 API/D1/R2 harness 不等於遠端 staging。
+- **FACT / verified — 建置與 dry-run**：Node 22 Cloudflare build 成功，HTML 964,673 bytes，建置標記 2026-10-31 00:22:57 UTC+8；Wrangler 4.151.0 的 staging deploy dry-run 通過，綁定獨立 spi-spc-staging D1 與 spi-spc-record-staging R2，未上傳或部署。
+- **NOT PASS → 局部修正 verified — 完整關卡**：主線整合後首輪 release-check exit 1／Overall BLOCKED，僅 step7 的 D-54 失敗；其餘 version、changelog、docs、deps、secrets、a11y 均 PASS，debug 為兩處 console 診斷 WARN。Node 22 單獨重現確認：fixture 透過新 API 建立未選規格的紀錄，已保存 unassigned，畫面正確顯示未指定，但舊測試仍預期未知。修正測試為同時驗證新紀錄未指定與缺少快照的舊紀錄未知，沒有移除未知狀態斷言；step7 全檔 9/9 通過、0 略過。Node 22 test:slow 已完成，7/7 通過、0 失敗、0 略過（123.7 秒）；修正後完整 release-check 已啟動，尚待終止結果。原工作樹的 438 項通過只屬舊候選，不能替代本候選結果。
+- **FACT / verified — 修正後完整結果**：同一個修正後 Node 22 release-check 程序已終止，exit 0，56 個測試檔、444 項通過，測試檢查 PASS；沒有略過警告。version、changelog、docs、deps、secrets、a11y 均 PASS。整體為 NEEDS REVIEW，保留兩處 console 診斷 WARN，不能寫成整體 READY。此結果取代上一項「尚待終止」的程序狀態；slow gate 的 7/7 為另一次獨立執行結果。
+- **FACT / reviewed — console 警告**：掃描命中的兩處為 3D 未繪出時的 console.warn 與 safeBoard2D 捕捉例外的 console.error；兩者均伴隨使用者可見降級／錯誤訊息，本次沒有修改這些路徑，也沒有為消除警告而移除診斷。NEEDS REVIEW 原始摘要保留。
+- **not verified — UI 與效能**：本候選未完成四尺寸 × 雙主題、所有分頁／對話框、鍵盤、觸控 44px 與 DPR 重複進出矩陣。候選 file: URL 曾被瀏覽器政策拒絕且禁止繞過；目前沒有可用的 Chrome Performance trace 工具，因此 LCP／CLS／INP 沒有量測值。既有主線矩陣與靜態測試不可替代本候選的實測。iPhone 真機 NOT TESTED。
+- **not verified — staging UAT 與發布**：目前未取得可用的 staging Worker 應用入口；獨立 D1/R2 存在不代表 Worker 已可用。使用者再次提供的是正式站與 repository，不能把它們當作 staging 或正式資料寫入授權。尚未建立三筆合成資料、驗證遠端快照／指紋、清除及核對稽核保留。
+- **FACT / verified（畫面）／not verified（HTTP）— 正式站登入後路徑**：使用者完成登入後，Chrome 正式站顯示 v10.12.2／2026-10-30 19:21:33；在「資料與規格 → 資料庫」按重新整理，成功呈現雲端 1 筆量測、2 筆座標與 3 個規格版本。未上傳、修改或刪除資料。可用的唯讀頁面範圍沒有暴露 Performance Resource Timing，未取得 HTTP 狀態碼；Windows 電腦操作介面另因不能可靠確認瀏覽器 URL 而要求停止，未繼續開發工具操作。這是既有正式版本的畫面證據，不證明 v10.12.3 的遠端快照或發布驗收。
+- **使用者核准的 staging 順序調整**：本機完整測試與 slow gate 完成後，使用者明確核准先 commit 並只推送 work/measurement-spec-history-main，透過獨立 spi-spc-analyst-staging 的 Cloudflare Git 建置（wrangler.staging.jsonc）完成候選驗收。這項授權解除 staging UAT 前不得推送測試分支的先後循環；main／production 仍等全部必要驗收通過後才推送，沒有豁免 UI、效能、獨立安裝或 UAT 證據。
+- **自我審查與停止條件**：沒有回填歷史規格、回退最新版、接受用戶端快照或更動權限／稽核／schema。接續依已核准順序建立 staging Git 建置入口與驗收；正式部署後仍須核對推送 SHA、Worker version ID 及登入後資料庫 HTTP 200。GitHub Actions 不作部署路徑，不使用手動 Wrangler 部署，不寫入 production 資料。
