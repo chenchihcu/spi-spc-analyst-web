@@ -159,8 +159,11 @@ RFC 的 UI/UX 審核本身未修改程式；後續問題地圖修正另由 PR #8
 
 - **VERIFIED — 流程與來源呈現**：資料頁新增五個編號步驟，顯示完成、待補與失敗狀態；欄位錯誤摘要可將焦點移至待修欄位。解析錯誤、必填料號／版次、無有效受控座標及缺少量測數值欄位皆有狀態提示。紀錄來源顯示檔名及完整 SHA-256；沒有持久化歷史規格快照的紀錄標為未知，不以目前預設值補上。
 - **VERIFIED — 測試情境**：`npm test` 共 438 項通過，涵蓋成功保存及回讀、欄位對應與必填錯誤、受控座標要求、搜尋、非管理者上傳回 403、原始檔指紋不符、座標檔缺失，以及歷史規格來源未知。測試使用本機 DOM／API harness，未連接 Production D1／R2。
-- **VERIFIED — UI build 矩陣**：本機 Cloudflare build 在 1440／820／390／320 CSS px、明亮／深色，檢視 14 個主分頁與 4 個資料子分頁，共 144 個頁面狀態；各狀態整頁 `scrollWidth === clientWidth`。行動版問題地圖列向排版已加入回歸測試。自動化測試驗證錯誤摘要焦點跳轉及觸控樣式規則；實體觸控、iPhone 與螢幕閱讀器驗收為 **NOT TESTED**。
-- **VERIFIED — 最終關卡**：`npm run test:slow` 7/7 通過；`npm run release-check` exit 0、438 項測試通過，版本、CHANGELOG、文件、相依、機密掃描及靜態控制項標籤均為 PASS。整體為 **NEEDS REVIEW**，因 debug 掃描保留 2 處既有 `console` 輸出警告。`npm run build:cloudflare` 成功，產生 `index.html`、`vendor/`、`_headers`，HTML 959,338 bytes；build 時間 2026-10-30 14:21:31（UTC+8）。
+- **VERIFIED — PR #90 build 版面矩陣**：候選來源以 b67746e7ab8d8d471260e4ba900106663c520618 為基礎，包含本次 mapBox 欄寬及紀錄選取焦點修正，v10.12.2；Cloudflare build 成功，HTML 960,179 bytes，建置時間 2026-10-30 16:11:05（UTC+8）。以 localhost:8774 的 build 產物在 1440／820／390／320 CSS px，各跑明亮／深色、14 主分頁與 4 資料子分頁，每個寬度 36 狀態，共 144 狀態（含一般 CSV 解析後的來源摘要與欄位預覽），等待版面更新完成後均符合 documentElement.scrollWidth === clientWidth。這只證明本機版面，不代表雲端路徑。
+- **VERIFIED — 錯誤回饋**：一般 CSV（board,pad,volume；B1,P1,100）缺少必填中繼資料時，焦點移至 impValidationSummary，inPart／inRev／inWorkOrder／inMeasuredDate 標記 aria-invalid；按摘要定位按鈕後焦點移到 inPart。320px 更多選單可開啟，設定面板寬度為 305px（等於當下 clientWidth）；已解析匯入區原本因隱式 auto grid 欄撐寬至約 350px；改為 minmax(0,1fr) 並允許子項收縮後，320px 下 mapBox 欄寬 223px，包含設定開啟狀態的 scrollWidth／clientWidth 均為 305px。新增 mobile-layout 回歸測試，13/13 通過。紀錄選取視窗開啟後聚焦 recPickerQ，關閉後返回 mtabMore；桌面開啟／關閉與 Escape 的 DOM 回歸測試通過。
+- **VERIFIED — 本次文字對比抽查**：匯入步驟、來源摘要與欄位錯誤各主題 27 個可見項目，明亮最低 5.30、深色最低 5.72，均 ≥4.5；不代表全站對比驗收。
+- **NOT TESTED — 其餘 UI 閘門**：本次 Chrome 與可用 IAB 均為 DPR 1，未完成 DPR > 1 重複進出；完整對話框、全站鍵盤與文字對比、pointer:coarse 觸控、iPhone 真機及螢幕閱讀器仍待驗收。不得把 144 頁面溢出檢查視為完整 UI 閘門通過。
+- **VERIFIED — 先前完整關卡**：同步 main 後 release-check 55 個測試檔共 439 項通過、exit 0，整體 NEEDS REVIEW（2 處既有 console 警告）；test:slow 7/7 為先前相同統計邏輯的執行證據。最新來源摘要修正的 record-proof-ui／ui-copy 聚焦測試 6/6 通過。v10.12.2 在 mapBox 修正後的完整 release-check exit 0、440 項通過，整體 NEEDS REVIEW（2 處既有 console 輸出）；該執行未包含稍後加入的焦點回歸測試，焦點修正後另跑 step7／mobile-layout 子系統測試共 22/22 通過，0 失敗。
 - **NOT VERIFIED — 發布與正式路徑**：本紀錄只涵蓋本機 build 與模擬測試。PR 尚未合併，Cloudflare Production 未部署本次 commit；正式 Worker 版本、登入後資料庫 API／畫面 HTTP 200、資料保存與下載均待核准合併後驗證。LCP／CLS／INP 未量測。
 
 ### 3.4 待排驗證清單

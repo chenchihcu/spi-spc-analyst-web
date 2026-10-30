@@ -495,3 +495,34 @@ test('FR-6: 載入驗證後的知識庫規則不應因覆寫常數失敗', async
   assert.deepEqual(Array.from(SPI_TEST_HOOK.getSpiKbRules(), rule => rule.id), payload.rules.map(rule => rule.id));
   dom.window.close();
 });
+
+test("紀錄選取視窗：開啟聚焦搜尋，關閉與 Escape 返回入口", async () => {
+  const dom = createDom();
+  const { document, KeyboardEvent } = dom.window;
+  const opener = document.getElementById("btnOpenRecModal");
+  const query = document.getElementById("recPickerQ");
+  const modal = document.getElementById("recPickerModal");
+  await dom.window.SPI_TEST_HOOK.RecDB.ready;
+  dom.window.SPI_TEST_HOOK.RecDB.list = async () => [];
+  const list = document.getElementById("tblPickSpi");
+  const waitRendered = async () => {
+    const deadline = Date.now() + 2000;
+    while (!list.childElementCount && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 10));
+    assert.ok(list.childElementCount, "紀錄清單應完成非同步渲染");
+  };
+  try {
+    list.replaceChildren();
+    opener.focus(); opener.click();
+    assert.equal(document.activeElement, query);
+    await waitRendered();
+    document.getElementById("recPickerClose").click();
+    assert.equal(modal.hidden, true);
+    assert.equal(document.activeElement, opener);
+    list.replaceChildren();
+    opener.click();
+    await waitRendered();
+    query.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    assert.equal(modal.hidden, true);
+    assert.equal(document.activeElement, opener);
+  } finally { dom.window.close(); }
+});

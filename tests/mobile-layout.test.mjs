@@ -379,3 +379,8 @@ test('10. 問題地圖列限制在容器內', () => {
   assert.match(mobileRules, /\.pmap-cells\.pmap-boards\{[^}]*grid-auto-flow:\s*row/, '窄螢幕各板格需逐列換行，避免撐開頁面');
   assert.match(mobileRules, /\.pmap-cells\.pmap-groups\{[^}]*display:flex;[^}]*overflow-x:auto/, '窄螢幕元件群組需保留容器內橫向捲動');
 });
+
+test("已解析匯入預覽的 grid 欄不得由內容撐寬", () => {
+  assert.match(htmlSource, /#mapBox\{grid-template-columns:minmax\(0,1fr\)\}/);
+  assert.match(htmlSource, /#mapBox>\*\{min-width:0\}/);
+});
