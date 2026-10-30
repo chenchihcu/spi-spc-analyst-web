@@ -122,12 +122,15 @@ test("舊紀錄：驗證顯示無座標引用，一鍵重新受控匯入後建�
   assert.equal($("#inPart").value, "PL-9");
   assert.equal($("#inRev").value, "");
   assert.match($("#recNote").textContent, /重新匯入舊紀錄 OLD-1/);
+  assert.match($("#impSourceSummary").textContent, /原紀錄未記錄座標引用；本次尚未選取受控座標檔/);
   // 選受控座標、填版次與工單後套用
   $('#btnSelectPlace').click();
   assert.ok(await until(() => rowOf(d, "#tblPickPlace", "PL-9")?.querySelector('[data-pact="use-place"]')));
   rowOf(d, "#tblPickPlace", "PL-9").querySelector('[data-pact="use-place"]').click();
   assert.ok(await until(() => $('#placePart').value === 'PL-9'));
   $('#recPickerClose').click();
+  assert.match($("#impSourceSummary").textContent, /原紀錄未記錄座標引用；PL-9 V3 TOP（本次重新受控匯入使用）/);
+  assert.doesNotMatch($("#impSourceSummary").textContent, /不套用目前選取座標/);
   $("#inRev").value = "V3"; $("#inWorkOrder").value = "WO-RE"; $("#inImpStencil").value = "120";
   const before = w.eval("S.runs.length");
   $("#btnApply").click();

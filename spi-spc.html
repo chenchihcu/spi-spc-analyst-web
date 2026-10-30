@@ -7877,7 +7877,9 @@ function showImportFieldError(id,message){const el=$("#"+id),hint=$("#"+id+"Erro
 function importSearchMatch(record,query){const q=String(query||"").trim().toLowerCase();return !q||[record.lot,record.part,record.rev,record.workOrder,record.work_order,record.measuredDate,record.measured_date,record.supplierWo,record.outsourceWo,record.name,record.user,record.note].some(v=>String(v||"").toLowerCase().includes(q))}
 function renderImportSourceSummary(){const box=$("#impSourceSummary");if(!box)return;const current=IMP,source=current&&(current.rec||current.reimportOf);if(!current||!current.raw){box.hidden=true;box.innerHTML="";return}
   const file=source?.name||current.name||"未命名檔案",fingerprint=source?.sha256?"SHA-256 "+String(source.sha256)+"（資料庫來源）":"伺服器指紋會在保存時建立並驗證";
-  const placeId=source&&(source.placeId||source.place_id),place=placeId?(PLACE?.recId===placeId?PLACE.part+" "+PLACE.rev+" "+PLACE.side+"（已載入原引用）":"來源紀錄有座標引用，但原檔目前未載入或無法驗證；不套用目前選取座標"):source?"原紀錄未記錄座標引用；不套用目前選取座標":PLACE?PLACE.part+" "+PLACE.rev+" "+PLACE.side+"（目前選取）":"尚未選取受控座標檔";
+  const placeId=source&&(source.placeId||source.place_id),place=current.reimportOf?
+    (placeId?"原紀錄座標引用 "+placeId:"原紀錄未記錄座標引用")+"；"+(PLACE?.recId?PLACE.part+" "+PLACE.rev+" "+PLACE.side+"（本次重新受控匯入使用）":"本次尚未選取受控座標檔"):
+    placeId?(PLACE?.recId===placeId?PLACE.part+" "+PLACE.rev+" "+PLACE.side+"（已載入原引用）":"來源紀錄有座標引用，但原檔目前未載入或無法驗證；不套用目前選取座標"):source?"原紀錄未記錄座標引用；不套用目前選取座標":PLACE?PLACE.part+" "+PLACE.rev+" "+PLACE.side+"（目前選取）":"尚未選取受控座標檔";
   const identity=source?[source.lot?"批號 "+source.lot:"",source.part?"料號 "+source.part:"",source.rev?"版次 "+source.rev:"",source.side?source.side+" 面":""].filter(Boolean).join("｜")||"歷史資料來源":"料號 "+($("#inPart")?.value||"待填")+"｜版次 "+($("#inRev")?.value||"待填");
   const lifecycle=source?(source.lifecycle==="active"?"有效":source.lifecycle==="pending_review"?"待管理者判定":source.lifecycle==="superseded"?"已被修正":"舊資料・未受控"):"尚未保存";
   const historicalSpec=source?"未保存歷史規格版本 ID／指紋，原始規格來源未知。":"尚未形成歷史規格快照。";
