@@ -99,3 +99,101 @@ test('4. JSDOM: 彈窗結構與多工雙欄容器完整性', { skip: !JSDOM && '
     assert.ok(g.closest('.panel, #p-overview, #p-control, #p-cross, #p-adv, #p-ai, #p-capability, .card'), '.grid2 需存在於合法的頁籤或卡片容器內');
   }
 });
+
+test('5. S.duo 狀態機拓撲結構驗證', () => {
+  assert.match(htmlSource, /duo:\s*\{active:false,posture:"folded",mode:"master-detail",leftTab:"issues",rightTab:"sim3d",thumbSide:"right",pinnedPad:null,dockOpen:false\}/, 'S.duo 需定義標準初始狀態機');
+});
+
+test('6. PR 2 DOM 元件：#duoToggleBtn 與 #duoThumbDock 向量圖示與無障礙規格', { skip: !JSDOM && '未安裝 jsdom' }, async () => {
+  const dom = new JSDOM(htmlSource.replace(/<script src=[^>]+><\/script>/g, ''), {
+    runScripts: 'outside-only',
+    url: 'https://example.test/',
+  });
+  const d = dom.window.document;
+  const $ = (s) => d.querySelector(s);
+
+  // a. 頂部 Duo 切換按鈕
+  const toggleBtn = $('#duoToggleBtn');
+  assert.ok(toggleBtn, '需存在 #duoToggleBtn');
+  assert.equal(toggleBtn.getAttribute('aria-label'), '切換雙欄模式', '需有 aria-label="切換雙欄模式"');
+  assert.equal(toggleBtn.getAttribute('aria-pressed'), 'false', '預設 aria-pressed="false"');
+  assert.ok(toggleBtn.querySelector('svg'), '需包含向量 SVG 圖示');
+  assert.doesNotMatch(toggleBtn.innerHTML, /📱|💻|✨/, '不可包含 emoji 圖示');
+
+  // b. 底部拇指微型操作 Dock
+  const dock = $('#duoThumbDock');
+  assert.ok(dock, '需存在 #duoThumbDock');
+  assert.equal(dock.getAttribute('aria-label'), '拇指快速操作列');
+  assert.ok($('#duoPrevBoardBtn'), '需有上一板按鈕 #duoPrevBoardBtn');
+  assert.ok($('#duoNextBoardBtn'), '需有下一板按鈕 #duoNextBoardBtn');
+  assert.ok($('#duoRightTabBtn'), '需有副欄切換按鈕 #duoRightTabBtn');
+  assert.ok($('#duoSwapPaneBtn'), '需有左右欄互換按鈕 #duoSwapPaneBtn');
+  assert.ok($('#duoCurBoard'), '需有目前板號 #duoCurBoard');
+  assert.ok($('#duoTotBoards'), '需有總板數 #duoTotBoards');
+});
+
+test('7. PR 2 CSS 樣式：拇指 Dock 觸控熱區與雙欄佈局規則', () => {
+  // a. 觸控熱區 >= 44px
+  assert.match(htmlSource, /\.thumb-btn\{[^}]*min-width:\s*44px;min-height:\s*44px/i, '.thumb-btn 觸控熱區需 >= 44x44px');
+
+  // b. Duo 模式下拇指 Dock 顯示與底欄隱藏
+  assert.match(htmlSource, /body\.duo-mode\s+\.duo-thumb-dock\{display:flex!important\}/, 'Duo 模式下需顯示拇指 Dock');
+  assert.match(htmlSource, /body\.duo-mode\s+nav\.mtab\{display:none!important\}/, 'Duo 模式下需隱藏單欄底欄');
+
+  // c. 雙欄浮動並排與左右折痕間距
+  assert.match(htmlSource, /body\.duo-mode\s+\.panel\.duo-pane-left\{[^}]*float:left!important/, '左欄需向左浮動');
+  assert.match(htmlSource, /body\.duo-mode\s+\.panel\.duo-pane-right\{[^}]*float:right!important/, '右欄需向右浮動');
+  assert.match(htmlSource, /body\.duo-mode::after\{[^}]*clear:both/, '需包含清除浮動偽元素');
+});
+
+test('8. Duo 雙欄 Panel 顯示調度邏輯與切換', { skip: !JSDOM && '未安裝 jsdom' }, async () => {
+  const dom = new JSDOM(htmlSource.replace(/<script src=[^>]+><\/script>/g, ''), {
+    runScripts: 'dangerously',
+    url: 'https://example.test/',
+    beforeParse(w) {
+      w.SPI_TEST_HOOK = {};
+      w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === 'measureText' ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
+      w.matchMedia = (query) => ({ matches: false, addEventListener() {} });
+      w.ResizeObserver = class { observe() {} };
+      w.scrollTo = () => {};
+      w.Chart = class { constructor() {} destroy() {} static register() {} static defaults = { font: {} }; };
+    },
+  });
+
+  const hook = dom.window.SPI_TEST_HOOK;
+  assert.ok(hook, '需存在 SPI_TEST_HOOK');
+  const { S, toggleDuoMode, setDuoTab, swapDuoPanes } = hook;
+
+  // a. 初始狀態：非 Duo 模式
+  assert.equal(S.duo.active, false, '初始 active 應為 false');
+  assert.equal(dom.window.document.body.classList.contains('duo-mode'), false, 'body 不應含 duo-mode');
+
+  // b. 開啟 Duo 模式
+  toggleDuoMode(true);
+  assert.equal(S.duo.active, true, '切換後 active 應為 true');
+  assert.equal(dom.window.document.body.classList.contains('duo-mode'), true, 'body 應含 duo-mode');
+
+  const pIssues = dom.window.document.querySelector('#p-issues');
+  const pSim3d = dom.window.document.querySelector('#p-sim3d');
+  const pOverview = dom.window.document.querySelector('#p-overview');
+
+  assert.equal(pIssues.hidden, false, '主欄 #p-issues 應顯示');
+  assert.equal(pIssues.classList.contains('duo-pane-left'), true, '#p-issues 應具有 duo-pane-left 類別');
+  assert.equal(pSim3d.hidden, false, '副欄 #p-sim3d 應顯示');
+  assert.equal(pSim3d.classList.contains('duo-pane-right'), true, '#p-sim3d 應具有 duo-pane-right 類別');
+  assert.equal(pOverview.hidden, true, '非當前左右欄之 #p-overview 應隱藏');
+
+  // c. 左右欄互換測試 (swapDuoPanes)
+  swapDuoPanes();
+  assert.equal(S.duo.leftTab, 'sim3d', '互換後 leftTab 應為 sim3d');
+  assert.equal(S.duo.rightTab, 'issues', '互換後 rightTab 應為 issues');
+  assert.equal(pSim3d.classList.contains('duo-pane-left'), true, '互換後 #p-sim3d 應為 duo-pane-left');
+  assert.equal(pIssues.classList.contains('duo-pane-right'), true, '互換後 #p-issues 應為 duo-pane-right');
+
+  // d. 關閉 Duo 模式，復原單欄
+  toggleDuoMode(false);
+  assert.equal(S.duo.active, false, '關閉後 active 應為 false');
+  assert.equal(dom.window.document.body.classList.contains('duo-mode'), false, 'body 應移除 duo-mode');
+  assert.equal(pSim3d.classList.contains('duo-pane-left'), false, '應清除 duo-pane-left');
+  assert.equal(pIssues.classList.contains('duo-pane-right'), false, '應清除 duo-pane-right');
+});
