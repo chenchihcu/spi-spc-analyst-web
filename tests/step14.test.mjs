@@ -124,7 +124,7 @@ test('D-12: Capacity card inline notice when Cpk < Ppk', () => {
     'Cpk < Ppk 時應顯示組內變異大於整體變異之行內說明');
 });
 
-test('D-15: Anderson-Darling sampling disclosure for N > 4000', () => {
+test('D-15: Anderson-Darling uses full data for N > 4000', () => {
   const { analyze } = core;
   const largeData = [];
   for (let b = 1; b <= 50; b++) {
@@ -145,8 +145,10 @@ test('D-15: Anderson-Darling sampling disclosure for N > 4000', () => {
   };
 
   const A = analyze(S);
-  assert.ok(A.ad.sampled != null, '大於 4000 筆時 ad.sampled 應有值');
-  assert.ok(A.ad.sampled > 0 && A.ad.sampled <= 4000, `抽樣後筆數應 <= 4000，實測 ${A.ad.sampled}`);
+  assert.equal(A.ad.sampled, null, '完整資料檢定不得顯示抽樣資訊');
+  const expected = core.andersonDarling(largeData.map(r => r.volume));
+  assert.equal(A.ad.A, expected.A);
+  assert.equal(A.ad.p, expected.p);
 });
 
 test('D-20: Cloudflare AI gateway default model is gpt-6.1-terra', async () => {

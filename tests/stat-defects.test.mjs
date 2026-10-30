@@ -275,8 +275,11 @@ test("D-AD: 超過 4000 筆時，列順序變換不改變 Anderson–Darling 結
   const rowsFor = xs => xs.map((volume, i) => ({ board: `B${Math.floor(i / 100) + 1}`, pad: `P${i}`, comp: `P${i}`, group: "G", volume, height: 120 + i % 5, area: 100 + i % 5 }));
   const A = c.analyze(st(rowsFor(values)));
   const B = c.analyze(st(rowsFor(values.slice(1).concat(values[0]))));
-  assert.equal(A.ad.sampled, 4000);
-  assert.equal(B.ad.sampled, 4000);
+  assert.equal(A.ad.sampled, null);
+  const full = c.andersonDarling(values);
+  assert.equal(A.ad.A, full.A);
+  assert.equal(A.ad.p, full.p);
+  assert.equal(B.ad.sampled, null);
   assert.equal(A.ad.A, B.ad.A, "A² 必須只依樣本值，不依輸入列位置");
   assert.equal(A.ad.p, B.ad.p, "p 值必須只依樣本值，不依輸入列位置");
   assert.equal(A.xv.rows.find(x => x.k === "常態性").st, B.xv.rows.find(x => x.k === "常態性").st);
@@ -362,7 +365,21 @@ test("D-EVIDENCE: 形貌與停線迷你圖按板顯示觀測值，不複製全�
   }
   const lisa = c.detectIssues(st(lisaRows)).find(x => x.rule_id === "空間自相關 MoranLISA");
   assert.ok(lisa, "空間群聚資料需產生 LISA 摘要卡");
+  assert.match(lisa.ev.title, /未依群聚分類/);
+  assert.deepEqual(Array.from(lisa.ev.hi), [], "未分類殘差不得標示為群聚焊墊");
   assert.equal(lisa.ev.type, "bars", "LISA 摘要小圖應顯示實測焊墊殘差");
   assert.equal(lisa.ev.values.length, 10, "LISA 小圖應顯示前 10 個實際焊墊值");
   assert.ok(new Set(lisa.ev.values).size > 1, "LISA 小圖不可將全域 Moran's I 複製成板序列");
+});
+
+ test("D-AD calibration: 50000 筆常態資料保留名目拒絕率並檢出偏態", () => {
+  let rejected = 0, skewRejected = 0;
+  for (let seed = 1; seed <= 100; seed++) {
+    const nrm = normal(mulberry32(seed));
+    const values = Array.from({length:50000}, () => nrm());
+    if (c.andersonDarling(values).p < .05) rejected++;
+    if (seed <= 30 && c.andersonDarling(values.map(x => Math.exp(.1*x))).p < .05) skewRejected++;
+  }
+  assert.ok(rejected >= 1 && rejected <= 12, `常態拒絕 ${rejected}/100`);
+  assert.ok(skewRejected >= 25, `偏態拒絕 ${skewRejected}/30`);
 });

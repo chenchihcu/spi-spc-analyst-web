@@ -389,12 +389,12 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 .rail-fields{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:flex-end}
 
 @media (max-width:600px), (pointer:coarse) and (max-height:500px){
+  :root{--navbar-h:76px}
   html,body{-webkit-text-size-adjust:100%}
   body{font-size:var(--fs-body-mobile)!important;line-height:1.5;padding-bottom:calc(var(--tabbar-h) + var(--safe-b) + 24px)!important}
   .tabs-bar,nav.tabs{display:none!important}
   #moreWrap{display:none!important}
   .brand .tag{display:none!important}
-  .brand .ver{display:none!important}
   header.top .toprow .chip{display:none!important}
 
   header.top{
@@ -412,10 +412,12 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     align-items:center;
     justify-content:center;
   }
-  .brand{justify-content:center;width:100%;gap:8px;flex-wrap:nowrap}
+  .brand{justify-content:center;width:100%;column-gap:8px;row-gap:2px;flex-wrap:wrap}
   .brand .mitcorp-logo{height:16px}
   .brand .brand-sep{height:14px}
   .brand h1{font-size:var(--fs-nav-title)!important;font-weight:600!important;line-height:44px;margin:0;text-align:center}
+  .brand .ver{flex:0 0 100%;min-width:0;max-width:100%;font-size:var(--fs-caption)!important;line-height:1.2;text-align:center;white-space:normal;overflow-wrap:anywhere}
+  .brand .ver .num{white-space:nowrap}
 
   .sticky{position:sticky!important;top:calc(var(--navbar-h) + var(--safe-t))!important;z-index:15;background:var(--bg)}
   .rail{padding:4px 0;border-bottom:0.5px solid var(--line);display:block}
@@ -582,10 +584,12 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   #p-issues>details.how{order:5}
 }
 @media (pointer:coarse) and (max-height:500px){
-  header.top{height:calc(36px + var(--safe-t))!important}
+  :root{--navbar-h:52px}
+  header.top{height:calc(var(--navbar-h) + var(--safe-t))!important}
   .brand .mitcorp-logo{height:14px}
   .brand h1{line-height:36px!important}
-  .sticky{top:calc(36px + var(--safe-t))!important}
+  .brand .ver{line-height:12px}
+  .sticky{top:calc(var(--navbar-h) + var(--safe-t))!important}
   .rail{padding:3px 0!important}
 }
 
@@ -2608,9 +2612,8 @@ function analyzeBase(st){
 
   const specCenter=hasSpec?(sp.usl+sp.lsl)/2:NaN;
   const unitMismatch=Boolean(hasSpec&&((cap&&isFinite(cap.cpk)&&Math.abs(cap.cpk)>50)||(overallSd>0&&Math.abs(specCenter-gMean)>10*overallSd)||(overallSd===0&&Math.abs(specCenter-gMean)>0)));
-  const adVals=all.length>4000?(()=>{const sorted=[...all].sort((a,b)=>a-b),n=4000;return Array.from({length:n},(_,i)=>sorted[Math.round(i*(sorted.length-1)/(n-1))])})():all;
-  const ad=andersonDarling(adVals);
-  ad.sampled=adVals===all?null:adVals.length;
+  const ad=andersonDarling(all);
+  ad.sampled=null;
   const sk=skewKurt(all);
   const sw=(all.length>=3&&all.length<=5000)?shapiroWilk(all):{W:NaN,p:NaN};
   // 群組
@@ -4732,7 +4735,8 @@ function detectIssues(st,onStage){
   if(bmRows.length){
     const badBm=bmRows.filter(r=>r.bridgemargin<25||(r.bridgegap!=null&&r.bridgegap<40));
     if(badBm.length>=3){
-      const hitB=[...new Set(badBm.map(r=>r.board))];
+      const counts=new Map();for(const r of badBm)counts.set(r.board,(counts.get(r.board)||0)+1);
+      const hitB=[...counts.keys()];
       add({lv:"ng",cat:"形貌缺陷",sig:{t:"morph",k:"bridgemargin",boards:hitB},
         title:`焊墊橋接間距餘裕不足（共 ${badBm.length} 處橋接餘裕 < 25%）`,
         ents:hitB.map(b=>"b:"+b),score:3.2,
@@ -4743,7 +4747,7 @@ function detectIssues(st,onStage){
         limit:"LSL = 25%（或間距 < 40µm）",z:"不適用",p:"不適用",
         facts:[`全批共檢出 ${badBm.length} 處焊墊橋接安全裕度低於 25%（最窄 ${f(Math.min(...badBm.map(r=>r.bridgemargin)),1)}%）`],
         cause:"鋼網開孔邊緣滲錫、開孔與焊墊間隙密封（Gasketing）不良、或下頂針支撐剛性不足導致印刷中下陷",conf:"高",action:"建議檢查鋼板底面清潔、更換擦拭溶劑，並在該元件下方補強頂針支撐",
-        ev:evBars("各板橋接風險焊墊數",boards,boards.map(b=>badBm.filter(r=>r.board===b).length),hitB.map(b=>boards.indexOf(b)),"處"),go:{tab:"adv"}})
+        ev:evBars("各板橋接風險焊墊數",boards,boards.map(b=>counts.get(b)||0),hitB.map(b=>boards.indexOf(b)),"處"),go:{tab:"adv"}})
     }
   }
 
@@ -4752,7 +4756,8 @@ function detectIssues(st,onStage){
   if(pkRows.length){
     const badPk=pkRows.filter(r=>r.peaking>35);
     if(badPk.length>=3){
-      const hitB=[...new Set(badPk.map(r=>r.board))];
+      const counts=new Map();for(const r of badPk)counts.set(r.board,(counts.get(r.board)||0)+1);
+      const hitB=[...counts.keys()];
       add({lv:"warn",cat:"形貌缺陷",sig:{t:"morph",k:"peaking",boards:hitB},
         title:`焊墊脫模拉尖超標（共 ${badPk.length} 處 > 35 µm）`,
         ents:hitB.map(b=>"b:"+b),score:2.4,
@@ -4763,7 +4768,7 @@ function detectIssues(st,onStage){
         limit:"USL = 35 µm",z:"不適用",p:"不適用",
         facts:[`全批共檢出 ${badPk.length} 處焊墊拉尖高度超過 35 µm（最高 ${f(Math.max(...badPk.map(r=>r.peaking)),1)} µm）`],
         cause:"鋼網脫模分離速度過快、開孔孔壁粗糙（Laser Burr 未拋光）、或錫膏溶劑過度揮發黏度上升",conf:"中",action:"調降印刷機分離速度（Separation Speed，建議 0.5~1.0 mm/s），或更換新錫膏",
-        ev:evBars("各板拉尖超標焊墊數",boards,boards.map(b=>badPk.filter(r=>r.board===b).length),hitB.map(b=>boards.indexOf(b)),"處"),go:{tab:"adv"}})
+        ev:evBars("各板拉尖超標焊墊數",boards,boards.map(b=>counts.get(b)||0),hitB.map(b=>boards.indexOf(b)),"處"),go:{tab:"adv"}})
     }
   }
 
@@ -4823,7 +4828,7 @@ function detectIssues(st,onStage){
           limit:"Z ≤ 2.58 或置換檢定 p ≥ 0.005（無顯著群聚）",z:String(sa.zScore),p:`置換檢定 p = ${sa.pPerm}`,
           facts:[`焊墊印刷體積在板面空間非隨機分佈：檢出 ${sa.counts.HH} 處高錫量相鄰熱區與 ${sa.counts.LL} 處低錫量相鄰冷區`],
           cause:"PCB 局部壓合下陷或缺乏下頂針支撐（冷區），或載具局部鼓起/頂針過高頂起 PCB（熱區）",conf:"高",action:"對照進階分析頁之 LISA 空間聚類分佈圖，檢查冷區下方是否懸空未落頂針，或熱區頂針高度是否過高",
-           ev:(()=>{const top=padPoints.slice().sort((a,b)=>Math.abs(b.val)-Math.abs(a.val)).slice(0,10);return evBars("群聚焊墊平均體積殘差（前 10）",top.map(p=>p.pad),top.map(p=>p.val),[0,1,2],"%")})(),go:{tab:"adv"}})
+           ev:(()=>{const top=padPoints.slice().sort((a,b)=>Math.abs(b.val)-Math.abs(a.val)).slice(0,10);return evBars("焊墊平均體積殘差（絕對值前 10，未依群聚分類）",top.map(p=>p.pad),top.map(p=>p.val),[],"%")})(),go:{tab:"adv"}})
       }
     }
   }
