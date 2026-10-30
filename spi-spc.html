@@ -39,6 +39,8 @@
   --safe-r:env(safe-area-inset-right,0px);
   --r-card:16px;
   --r-sheet:20px;
+  --duo-hinge-width:env(viewport-segment-width 0 0,20px);
+  --duo-pane-w:calc((100vw - var(--duo-hinge-width) - 32px) / 2);
   --c-bar:rgba(242,244,240,.88);
   --c-hairline:rgba(24,32,27,.10);
   --tbl-sticky-shadow:2px 0 5px rgba(24,32,27,.08);
@@ -617,6 +619,34 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   .pmap-boards button{min-width:44px!important}
 }
 
+/* ---------- iPhone Duo 折疊屏適配 (外螢幕 466x678 與展開書本 890x626) ---------- */
+@media (max-width:500px) and (max-height:700px){
+  :root{--navbar-h:56px}
+  header.top{height:calc(var(--navbar-h) + var(--safe-t))!important}
+  .brand h1{line-height:32px!important}
+  .sticky{top:calc(var(--navbar-h) + var(--safe-t))!important}
+  .db-modal.open{inset:calc(var(--navbar-h) + var(--safe-t)) 0 calc(var(--tabbar-h) + var(--safe-b)) 0!important;padding:0!important}
+  .sheet-modal.open{inset:calc(var(--navbar-h) + var(--safe-t)) 0 calc(var(--tabbar-h) + var(--safe-b)) 0!important}
+}
+
+@media (horizontal-viewport-segments: 2), (min-width: 800px) and (max-width: 960px) and (max-height: 720px){
+  :root{
+    --duo-hinge-width:env(viewport-segment-width 0 0,20px);
+    --duo-pane-w:calc((100vw - var(--duo-hinge-width) - 32px) / 2);
+  }
+  .grid2{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+    gap:var(--duo-hinge-width,20px)!important;
+  }
+  .grid2>*{
+    min-width:0!important;
+  }
+  .duo-hinge-clearance{
+    column-gap:var(--duo-hinge-width,20px)!important;
+  }
+}
+
 /* ---------- 資料庫選取中樞 Modal (跨裝置 Desktop & Mobile) ---------- */
 .db-modal{display:none}
 .db-modal.open{
@@ -711,13 +741,13 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 .db-modal-panel--md{max-width:760px;margin:auto}
 .sheet-head--db{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px}
 .sheet-head--db-rec{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:var(--surface)}
-.sheet-foot--db{padding:10px 16px;border-top:1px solid var(--line);display:flex;gap:8px}
+.sheet-foot--db{padding:10px 16px;border-top:1px solid var(--line);display:flex;gap:8px;flex-shrink:0}
 .sheet-foot--db-end{justify-content:flex-end}
 .modal-h3{margin:0;font-size:var(--fs-heading)}
 .modal-h3--lead{margin:0 0 8px;font-size:var(--fs-heading)}
 .modal-body-pad{padding:16px}
 .modal-body-scroll{padding:16px;overflow:auto}
-.modal-body-stack{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.modal-body-stack{padding:14px 16px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;flex:1 1 auto}
 .modal-note-accent{font-size:var(--fs-caption);color:var(--accent-ink)}
 .modal-proof-body{padding:14px 16px;overflow:auto;display:flex;flex-direction:column;gap:12px;min-height:0}
 .modal-title-wrap{min-width:0;overflow-wrap:anywhere}
