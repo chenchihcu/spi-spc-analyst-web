@@ -226,6 +226,7 @@ table.show-all tr.more-row{display:table-row}
 .pmap{display:grid;gap:8px}
 .pmap-row{display:grid;grid-template-columns:72px 1fr;gap:8px;align-items:center}
 .pmap-cells{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:2px;min-width:0}
+.pmap-cells.pmap-groups{grid-auto-flow:row;grid-template-columns:repeat(auto-fill,minmax(44px,1fr))}
 .pmap-cells button{min-height:30px;padding:0;border-radius:3px;border:1px solid transparent;background:var(--surface2);font-family:var(--f-mono);font-size:var(--fs-chart);color:var(--muted);overflow:hidden}
 .pmap-cells button.ng{background:var(--ng);color:var(--on-strong)}.pmap-cells button.warn{background:var(--warn);color:var(--on-strong)}.pmap-cells button.info{background:var(--series2);color:var(--on-strong)}
 .pmap-cells button[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:1px}
@@ -591,7 +592,8 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 @media (max-width:720px){
   .pmap-cells{display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
   .pmap-cells button{min-width:28px!important;min-height:44px!important;height:44px!important;flex:0 0 auto;font-size:var(--fs-caption)!important}
-  .pmap-cells.pmap-boards{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:4px;overflow-x:visible}
+  .pmap-cells.pmap-boards{display:grid;grid-auto-flow:row;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:4px;overflow-x:visible}
+  .pmap-cells.pmap-groups{display:flex;flex-wrap:nowrap;overflow-x:auto}
   .pmap-boards button{min-width:44px!important}
 }
 
@@ -5768,7 +5770,7 @@ function renderPmap(){const B=[...new Set(S.rows.map(r=>r.board))],G=[...new Set
   const byB=new Map(B.map(b=>[b,[]])),byG=new Map(G.map(g=>["g:"+g,[]]));
   for(const x of S.F){for(const b of issueBoards(x)){const a=byB.get(b);if(a)a.push({x,lv:lvOn(x,"b:"+b)})}for(const e of x.ents){const a=byG.get(e);if(a&&(!a.length||a[a.length-1].x!==x))a.push({x,lv:lvOn(x,e)})}}
   $("#pmap").innerHTML=`<div class="pmap-row"><span class="pmap-lab">各板（依印刷順序）</span><div class="pmap-cells pmap-boards">${B.map(b=>cell("b:"+b,b,byB.get(b))).join("")}</div></div>
-    <div class="pmap-row"><span class="pmap-lab">元件群組</span><div class="pmap-cells">${G.map(g=>`<button data-ent="g:${esc(g)}" class="${worst(byG.get("g:"+g))||""}" aria-pressed="${S.issEnt==="g:"+g}" title="${esc(g)}：${esc(tip(g,byG.get("g:"+g),"群組"))}" style="font-size:var(--fs-caption)">${esc(g)}</button>`).join("")}</div></div>
+  <div class="pmap-row"><span class="pmap-lab">元件群組</span><div class="pmap-cells pmap-groups">${G.map(g=>`<button data-ent="g:${esc(g)}" class="${worst(byG.get("g:"+g))||""}" aria-pressed="${S.issEnt==="g:"+g}" title="${esc(g)}：${esc(tip(g,byG.get("g:"+g),"群組"))}" style="font-size:var(--fs-caption)">${esc(g)}</button>`).join("")}</div></div>
     ${sys.length?`<p class="note" style="margin:0">另有 ${sys.length} 項不屬特定板或群組的整體性問題（${[...new Set(sys.map(x=>x.cat))].join("、")}）。</p>`:""}
     ${S.issEnt?`<p style="margin:0"><span class="pill warn">只顯示 ${esc(S.issEnt.slice(S.issEnt.indexOf(":")+1))} 相關的問題</span> <button class="linkbtn" id="pmapClear">顯示全部</button></p>`:""}`;
   $$("#pmap [data-ent]").forEach(b=>b.onclick=()=>{S.issEnt=S.issEnt===b.dataset.ent?null:b.dataset.ent;renderIssues()});if($("#pmapClear"))$("#pmapClear").onclick=()=>{S.issEnt=null;renderIssues()}}
