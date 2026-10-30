@@ -2606,7 +2606,7 @@ function analyzeBase(st){
 
   const specCenter=hasSpec?(sp.usl+sp.lsl)/2:NaN;
   const unitMismatch=Boolean(hasSpec&&((cap&&isFinite(cap.cpk)&&Math.abs(cap.cpk)>50)||(overallSd>0&&Math.abs(specCenter-gMean)>10*overallSd)||(overallSd===0&&Math.abs(specCenter-gMean)>0)));
-  const adVals=all.length>4000?(()=>{const sorted=[...all].sort((a,b)=>a-b),n=4000;return Array.from({length:n},(_,i)=>sorted[Math.floor((i+.5)*sorted.length/n)])})():all;
+  const adVals=all.length>4000?(()=>{const sorted=[...all].sort((a,b)=>a-b),n=4000;return Array.from({length:n},(_,i)=>sorted[Math.round(i*(sorted.length-1)/(n-1))])})():all;
   const ad=andersonDarling(adVals);
   ad.sampled=adVals===all?null:adVals.length;
   const sk=skewKurt(all);
