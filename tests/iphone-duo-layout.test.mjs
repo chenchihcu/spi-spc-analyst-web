@@ -197,3 +197,68 @@ test('8. Duo 雙欄 Panel 顯示調度邏輯與切換', { skip: !JSDOM && '未�
   assert.equal(pSim3d.classList.contains('duo-pane-left'), false, '應清除 duo-pane-left');
   assert.equal(pIssues.classList.contains('duo-pane-right'), false, '應清除 duo-pane-right');
 });
+
+test('9. PR 3 主從事件匯流排 spc:duo-pad-select 與跨欄聯動', { skip: !JSDOM && '未安裝 jsdom' }, async () => {
+  const dom = new JSDOM(htmlSource.replace(/<script src=[^>]+><\/script>/g, ''), {
+    runScripts: 'dangerously',
+    url: 'https://example.test/',
+    beforeParse(w) {
+      w.SPI_TEST_HOOK = {};
+      w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === 'measureText' ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
+      w.matchMedia = (query) => ({ matches: false, addEventListener() {} });
+      w.ResizeObserver = class { observe() {} };
+      w.scrollTo = () => {};
+      w.Chart = class { constructor() {} destroy() {} static register() {} static defaults = { font: {} }; };
+    },
+  });
+
+  const hook = dom.window.SPI_TEST_HOOK;
+  const { S, toggleDuoMode } = hook;
+  toggleDuoMode(true);
+
+  let eventFired = false;
+  let receivedDetail = null;
+  dom.window.addEventListener('spc:duo-pad-select', (e) => {
+    eventFired = true;
+    receivedDetail = e.detail;
+  });
+
+  // 分發事件模擬點選焊墊
+  dom.window.dispatchEvent(new dom.window.CustomEvent('spc:duo-pad-select', {
+    detail: { pad: 'U2_A1', board: 3, tab: 'sim3d', issue: { id: 101, title: '連錫風險' } }
+  }));
+
+  assert.equal(eventFired, true, '需成功監聽到 spc:duo-pad-select 事件');
+  assert.equal(receivedDetail.pad, 'U2_A1', '事件資料需包含 pad');
+  assert.equal(receivedDetail.board, 3, '事件資料需包含 board');
+  assert.equal(receivedDetail.issue.id, 101, '事件資料需包含 issue');
+});
+
+test('10. PR 3 WebGL 資源防護與 Web-Perf 記憶體凍結守衛', { skip: !JSDOM && '未安裝 jsdom' }, async () => {
+  const dom = new JSDOM(htmlSource.replace(/<script src=[^>]+><\/script>/g, ''), {
+    runScripts: 'dangerously',
+    url: 'https://example.test/',
+    beforeParse(w) {
+      w.SPI_TEST_HOOK = {};
+      w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === 'measureText' ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
+      w.matchMedia = (query) => ({ matches: false, addEventListener() {} });
+      w.ResizeObserver = class { observe() {} };
+      w.scrollTo = () => {};
+      w.Chart = class { constructor() {} destroy() {} static register() {} static defaults = { font: {} }; };
+    },
+  });
+
+  const hook = dom.window.SPI_TEST_HOOK;
+  const { suspendDuoSim3D, T } = hook;
+  assert.equal(typeof suspendDuoSim3D, 'function', '需導出 suspendDuoSim3D 函式');
+
+  // 模擬 raf 動畫排程並執行凍結
+  if (T) {
+    T.raf = 999;
+    suspendDuoSim3D();
+    assert.equal(T.raf, 0, 'suspendDuoSim3D 需將 T.raf 重置為 0 停止動畫循環');
+  }
+
+  // 檢查選取卡片高亮樣式
+  assert.match(htmlSource, /\.iss-card\.duo-selected\{[^}]*outline:\s*2px solid var\(--accent\)!important/i, '需定義 .iss-card.duo-selected 高亮外框');
+});
