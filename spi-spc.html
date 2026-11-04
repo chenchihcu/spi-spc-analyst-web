@@ -2601,7 +2601,7 @@ function rescaleHpct(rows,from,to,st){if(!(from>0)||!(to>0)||from===to)return 0;
   for(const r of rows)if(r.height!=null&&isFinite(r.height)){const z=st?zoneOf(r,st):null,k=z?1:to/from;if(k!==1){r.height=r.height*k;n++}}return n}
 function padThk(r,st){const z=zoneOf(r,st);return z?z.t:st.stencil||120}
 /* 規格一律由使用者定義（料號規格）；範例資料使用內建示範規格。元件群組覆寫存在 specsG（已補齊全板值的完整規格） */
-function specOfGroup(st,g,m){const G=st.specsG&&st.specsG[g];return G&&G[m]?G[m]:st.specs[m]}
+function specOfGroup(st,g,m){if(m==="height"&&st.heightUnit==="unknown")return null;const G=st.specsG&&st.specsG[g];return G&&G[m]?G[m]:st.specs[m]}
 /* 階梯鋼板的高度 % 界限：該群組有覆寫就用群組的，否則用全板（st.htol） */
 function stepHpct(st,g){const G=st.specsG&&st.specsG[g];return G&&G.hpct?{lo:G.hpct.lsl,hi:G.hpct.usl}:st.htol}
 function classify(r,sp,st){if(st&&st.specsG&&st.specsG[r.group])sp=st.specsG[r.group];return specClassify(r,sp,st)}
@@ -2659,7 +2659,7 @@ function anUnpack(P,st){const R=st.rows,B={};for(const k in P)if(!AN_PACKED.has(
 /* 多個元件群組合併的資料是混合分布，對它做 Box-Cox／Johnson 沒有意義，也和卡片上「最差群組」的 Cpk 不是同一母體 */
 const NN_MIXED={valid:false,reason:"元件群組混合，非常態能力不適用；請選單一元件群組"};
 function analyzeBase(st){
-  const m=st.metric,sp=!isAllGrp(st.group)?specOfGroup(st,st.group,m):st.specs[m];
+  const m=st.metric,sp=specOfGroup(st,isAllGrp(st.group)?null:st.group,m);
   const rows=st.rows.filter(r=>(isAllGrp(st.group)||r.group===st.group)&&r[m]!=null&&isFinite(r[m]));
   const boards=[...new Set(rows.map(r=>r.board))];
   const bIdx=new Map();for(const r of rows){let a=bIdx.get(r.board);if(!a)bIdx.set(r.board,a=[]);a.push(r)}   // 板索引：避免每板重掃全部資料
@@ -3454,7 +3454,7 @@ function betacf(a,b,x){const T=1e-300;let qab=a+b,qap=a+1,qam=a-1,c=1,d=1-qab*x/
 function ibeta(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b}
 const tP=(t,df)=>!isFinite(t)||df<=0?NaN:ibeta(df/2,.5,df/(df+t*t));   // 雙尾 p
 function welch(a,b){if(a.length<2||b.length<2)return null;const ma=mean(a),mb=mean(b),va=sd(a)**2/a.length,vb=sd(b)**2/b.length,t=(ma-mb)/Math.sqrt(va+vb),df=(va+vb)**2/(va*va/(a.length-1)+vb*vb/(b.length-1));return{ma,mb,t,df,p:tP(Math.abs(t),df)}}
-function specFor(r,m,st){if(m==="height"&&st.step&&st.step.on){const t=padThk(r,st),h=stepHpct(st,r.group);return{lsl:t*h.lo/100,usl:t*h.hi/100}}return specOfGroup(st,r.group,m)}
+function specFor(r,m,st){if(m==="height"&&st.heightUnit==="unknown")return null;if(m==="height"&&st.step&&st.step.on){const t=padThk(r,st),h=stepHpct(st,r.group);return{lsl:t*h.lo/100,usl:t*h.hi/100}}return specOfGroup(st,r.group,m)}
 /* 鋼板開孔：優先序 CSV 逐焊墊開孔尺寸 > 群組指定尺寸 > 焊墊尺寸 ×（1 − 線性縮減%） */
 function aperture(r,st){if(r.apL!=null&&r.apW!=null)return{L:r.apL,W:r.apW,shape:r.shape==="round"&&r.apL===r.apW?"round":"rect",src:"CSV"};
   const g=(st.aperture&&st.aperture.groups&&st.aperture.groups[r.group])||{},shape=g.shape&&g.shape!=="pad"?g.shape:r.shape;
@@ -3509,7 +3509,7 @@ function msaCheck(rows,st){const hv=rows.filter(r=>r.height!=null&&r.area!=null&
 function advAnalyze(st,A){const m=A.m,G=st.rows.filter(r=>isAllGrp(st.group)||r.group===st.group);
   // 焊墊 Cpk 排行
   const bp={};for(const r of A.rows)(bp[r.pad]=bp[r.pad]||{pad:r.pad,group:r.group,r,v:[]}).v.push(r[m]);
-  const padCpk=Object.values(bp).filter(p=>p.v.length>=5).map(p=>{const sp=specFor(p.r,m,st),mu=mean(p.v),s=sd(p.v);return{pad:p.pad,group:p.group,n:p.v.length,mean:mu,sd:s,cpk:s?Math.min(sp.usl-mu,mu-sp.lsl)/(3*s):NaN}}).filter(p=>isFinite(p.cpk)).sort((a,b)=>a.cpk-b.cpk);
+  const padCpk=Object.values(bp).filter(p=>p.v.length>=5).map(p=>{const sp=specFor(p.r,m,st);if(!sp)return null;const mu=mean(p.v),s=sd(p.v);return{pad:p.pad,group:p.group,n:p.v.length,mean:mu,sd:s,cpk:s?Math.min(sp.usl-mu,mu-sp.lsl)/(3*s):NaN}}).filter(p=>p&&isFinite(p.cpk)).sort((a,b)=>a.cpk-b.cpk);
   // 面積比 × 轉移效率
   const tp={};for(const r of G)if(r.volume!=null)(tp[r.pad]=tp[r.pad]||{pad:r.pad,group:r.group,r,v:[]}).v.push(r.volume);
   const arPads=Object.values(tp).map(p=>{const a=aperture(p.r,st);return{pad:p.pad,group:p.group,ar:areaRatio(p.r,st),asp:aspectRatio(p.r,st),tmax:maxThkForAR(p.r,st),vol:apVolNL(p.r,st),ap:a,te:mean(p.v),cv:sd(p.v)/mean(p.v)*100,thk:padThk(p.r,st),assumed:geomAssumed(p.r,st)}});
@@ -5223,7 +5223,7 @@ function strokeOf(st){const first=new Map();for(const r of st.rows){if(!first.ha
 function runGroupStats(st,m){const R=st.rows;for(const r of R)if(st.heightUnit!=="unknown"&&r.height!=null)r.hpct=+(r.height/padThk(r,st)*100).toFixed(1);else delete r.hpct;
   const boards=[...new Set(R.map(r=>r.board))],groups=[...new Set(R.map(r=>r.group))],out={};
   for(const g of ["整體",...groups]){const rs=g==="整體"?R:R.filter(r=>r.group===g);if(!rs.length)continue;
-    const v=rs.map(r=>r[m]).filter(v=>v!=null),te=rs.map(r=>r.volume).filter(v=>v!=null),sp=g==="整體"?st.specs[m]:specOfGroup(st,g,m);
+    const v=rs.map(r=>r[m]).filter(v=>v!=null),te=rs.map(r=>r.volume).filter(v=>v!=null),sp=specOfGroup(st,g==="整體"?null:g,m);
     const bv=new Map();for(const r of rs)if(r.volume!=null){let l=bv.get(r.board);if(!l)bv.set(r.board,l=[]);l.push(r.volume)}
     const bm=boards.map(b=>{const x=bv.get(b);return x&&x.length?mean(x):NaN}).filter(isFinite);
     const mu=v.length?mean(v):NaN,s=v.length>1?sd(v):NaN,ppk=sp&&sp.usl>sp.lsl&&s>0?Math.min(sp.usl-mu,mu-sp.lsl)/(3*s):NaN;
@@ -5693,20 +5693,20 @@ function syncControls(){
   if($("#selRelChart"))$("#selRelChart").value=S.relChart||"specScatter";
   if($("#selXrSize"))$("#selXrSize").value=String(S.xrSize||"4");
   if($("#selXrMode"))$("#selXrMode").value=S.xrMode||"board";
-  const sp=S.specs[S.metric];
+  const sp=specOfGroup(S,isAllGrp(S.group)?null:S.group,S.metric);
   $("#srcName").textContent=S.source;$("#srcBoards").textContent=new Set(S.rows.map(r=>r.board)).size;$("#srcPads").textContent=new Set(S.rows.map(r=>r.pad)).size;
   $("#inStencil2").value=S.stencil;
   const hs=S.specs.height,hv=S.rows.filter(r=>r.height!=null).map(r=>r.height),hm=hv.length?mean(hv):NaN;
-  const hp=S.rows.filter(r=>r.height!=null).map(r=>r.height/padThk(r,S)),hpm=hp.length?mean(hp):NaN;
+  const hp=S.heightUnit==="unknown"?[]:S.rows.filter(r=>r.height!=null).map(r=>r.height/padThk(r,S)),hpm=hp.length?mean(hp):NaN;
   const zCnt=S.step&&S.step.on?zoneCounts():null;
   const stepCovered=zCnt?Object.values(zCnt.c).reduce((a,b)=>a+b,0):0;
   const stepWarn=(S.step&&S.step.on&&S.step.zones.length>0&&stepCovered===0)?" ⚠️ 階梯區域未涵蓋任何焊墊。":"";
-  $("#stencilNote").textContent=(S.heightUnit==="unknown"?"目前來源未記錄高度單位；高度不以 µm 規格判讀，請重新匯入並明確選擇 µm 或 mm。 ":"")+(!specReady(S)?`鋼板厚度 ${S.stencil} µm；高度規格尚未定義，請在下方規格表以鋼板厚度 % 填寫並儲存。`:S.step.on?`階梯鋼板啟用：基礎厚度 ${S.stencil} µm，各區域厚度見下方設定；高度依各焊墊所在區域厚度 × ${S.htol.lo}% ~ ${S.htol.hi}% 判定。`:`高度規格 = 厚度 × ${S.htol.lo}% ~ ${S.htol.hi}% → ${f(hs.lsl,0)} ~ ${f(hs.usl,0)} µm，目標 ${S.stencil} µm。`)
-    +(isFinite(hpm)?` 目前資料平均高度為所在區域厚度的 ${f(hpm*100,0)}%`+(Math.abs(hpm-1)>.2?"，差距大，請確認厚度輸入是否正確。":"。"):"")
+  $("#stencilNote").textContent=(S.heightUnit==="unknown"?"目前來源未記錄高度單位；高度不以 µm 規格判讀，請重新匯入並明確選擇 µm 或 mm。 ":"")+(S.heightUnit==="unknown"?"":!specReady(S)?`鋼板厚度 ${S.stencil} µm；高度規格尚未定義，請在下方規格表以鋼板厚度 % 填寫並儲存。`:S.step.on?`階梯鋼板啟用：基礎厚度 ${S.stencil} µm，各區域厚度見下方設定；高度依各焊墊所在區域厚度 × ${S.htol.lo}% ~ ${S.htol.hi}% 判定。`:`高度規格 = 厚度 × ${S.htol.lo}% ~ ${S.htol.hi}% → ${f(hs.lsl,0)} ~ ${f(hs.usl,0)} µm，目標 ${S.stencil} µm。`)
+    +(S.heightUnit!=="unknown"&&isFinite(hpm)?` 目前資料平均高度為所在區域厚度的 ${f(hpm*100,0)}%`+(Math.abs(hpm-1)>.2?"，差距大，請確認厚度輸入是否正確。":"。"):"")
     +stepWarn+" 階梯厚度影響高度%厚、高度規格、面積比、寬厚比與體積預測；體積 % 本身由機台計算，不會改寫。匯入厚度只在按「套用匯入」時帶入本回合；修改本欄不改寫資料庫中的匯入紀錄。";
   $("#chkStep").checked=S.step.on;
   $("label[for=inStencil2]").textContent=S.step.on?"本回合基礎鋼板厚度 µm":"本回合鋼板厚度 µm";
-  $("#railSum").textContent=`${S.stencil} µm${S.step.on?`（階梯 ${S.step.zones.length} 區，涵蓋 ${stepCovered} 焊墊）`:""} · ${(METRICS[S.metric]||{}).short||""} ${specReady(S)?`${sp.lsl}–${sp.usl}`:"規格未定義"}`;
+  $("#railSum").textContent=`${S.stencil} µm${S.step.on?`（階梯 ${S.step.zones.length} 區，涵蓋 ${stepCovered} 焊墊）`:""} · ${(METRICS[S.metric]||{}).short||""} ${sp?`${sp.lsl}–${sp.usl}`:"規格未定義"}`;
   renderRuns();
   $("#selSqDir").value=S.sqDir||"Y";$("#inWipe2").value=S.wipe;$("#inWipe").value=S.wipe;
   renderSpecTbl();
@@ -6088,7 +6088,7 @@ function renderStats(){
       $("#matrixTbl").innerHTML=head+`<tbody>`+body+`</tbody>`+foot;
     }
   }
-  const curSp=!isAllGrp(S.group)?specOfGroup(S,S.group,S.metric):S.specs[S.metric],rows=S.rows.filter(r=>(isAllGrp(S.group)||r.group===S.group));
+  const curSp=specOfGroup(S,isAllGrp(S.group)?null:S.group,S.metric),rows=S.rows.filter(r=>(isAllGrp(S.group)||r.group===S.group));
   const sided=computeSidedPpmBlock(rows,curSp,S.metric,{boards:[...new Set(rows.map(r=>r.board))]});
   const fmtSide=formatSidedPpmBlock(sided,fmtPpm);
   if($("#sidedPpmKpis"))$("#sidedPpmKpis").innerHTML=kpi("低於下限 PPM",fmtSide.belowLslPpm,"")+kpi("高於上限 PPM",fmtSide.aboveUslPpm,"")+kpi("合併事件 DPMO",fmtSide.eventDpmo,"")+kpi("合併板 DPMO",fmtSide.boardDpmo,"");
@@ -7638,7 +7638,7 @@ function renderSpecTbl(){const sm=S.specSrc==="sample",part=runPart(),v=specView
     :v.fresh?"下表為內建起始值，尚未存檔、不會用於判定。請確認或修改後按「儲存為新版本」。":"確認下表後按「儲存為新版本」。";
   $("#specTblErr").textContent="";
   const dis=!sm&&!part?" disabled":"";
-  $("#specTbl").innerHTML=`<thead><tr><th>項目</th>${SPEC_Q.map(q=>`<th>${q[1]}</th>`).join("")}</tr></thead><tbody>`+SPEC_ROWS.map(([k,l,u])=>`<tr><th scope="row">${l} <span class="note">${u}</span></th>${SPEC_Q.map(([q,ql])=>`<td><input type="number" step="any" id="sp-${k}-${q}" value="${v.specs[k]&&v.specs[k][q]!=null?v.specs[k][q]:""}" data-k="${k}" data-q="${q}" aria-label="${l} ${ql}"${dis}></td>`).join("")}</tr>`).join("")+"</tbody>";
+  $("#specTbl").innerHTML=`<thead><tr><th>項目</th>${SPEC_Q.map(q=>`<th>${q[1]}</th>`).join("")}</tr></thead><tbody>`+SPEC_ROWS.map(([k,l,u])=>`<tr><th scope="row">${l} <span class="note">${k==="height"&&S.heightUnit==="unknown"?"單位未知":u}</span></th>${SPEC_Q.map(([q,ql])=>`<td><input type="number" step="any" id="sp-${k}-${q}" value="${v.specs[k]&&v.specs[k][q]!=null?v.specs[k][q]:""}" data-k="${k}" data-q="${q}" aria-label="${l} ${ql}"${dis}></td>`).join("")}</tr>`).join("")+"</tbody>";
   $$("#specTbl input").forEach(i=>i.onchange=()=>{const k=i.dataset.k,q=i.dataset.q,val=parseFloat(i.value);i.removeAttribute("aria-invalid");
     if(!isFinite(val))return specFieldErr(i,"請輸入數字");
     if(sm){if(k==="hpct"&&q!=="tgt"){applyStencil(NaN,q==="lsl"?val:NaN,q==="usl"?val:NaN);return}S.specs[k][q]=val;syncControls();recompute();return}
@@ -7697,16 +7697,17 @@ async function renderSpecVers(){const part=runPart(),st=$("#specVerState"),tb=$(
 const esc=x=>String(x??"").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
 const clone=o=>JSON.parse(JSON.stringify(o));
 const withHpct=m=>m.includes("height")&&!m.includes("hpct")?[...m.slice(0,m.indexOf("height")+1),"hpct",...m.slice(m.indexOf("height")+1)]:m;
+const runMetrics=(metrics,heightUnit)=>heightUnit==="unknown"?metrics.filter(k=>k!=="height"&&k!=="hpct"):withHpct(metrics);
 const DEF_ZONES=()=>({on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]});
 function snapCfg(){return clone({specs:S.specs,specSrc:S.specSrc,partSpec:S.partSpec,specDraft:S.specDraft,specsG:S.specsG,sqDir:S.sqDir,stencil:S.stencil,htol:S.htol,step:S.step,aperture:S.aperture,wipe:S.wipe,geometryPads:S.geometryPads})}
 /* 範例資料的回合設定：內建示範規格（不需使用者定義即可分析） */
 function sampleCfg(){const c=snapCfg();c.specSrc="sample";c.partSpec=null;c.specDraft=null;c.specsG=null;if(S.specSrc!=="sample"){c.specs=clone(DEF_SPECS);c.stencil=120;c.htol={lo:75,hi:125}}return c}
 function curRun(){return (S.runs&&S.runs.find(r=>r.id===S.runId))||null}
 function runHeightUnit(run){return run&&((run.sample)||run.info&&run.info.heightUnit==="um")?"um":"unknown"}
-function runState(run){return run.id===S.runId?{...S}:{...S,rows:run.rows,metrics:run.metrics,heightUnit:runHeightUnit(run),...clone(run.cfg)}}
-function addRun(name,rows,metrics,cfg,info){name=safeId(name)||"未命名回合";const id=Math.max(0,...S.runs.map(r=>r.id))+1,heightUnit=info&&info.heightUnit||S.heightUnit||"unknown",runInfo={...(info||{}),heightUnit};S.runs.push({id,name,rows,metrics:heightUnit==="unknown"?metrics.filter(k=>k!=="hpct"):withHpct(metrics),cfg:cfg||snapCfg(),info:runInfo,aoi:null,_rawRows:rows});return id}
+function runState(run){const heightUnit=runHeightUnit(run);return run.id===S.runId?{...S}:{...S,rows:run.rows,metrics:runMetrics(run.metrics,heightUnit),heightUnit,...clone(run.cfg)}}
+function addRun(name,rows,metrics,cfg,info){name=safeId(name)||"未命名回合";const id=Math.max(0,...S.runs.map(r=>r.id))+1,heightUnit=info&&info.heightUnit||S.heightUnit||"unknown",runInfo={...(info||{}),heightUnit};S.runs.push({id,name,rows,metrics:runMetrics(metrics,heightUnit),cfg:cfg||snapCfg(),info:runInfo,aoi:null,_rawRows:rows});return id}
 function switchRun(id){const c=curRun();if(c)c.cfg=snapCfg();const n=S.runs.find(r=>r.id===id);if(!n)return;
-  S.runId=id;S.rows=n.rows;S._rawRows=n._rawRows||n.rows;S.timeFilter=null;S.partialBoards=null;S.metrics=runHeightUnit(n)==="unknown"?n.metrics.filter(k=>k!=="hpct"):withHpct(n.metrics);S.heightUnit=runHeightUnit(n);S.source=n.name;S.issEnt=null;S.ctx=null;S.specSrc="none";S.partSpec=null;S.specDraft=null;S.specsG=null;S.sqDir="Y";Object.assign(S,clone(n.cfg));S.heightUnit=runHeightUnit(n);delete S.specsCustom;S.group="ALL";S.board=null;S.pad=null;
+  S.runId=id;S.rows=n.rows;S._rawRows=n._rawRows||n.rows;S.timeFilter=null;S.partialBoards=null;S.metrics=runMetrics(n.metrics,runHeightUnit(n));S.heightUnit=runHeightUnit(n);S.source=n.name;S.issEnt=null;S.ctx=null;S.specSrc="none";S.partSpec=null;S.specDraft=null;S.specsG=null;S.sqDir="Y";Object.assign(S,clone(n.cfg));S.heightUnit=runHeightUnit(n);delete S.specsCustom;S.group="ALL";S.board=null;S.pad=null;
   LOAD_ERROR.spi="";
   /* 規格一律由使用者定義：舊版的機台推估、自訂、工單、AOI 建議窗回合一律視為未定義（鎖定到套用料號規格為止）；範例資料用示範規格 */
   if(n.sample)S.specSrc="sample";else if(S.specSrc!=="part"||!S.partSpec||!S.partSpec.id){S.specSrc="none";S.partSpec=null;S.specsG=null}
@@ -8145,7 +8146,7 @@ $("#btnApply").onclick=async()=>{if(!IMP||!IMP.res)return;const I0=IMP,demo=!!I0
   const{rows,metrics}=IMP.res,info={...IMP.res.info,heightUnit:IMP.conv&&IMP.conv.hPct?"um":IMP.res.info.heightUnit,src:src?srcInfo(src):null,...(IMP.conv&&IMP.conv.hPct?{hPctThk:IMP.conv.thk}:{})},mode=(document.querySelector("input[name=impMode]:checked")||{}).value,name=safeId($("#inRunName").value)||safeId(IMP.name);
   IMPORT_FLOW_RESULT=demo?"範例資料已載入並開始分析。":locked?"資料已保存；請完成規格設定後開始分析。":"資料已保存並開始分析。";
   runBusy(`正在分析 ${rows.length.toLocaleString()} 筆資料…`,()=>{
-  holdRender(()=>{if(mode==="replace"){const c=curRun();c.rows=rows;c.metrics=info.heightUnit==="unknown"?metrics.filter(k=>k!=="hpct"):withHpct(metrics);c.name=name;c.info=info;c.aoi=null;c.sample=demo;c.cfg=cfg;S.runId=null;switchRun(c.id)}
+  holdRender(()=>{if(mode==="replace"){const c=curRun();c.rows=rows;c.metrics=runMetrics(metrics,info.heightUnit);c.name=name;c.info=info;c.aoi=null;c.sample=demo;c.cfg=cfg;S.runId=null;switchRun(c.id)}
     else{const id=addRun(name,rows,metrics,cfg,info);if(demo)S.runs.find(r=>r.id===id).sample=true;switchRun(id)}});
   $("#mapBox").hidden=true;IMP=null;IMPORT_FLOW_COMPLETE=true;IMPORT_FLOW_PHASE="";updateImportWorkflow();
   if(locked){setTab("data");setSub("import");gotoSpecCard();toast(`料號 ${partNo} 尚無料號規格：請確認規格表後按「儲存為新版本」，分析才會開始`)}

@@ -14,8 +14,8 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
 - **雲端部署以 Cloudflare 正式環境為準**：重現、除錯與驗收走正式 Worker 的頁面與 API（含 D1／R2）。不用只有靜態檔、沒有 Worker API 的本機預覽代替。本機測試與 `wrangler dev` 可輔助，不能把靜態預覽的結果寫成雲端已驗證。
   - 檢查：驗收紀錄寫明正式站 URL、走過的頁面或 API 與 HTTP 狀態。只開了靜態檔伺服器時寫「雲端路徑未驗證」。
   - 出處：2026-10-29 AI 分析；埠 8770 的靜態預覽沒有 `/api/analyze`，不能代表正式站。
-- **合併失敗先自行修復再重試，不等使用者要求**：已核准合併的 PR，`gh pr merge` 失敗時先讀錯誤輸出，依下列分類修正，再重跑本 PR 原本通過的關卡（`npm test`、`npm run release-check`、CI）。全部通過就仍在原核准範圍內，直接重試合併，不需要再問。
-  - 與 main 衝突（`gh pr view --json mergeStateStatus` 為 `DIRTY`）：在工作分支 `git merge origin/main`。版本檔（`package.json`、`package-lock.json`、`lib/version.mjs`、`spi-spc.html` 的 `#appVer`、`CHANGELOG.md`；`#appBuilt` 固定為預設值，由 build 注入）先採 main 的內容，再把本 PR 的版本改成 main 版本的下一號，保留本 PR 的 CHANGELOG 條目；`npm test` 通過後 push，再合併。
+- **合併失敗先自行修復再重試，不等使用者要求**：已核准合併的 PR，`gh pr merge` 失敗時先讀錯誤輸出，依下列分類修正，再重跑因修正而失效的必要關卡；完整測試與 `release-check` 的安排依下方「驗證避免重複」規則。必要關卡通過就仍在原核准範圍內，直接重試合併，不需要再問。
+  - 與 main 衝突（`gh pr view --json mergeStateStatus` 為 `DIRTY`）：在工作分支 `git merge origin/main`。版本檔（`package.json`、`package-lock.json`、`lib/version.mjs`、`spi-spc.html` 的 `#appVer`、`CHANGELOG.md`；`#appBuilt` 固定為預設值，由 build 注入）先採 main 的內容，再把本 PR 的版本改成 main 版本的下一號，保留本 PR 的 CHANGELOG 條目；依「驗證避免重複」完成受影響關卡後 push，再合併。
   - `--match-head-commit` 一律用 `gh pr view --json headRefOid` 的完整 40 碼 SHA（短 SHA 會被 GraphQL 拒絕）。
   - 遠端已合併、只有本機收尾失敗（worktree 刪除 Permission denied、main 被其他 worktree 佔用、本機分支刪不掉）：以 `gh pr view --json state` 確認 `MERGED` 後繼續部署驗證，收尾失敗只在報告列出殘留路徑。
   - 重試前先確認 `git status` 沒有 `UU`；不在未解決的合併上再開新的合併。
@@ -60,6 +60,13 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
   - 契約：`docs/spec-ui-copy-rfc.md`。
 
 ## 驗證
+
+- **驗證避免重複**：安排關卡前先讀 `package.json` 與包裝腳本，確認是否內含相同測試。發布需跑 `npm run release-check` 時，直接以其內含的完整測試滿足 `npm test` 關卡，不先另跑一遍；統計變更所需的 `test:slow`、build 與 UI 驗收仍各自執行。同一份受測內容、相依與環境已有通過證據時，只因相關變更、失敗或具體未解疑慮重跑；commit／push 本身不使結果失效。
+  - 已先完成 `npm test` 時：保留其命令、結果與受測版本／工作樹差異證據，查明發布腳本是否提供獨立掃描入口。目前 `tools/release-check.js` 無此入口，不臆造略過參數、不把未執行的掃描標為通過；要消除這次重跑，須另以明確的腳本變更保留全部發布掃描，並將測試標為沿用既有證據或未執行。
+  - 檢查：驗收紀錄列出每個必要關卡由哪次執行滿足；同套測試再次執行時註明失效原因或既有腳本綁定限制。版本、機密掃描與本機測試、遠端 CI 分別報告。
+  - 覆蓋範圍：一般測試中的 `[slow]` 案例使用縮小樣本，不能代替 `RUN_SLOW=1` 的完整模擬；build、Worker dry-run、實際 UI 與部署後資料庫路徑各有不同目的，不能互相冒充。聚焦 smoke 可作修正後快速回饋，完整套件已覆蓋且未失效時不另重跑。遠端 CI 的乾淨環境驗證保留，但同一 job 內不安排兩次相同完整套件；遵守實際 required checks。
+  - 結果判讀：`release-check` exit 0 仍可能是 `NEEDS REVIEW`，須讀取各項狀態並記錄警告判讀；不得宣稱 `READY`。`BLOCKED` 停止發布。`npm test`／發布掃描通過不代表慢速模擬、UI 矩陣或正式環境已驗證。
+  - 出處：2026-11-04 本次 SPI 稽核對話；完整測試 460 項通過耗時約 12.7 分鐘，後續 `release-check` 仍內含同套測試。
 
 - **UI 改動的驗證矩陣**：以 build 產物（非 dev server）在 1440／820／390／320 四種寬度，各跑明亮與深色，涵蓋 14 個分頁、4 個資料子分頁、「更多」選單、設定面板與全部對話框。每頁檢查整頁橫向溢出（以當下的 `clientWidth` 比較）、觸控熱區 ≥ 44px（含包住核取方塊的 label）、文字對比；在 devicePixelRatio > 1 下同一頁至少進出兩次，抓累積狀態的錯誤。
   - 檢查：驗收紀錄列出每個寬度 × 主題的結果；無法模擬的項目（例如 ≥768px 的觸控）標 `NOT TESTED`。
