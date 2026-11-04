@@ -38,6 +38,25 @@ test('[D-05] Nelson 規則 4：邊界判定', async (t) => {
     const r4 = res.rules.find(r => r.id === 4);
     assert.equal(r4.idx.length, 0, '差值為 0 不應觸發規則 4');
   });
+
+  await t.test('NaN、無限值與有限數差值溢位不算交替', () => {
+    const alternating = Array.from({ length: 14 }, (_, i) => i % 2 ? 1 : 0);
+    for (const [label, z] of [
+      ['NaN', alternating.map((v, i) => i === 6 ? NaN : v)],
+      ['Infinity', alternating.map((v, i) => i === 6 ? Infinity : v)],
+      ['差值溢位', Array.from({ length: 14 }, (_, i) => i % 2 ? Number.MAX_VALUE : -Number.MAX_VALUE)]
+    ]) {
+      const r4 = core.nelson(z).rules.find(r => r.id === 4);
+      assert.equal(r4.idx.length, 0, `${label} 不應觸發規則 4`);
+    }
+  });
+
+  await t.test('規則 8 要求八點都在一倍標準差外且中心線兩側皆有點', () => {
+    const getRule8 = z => core.nelson(z).rules.find(r => r.id === 8);
+    assert.equal(getRule8(Array(8).fill(1.2)).idx.length, 0, '同側八點不應觸發規則 8');
+    assert.equal(getRule8([1.2, -1.2, 1.3, -1.3, 1.4, -1.4, 1.5, -1.5]).idx.length, 8, '中心線兩側各有點時應觸發規則 8');
+    assert.equal(getRule8([1.2, -1.2, 1.3, -1.3, 1.4, -1.4, 1.5]).idx.length, 0, '七點不足八點不應觸發規則 8');
+  });
 });
 
 test('[D-40] 欄位別名擴充與希臘字母處理', () => {
@@ -167,6 +186,37 @@ test('[D-45] 無封裝欄時群組推定為位號本身與保留字 __ALL__', ()
   assert.equal(res.rows[1].group, 'U2', 'U2 的群組應推定為位號本身 U2');
   assert.ok(res.rows[0].groupInferred, '應標記 groupInferred');
   assert.equal(core.ALL_GRP, '__ALL__', '保留字應為 __ALL__');
+});
+
+test('[D-68] 分組依據與高度單位沿匯入欄位正確辨識', () => {
+  const data = [['B1', 'U1', 'P1', '100', '120', '0402']];
+  const pkgHead = ['Board', 'Component', 'Pad', 'Volume', 'Height', 'Package'];
+  const pkgMap = core.autoMap(pkgHead), pkgOpts = core.guessOpts(pkgHead, pkgMap);
+  assert.equal(pkgOpts.heightUnit, 'unknown', '沒有單位的 Height 欄不得預設成 µm');
+  const pkg = core.buildRows({ head: pkgHead, data }, pkgMap, pkgOpts);
+  assert.equal(pkg.info.groupBasis, 'package', '有封裝欄時依封裝分組');
+  assert.equal(pkg.info.heightUnit, 'unknown', '來源未標示高度單位時保留未知');
+
+  const refHead = ['Board', 'Component', 'Pad', 'Volume', 'Height(um)'];
+  const refMap = core.autoMap(refHead), refOpts = core.guessOpts(refHead, refMap);
+  assert.equal(refOpts.heightUnit, 'um', '欄名明確標示 µm 時辨識為 µm');
+  const ref = core.buildRows({ head: refHead, data: [['B1', 'U1A', 'P1', '100', '120']] }, refMap, refOpts);
+  assert.equal(ref.info.groupBasis, 'refdes', '沒有封裝時依位號分組');
+  assert.equal(ref.info.heightUnit, 'um');
+
+  const mmHead = ['Board', 'Component', 'Pad', 'Volume', 'Height(mm)'];
+  const mmMap = core.autoMap(mmHead), mmOpts = core.guessOpts(mmHead, mmMap);
+  const mm = core.buildRows({ head: mmHead, data: [['B1', 'U1A', 'P1', '100', '0.12']] }, mmMap, mmOpts);
+  assert.equal(mm.info.heightUnit, 'um', '明確標示 mm 後正規化為 µm');
+  assert.equal(mm.rows[0].height, 120, '0.12 mm 應換算成 120 µm');
+
+  const prefixOpts = { ...refOpts, groupFallback: 'prefix' };
+  const prefix = core.buildRows({ head: refHead, data: [['B1', 'U1A', 'P1', '100', '120']] }, refMap, prefixOpts);
+  assert.equal(prefix.info.groupBasis, 'prefix', '明確選位號前綴時標示位號前綴');
+  const otherHead = ['Board', 'Pad', 'Volume'];
+  const otherMap = core.autoMap(otherHead);
+  const other = core.buildRows({ head: otherHead, data: [['B1', 'P1', '100']] }, otherMap, core.guessOpts(otherHead, otherMap));
+  assert.equal(other.info.groupBasis, 'other', '沒有封裝或位號時標示其他');
 });
 
 test('[D-50] Excel 百分比格式數值自動 ×100 與 pctCount 統計', () => {

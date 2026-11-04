@@ -31,7 +31,7 @@ function page(saved, cloud, preloadPlace) {
   } });
   return { dom, errs };
 }
-const CSV = "Board,Pad,Component,Volume,Height,Area\n" + Array.from({ length: 60 }, (_, i) => `B${Math.floor(i / 6) + 1},P${i % 6},U1,${100 + (i % 5)},120,100`).join("\n");
+const CSV = "Board,Pad,Component,Volume,Height(um),Area\n" + Array.from({ length: 60 }, (_, i) => `B${Math.floor(i / 6) + 1},P${i % 6},U1,${100 + (i % 5)},120,100`).join("\n");
 async function until(fn, n = 150) { for (let i = 0; i < n; i++) { if (fn()) return true; await tick(20); } return false; }
 async function pickFile(dom, name, text) {
   const w = dom.window, inp = w.document.querySelector("#fileIn");
@@ -86,6 +86,59 @@ async function seedHistorical(w, rec, source) {
   });
   return row;
 }
+
+test("匯入來源未標高度單位時顯示未知並阻止套用；明確選 µm 後顯示 µm", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { dom, errs } = await cloudPage();
+  const w = dom.window, d = w.document;
+  await pickFile(dom, "unitless.csv", "Board,Pad,Component,Volume,Height,Area\nB1,P1,U1,100,120,100\n");
+  assert.match(d.querySelector("#mapPrev").textContent, /高度 120（單位未確認）/);
+  assert.doesNotMatch(d.querySelector("#mapPrev").textContent, /高度 120 µm/);
+  assert.equal(d.querySelector("#btnApply").disabled, true, "未確認高度單位前不可套用分析");
+  d.querySelector("#optH").value = "um";
+  d.querySelector("#optH").dispatchEvent(new w.Event("change", { bubbles: true }));
+  assert.match(d.querySelector("#mapPrev").textContent, /高度 120 µm/);
+  assert.equal(d.querySelector("#btnApply").disabled, false, "明確指定 µm 後不再因單位阻擋");
+  const unknown = w.SPI_TEST_HOOK.specDownloadInfo({ part: "P1" });
+  assert.equal(unknown.filename, "料號規格_P1_版本未知.json");
+  assert.match(unknown.warning, /沒有版本號/);
+  const known = w.SPI_TEST_HOOK.specDownloadInfo({ part: "P1", ver: 3 });
+  assert.equal(known.filename, "料號規格_P1_v3.json");
+  assert.equal(known.warning, "");
+  w.eval("SPI_TEST_HOOK.S.runId=null;SPI_TEST_HOOK.S.rows=[{group:'0402',groupBasis:'package'}];SPI_TEST_HOOK.updateRailSummary()");
+  assert.match(d.querySelector("#groupBasisNote").textContent, /分組依據：封裝/);
+  assert.match(d.querySelector("#railChipSummary").textContent, /分組依據：封裝/);
+  assert.deepEqual(errs, []);
+  dom.window.close();
+});
+
+test("UNKNOWN_UNIT 恢復舊回合時停用高度分析與規格比較", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { dom, errs } = page([], null);
+  const w = dom.window, d = w.document, h = w.SPI_TEST_HOOK, S = h.S;
+  w.eval("saveRunsSoon=()=>{};updateStartupDbBanner=()=>{}");
+  assert.ok(await until(() => S.runId != null && d.querySelector("#srcName").textContent), "等待舊回合測試頁面完成初始載入");
+  const rows = [];
+  for (let b = 1; b <= 10; b++) for (let i = 0; i < 6; i++) rows.push({
+    board: `B${b}`, pad: `P${i}`, comp: `P${i}`, group: "G", volume: 100 + (i % 5), height: 200 + i, area: 100
+  });
+  const id = Math.max(0, ...S.runs.map(r => r.id)) + 1;
+  S.runs.push({ id, name: "舊版未知單位回合", rows, metrics: ["volume", "height", "hpct", "area"], info: {}, sample: false,
+    cfg: { specs: JSON.parse(JSON.stringify(S.specs)), specSrc: "none", partSpec: null, specDraft: null, specsG: null,
+      stencil: 120, htol: { lo: 75, hi: 125 }, step: { on: false, zones: [] }, aperture: { groups: {} }, wipe: 5 } });
+  S.metric = "height";
+  h.switchRun(id);
+  assert.ok(await until(() => d.querySelector("#srcName").textContent === "舊版未知單位回合" && d.querySelector("#selMetric").value === S.metric), "等待回合切換完成");
+  assert.equal(S.heightUnit, "unknown");
+  assert.ok(!S.metrics.includes("height") && !S.metrics.includes("hpct"), "高度與高度%不得留在舊回合的可選分析項目");
+  assert.notEqual(S.metric, "height", "選取的分析項目須回到可用指標");
+  assert.match(d.querySelector("#stencilNote").textContent, /高度不以 µm 規格判讀/);
+  assert.doesNotMatch(d.querySelector("#stencilNote").textContent, /\d+\s*~\s*\d+\s*µm/);
+  const heightHeader = [...d.querySelectorAll("#specTbl th[scope=row]")].find(x => x.textContent.includes("高度"));
+  assert.match(heightHeader.textContent, /單位未知/);
+  const out = h.buildStatsData(S);
+  assert.equal(out.filter(x => x.metric === "height" && /^OOC/.test(x.rule)).length, 0, "舊回合不可用未知高度單位輸出規格異常");
+  assert.deepEqual(errs, []);
+  dom.window.close();
+});
 
 test("JS 版 SHA-256（瀏覽器不支援內建時使用）與標準結果相同", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const { dom } = page([]);

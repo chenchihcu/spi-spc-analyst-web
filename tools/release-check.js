@@ -1,8 +1,14 @@
 // 上線前檢查：依 validate-production-release 的七大類，改寫為適用單頁 HTML 工具的版本
-// 用法：node tools/release-check.js [--json]
+// 用法：node tools/release-check.js [--json] [--scans-only]
 const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
+const args = process.argv.slice(2);
+if (args.some(a => !["--json", "--scans-only"].includes(a))) {
+  console.error("Usage: node tools/release-check.js [--json] [--scans-only]");
+  process.exit(2);
+}
+const scansOnly = args.includes("--scans-only");
 
 const ROOT = path.join(__dirname, "..");
 const read = (f) => (fs.existsSync(path.join(ROOT, f)) ? fs.readFileSync(path.join(ROOT, f), "utf8") : null);
@@ -95,8 +101,10 @@ const put = (k, status, messages) => (out[k] = { status, messages });
   }
   put("deps", st, m);
 }
-// 6. 測試
-{
+// 6. 測試；僅掃描模式不宣稱沿用或通過任何測試。
+if (scansOnly) {
+  put("tests", "not-run", ["FACT: 僅執行發布掃描，測試未執行；發布須另附同一受測內容、相依與環境的有效測試證據"]);
+} else {
   const files = fs.existsSync(path.join(ROOT, "tests")) ? fs.readdirSync(path.join(ROOT, "tests")).filter((f) => /\.test\.m?js$/.test(f)) : [];
   if (!files.length) put("tests", "fail", ["FACT: 沒有 tests/*.test.js"]);
   else {
@@ -161,7 +169,7 @@ const put = (k, status, messages) => (out[k] = { status, messages });
   put("a11y", bad.length ? "warn" : "pass", bad.length ? [`FACT: ${bad.length} 個控制項缺少標籤：${bad.join("、")}`] : [`FACT: ${ctr.length} 個靜態控制項皆有標籤或包在 label 內`]);
 }
 
-const overall = Object.values(out).some((x) => x.status === "fail") ? "BLOCKED" : Object.values(out).some((x) => x.status === "warn") ? "NEEDS REVIEW" : "READY";
+const overall = Object.values(out).some((x) => x.status === "fail") ? "BLOCKED" : scansOnly ? "SCAN ONLY" : Object.values(out).some((x) => x.status === "warn") ? "NEEDS REVIEW" : "READY";
 if (process.argv.includes("--json")) console.log(JSON.stringify({ overall, checks: out }, null, 2));
 else { console.log(`Overall: ${overall}`); for (const [k, v] of Object.entries(out)) console.log(`[${v.status.toUpperCase()}] ${k}\n  ${v.messages.join("\n  ")}`); }
 process.exit(overall === "BLOCKED" ? 1 : 0);

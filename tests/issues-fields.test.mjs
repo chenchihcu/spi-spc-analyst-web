@@ -39,7 +39,7 @@ test('R-ISSUE (8.0): 每張問題卡必備 23 個欄位，不為 undefined 或 n
   }
 });
 
-test('R-ISSUE (8.0): issuesCsv 匯出格式包含 24 欄標準欄位（含規格來源）', () => {
+test('R-ISSUE (8.0): issuesCsv 匯出格式包含 group_basis 與規格來源欄位', () => {
   const samp = core.sampleData();
   const st = baseState(core, {
     rows: samp,
@@ -49,11 +49,13 @@ test('R-ISSUE (8.0): issuesCsv 匯出格式包含 24 欄標準欄位（含規格
     chart: 'xbars'
   });
   const issues = core.detectIssues(st);
-  const csv = core.issuesCsv(issues);
-  const lines = csv.split('\n');
-  const header = lines[0].replace(/\r/g, '').split(',');
+  const csv = core.issuesCsv(issues, 'package');
+  const parsed = core.csvTable(csv);
+  const header = Array.from(parsed.head);
   assert.deepEqual(header, [...core.ISS_CSV_COLS], 'CSV 標頭應與 ISS_CSV_COLS 完全一致');
-  assert.equal(lines.length, issues.length + 1, 'CSV 行數應為 issues 數 + 1');
+  assert.ok(header.includes('group_basis'), 'CSV 應包含 group_basis 欄');
+  assert.ok(parsed.data.every(row => row[header.indexOf('group_basis')] === 'package'), '每張問題卡應帶入本回合分組依據');
+  assert.equal(parsed.data.length, issues.length, 'CSV 行數應為 issues 數 + 1');
 });
 
 test('D-47: Nelson 規則卡獨立於畫面選擇、嚴重度依 8.0、誤報率來自常數表', () => {

@@ -220,7 +220,7 @@ test('M-20: issuesXlsx OpenXML export and xlsxTable roundtrip', async () => {
     }
   ];
 
-  const xlsxBuf = issuesXlsx(mockIssues);
+  const xlsxBuf = issuesXlsx(mockIssues, 'package');
   assert.ok(xlsxBuf instanceof Uint8Array, 'issuesXlsx 應回傳 Uint8Array');
   assert.ok(xlsxBuf.length > 500, '檔案應具有合法 OpenXML 結構大小');
 
@@ -229,6 +229,9 @@ test('M-20: issuesXlsx OpenXML export and xlsxTable roundtrip', async () => {
   assert.equal(xlsxBuf[1], 0x4b);
   assert.equal(xlsxBuf[2], 0x03);
   assert.equal(xlsxBuf[3], 0x04);
+  const xlsxXml = Buffer.from(xlsxBuf).toString('utf8');
+  assert.ok(xlsxXml.includes('group_basis'), 'XLSX 工作表應有 group_basis 欄名');
+  assert.ok(xlsxXml.includes('package'), 'XLSX 每筆問題應記錄分組依據');
 });
 
 test('M-21: applyTimeFilter sequence R5-18 and partial board detection', () => {

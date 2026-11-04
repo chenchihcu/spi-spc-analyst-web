@@ -40,6 +40,21 @@ test("B4 混合群組：能力卡 Cpk/Ppk/PPM/比值取同一最差群組，全�
   assert.match(A.xv.rows.find((x) => x.k === "製程能力").ev, /最差群組 G_BAD：.*全部群組加權預估/);
 });
 
+test("UNKNOWN_UNIT 未知高度單位不套用高度規格或輸出高度規格異常", () => {
+  const rows = [];
+  for (let b = 1; b <= 10; b++) for (let i = 0; i < 6; i++) rows.push({
+    board: `B${b}`, pad: `P${i}`, comp: `P${i}`, group: "G", volume: 100 + (i % 5), height: 200 + i, area: 100
+  });
+  const S = st(rows, { metric: "height", heightUnit: "unknown" });
+  const A = c.analyze(S);
+  assert.equal(A.hasSpec, false, "未知單位時高度能力不可使用 µm 規格計算");
+  assert.ok(A.cap && Number.isNaN(A.cap.cpk) && Number.isNaN(A.cap.ppk), "未知單位時不得產生有效高度 Cpk/Ppk");
+  assert.equal(A.cap.reason, "無規格");
+  S.A = A;
+  const out = c.buildStatsData(S);
+  assert.equal(out.filter(x => x.metric === "height" && /^OOC/.test(x.rule)).length, 0, "未知單位時不得輸出高度規格 OOC");
+});
+
 test("B8 混合群組不對合併資料做非常態能力", () => {
   const A = c.analyze(st(mixedRows()));
   assert.equal(A.nonNormal.valid, false);
@@ -332,7 +347,7 @@ test("D-XBAR: 25 板樣本數不等時，X̄ 圖與 Nelson 卡使用同一加權
   const chartRules = Array.from(A.nelX.rules.filter(r => r.idx.length && r.id !== 7), r => r.id).sort((a, b) => a - b);
   assert.ok(Math.abs(A.xs.cl - c.mean(rows.map(r => r.volume))) < 1e-10, "X̄ 中心線應為依各板量測數加權的總平均");
   assert.deepEqual(chartRules, cardRules, `X̄ 圖觸發 ${chartRules.join(",")}，卡片觸發 ${cardRules.join(",")}`);
-  assert.equal(chartRules.length, 5, "此 25 板反例在共用中心線下應有 5 條規則");
+  assert.deepEqual(chartRules, [1, 2, 5, 6], "規則 8 現要求中心線兩側均有點；此反例八點皆在同一側，因此其餘 4 條規則仍須一致");
 });
 
 test("D-EVIDENCE: 形貌與停線迷你圖按板顯示觀測值，不複製全批統計量", () => {

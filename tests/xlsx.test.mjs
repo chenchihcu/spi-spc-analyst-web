@@ -57,6 +57,8 @@ test("xlsx：略過空白說明頁、讀到資料頁、欄位自動對應、日�
   assert.match(d.querySelector("#mapPrev").textContent, /已依日期時間排序/, "Excel 日期時間欄應被辨識");
   assert.match(d.querySelector("#toast")?.textContent || "", /SPI資料.*共 2 個工作表/);
   assert.equal(d.querySelector("#inRunName").value, "spi-sample");
+  d.querySelector("#optH").value = "um";
+  d.querySelector("#optH").dispatchEvent(new w.Event("change", { bubbles: true }));
   d.querySelector("#inLot").value = "X1"; d.querySelector("#inPart").value = "P1";
   d.querySelector('#inRev').value = 'V1'; d.querySelector('#inWorkOrder').value = 'WO-XLSX'; d.querySelector('#inImpStencil').value = '120';
   const specBytes = w.eval('(()=>{const sp={schema:"spi-part-spec/1",part:"P1",stencilRef:120,specs:{},groups:{},note:"測試"};for(const k of PART_SPEC_METRICS)sp.specs[k]={...DEF_SPECS[k]};return partSpecEncode(sp).bytes})()');

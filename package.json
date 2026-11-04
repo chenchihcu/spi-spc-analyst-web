@@ -1,6 +1,6 @@
 {
   "name": "spi-spc-analyst",
-  "version": "10.13.0",
+  "version": "10.13.1",
   "private": true,
   "description": "SPI·SPC 分析台：錫膏印刷檢測數據的問題偵測與試產分析",
   "imports": {
@@ -13,6 +13,7 @@
     "test": "node --test --test-concurrency=1 tests/*.test.js tests/*.test.mjs",
     "test:slow": "node -e \"process.env.RUN_SLOW='1'; const { spawnSync } = require('child_process'); process.exit(spawnSync(process.execPath, ['--test', 'tests/verdict-sim.test.mjs'], { stdio: 'inherit', env: process.env }).status);\"",
     "release-check": "node tools/release-check.js",
+    "release-check:scans": "node tools/release-check.js --scans-only",
     "build:cloudflare": "node tools/build-cloudflare.mjs"
   },
   "devDependencies": {

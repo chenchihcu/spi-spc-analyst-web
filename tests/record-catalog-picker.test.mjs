@@ -31,7 +31,7 @@ function page(saved = [], { fetch: fetchStub, cloud } = {}) {
   return { dom, errs };
 }
 
-const CSV = "Board,Pad,Component,Volume,Height,Area\n" + Array.from({ length: 60 }, (_, i) => `B${Math.floor(i / 6) + 1},P${i % 6},U1,${100 + (i % 5)},120,100`).join("\n");
+const CSV = "Board,Pad,Component,Volume,Height(um),Area\n" + Array.from({ length: 60 }, (_, i) => `B${Math.floor(i / 6) + 1},P${i % 6},U1,${100 + (i % 5)},120,100`).join("\n");
 async function until(fn, n = 150) { for (let i = 0; i < n; i++) { if (fn()) return true; await tick(20); } return false; }
 
 async function cloudPage() {
@@ -199,7 +199,7 @@ test("SMT 產線過濾工具列、品質快照狀態與手機端卡片流", { sk
   await importMeasurement(dom, cloud, { part: 'PART-AAA', side: 'TOP', lot: 'LOT-OK', name: 'NORMAL_TOP.csv' });
 
   // 第二筆：不良資料（Volume < 50）
-  const BAD_CSV = "Board,Pad,Component,Volume,Height,Area\n" + Array.from({ length: 60 }, (_, i) => `B${Math.floor(i / 6) + 1},P${i % 6},U1,${i === 5 ? 20 : 100},120,100`).join("\n");
+  const BAD_CSV = "Board,Pad,Component,Volume,Height(um),Area\n" + Array.from({ length: 60 }, (_, i) => `B${Math.floor(i / 6) + 1},P${i % 6},U1,${i === 5 ? 20 : 100},120,100`).join("\n");
   await importMeasurement(dom, cloud, { part: 'PART-BBB', side: 'BOT', lot: 'LOT-NG', name: 'DEFECT_BOT.csv', csv: BAD_CSV });
 
   // 2. 開啟選取視窗

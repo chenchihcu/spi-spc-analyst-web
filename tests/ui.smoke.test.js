@@ -97,7 +97,7 @@ test("匯入資料中的 HTML 不會被執行（XSS）", { skip: !JSDOM && "未�
     w.Chart = class { constructor() {} destroy() {} static register() {} }; withIdb(w); installBrowserCloud(w, cloud); w.SPI_TEST_HOOK = {}; } });
   const w = dom.window, d = w.document, $ = (s) => d.querySelector(s);
   await new Promise((r) => setTimeout(r, 50));
-  const csv = "Board,Pad,Component,Result,Volume,Height,Area\n" + Array.from({ length: 60 }, (_, i) => `"B${Math.floor(i / 6) + 1}<img src=x onerror=1>",P${i % 6}<b>x</b>,U1,"NG<img src=y>",${i === 13 ? 40 : 100 + (i % 5)},120,${i === 13 ? 40 : 100}`).join("\n");
+  const csv = "Board,Pad,Component,Result,Volume,Height(um),Area\n" + Array.from({ length: 60 }, (_, i) => `"B${Math.floor(i / 6) + 1}<img src=x onerror=1>",P${i % 6}<b>x</b>,U1,"NG<img src=y>",${i === 13 ? 40 : 100 + (i % 5)},120,${i === 13 ? 40 : 100}`).join("\n");
   $("#btnSelectPlace").click();
   for (let i = 0; i < 100 && !$("#tblPickPlace [data-pact='use-place']"); i++) await new Promise(r => setTimeout(r, 20));
   assert.ok($("#tblPickPlace [data-pact='use-place']"), "有效受控座標應可選取");
