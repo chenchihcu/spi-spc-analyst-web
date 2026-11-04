@@ -46,13 +46,13 @@ test('issuesMd, fmMd 已匯出於核心模組，可在無 DOM 環境下直接呼
 
 test('buildStatsData 納入 Nelson Rule 1（超出 3σ 點），與 Rule 2、3 齊全', () => {
   const rows = [];
-  // 10 boards × 10 pads; board B09 has a large mean offset exceeding 3σ
+  // 10 boards × 10 pads; small within-board spread keeps σ̂組內 estimable while B09 remains >3σ
   for (let b = 1; b <= 10; b++) {
     const val = b === 9 ? 180 : 100;
     for (let p = 1; p <= 10; p++) {
       rows.push({
         board: 'B0' + b, comp: 'R' + p, refdes: 'R' + p, pad: 'P' + p,
-        group: '0402', volume: val, height: 120, area: 100
+        group: '0402', volume: val + (p % 2 ? -0.1 : 0.1), height: 120, area: 100
       });
     }
   }

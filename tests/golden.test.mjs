@@ -251,8 +251,9 @@ test('[M-02] sample_lt_10: 樣本數不足 10 顯示原因不輸出數值', { sk
   assert.ok(A.cap.groups.every(g => g.cp === null || Number.isNaN(g.cp)));
   assert.ok(A.cap.groups.every(g => g.cpk === null || Number.isNaN(g.cpk)));
   assert.ok(A.cap.reason.includes('樣本數不足'));
-  assert.equal(A.xs.rejected, false, '5 板應可計算 X̄ 圖');
-  assert.equal(A.xs.subgroupWarning, '子群組少於 20，界限僅供參考');
+  assert.equal(A.xs.rejected, true, '5 板雖達最低板數，但每板×群組只有一筆，沒有可估的組內自由度');
+  assert.equal(A.stable, null, '沒有組內自由度時穩定性應為無法判定');
+  assert.match(A.xs.reason, /組內變異為零/);
 });
 
 test('normal_baseline: 5 板 × 2 焊墊，Volume 敘述統計與座標 join 10/0', { skip: !JSDOM && '未安裝 jsdom' }, async () => {

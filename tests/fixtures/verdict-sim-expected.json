@@ -6742,5 +6742,6977 @@
         ]
       }
     ]
+  },
+  "iidSimulationNote": "新 Phase I slow 基準使用列級 i.i.d. 常態量測；舊 generateStableData 含同板共變，無法作為獨立樣本 t(df) 誤報率參考。每筆變更 seed 均記錄此輸入模型差異。",
+  "iidRuns": {
+    "25_shift0": {
+      "summary": {
+        "okCount": 183,
+        "total": 200,
+        "okRate": 0.915
+      },
+      "seeds": [
+        {
+          "seed": 1,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 2,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 2：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 3,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 4,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 5,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 5：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 6,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "空間分布",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 6：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 7,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 7：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 8,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 9,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 10,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 10：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 11,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 12,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 12：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 13,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 13：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 14,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 14：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 15,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 15：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 16,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 16：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 17,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 18,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "孤立極端焊墊",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 18：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 19,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 19：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 20,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 20：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 21,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 22,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 23,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 24,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 24：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 25,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 25：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 26,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 27,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 27：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 28,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 29,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 29：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 30,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 31,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 31：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 32,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 32：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 33,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 34,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 34：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 35,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 35：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 36,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 36：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 37,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 38,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 39,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 40,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 40：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 41,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 41：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 42,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 42：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 43,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 44,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 44：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 45,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "多變量離群"
+          ],
+          "changeReason": "seed 45：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 46,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 47,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 48,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 49,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "多變量離群"
+          ],
+          "changeReason": "seed 49：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 50,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 50：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 51,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 52,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 53,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 54,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 55,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 56,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 56：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 57,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 57：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 58,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 58：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 59,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 60,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 61,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 62,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 63,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "多變量離群",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 63：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 64,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 65,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 65：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 66,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 67,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 67：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 68,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "空間群聚",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 68：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 69,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 70,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 71,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 71：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 72,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 72：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 73,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 74,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 74：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 75,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 75：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 76,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 77,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 77：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 78,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 78：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 79,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 80,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 80：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 81,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 81：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 82,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 82：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 83,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 83：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 84,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 84：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 85,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "多變量離群"
+          ],
+          "changeReason": "seed 85：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 86,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 86：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 87,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 88,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 89,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 89：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 90,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 90：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 91,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 91：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 92,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 92：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 93,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 93：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 94,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 94：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 95,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 96,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 97,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 97：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 98,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 98：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 99,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 99：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 100,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 101,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 101：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 102,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 102：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 103,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 104,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 105,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 105：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 106,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 107,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 108,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 108：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 109,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 110,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 110：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 111,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 111：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 112,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 113,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 114,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 114：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 115,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "空間分布",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 115：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 116,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 117,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 118,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 118：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 119,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 119：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 120,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 120：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 121,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 121：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 122,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 122：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 123,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 124,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 124：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 125,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 126,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 127,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 128,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 128：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 129,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 130,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 130：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 131,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 131：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 132,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 132：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 133,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 133：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 134,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 134：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 135,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 136,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 137,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 137：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 138,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 138：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 139,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 140,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 141,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 141：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 142,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 143,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 143：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 144,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 144：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 145,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 146,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 146：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 147,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 147：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 148,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 149,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "孤立極端焊墊",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 149：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 150,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 151,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 151：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 152,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 152：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 153,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 153：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 154,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "孤立極端焊墊"
+          ],
+          "changeReason": "seed 154：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 155,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 155：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 156,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "多變量離群",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 156：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 157,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 158,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "多變量離群",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 158：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 159,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 160,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 161,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 162,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 162：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 163,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 163：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 164,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 165,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 165：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 166,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 167,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 168,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 169,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "空間分布",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 169：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 170,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 171,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 171：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 172,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 173,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 173：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 174,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 175,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 175：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 176,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 177,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 177：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 178,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 179,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "孤立極端焊墊",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 179：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 180,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 180：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 181,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 182,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 183,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 183：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 184,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 184：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 185,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 186,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 186：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 187,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 187：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 188,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 188：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 189,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 189：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 190,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 190：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 191,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 191：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 192,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "孤立極端焊墊",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 192：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 193,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 193：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 194,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "孤立極端焊墊",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 194：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 195,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 195：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 196,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "多變量離群"
+          ],
+          "changeReason": "seed 196：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 197,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": []
+        },
+        {
+          "seed": 198,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "孤立極端焊墊",
+            "空間分布",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 198：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 199,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 200,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        }
+      ]
+    },
+    "50_shift0": {
+      "summary": {
+        "okCount": 190,
+        "total": 200,
+        "okRate": 0.95
+      },
+      "seeds": [
+        {
+          "seed": 1,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 1：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 2,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 2：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 3,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 4,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 5,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 5：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 6,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 6：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 7,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 8,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 9,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 10,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 10：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 11,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 12,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 13,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 13：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 14,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 14：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 15,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 16,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 17,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 17：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 18,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "孤立極端焊墊",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 18：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 19,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 20,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 21,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 22,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 23,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 24,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 25,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 26,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 27,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 27：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 28,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 29,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 30,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 31,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 32,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 33,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "擦拭週期",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 33：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 34,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 34：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 35,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 36,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 37,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 38,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 39,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 40,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 41,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 42,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 43,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 43：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 44,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 45,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 46,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 46：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 47,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 48,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "多變量離群",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 48：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 49,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 50,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 50：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 51,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 52,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 52：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 53,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 54,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 55,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 55：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 56,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 57,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 58,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 58：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 59,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "刮刀方向",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 59：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 60,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 60：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 61,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 62,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 62：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 63,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 63：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 64,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 65,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 66,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 67,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 67：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 68,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 68：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 69,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 70,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 71,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 72,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 73,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 74,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 75,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 76,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 76：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 77,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 77：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 78,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 79,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 80,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 81,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 82,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 83,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 83：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 84,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 85,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 85：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 86,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 87,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 88,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 89,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 89：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 90,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 91,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 92,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "多變量離群",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 92：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 93,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 94,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 95,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 96,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 96：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 97,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 98,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 98：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 99,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 100,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 101,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 101：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 102,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 103,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 103：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 104,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 105,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 105：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 106,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 107,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 108,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 109,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 109：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 110,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "孤立極端焊墊",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 110：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 111,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 111：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 112,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 113,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 114,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 115,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 116,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 117,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 118,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 118：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 119,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "刮刀方向",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 119：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 120,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 120：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 121,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 122,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 123,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 123：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 124,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 124：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 125,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 126,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 127,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 128,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 129,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 130,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 131,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 132,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 133,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 134,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 135,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 136,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 136：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 137,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 138,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 139,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 139：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 140,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "孤立極端焊墊"
+          ],
+          "changeReason": "seed 140：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 141,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 142,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 143,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 144,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 144：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 145,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 145：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 146,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 147,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 147：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 148,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 148：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 149,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "孤立極端焊墊",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 149：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 150,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 151,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 151：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 152,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 153,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 154,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 154：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 155,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 156,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 156：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 157,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 158,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 158：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 159,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 160,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 161,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 162,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 163,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 163：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 164,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 165,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 166,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "擦拭週期",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 166：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 167,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 168,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 169,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 170,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 171,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 172,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 173,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 173：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 174,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 175,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [],
+          "changeReason": "seed 175：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 176,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 177,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 177：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 178,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 179,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 180,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 180：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 181,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 182,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 183,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 184,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 184：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 185,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "多變量離群",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 185：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 186,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 187,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 188,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 189,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 190,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 190：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 191,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 191：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 192,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "孤立極端焊墊",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 192：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 193,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 194,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 195,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 196,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 197,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "多變量離群",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 197：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 198,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "多變量離群",
+            "孤立極端焊墊",
+            "空間分布",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 198：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 199,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        },
+        {
+          "seed": 200,
+          "verdict": "正常",
+          "level": "ok",
+          "cats": [
+            "管制圖規則"
+          ]
+        }
+      ]
+    },
+    "25_shift3": {
+      "summary": {
+        "okCount": 0,
+        "total": 200,
+        "okRate": 0
+      },
+      "seeds": [
+        {
+          "seed": 1,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 2,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 3,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 3：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 4,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 5,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 6,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "空間分布",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 6：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 7,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 8,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 9,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 10,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 11,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 12,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 12：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 13,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "擦拭週期",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 13：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 14,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 15,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 16,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 17,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 18,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "孤立極端焊墊",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 18：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 19,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 20,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 21,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 22,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 23,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 24,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 25,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 26,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 27,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 27：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 28,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 29,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 30,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 31,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 32,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 33,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 33：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 34,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 35,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 36,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 37,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 38,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 39,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 40,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 40：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 41,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 42,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 42：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 43,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 44,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 45,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "多變量離群",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 45：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 46,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 46：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 47,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 48,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 49,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "多變量離群",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 49：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 50,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 51,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 52,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 53,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 54,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 55,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 56,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 57,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 58,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 59,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 60,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 61,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 62,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 63,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "多變量離群",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 63：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 64,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 65,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 66,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 67,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 68,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "空間群聚",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 68：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 69,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 70,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 71,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 72,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 73,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 74,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 75,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 76,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 77,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 78,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 79,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 80,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 81,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 82,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 82：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 83,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 84,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 85,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "多變量離群",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 85：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 86,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 87,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 88,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 89,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 90,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 90：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 91,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 92,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 93,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 94,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 95,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 96,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 97,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 98,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 98：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 99,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 100,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 101,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 102,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 103,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 104,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 105,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 106,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 107,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 108,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 109,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 110,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 111,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 112,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 113,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 114,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 115,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "空間分布",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 115：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 116,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 117,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 118,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 119,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 120,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 121,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 122,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 123,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 124,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 125,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 126,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 126：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 127,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 128,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 129,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 130,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 131,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 132,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 133,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 134,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 135,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 136,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 137,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 138,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 139,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 140,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 141,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 142,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 143,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 143：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 144,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 145,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 146,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 147,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 147：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 148,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 149,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "孤立極端焊墊",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 149：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 150,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "孤立極端焊墊",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 150：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 151,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 152,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 153,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 153：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 154,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "孤立極端焊墊",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 154：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 155,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 156,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "多變量離群",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 156：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 157,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 158,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "多變量離群",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 158：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 159,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 160,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 161,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 162,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 163,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 164,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 165,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 166,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 167,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 168,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 169,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "空間分布",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 169：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 170,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 171,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 172,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 173,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 173：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 174,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 175,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 175：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 176,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 177,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 178,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 179,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "孤立極端焊墊",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 179：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 180,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 180：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 181,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 182,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 183,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 184,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 184：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 185,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 186,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 187,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 188,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 189,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 190,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 190：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 191,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 192,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "孤立極端焊墊",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 192：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 193,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 194,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 195,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 196,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "多變量離群",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 196：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 197,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 198,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "孤立極端焊墊",
+            "空間分布",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 198：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 199,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 200,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        }
+      ]
+    },
+    "50_shift3": {
+      "summary": {
+        "okCount": 0,
+        "total": 200,
+        "okRate": 0
+      },
+      "seeds": [
+        {
+          "seed": 1,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 1：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 2,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 2：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 3,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 4,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 5,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 6,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 7,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 7：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 8,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 9,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 9：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 10,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 10：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 11,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 12,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 13,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 13：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 14,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 14：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 15,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 16,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 17,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 17：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 18,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "孤立極端焊墊",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 18：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 19,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 19：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 20,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 20：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 21,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 22,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 23,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 23：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 24,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 25,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 25：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 26,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 27,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 27：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 28,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 29,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 30,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 31,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 31：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 32,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 33,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 34,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 34：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 35,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 36,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 36：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 37,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "孤立極端焊墊",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 37：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 38,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 39,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 40,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 40：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 41,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 42,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 43,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 43：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 44,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 45,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 46,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 46：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 47,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 48,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "多變量離群",
+            "孤立極端焊墊",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 48：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 49,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 50,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 50：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 51,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 52,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 53,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 54,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 55,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 55：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 56,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 56：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 57,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 58,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 59,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "刮刀方向",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 59：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 60,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 60：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 61,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 62,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 63,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 63：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 64,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 65,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 65：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 66,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 67,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 68,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 68：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 69,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 70,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 70：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 71,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 72,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 73,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 74,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 75,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 76,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 77,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 78,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "單板異常",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 78：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 79,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 80,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 81,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 82,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 83,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 83：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 84,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 85,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 86,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 87,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 88,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 89,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 90,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 91,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 92,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "多變量離群",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 92：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 93,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 94,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 95,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "單板異常",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 95：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 96,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 96：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 97,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 98,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 98：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 99,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 100,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 101,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 102,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 102：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 103,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 104,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 105,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 106,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 107,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 107：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 108,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 109,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 110,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "孤立極端焊墊",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 110：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 111,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 112,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 113,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 114,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 114：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 115,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 116,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 117,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 118,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 119,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 120,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 120：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 121,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 122,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 123,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 124,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 125,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 126,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 127,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 128,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 129,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 130,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 131,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 132,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 133,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 134,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 135,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 135：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 136,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 137,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 138,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 138：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 139,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 140,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 141,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 142,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 143,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 144,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 145,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 145：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 146,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 146：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 147,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 147：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 148,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 148：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 149,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "孤立極端焊墊",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 149：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 150,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 151,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 151：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 152,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 152：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 153,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 154,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 154：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 155,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 156,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 156：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 157,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 157：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 158,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 158：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 159,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 160,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 161,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 162,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 162：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 163,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 164,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 165,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 166,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 166：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 167,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 168,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 169,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 169：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 170,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 171,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 172,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 172：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 173,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 174,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 174：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 175,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 176,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 176：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 177,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 178,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 179,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 180,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 181,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 181：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 182,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 183,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 184,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 184：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 185,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "多變量離群",
+            "管制圖規則"
+          ],
+          "changeReason": "seed 185：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 186,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 187,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 188,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 188：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 189,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 190,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 190：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 191,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 192,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "孤立極端焊墊",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 192：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 193,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 194,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 194：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 195,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 196,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 197,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "多變量離群",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 197：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 198,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "多變量離群",
+            "孤立極端焊墊",
+            "空間分布",
+            "管制圖規則",
+            "趨勢漂移"
+          ],
+          "changeReason": "seed 198：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        },
+        {
+          "seed": 199,
+          "verdict": "異常",
+          "level": "ng",
+          "cats": [
+            "管制圖規則",
+            "趨勢漂移"
+          ]
+        },
+        {
+          "seed": 200,
+          "verdict": "警示",
+          "level": "warn",
+          "cats": [
+            "管制圖規則"
+          ],
+          "changeReason": "seed 200：由含板級隨機效應的舊資料改為列級 i.i.d. 常態量測後，依每板 n_i 與新 X̄ 界限重算。"
+        }
+      ]
+    }
   }
 }

@@ -71,6 +71,157 @@ test("B2/B3 零變異：交叉驗證為不適用（不是異常），超規 PPM 
   assert.doesNotMatch(cap.ev, /NaN/);
 });
 
+test("L3 穩定性三態：少於 5 板不得由空 Nelson 規則推成穩定", () => {
+  const rows = [];
+  for (let b = 1; b <= 4; b++) for (let i = 0; i < 5; i++) rows.push({ board: `B${b}`, pad: `P${i}`, comp: `P${i}`, group: "G", volume: 100 + b + (i % 3), height: 120, area: 100 });
+  const S = st(rows), A = c.analyze(S);
+  S.A = A;
+  assert.equal(A.xs.rejected, true);
+  assert.equal(A.stable, null, "拒絕判異時穩定性必須為 unknown/null");
+  assert.match(A.xs.reason, /需 ≥5/);
+  const control = A.xv.rows.find(x => x.k === "管制狀態");
+  assert.equal(control.st, "na");
+  assert.match(control.ev, /無法判定/);
+  assert.equal(c.overallVerdict(S, []).level, "warn", "總覽不可把無法判定標成正常穩定");
+  const out = c.buildStatsData(S);
+  assert.ok(out.some(x => /管制狀態無法判定/.test(x.rule)), "統計資料匯出需揭露穩定性未知");
+  assert.match(c.statsDataCsv(S), /管制狀態無法判定/);
+});
+
+test("L3 組內 σ 為零：Cp/Cpk 不估，Pp/Ppk 仍依有效整體 σ 計算", () => {
+  const rows = [];
+  for (let b = 1; b <= 5; b++) for (let i = 0; i < 20; i++) rows.push({ board: `B${b}`, pad: `P${i}`, comp: `P${i}`, group: "G", volume: 96 + b, height: 120, area: 100 });
+  const A = c.analyze(st(rows));
+  assert.equal(A.sigmaW, 0);
+  assert.ok(A.overallSd > 0);
+  assert.ok(Number.isNaN(A.cap.cp) && Number.isNaN(A.cap.cpk), "組內 σ=0 時 Cp/Cpk 必須不可估");
+  assert.ok(Number.isFinite(A.cap.pp) && Number.isFinite(A.cap.ppk), "整體 σ 有效時 Pp/Ppk 必須保留");
+  assert.match(A.cap.reason, /組內變異為零.*Cp\/Cpk 無法估計/);
+  assert.equal(A.stable, null, "組內 σ=0 時 X̄ 穩定性應為無法判定");
+});
+
+test("L3 混合群組也不以群組間差異補造組內 σ，仍保留各群組 Ppk", () => {
+  const rows = [];
+  for (let b = 1; b <= 5; b++) for (let g = 1; g <= 2; g++) for (let i = 0; i < 10; i++) rows.push({
+    board: `B${b}`, pad: `G${g}-P${i}`, comp: `G${g}`, group: `G${g}`, volume: 90 + g * 12 + b * (g === 1 ? 1 : 2), height: 120, area: 100
+  });
+  const A = c.analyze(st(rows));
+  assert.equal(A.mixed, true);
+  assert.equal(A.sigmaW, 0);
+  assert.ok(Number.isFinite(A.overallSd));
+  assert.ok(Number.isNaN(A.cap.cpk));
+  assert.ok(Number.isFinite(A.cap.ppk), "混合群組摘要仍須提供最差可估 Ppk");
+  assert.ok(A.cap.groups.every(g => Number.isNaN(g.cpk) && Number.isFinite(g.ppk)), "每個群組須分開標示 Cp/Cpk 不估與 Ppk 有效");
+  const xv = A.xv.rows.find(x => x.k === "製程能力");
+  assert.equal(xv.st, "na");
+  assert.match(xv.ev, /Ppk .*仍依整體 σ 計算/);
+});
+
+test("L3 沒有組內自由度時，σ̂組內與 Cpk 不由整體 σ 代替", () => {
+  const rows = Array.from({ length: 10 }, (_, i) => ({ board: `B${i + 1}`, pad: "P1", comp: "P1", group: "G", volume: 96 + i, height: 120, area: 100 }));
+  const A = c.analyze(st(rows));
+  assert.ok(Number.isNaN(A.sigmaW), "只有每板一點時沒有組內自由度，σ̂組內應為 NaN");
+  assert.ok(A.overallSd > 0);
+  assert.ok(Number.isNaN(A.cap.cpk));
+  assert.ok(Number.isFinite(A.cap.ppk), "整體 σ 有效時仍可估 Ppk");
+  assert.match(A.cap.reason, /組內自由度不足/);
+  assert.equal(A.stable, null);
+  const issues = c.detectIssues(st(rows));
+  assert.equal(issues.meta.verdict.worstCap, null, "問題偵測也不可用整體 σ 補造組內 Cpk");
+});
+
+test("L3 固定 seed X̄ 模擬：每板 n_i 正規化，依 Phase I t(df) 參考核對誤報", () => {
+  let seed = 20261104 >>> 0;
+  const ref = normal(() => ((seed = (Math.imul(1664525, seed) + 1013904223) >>> 0) / 4294967296)), reps = 10000;
+  const simulate = (counts) => {
+    const byN = new Map(), totalBoards = counts.length;
+    for (let trial = 0; trial < reps; trial++) {
+      const means = new Float64Array(totalBoards); let grandSum = 0, N = 0, ssw = 0, df = 0;
+      for (let b = 0; b < totalBoards; b++) {
+        const n = counts[b], values = new Float64Array(n); let sum = 0;
+        for (let i = 0; i < n; i++) { const x = ref(); values[i] = x; sum += x; }
+        const m = sum / n; means[b] = m; grandSum += sum; N += n;
+        if (n > 1) { for (const x of values) ssw += (x - m) ** 2; df += n - 1; }
+      }
+      const grand = grandSum / N, sigmaW = Math.sqrt(ssw / df);
+      for (let b = 0; b < totalBoards; b++) {
+        const n = counts[b], z = (means[b] - grand) / (sigmaW / Math.sqrt(n));
+        const bucket = byN.get(n) || { total: 0, hit: 0 }; bucket.total++;
+        if (Math.abs(z) > 3) bucket.hit++;
+        byN.set(n, bucket);
+      }
+    }
+    return Object.fromEntries([...byN].map(([n, x]) => [n, { ...x, rate: x.hit / x.total }]));
+  };
+  const fixedN = simulate(Array(25).fill(5));
+  const alternating = simulate(Array.from({ length: 25 }, (_, i) => i % 2 ? 25 : 1));
+  // Phase I reference: P(|t_df| > 3 / sqrt(1 - n_i/N)); n=5 => df=100,
+  // n=1/25 alternating => N=313, df=288. The Monte Carlo tolerance is six binomial standard errors
+  // from that n-specific reference, not a shared fixed error-rate interval.
+  const checkReference = (result, n, N, df) => {
+    const p = c.tP(3 / Math.sqrt(1 - n / N), df), expected = result.total * p, se = Math.sqrt(result.total * p * (1 - p));
+    assert.ok(Math.abs(result.hit - expected) <= 6 * se, `n=${n}: ${result.hit}/${result.total} differs from t(${df}) reference ${p} (${expected.toFixed(1)} expected, ${se.toFixed(1)} SE)`);
+  };
+  assert.equal(fixedN[5].total, 250000);
+  assert.equal(alternating[1].total, 130000);
+  assert.equal(alternating[25].total, 120000);
+  checkReference(fixedN[5], 5, 125, 100);
+  checkReference(alternating[1], 1, 313, 288);
+  checkReference(alternating[25], 25, 313, 288);
+
+  const rows = [];
+  for (let b = 0; b < 25; b++) for (let i = 0; i < (b % 2 ? 25 : 1); i++) rows.push({ board: `B${b + 1}`, pad: `P${i}`, comp: `P${i}`, group: "G", volume: 100 + (b % 2 ? 2 : 0) + (i - 12) * 0.1, height: 120, area: 100 });
+  const A = c.analyze(st(rows));
+  assert.equal(rows.length, 313);
+  assert.equal(A.sigmaW > 0, true);
+  for (let i = 0; i < A.byBoard.length; i++) {
+    const n = A.byBoard[i].n, p = A.xs.pts[i], expectedSd = A.sigmaW / Math.sqrt(n);
+    assert.ok(Math.abs(p.sd - expectedSd) < 1e-12, `B${i + 1} 的 z 分母應為 σ̂組內/√n_i`);
+    assert.ok(Math.abs(p.ucl - (A.gMean + 3 * expectedSd)) < 1e-12, `B${i + 1} 的 UCL 應依 n_i 調整`);
+    assert.ok(Math.abs(p.z - (p.v - A.gMean) / expectedSd) < 1e-12, `B${i + 1} 的 z 應與界限同分母`);
+  }
+});
+
+test("L3 零組內變異的總覽、能力頁、報告與 AI payload 明確呈現未知及保留 Ppk", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const html = fs.readFileSync(HTML, "utf8").replace(/<script src=[^>]+><\/script>/g, "");
+  const dom = new JSDOM(html, { runScripts: "dangerously", url: "https://spi.example/", beforeParse(w) {
+    w.SPI_TEST_HOOK = {};
+    w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === "measureText" ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
+    w.HTMLCanvasElement.prototype.toDataURL = () => "data:image/png;base64,AA==";
+    Object.defineProperty(w.HTMLElement.prototype, "offsetParent", { get() { let e = this; while (e) { if (e.hidden) return null; e = e.parentElement; } return w.document.body; } });
+    w.Element.prototype.scrollIntoView = () => {}; w.matchMedia = () => ({ matches: false, addEventListener() {} }); w.ResizeObserver = class { observe() {} }; w.MutationObserver = class { observe() {} disconnect() {} }; w.scrollTo = () => {};
+    w.Chart = class { constructor() {} destroy() {} static register() {} static defaults = { font: {} }; };
+  } });
+  const w = dom.window, hook = w.SPI_TEST_HOOK;
+  for (let i = 0; i < 200 && !(hook.aiPayload && w.eval("typeof S!=='undefined'")); i++) await tick(20);
+  assert.ok(hook.aiPayload && hook.setTab && hook.renderOverview && hook.reportMd, "頁面內部測試掛鉤需就緒");
+  const S = hook.S, rows = [];
+  for (let b = 1; b <= 5; b++) for (let i = 0; i < 20; i++) rows.push({ board: `B${b}`, pad: `P${i}`, comp: `P${i}`, group: "G", volume: 96 + b, height: 120, area: 100 });
+  S.rows = rows; S.metric = "volume"; S.group = "ALL"; S.pendingVerify = false;
+  w.eval("S.A=analyze(S); S.F=detectIssues(S);");
+  hook.renderOverview(); hook.setTab("capability"); hook.renderReport();
+
+  const kpis = [...w.document.querySelectorAll("#capKpis .kpi")];
+  const cpk = kpis.find(x => x.querySelector(".k")?.textContent === "CPK");
+  const ppk = kpis.find(x => x.querySelector(".k")?.textContent === "PPK");
+  assert.equal(cpk.querySelector(".v").textContent, "—", "能力頁 Cpk 不可顯示有限值");
+  assert.match(cpk.querySelector(".s").textContent, /組內變異為零/);
+  assert.notEqual(ppk.querySelector(".v").textContent, "—", "能力頁仍須顯示有效 Ppk");
+  assert.match(w.document.querySelector("#kpis").textContent, /製程穩定性無法判定/);
+  assert.match(w.document.querySelector("#reportPreview").textContent, /穩定性無法判定/);
+
+  const md = hook.reportMd(), payload = hook.aiPayload();
+  assert.match(md, /製程穩定性無法判定/);
+  assert.match(md, /組內變異為零，Cp\/Cpk 無法估計/);
+  assert.match(md, /Pp \/ Ppk \| .* \/ \d/);
+  assert.equal(payload.能力.製程穩定, null);
+  assert.match(payload.能力.製程穩定狀態, /無法判定：組內變異為零，X̄ 界限無法估計/);
+  assert.notEqual(payload.能力.Ppk, null, "AI payload 應保留可估 Ppk");
+  assert.equal(payload.管制狀態.製程穩定, null);
+  assert.match(payload.管制狀態.製程穩定狀態, /無法判定：組內變異為零，X̄ 界限無法估計/);
+  dom.window.close();
+});
+
 test("B1 印刷機 θ 補償：alignFit 的旋轉（thDeg）會帶入，不再恆為 0", () => {
   const nrm = normal(mulberry32(5)), rows = [], thMrad = 0.87; // 約 0.05°
   for (let b = 1; b <= 3; b++) for (let i = 0; i < 60; i++) {
@@ -306,7 +457,7 @@ test("D-R7: 只有 Nelson 規則 7 時，摘要明確顯示低變異警訊而非
     0.48363933297805495, -0.014352352079004094, 0.17607804690487694, -0.06405330877751114, -0.30887053557671607];
   const nelX = c.nelson(z);
   assert.deepEqual(Array.from(nelX.rules.filter(r => r.idx.length), r => r.id), [7]);
-  const rows = z.map((v, i) => ({ board: `B${i + 1}`, pad: "P1", comp: "P1", group: "G", volume: 100 + v, height: 120 + i * 0.01, area: 100 + i * 0.01 }));
+  const rows = z.flatMap((v, i) => [-0.1, 0.1].map((inner, j) => ({ board: `B${i + 1}`, pad: `P${j + 1}`, comp: `P${j + 1}`, group: "G", volume: 100 + v + inner, height: 120 + i * 0.01, area: 100 + i * 0.01 })));
   const A = c.analyze(st(rows));
   A.nelX = nelX;
   const summary = c.crossValidate(A).rows.find(x => x.k === "管制狀態");
@@ -339,7 +490,7 @@ test("D-XBAR: 25 板樣本數不等時，X̄ 圖與 Nelson 卡使用同一加權
   const rows = [];
   for (let i = 0; i < means.length; i++) for (let j = 0; j < counts[i]; j++)
     rows.push({ board: `B${String(i + 1).padStart(2, "0")}`, pad: `P${j}`, comp: `P${j}`, group: "G",
-      volume: 100 + means[i], height: 120 + (j % 2) * 0.01, area: 100 + (j % 3) * 0.01 });
+      volume: 100 + means[i] + ((j % 5) - 2) * 0.01, height: 120 + (j % 2) * 0.01, area: 100 + (j % 3) * 0.01 });
   const S = st(rows, { chart: "xbars" });
   const A = c.analyze(S);
   const cards = c.detectIssues(S).filter(x => x.category === "管制圖規則" && x.metric === "體積");
@@ -347,7 +498,20 @@ test("D-XBAR: 25 板樣本數不等時，X̄ 圖與 Nelson 卡使用同一加權
   const chartRules = Array.from(A.nelX.rules.filter(r => r.idx.length && r.id !== 7), r => r.id).sort((a, b) => a - b);
   assert.ok(Math.abs(A.xs.cl - c.mean(rows.map(r => r.volume))) < 1e-10, "X̄ 中心線應為依各板量測數加權的總平均");
   assert.deepEqual(chartRules, cardRules, `X̄ 圖觸發 ${chartRules.join(",")}，卡片觸發 ${cardRules.join(",")}`);
-  assert.deepEqual(chartRules, [1, 2, 5, 6], "規則 8 現要求中心線兩側均有點；此反例八點皆在同一側，因此其餘 4 條規則仍須一致");
+  for (let i = 0; i < A.xs.pts.length; i++) {
+    const p = A.xs.pts[i], n = A.byBoard[i].n;
+    assert.ok(Math.abs(p.sd - A.sigmaW / Math.sqrt(n)) < 1e-12, `${p.lab} 的 X̄ 標準誤應依 n=${n} 縮放`);
+    assert.ok(Math.abs(p.ucl - (A.xs.cl + 3 * p.sd)) < 1e-12, `${p.lab} UCL 應使用該板標準誤`);
+    assert.ok(Math.abs(p.lcl - (A.xs.cl - 3 * p.sd)) < 1e-12, `${p.lab} LCL 應使用該板標準誤`);
+  }
+  const rule1 = cards.find(x => x.rule_id === "Nelson 規則 1");
+  assert.ok(rule1, "此異質 n 反例應有可對照的單點 Nelson 卡");
+  const rule1Idx = A.nelX.rules.find(r => r.id === 1).idx;
+  for (const i of rule1Idx.slice(0, 10)) {
+    const p = A.xs.pts[i];
+    assert.ok(rule1.limit.includes(`${p.lab} ${p.lcl.toFixed(2)}–${p.ucl.toFixed(2)}（n=${A.byBoard[i].n}）`), `${p.lab} 問題卡應揭露圖表相同的板別界限；預期 ${p.lab} ${p.lcl.toFixed(2)}–${p.ucl.toFixed(2)}，實際 ${rule1.limit}`);
+  }
+  if (rule1Idx.length > 10) assert.ok(rule1.limit.includes(`另 ${rule1Idx.length - 10} 個`), "超過摘要列數的板別界限應揭露剩餘筆數");
 });
 
 test("D-EVIDENCE: 形貌與停線迷你圖按板顯示觀測值，不複製全批統計量", () => {
