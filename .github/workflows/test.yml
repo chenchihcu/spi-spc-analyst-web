@@ -27,6 +27,9 @@ jobs:
       - name: Run release check including unit & integration tests
         run: npm run release-check
 
+      - name: Calibrate statistical rules with full stable-process simulations
+        run: npm run test:slow
+
       - name: Build Cloudflare assets
         run: npm run build:cloudflare
 

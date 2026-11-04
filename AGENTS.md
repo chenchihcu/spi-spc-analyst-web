@@ -34,6 +34,10 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
 
 ## 統計與問題偵測
 
+| 重複錯誤類別 | 強制檢查 | 歷史證據 |
+|---|---|---|
+| 用縮小樣本測試代替完整穩定製程校準 | CI 的 `npm run test:slow` 執行完整 seed／群組大小模擬；`tests/release-check.test.js` 阻擋移除或重複此關卡 | #51 FastMCD 小樣本誤報 25–50 倍；#52 Moran's I 標準誤低估造成誤報 |
+
 - **新增或修改偵測規則時，以穩定製程模擬量測誤報率**：用 i.i.d. 資料、在實際群組大小（焊墊群組常只有 30–100 個）下量測每點誤報，需接近名目值。不可使用只在大樣本成立的漸近門檻（χ²、常態近似標準誤），也不可拿同一份資料推估規格再算 Cpk。
   - 檢查：`npm run test:slow` 通過；更新 `tests/verdict-sim-expected.json` 時逐 seed 說明變動原因。
   - 出處：v9.2.0、v9.13.2（1784 項中 1716 張自我參照 Cpk 誤報）、v10.2.0、v10.2.2（FastMCD χ² 小樣本誤報 25–50 倍）、v10.2.3（Moran's I 標準誤低估約 1.5 倍）。
