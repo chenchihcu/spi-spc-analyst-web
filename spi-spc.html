@@ -888,7 +888,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.13.1</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.14.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -1088,6 +1088,8 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
       <button id="btnPlay" aria-pressed="false">逐板播放</button>
       <button type="button" id="btn3dTouch" aria-pressed="false" title="手機預設單指上下捲動頁面；開啟後可單指旋轉 3D">操作 3D</button>
       <button type="button" id="btnDl3d">下載 3D 圖</button>
+      <div class="field"><label>外觀模式</label><div class="seg" id="seg3dRenderMode">
+        <button type="button" data-m="real" aria-pressed="true">真實外觀</button><button type="button" data-m="heatmap" aria-pressed="false">品質熱圖</button></div></div>
       <div class="field"><label>著色</label><div class="seg" id="segColor">
         <button data-v="status" aria-pressed="true">判定</button><button data-v="height">高度偏差</button><button data-v="volume">體積偏差</button></div></div>
       <div class="field"><label for="inExag">高度放大 <span id="exagOut" class="num">20×</span></label><input type="range" id="inExag" min="5" max="60" step="1" value="20"></div>
@@ -2589,7 +2591,7 @@ function formatSidedPpmBlock(block, fmt = (v) => String(Math.round(v))) {
 /* @windows-parity END */
 /* Number.isFinite：空白座標欄解析為 null，全域 isFinite(null) 會當成 0 */
 const realXY=r=>Boolean(r&&!r.gridPos&&Number.isFinite(r.x)&&Number.isFinite(r.y));
-const S={rows:[],metrics:[],metric:"volume",group:ALL_GRP,chart:"xbars",relChart:"specScatter",pad:null,board:null,specSrc:"sample",partSpec:null,specDraft:null,specsG:null,sqDir:"Y",specs:JSON.parse(JSON.stringify(DEF_SPECS)),stencil:120,heightUnit:"um",htol:{lo:75,hi:125},step:{on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]},selZone:1,wipe:5,aperture:{groups:{}},geometryPads:null,padCoverage:null,pendingVerify:false,runVendor:"generic",ovCapSnap:null,ovCapSnapKey:"",source:"範例資料",tab:"issues",F:[],issLv:"all",issCat:"all",issEnt:null,ctx:null,colorMode:"status",exag:20,ghost:true,bridgeWarn:true,csAxis:"X",selectedPad:null,A:null,ai:"",aiModel:"",duo:{active:false,posture:"folded",mode:"master-detail",leftTab:"issues",rightTab:"sim3d",thumbSide:"right",pinnedPad:null,dockOpen:false}};
+const S={rows:[],metrics:[],metric:"volume",group:ALL_GRP,chart:"xbars",relChart:"specScatter",pad:null,board:null,specSrc:"sample",partSpec:null,specDraft:null,specsG:null,sqDir:"Y",specs:JSON.parse(JSON.stringify(DEF_SPECS)),stencil:120,heightUnit:"um",htol:{lo:75,hi:125},step:{on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]},selZone:1,wipe:5,aperture:{groups:{}},geometryPads:null,padCoverage:null,pendingVerify:false,runVendor:"generic",ovCapSnap:null,ovCapSnapKey:"",source:"範例資料",tab:"issues",F:[],issLv:"all",issCat:"all",issEnt:null,ctx:null,colorMode:"status",sim3dMode:"real",exag:20,ghost:true,bridgeWarn:true,csAxis:"X",selectedPad:null,A:null,ai:"",aiModel:"",duo:{active:false,posture:"folded",mode:"master-detail",leftTab:"issues",rightTab:"sim3d",thumbSide:"right",pinnedPad:null,dockOpen:false}};
 function metricUnit(k,st=S){return k==="height"&&st&&st.heightUnit==="unknown"?"單位未知":(METRICS[k]&&METRICS[k].unit)||""}
 loadSpiKbRules();
 
@@ -5949,7 +5951,7 @@ const LVL={ng:"嚴重",warn:"警示",info:"資訊"},GOLAB={sim3d:"看該板 3D",
 /* 前往證據頁時記住來源問題，在目標頁顯示來源提示與返回鍵 */
 function goto(g,from){if(!g)return;if(g.metric&&S.metrics.includes(g.metric))S.metric=g.metric;if(g.group!==undefined)S.group=g.group;if(g.chart)S.chart=g.chart;if(g.pad)S.pad=g.pad;if(g.board)S.board=g.board;
   S.ctx=from?{id:from.id,title:from.title,lv:from.lv}:null;
-  holdRender(()=>{syncControls();recompute()});if(g.board&&$("#selBoard")){$("#selBoard").value=g.board}if(g.tab==="data")setSub(g.sub||"import");if(S.duo&&S.duo.active){S.duo.rightTab=g.tab;if(g.pad)S.duo.pinnedPad=g.pad;updateDuoThumbDock();showPanels(S.tab);renderTab();window.dispatchEvent(new CustomEvent("spc:duo-pad-select",{detail:{pad:g.pad,board:g.board,group:g.group,metric:g.metric,tab:g.tab,issue:from}}))}else{setTab(g.tab);window.scrollTo({top:0,behavior:"smooth"})}}
+  holdRender(()=>{syncControls();recompute()});if(g.board&&$("#selBoard")){$("#selBoard").value=g.board}if(g.tab==="data")setSub(g.sub||"import");if(S.duo&&S.duo.active){S.duo.rightTab=g.tab;if(g.pad)S.duo.pinnedPad=g.pad;updateDuoThumbDock();showPanels(S.tab);renderTab();window.dispatchEvent(new CustomEvent("spc:duo-pad-select",{detail:{pad:g.pad,board:g.board,group:g.group,metric:g.metric,tab:g.tab,issue:from}}))}else{setTab(g.tab);window.scrollTo({top:0,behavior:"smooth"})};if(g.tab==="sim3d"&&g.pad&&typeof focusPad3D==="function"){setTimeout(()=>focusPad3D(g.pad),120)}}
 function showCtx(){const c=S.ctx,bar=$("#ctxBar");bar.hidden=!c||S.tab==="issues";if(c)$("#ctxText").innerHTML=`正在查看問題 <b>#${c.id}</b> 的證據：${esc(c.title)}`}
 $("#ctxBack").onclick=()=>{const id=S.ctx&&S.ctx.id;setTab("issues");if(id)setTimeout(()=>flashIssue(id),60)};
 $("#ctxClose").onclick=()=>{S.ctx=null;showCtx()};
@@ -7263,6 +7265,9 @@ function drawCrossSectionProfile(r){
     else if(typeof ctx.rect==="function"){ctx.beginPath();ctx.rect(aLeft,aTop,aRight-aLeft,toPy(0)-aTop);ctx.stroke()}
     setDash([]);
 
+    const eta=typeof calcShapeFactor==="function"?calcShapeFactor(r,hs,S):0.82;
+    const alphaTop=Math.min(0.95,Math.max(0.25,2*eta-1));
+    const topW_um=baseW_um*Math.sqrt(alphaTop);
     const cX=off;
     const bL=cX-baseW_um/2,bR=cX+baseW_um/2;
     const pts=[];
@@ -7273,11 +7278,20 @@ function drawCrossSectionProfile(r){
       const u=(x-cX)/((bR-bL)/2||1);
       let y=0;
       if(Math.abs(u)<=1.0){
-        const core=Math.max(0,1-Math.pow(Math.abs(u),3.5));
-        y=hActual*core;
-        if(pk>10&&core>0.08){
-          const rim=Math.pow(Math.abs(u),2.5);
-          y+=pk*rim;
+        const uTop=(x-cX)/(topW_um/2||1);
+        if(Math.abs(uTop)<=1.0){
+          y=hActual;
+          if(eta>=0.85)y+=Math.min(hActual*0.12,6)*(1-Math.pow(Math.abs(uTop),3));
+          else y+=Math.min(hActual*0.22,10)*(1-Math.pow(Math.abs(uTop),2))*(0.9-eta+0.1);
+          if(pk>10)y+=pk*Math.pow(Math.abs(uTop),2.5);
+          const copl=r.coplanarity||0;
+          if(copl>0||eta<0.65){
+            const sc=Math.max(copl,(0.70-eta)*hActual*0.4);
+            y-=Math.min(hActual*0.4,sc)*Math.max(0,1-Math.abs(uTop));
+          }
+        }else{
+          const slopeT=(1.0-Math.abs(u))/(1.0-(topW_um/baseW_um)||0.01);
+          y=hActual*Math.max(0,Math.min(1,slopeT));
         }
       }
       pts.push({x:toPx(x),y:toPy(Math.max(0,y))});
@@ -7318,13 +7332,16 @@ function selectPadForProfile(r){
   if(!r)return;
   S.selectedPad=r;
   const d=classify(r,S.specs,S);
+  const eta=typeof calcShapeFactor==="function"?calcShapeFactor(r,S.specs.height,S):0.82;
   const morphTxt = (r.bridgemargin != null ? ` · 橋接餘裕 <b>${f(r.bridgemargin, 1)}%</b>` : "")
     + (r.peaking != null ? ` · 拉尖 <b>${f(r.peaking, 1)} µm</b>` : "")
     + (r.coplanarity != null ? ` · 共面性 <b>${f(r.coplanarity, 1)} µm</b>` : "")
-    + (r.coverage != null ? ` · 覆蓋率 <b>${f(r.coverage, 1)}%</b>` : "");
+    + (r.coverage != null ? ` · 覆蓋率 <b>${f(r.coverage, 1)}%</b>` : "")
+    + ` · 形狀因子 η <b>${f(eta, 2)}</b>`;
   $("#hud").innerHTML=`<b>${r.board} · ${r.pad}</b>（${r.group}）<br>體積 <b>${f(r.volume,1)}%</b> · 高度 <b>${f(r.height,1)} ${METRICS.height.unit}</b> · 面積 <b>${f(r.area,1)}%</b><br>偏移 X <b>${f(r.offx,0)}</b> / Y <b>${f(r.offy,0)}</b> µm<br>鋼板 <b>${padThk(r,S)} µm</b>${zoneOf(r,S)?"（"+zoneOf(r,S).name+"）":""} · 高度 ${S.heightUnit==="unknown"?"單位未確認，厚度比不計算":`<b>${f(r.height/padThk(r,S)*100,0)}%</b> 厚度`}${morphTxt}<br>${d.length?d.map(c=>DEFECTS[c]).join("、"):"規格內"}`;
   if($("#csPadTitle"))$("#csPadTitle").innerHTML=`${esc(r.pad)} <span class="note">（${esc(r.group)}）</span>`;
   drawCrossSectionProfile(r);
+  if(typeof highlightSelectedPad3D==="function")highlightSelectedPad3D(r);
 }
 function renderBoard2D(){
   const A=S.A;if(!A||!S.board)return;
@@ -7451,15 +7468,130 @@ function check3DRender(){
   return why;
 }
 function statusCol(r){const d=classify(r,S.specs,S);if(!d.length)return css("--ok");return d.some(c=>c==="INS"||c==="BRG"||c==="EXC")?css("--ng"):css("--warn")}
+function calcShapeFactor(r,hs,st){
+  if(!r||(r.volume==null&&r.area==null&&r.height==null))return 0.82;
+  const s=st||S;
+  const thk=s.step&&s.step.on?padThk(r,s):(s.stencil||120);
+  const vMeas=r&&r.volume!=null?r.volume:100;
+  const aMeas=r&&r.area!=null?Math.max(r.area,5):100;
+  const hMeas=r&&r.height!=null?Math.max(r.height,5):(hs&&hs.tgt?hs.tgt:thk);
+  let eta=(vMeas*thk)/(aMeas*hMeas);
+  if(!isFinite(eta)||eta<=0)eta=0.82;
+  return Math.min(0.98,Math.max(0.45,eta));
+}
+
+let solderGrainTex=null;
+function getSolderGrainTexture(){
+  if(solderGrainTex)return solderGrainTex;
+  if(!window.THREE||typeof THREE.DataTexture!=="function")return null;
+  try{
+    const size=64;
+    const data=new Uint8Array(size*size*4);
+    let s=123456789;
+    const rnd=()=>{s=(s*1664525+1013904223)>>>0;return(s>>>0)/4294967296};
+    const h=new Float32Array(size*size);
+    for(let i=0;i<size*size;i++){
+      h[i]=rnd()*0.7+(Math.sin((i%size)*0.8)*Math.cos(Math.floor(i/size)*0.8))*0.3;
+    }
+    for(let y=0;y<size;y++){
+      for(let x=0;x<size;x++){
+        const idx=(y*size+x)*4;
+        const x0=h[y*size+((x-1+size)%size)];
+        const x1=h[y*size+((x+1)%size)];
+        const y0=h[((y-1+size)%size)*size+x];
+        const y1=h[((y+1)%size)*size+x];
+        const dx=(x0-x1)*1.5;
+        const dy=(y0-y1)*1.5;
+        const dz=1.0;
+        const len=Math.hypot(dx,dy,dz)||1;
+        data[idx]=Math.round(((dx/len)*0.5+0.5)*255);
+        data[idx+1]=Math.round(((dy/len)*0.5+0.5)*255);
+        data[idx+2]=Math.round(((dz/len)*0.5+0.5)*255);
+        data[idx+3]=255;
+      }
+    }
+    const tex=new THREE.DataTexture(data,size,size,THREE.RGBAFormat);
+    if(THREE.RepeatWrapping){
+      tex.wrapS=THREE.RepeatWrapping;tex.wrapT=THREE.RepeatWrapping;
+      if(typeof tex.repeat.set==="function")tex.repeat.set(4,4);
+    }
+    tex.needsUpdate=true;
+    solderGrainTex=tex;
+    return tex;
+  }catch(e){return null}
+}
+
+let realPasteMat=null;
+function getRealPasteMat(){
+  if(realPasteMat)return realPasteMat;
+  if(!window.THREE||typeof THREE.MeshStandardMaterial!=="function")return null;
+  const tex=getSolderGrainTexture();
+  const opts={color:new THREE.Color(0x9e9e98),metalness:0.72,roughness:0.48};
+  if(tex&&typeof THREE.Vector2==="function"){
+    opts.normalMap=tex;
+    opts.normalScale=new THREE.Vector2(0.35,0.35);
+  }
+  realPasteMat=new THREE.MeshStandardMaterial(opts);
+  return realPasteMat;
+}
+
+let selectedHighlightMesh=null;
+function highlightSelectedPad3D(padRow){
+  if(!T.ok||!T.root||!window.THREE)return;
+  if(selectedHighlightMesh){
+    T.root.remove(selectedHighlightMesh);
+    if(selectedHighlightMesh.geometry)selectedHighlightMesh.geometry.dispose();
+    if(selectedHighlightMesh.material)selectedHighlightMesh.material.dispose();
+    selectedHighlightMesh=null;
+  }
+  if(!padRow)return;
+  const all=S.rows,P=pos3D(all);
+  const pos=P.get(padRow);
+  if(!pos)return;
+  const E=ext3D(P),cx=(E.x0+E.x1)/2,cy=(E.y0+E.y1)/2;
+  const x=pos.x-cx+((padRow.offx||0)/1000);
+  const z=cy-pos.y-((padRow.offy||0)/1000);
+  const ap=aperture(padRow,S);
+  const k=Math.sqrt(Math.max((padRow.area??100)/100,.05));
+  const w=ap.L*k,d=ap.W*k;
+  const rad=Math.max(w,d)/2+0.12;
+  if(typeof THREE.RingGeometry==="function"&&typeof THREE.MeshBasicMaterial==="function"){
+    const ringGeo=new THREE.RingGeometry(rad*0.85,rad*1.2,24);
+    const ringMat=new THREE.MeshBasicMaterial({color:0x38bdf8,side:THREE.DoubleSide,transparent:true,opacity:0.85,depthWrite:false});
+    const ring=new THREE.Mesh(ringGeo,ringMat);
+    ring.rotation.x=Math.PI/2;
+    ring.position.set(x,0.05,z);
+    T.root.add(ring);
+    selectedHighlightMesh=ring;
+    if(typeof draw3==="function")draw3();
+  }
+}
+
+function focusPad3D(padOrRow){
+  if(!T.ok||!T.cam||!T.root)return;
+  const all=S.rows,P=pos3D(all);
+  const r=typeof padOrRow==="string"?all.find(x=>x.pad===padOrRow&&(x.board===S.board||!S.board)):padOrRow;
+  if(!r)return;
+  const pos=P.get(r);
+  if(!pos)return;
+  const E=ext3D(P),cx=(E.x0+E.x1)/2,cy=(E.y0+E.y1)/2;
+  T.tx=pos.x-cx;
+  T.tz=cy-pos.y;
+  highlightSelectedPad3D(r);
+  if(typeof draw3==="function")draw3();
+}
+
 function createSolderPasteGeometry(w,h,d,r,ex,shape){
   const pkMicron=(r&&r.peaking!=null)?Math.max(0,r.peaking):0;
   const hPeak=(pkMicron*ex)/1000;
   const coplMicron=(r&&r.coplanarity!=null)?Math.max(0,r.coplanarity):0;
   const hScoop=(coplMicron*ex)/1000;
   const slump=Math.max(0,((r&&r.area?r.area:100)-100)*0.0008)+Math.max(0,(r&&r.bridgemargin!=null&&r.bridgemargin<30?(30-r.bridgemargin)*0.0015:0));
+  const eta=calcShapeFactor(r,S.specs&&S.specs.height,S);
   if(shape==="round"){
     const rBase=(w/2)+slump;
-    const rTop=(w/2)*(pkMicron>20?Math.max(0.45,0.88-(pkMicron-20)/75):0.88);
+    const alphaTop=Math.min(0.92,Math.max(0.25,2*eta-1));
+    const rTop=rBase*Math.sqrt(alphaTop)*(pkMicron>20?Math.max(0.45,0.88-(pkMicron-20)/75):1.0);
     const geo=new THREE.CylinderGeometry(rTop,rBase,h,24,4);
     const pos=geo&&geo.attributes?geo.attributes.position:null;
     if(pos&&typeof pos.getY==="function"){
@@ -7469,8 +7601,11 @@ function createSolderPasteGeometry(w,h,d,r,ex,shape){
         if(Math.abs(py-halfH)<0.001){
           const px=pos.getX(i),pz=pos.getZ(i);
           const distNorm=Math.min(1,Math.hypot(px,pz)/(rTop||0.01));
-          if(pkMicron>20)pos.setY(i,py+hPeak*Math.pow(distNorm,2));
-          else pos.setY(i,py+Math.min(h*0.12,0.06)*(1-Math.pow(distNorm,2)));
+          const dome=Math.min(h*0.15,0.06)*(1-Math.pow(distNorm,2));
+          let elevOffset=(eta<0.75?dome*(1.5-eta):dome*0.5);
+          if(pkMicron>20)elevOffset+=hPeak*Math.pow(distNorm,2);
+          if(hScoop>0||eta<0.65)elevOffset-=Math.min(h*0.35,Math.max(hScoop,h*0.2*(0.75-eta)))*(1-distNorm);
+          pos.setY(i,py+elevOffset);
         }
       }
       if(typeof geo.computeVertexNormals==="function")geo.computeVertexNormals();
@@ -7480,7 +7615,10 @@ function createSolderPasteGeometry(w,h,d,r,ex,shape){
   if(typeof THREE.BufferGeometry!=="function"||typeof THREE.Float32BufferAttribute!=="function"){
     return new THREE.BoxGeometry(w,h,d);
   }
-  const wBase=w+2*slump,dBase=d+2*slump,wTop=w*0.90,dTop=d*0.90;
+  const wBase=w+2*slump,dBase=d+2*slump;
+  const alphaTop=Math.min(0.95,Math.max(0.25,2*eta-1));
+  const topRatio=Math.sqrt(alphaTop);
+  const wTop=wBase*topRatio,dTop=dBase*topRatio;
   const NX=6,NZ=6,verts=[],indices=[];
   const topStart=0;
   for(let j=0;j<=NZ;j++){
@@ -7489,10 +7627,18 @@ function createSolderPasteGeometry(w,h,d,r,ex,shape){
       const u=(i/NX)*2-1;
       const px=u*(wTop/2),pz=v*(dTop/2);
       let elev=h/2;
-      const rim=Math.pow(Math.max(Math.abs(u),Math.abs(v)),2.5);
-      if(pkMicron>15)elev+=hPeak*rim;
-      else elev+=Math.min(h*0.12,0.05)*(1-Math.pow(Math.hypot(u,v)/1.414,2));
-      if(hScoop>0)elev-=Math.min(h*0.35,hScoop)*Math.max(0,1-Math.hypot(u,v));
+      const rEdge=Math.max(Math.abs(u),Math.abs(v));
+      const rDist=Math.min(1,Math.hypot(u,v)/1.414);
+      if(eta>=0.85){
+        elev+=Math.min(h*0.12,0.05)*(1-Math.pow(rEdge,3));
+      }else{
+        elev+=Math.min(h*0.22,0.08)*(1-Math.pow(rDist,2))*(0.9-eta+0.1);
+      }
+      if(pkMicron>15)elev+=hPeak*Math.pow(rEdge,2.5);
+      if(hScoop>0||eta<0.65){
+        const sc=Math.max(hScoop,(0.70-eta)*h*0.4);
+        elev-=Math.min(h*0.4,sc)*Math.max(0,1-rDist);
+      }
       verts.push(px,elev,pz);
     }
   }
@@ -7584,20 +7730,24 @@ function build3D(){safeBoard2D();if(!T.ok||!window.THREE||!T||!T.root||!T.root.c
   const E=ext3D(P),{x0,x1,y0,y1}=E,cx=(x0+x1)/2,cy=(y0+y1)/2;
   /* 板面大小改變（換回合）才重新對準鏡頭；同回合換板保留使用者的視角 */
   if(T.fitSpan!==E.span){T.fitSpan=E.span;T.fit=fit3D(E.span);T.rad=T.fit.rad;T.tx=0;T.tz=0;T.cam.near=T.fit.near;T.cam.far=T.fit.far;T.cam.updateProjectionMatrix()}
-  const brd=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,1.2,y1-y0),new THREE.MeshStandardMaterial({color:0x1f4a3a,roughness:.75}));brd.position.y=-0.6;T.root.add(brd);
+  const brd=new THREE.Mesh(new THREE.BoxGeometry(x1-x0,1.2,y1-y0),new THREE.MeshStandardMaterial({color:0x173d2a,roughness:.65,metalness:.08}));brd.position.y=-0.6;T.root.add(brd);
   const bRows=S.rows.filter(r=>r.board===S.board&&(isAllGrp(S.group)||r.group===S.group)),rows=bRows.filter(r=>P.has(r)),ex=S.exag/1000;T.meshes=[];
   const note=pos3DNote(),hud=$("#hud");
   if(hud&&note)hud.insertAdjacentHTML("beforeend",`<br><span class="note">${esc(note)}</span>`);
-  const cuMat=new THREE.MeshStandardMaterial({color:0xb87333,metalness:.6,roughness:.35});
+  const cuMat=new THREE.MeshStandardMaterial({color:0xc87533,metalness:.85,roughness:.25});
   const hs=S.specs.height,vs=S.specs.volume;
   const pasteMats=new Map();
-  const getPasteMat=colStr=>{let m=pasteMats.get(colStr);if(!m)pasteMats.set(colStr,m=new THREE.MeshStandardMaterial({color:new THREE.Color(colStr),roughness:.55,metalness:.15}));return m;};
+  const grainTex=getSolderGrainTexture();
+  const getPasteMat=colStr=>{let m=pasteMats.get(colStr);if(!m){const opts={color:new THREE.Color(colStr),roughness:.52,metalness:.25};if(grainTex&&typeof THREE.Vector2==="function"){opts.normalMap=grainTex;opts.normalScale=new THREE.Vector2(0.2,0.2)}pasteMats.set(colStr,m=new THREE.MeshStandardMaterial(opts))}return m;};
+  const isReal=S.sim3dMode!=="heatmap";
+  const realMat=isReal?getRealPasteMat():null;
   for(const r of rows){const ap=aperture(r,S),k=Math.sqrt(Math.max((r.area??100)/100,.05)),w=ap.L*k,d=ap.W*k,h=Math.max((r.height??hs.tgt)*ex,0.05),x=P.get(r).x-cx,z=cy-P.get(r).y,dx=(r.offx||0)/1000,dz=-(r.offy||0)/1000;
     const cu=new THREE.Mesh(r.shape==="round"?new THREE.CylinderGeometry(r.w/2,r.w/2,0.06,20):new THREE.BoxGeometry(r.w,0.06,r.d),cuMat);cu.position.set(x,0.03,z);T.root.add(cu);
     const thk=S.step.on?padThk(r,S):hs.tgt,half=S.step.on?thk*(S.htol.hi-S.htol.lo)/200:(hs.usl-hs.lsl)/2;
     let col;if(S.colorMode==="status")col=statusCol(r);else if(S.colorMode==="height")col=divColor(((r.height??thk)-thk)/half);else col=divColor(((r.volume??vs.tgt)-vs.tgt)/((vs.usl-vs.lsl)/2));
     const geo = createSolderPasteGeometry(w, h, d, r, ex, ap.shape);
-    const m=new THREE.Mesh(geo,getPasteMat(col));m.position.set(x+dx,0.06+h/2,z+dz);m.userData=r;T.root.add(m);T.meshes.push(m);
+    const mMat=isReal?realMat:getPasteMat(col);
+    const m=new THREE.Mesh(geo,mMat);m.position.set(x+dx,0.06+h/2,z+dz);m.userData=r;T.root.add(m);T.meshes.push(m);
     if(S.ghost){const gh=(S.step.on?thk:S.stencil)*ex,gg=ap.shape==="round"?new THREE.CylinderGeometry(ap.L/2,ap.L/2,gh,16):new THREE.BoxGeometry(ap.L,gh,ap.W);const e=new THREE.LineSegments(new THREE.EdgesGeometry(gg),new THREE.LineBasicMaterial({color:0x9aa3a0,transparent:true,opacity:.45}));gg.dispose();e.position.set(x,0.06+gh/2,z);T.root.add(e)}}
   if(S.bridgeWarn&&typeof THREE.RingGeometry==="function"){
     const warnMat=new THREE.MeshBasicMaterial({color:0xef4444,transparent:true,opacity:0.55,side:THREE.DoubleSide,depthWrite:false});
@@ -7614,9 +7764,10 @@ function build3D(){safeBoard2D();if(!T.ok||!window.THREE||!T||!T.root||!T.root.c
   if(S.step.on)S.step.zones.forEach((z,i)=>{const R=zoneRect(z);if(!R)return;const w=R.x1-R.x0,d=R.y1-R.y0,col=new THREE.Color(ZCOL[i%ZCOL.length]);
     const pl=new THREE.Mesh(new THREE.BoxGeometry(w,0.02,d),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.22,depthWrite:false}));pl.position.set((R.x0+R.x1)/2-cx,0.012,cy-(R.y0+R.y1)/2);T.root.add(pl);
     const eg=new THREE.EdgesGeometry(new THREE.BoxGeometry(w,0.02,d)),ln=new THREE.LineSegments(eg,new THREE.LineBasicMaterial({color:col}));ln.position.copy(pl.position);T.root.add(ln)});
+  if(S.selectedPad&&typeof highlightSelectedPad3D==="function")highlightSelectedPad3D(S.selectedPad);
   T.check=true;draw3();
 }
-function pick(e){if(!T.ok||!window.THREE||!T.cam)return;const el=$("#view3d"),rc=el.getBoundingClientRect(),v=new THREE.Vector2((e.clientX-rc.left)/rc.width*2-1,-(e.clientY-rc.top)/rc.height*2+1),ray=new THREE.Raycaster();ray.setFromCamera(v,T.cam);const hit=ray.intersectObjects(T.meshes||[])[0];if(!hit)return;const r=hit.object.userData;selectPadForProfile(r)}
+function pick(e){if(!T.ok||!window.THREE||!T.cam)return;const el=$("#view3d"),rc=el.getBoundingClientRect(),v=new THREE.Vector2((e.clientX-rc.left)/rc.width*2-1,-(e.clientY-rc.top)/rc.height*2+1),ray=new THREE.Raycaster();ray.setFromCamera(v,T.cam);const hit=ray.intersectObjects(T.meshes||[])[0];if(!hit)return;const r=hit.object.userData;selectPadForProfile(r);if(typeof highlightSelectedPad3D==="function")highlightSelectedPad3D(r)}
 /* three.js 只在第一次開啟 3D 頁籤時載入（約 600 KB），先用網站自帶檔，沒有才用 CDN */
 let threeP=null;
 function loadScript(src){return new Promise((ok,no)=>{const s=document.createElement("script");s.src=src;let done=false;const tm=setTimeout(()=>{if(done)return;done=true;s.remove();no(new Error("載入腳本逾時: "+src))},2500);s.onload=()=>{if(done)return;done=true;clearTimeout(tm);ok()};s.onerror=()=>{if(done)return;done=true;clearTimeout(tm);s.remove();no(new Error(src))};document.head.appendChild(s)})}
@@ -7629,6 +7780,7 @@ $("#btnWorst").onclick=()=>{if(S.A.worst){S.board=S.A.worst.board;$("#selBoard")
 let playT=0;function stopPlay(){clearInterval(playT);playT=0;$("#btnPlay").setAttribute("aria-pressed","false");$("#btnPlay").textContent="逐板播放"}
 $("#btnPlay").onclick=()=>{if(!T.ok)return;if(playT)return stopPlay();$("#btnPlay").setAttribute("aria-pressed","true");$("#btnPlay").textContent="停止播放";playT=setInterval(()=>{if(!T.ok)return stopPlay();const B=S.A.boards,i=(B.indexOf(S.board)+1)%B.length;S.board=B[i];$("#selBoard").value=S.board;build3D()},900)};
 if($("#btn3dTouch"))$("#btn3dTouch").onclick=()=>{const b=$("#btn3dTouch"),el=$("#view3d"),on=b.getAttribute("aria-pressed")!=="true";b.setAttribute("aria-pressed",String(on));b.textContent=on?"完成 3D 操作":"操作 3D";if(el)el.classList.toggle("touch-3d",on)};
+if($("#seg3dRenderMode"))$$("#seg3dRenderMode button").forEach(b=>b.onclick=()=>{S.sim3dMode=b.dataset.m;$$("#seg3dRenderMode button").forEach(x=>x.setAttribute("aria-pressed",x===b));if(!T.ok){renderBoard2D();return}build3D()});
 $$("#segColor button").forEach(b=>b.onclick=()=>{S.colorMode=b.dataset.v;$$("#segColor button").forEach(x=>x.setAttribute("aria-pressed",x===b));if(!T.ok){renderBoard2D();return}build3D()});
 $("#inExag").oninput=e=>{S.exag=+e.target.value;$("#exagOut").textContent=S.exag+"×";if(!T.ok)return;build3D()};
 $("#chkGhost").onchange=e=>{S.ghost=e.target.checked;if(!T.ok){renderBoard2D();return}build3D()};
@@ -11739,7 +11891,7 @@ updateStartupDbBanner();
 /* 測試用：只有測試在載入前設定 window.SPI_TEST_HOOK 時才公開內部函式 */
 if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{importSearchMatch,renderImportSourceSummary,updateImportWorkflow,showImportValidationError,clearImportValidationError});
 if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")window.SPI_TEST_HOOK.specDownloadInfo=specDownloadInfo;
-if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,renderLISAUI,renderRelChartUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus});
+if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,renderLISAUI,renderRelChartUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,calcShapeFactor,getSolderGrainTexture,getRealPasteMat,createSolderPasteGeometry,selectPadForProfile,highlightSelectedPad3D,focusPad3D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus});
 if($("#geomPadFile"))$("#geomPadFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{const p=parseGeometryPadListCsv(rd.result);if(!p.ok){toast("幾何焊墊清單："+p.error);e.target.value="";return}S.geometryPads=p.pads;persist();updatePadCoverageState();recompute();renderGeomPadStatus();toast(`已匯入 ${p.pads.length} 個幾何焊墊`);e.target.value=""};rd.readAsText(f)});
 if($("#geomPadClear"))$("#geomPadClear").onclick=()=>{S.geometryPads=null;S.padCoverage=null;S.pendingVerify=false;persist();updatePadCoverageState();recompute();renderGeomPadStatus()};
 const initHash=(location.hash||"").slice(1);
