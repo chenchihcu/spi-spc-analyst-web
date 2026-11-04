@@ -67,6 +67,8 @@ test('CI invokes the full release gate once without a second full suite', () => 
   const yaml = fs.readFileSync(path.join(root, '.github/workflows/test.yml'), 'utf8');
   const commands = [...yaml.matchAll(/^\s+run:\s*(.+)\r?$/gm)].map(m => m[1].trim());
   assert.equal(commands.filter(c => c === 'npm run release-check').length, 1);
+  assert.equal(commands.filter(c => c === 'npm run test:slow').length, 1,
+    '.github/workflows/test.yml must run npm run test:slow exactly once; npm test uses reduced simulation samples and cannot establish false-alarm calibration.');
   assert.ok(!commands.includes('npm test'));
   assert.ok(!commands.includes('npm run release-check:scans'));
   assert.ok(commands.includes('npm run build:cloudflare'));
