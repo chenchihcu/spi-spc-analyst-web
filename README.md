@@ -79,9 +79,10 @@
 
 ```bash
 npm install            # 安裝測試用依賴 (jsdom, fake-indexeddb, wrangler)
-npm test               # 執行全套 31 個測試檔、共 259 項單元與整合測試
+npm test               # 開發時執行完整單元與整合測試；項數以實際輸出為準
 npm run release-check  # 上線前檢查（版本、更新紀錄、除錯殘留、文件、相依、測試、機密、無障礙）
 npm run test:slow      # 執行蒙地卡羅慢速整體判定模擬測試
+npm run release-check:scans # 僅發布掃描，不執行測試，不代表完整發布就緒
 ```
 
 ## 部署
@@ -107,8 +108,9 @@ npm run test:slow      # 執行蒙地卡羅慢速整體判定模擬測試
 
    主頁 `#appBuilt` 與 `lib/version.mjs` 的 `APP_BUILT` 固定為預設值 `0000-00-00 00:00:00`，不要手改；`npm run build:cloudflare` 會把 build 當下的時間（UTC+8，`YYYY-MM-DD HH:mm:ss`）寫入 `dist/index.html` 與 `.build/build-info.mjs`，登入頁由後者讀取。
 2. **本機驗證閘門**：
-   - 執行 `npm test`（31 個測試檔、259 項測試必須 100% 通過）
-   - 執行 `node tools/release-check.js`（狀態必須為 `Overall: READY`）
+   - 執行 `npm run release-check`，內含完整測試，不先另跑 `npm test`。`BLOCKED` 停止發布；`NEEDS REVIEW` 須判讀並記錄各項警告，不得宣稱 `READY`。
+   - 若同一份內容、相依與環境已有完整測試通過證據，可改跑 `npm run release-check:scans`；結果為 `SCAN ONLY`、測試為 `not-run`，須另附有效測試證據。掃描失敗仍回報 `BLOCKED` 並以非零碼退出；掃描警告仍須判讀。
+   - 統計規則變更另跑 `npm run test:slow`；一般測試中的縮小模擬不代替完整 seed 驗證。UI 變更另依 AGENTS.md 驗收矩陣執行。
    - 執行 `npm run build:cloudflare; npx wrangler deploy --dry-run`（建置資產產出且 dry-run 成功）
 3. **部署至 Cloudflare Workers**：
    - 合併至 `main` 分支，由 Cloudflare Workers Git CI/CD 自動建置部署，或由系統管理員執行 `npm run build:cloudflare; npx wrangler deploy` 發布。
