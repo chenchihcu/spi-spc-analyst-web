@@ -29,7 +29,7 @@ function page(cloud) {
   return { dom, errs };
 }
 // 兩個元件群組、10 片板；U2 的體積偏低（約 80%）
-const CSV = "Board,Pad,Component,Volume,Height,Area\n" + Array.from({ length: 120 }, (_, i) => {
+const CSV = "Board,Pad,Component,Volume,Height(um),Area\n" + Array.from({ length: 120 }, (_, i) => {
   const b = Math.floor(i / 12) + 1, p = i % 12, c = p < 6 ? "U1" : "U2", v = c === "U1" ? 100 + (i % 5) : 78 + (i % 5);
   return `B${b},P${p},${c},${v},${118 + (i % 4)},${100 + (i % 3)}`;
 }).join("\n");

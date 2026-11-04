@@ -31,7 +31,7 @@ function page(saved, cloud, preloadPlace) {
   } });
   return { dom, errs };
 }
-const CSV = "Board,Pad,Component,Volume,Height,Area\n" + Array.from({ length: 60 }, (_, i) => `B${Math.floor(i / 6) + 1},P${i % 6},U1,${100 + (i % 5)},120,100`).join("\n");
+const CSV = "Board,Pad,Component,Volume,Height(um),Area\n" + Array.from({ length: 60 }, (_, i) => `B${Math.floor(i / 6) + 1},P${i % 6},U1,${100 + (i % 5)},120,100`).join("\n");
 async function until(fn, n = 150) { for (let i = 0; i < n; i++) { if (fn()) return true; await tick(20); } return false; }
 async function pickFile(dom, name, text) {
   const w = dom.window, inp = w.document.querySelector("#fileIn");
@@ -86,6 +86,30 @@ async function seedHistorical(w, rec, source) {
   });
   return row;
 }
+
+test("匯入來源未標高度單位時顯示未知並阻止套用；明確選 µm 後顯示 µm", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { dom, errs } = await cloudPage();
+  const w = dom.window, d = w.document;
+  await pickFile(dom, "unitless.csv", "Board,Pad,Component,Volume,Height,Area\nB1,P1,U1,100,120,100\n");
+  assert.match(d.querySelector("#mapPrev").textContent, /高度 120（單位未確認）/);
+  assert.doesNotMatch(d.querySelector("#mapPrev").textContent, /高度 120 µm/);
+  assert.equal(d.querySelector("#btnApply").disabled, true, "未確認高度單位前不可套用分析");
+  d.querySelector("#optH").value = "um";
+  d.querySelector("#optH").dispatchEvent(new w.Event("change", { bubbles: true }));
+  assert.match(d.querySelector("#mapPrev").textContent, /高度 120 µm/);
+  assert.equal(d.querySelector("#btnApply").disabled, false, "明確指定 µm 後不再因單位阻擋");
+  const unknown = w.SPI_TEST_HOOK.specDownloadInfo({ part: "P1" });
+  assert.equal(unknown.filename, "料號規格_P1_版本未知.json");
+  assert.match(unknown.warning, /沒有版本號/);
+  const known = w.SPI_TEST_HOOK.specDownloadInfo({ part: "P1", ver: 3 });
+  assert.equal(known.filename, "料號規格_P1_v3.json");
+  assert.equal(known.warning, "");
+  w.eval("SPI_TEST_HOOK.S.runId=null;SPI_TEST_HOOK.S.rows=[{group:'0402',groupBasis:'package'}];SPI_TEST_HOOK.updateRailSummary()");
+  assert.match(d.querySelector("#groupBasisNote").textContent, /分組依據：封裝/);
+  assert.match(d.querySelector("#railChipSummary").textContent, /分組依據：封裝/);
+  assert.deepEqual(errs, []);
+  dom.window.close();
+});
 
 test("JS 版 SHA-256（瀏覽器不支援內建時使用）與標準結果相同", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const { dom } = page([]);

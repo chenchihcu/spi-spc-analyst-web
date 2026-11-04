@@ -332,7 +332,7 @@ test("D-XBAR: 25 板樣本數不等時，X̄ 圖與 Nelson 卡使用同一加權
   const chartRules = Array.from(A.nelX.rules.filter(r => r.idx.length && r.id !== 7), r => r.id).sort((a, b) => a - b);
   assert.ok(Math.abs(A.xs.cl - c.mean(rows.map(r => r.volume))) < 1e-10, "X̄ 中心線應為依各板量測數加權的總平均");
   assert.deepEqual(chartRules, cardRules, `X̄ 圖觸發 ${chartRules.join(",")}，卡片觸發 ${cardRules.join(",")}`);
-  assert.equal(chartRules.length, 5, "此 25 板反例在共用中心線下應有 5 條規則");
+  assert.deepEqual(chartRules, [1, 2, 5, 6], "規則 8 現要求中心線兩側均有點；此反例八點皆在同一側，因此其餘 4 條規則仍須一致");
 });
 
 test("D-EVIDENCE: 形貌與停線迷你圖按板顯示觀測值，不複製全批統計量", () => {
