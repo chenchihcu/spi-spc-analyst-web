@@ -5,9 +5,15 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
 
 ## 發布與部署
 
-- **合併到 main 就是發布**：main 合併後約 30 秒自動部署正式 Worker。PR 若新增 `cloudflare/migrations/*`，合併前先執行 `npx wrangler d1 migrations list spi-spc --remote`；未套用時先備份（放在 repo 外，release-check 的機密掃描會擋下 repo 內的備份）、在本機副本演練、經使用者核准套用，再合併。
+- **GitHub main 觸發正式發布**：已核實連接的 repository 為 `chenchihcu/spi-spc-analyst-web`、production branch 為 `main`。經授權 commit／push 或 PR 合併到 main 後，由 Cloudflare Git integration 依序完成完整發布檢查、慢速模擬與 build，再部署正式 Worker；建置耗時不固定，不能以推送成功或等待固定秒數判定部署完成。推送／合併授權仍依本次使用者指示與 `website-ship.md`，本條不新增授權。PR 若新增 `cloudflare/migrations/*`，合併前先執行 `npx wrangler d1 migrations list spi-spc --remote`；未套用時先備份（放在 repo 外，release-check 的機密掃描會擋下 repo 內的備份）、在本機副本演練、經使用者核准套用，再合併。
   - 檢查：合併前遠端 migration 清單回報 `No migrations to apply`。
-  - 出處：2026-10-24 v10.3.0／v10.3.1 缺 `0007` 導致登入後 503，正式站回退 v10.2.3。
+  - 發布讀回：記錄 Git commit、Cloudflare build 狀態、部署 version／流量、正式 URL／HTTP status；資料庫路徑依下一條驗證。多個提交並行建置時，逐一對應來源，不以較新的手動部署替另一個 Git build 作證。
+  - 工具受阻：CLI 在啟動前被政策拒絕代表命令未執行，不是 build 失敗；檢查既有核准入口，或以 Chrome 讀取 Cloudflare 狀態。Chrome 安全檢查中止時停止該路徑，列明 not verified、風險及下一項讀回；不以空提交、改連線設定或手動部署繞過。Actions 因付款／額度未執行時記為無測試結果；依 `website-ship.md` 與實際 required checks 繼續處理。
+  - 出處：2026-10-24 migration 事故；2026-11-05 使用者確認 GitHub → Cloudflare 發布方式。#94 Git build 約 18 分鐘；#95 觸發後仍需完成 `release-check && test:slow && build:cloudflare`，更正舊「約 30 秒」說法。
+
+| 重複錯誤類別 | 檢查／執行入口 | 證據 |
+|---|---|---|
+| 混淆提交、建置、部署與工具執行結果 | 既有 Git integration；從 Cloudflare production build／deployment 讀回同一 commit 的狀態與 version；CLI／瀏覽器中止單列為驗證受阻 | 2026-10-24 只查登入頁而漏掉 DB 503；2026-11-05 #95／#96 並行建置與不同來源部署不可互相作證 |
 - **部署驗證要走過資料庫路徑**：登入頁顯示新版本只代表靜態資產已更新。至少確認一個登入後的資料庫畫面或 API 回 200；無法登入時回報「資料庫路徑未驗證」，不可寫成部署成功。
   - 檢查：驗收紀錄寫明走過的頁面或 API 與 HTTP 狀態。
   - 出處：同上事故；當時只看登入頁版本即回報成功。
