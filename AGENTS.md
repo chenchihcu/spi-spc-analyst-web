@@ -37,6 +37,9 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
 - **改變列欄位語意（改名、不再填值）時，同一個 PR 更新所有讀取端**：先 grep 該欄位的全部讀取處（統計、3D、報表 3D、匯出），沒有更新的讀取端要有 fail-visible 處理，不可靜默算出 NaN。
   - 檢查：該匯入路徑有一條測試串過 `buildRows` 到各讀取端（例：`tests/step8.test.mjs`「受控座標匯入 → buildRows → 3D 示意位置皆為有限值」）。
   - 出處：PR #53（座標改寫 `componentX/Y`，3D 仍讀 `r.x/r.y`）→ 2026-10-28 正式站 3D 空白。
+- **3D 空間佈局優先序與虛擬網格 Fail-Visible 守則**：焊墊 3D 位置解析（`pos3D`）必須嚴格遵守三階優先序：真實焊墊物理座標（`realXY(r)`）優先 $\to$ CAD 受控元件中心（`componentX/Y`）展開次之 $\to$ 虛擬格狀回退（`gridPos`）保底。虛擬網格座標不得搶先覆蓋 CAD 元件座標；全板僅有虛擬網格時，HUD 與工具列必須以醒目標示（`grid: true`、HUD 警示文字、`#grid3dWarn` 橫幅）明確揭露「無實際座標，為排列示意網格」，嚴禁靜默展示為真實 PCBA 佈局以防誤導檢驗判讀。
+  - 檢查：`node --test tests/step8.test.mjs`「3D 座標優先順序與虛擬格狀警示」通過。
+  - 出處：PR #98（2026-11-05，缺少焊墊座標時 `pos3D` 誤將 49×49 網格覆蓋 CAD 元件座標致 3D 佈局失真，且無任何示意警語）。
 
 ## 統計與問題偵測
 
