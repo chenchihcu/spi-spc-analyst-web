@@ -259,15 +259,41 @@ test("3D 示意位置：受控座標只有元件中心時展開焊墊，不寫�
   assert.equal(P.size, 6, "無任何座標的焊墊不繪出");
   assert.ok(!P.has(rows[5]));
   for (const p of P.values()) assert.ok(Number.isFinite(p.x) && Number.isFinite(p.y), "示意位置不可為 NaN");
-  assert.deepEqual({ ...P.get(rows[6]) }, { x: 1, y: 2, est: false }, "既有 x/y（含舊格狀示意）照用");
+  assert.deepEqual({ ...P.get(rows[6]) }, { x: 1, y: 2, est: true, grid: true }, "既有格狀示意標為示意與網格");
   const u1 = rows.slice(0, 4).map(r => P.get(r));
-  assert.ok(u1.every(p => p.est), "元件中心來源要標成示意");
+  assert.ok(u1.every(p => p.est && !p.grid), "元件中心來源要標成示意且非網格");
   assert.equal(new Set(u1.map(p => p.x + "," + p.y)).size, 4, "同元件焊墊展開後不可重疊");
   const mx = u1.reduce((s, p) => s + p.x, 0) / 4, my = u1.reduce((s, p) => s + p.y, 0) / 4;
   assert.ok(Math.abs(mx - 10) < 1e-9 && Math.abs(my - 20) < 1e-9, "展開以元件中心為中心");
   assert.ok(u1.every(p => Math.hypot(p.x - 10, p.y - 20) < 0.7 * 1.4 * 2), "展開不離元件中心太遠");
-  assert.deepEqual({ ...P.get(rows[4]) }, { x: 30, y: 5, est: true }, "單一焊墊元件放在元件中心");
+  assert.deepEqual({ ...P.get(rows[4]) }, { x: 30, y: 5, est: true, grid: false }, "單一焊墊元件放在元件中心");
   assert.ok(rows.every(r => !("x" in r) || r.pad === "G1"), "不可把元件中心寫回 r.x/r.y（統計不使用）");
+});
+
+test("3D 座標優先順序與虛擬格狀警示：componentX/Y 優先於 gridPos，全板 gridPos 時 pos3DNote 明確提示", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const dom = createPage();
+  const w = dom.window, H = await waitFor(() => w.SPI_TEST_HOOK?.pos3D && w.SPI_TEST_HOOK);
+  // 1. 同時具有 componentX/Y 與 gridPos 時，優先使用元件中心，不可被 gridPos 覆蓋
+  const mixedRow = { board: "B01", pad: "U1-1", comp: "U1", x: 4, y: 4, gridPos: true, componentX: 50, componentY: 60, w: 0.7, d: 0.7 };
+  H.T.pos = null;
+  const P1 = H.pos3D([mixedRow]);
+  assert.equal(P1.get(mixedRow).grid, false, "有 componentX/Y 時不可判定為網格");
+  assert.equal(P1.get(mixedRow).x, 50, "有 componentX/Y 時優先使用元件中心 X");
+  assert.equal(P1.get(mixedRow).y, 60, "有 componentX/Y 時優先使用元件中心 Y");
+
+  // 2. 全板僅有 gridPos 時，pos3DNote 明確提示無實際座標
+  const gridRows = [
+    { board: "B01", pad: "P1", x: 4, y: 4, gridPos: true, w: 0.7, d: 0.7 },
+    { board: "B01", pad: "P2", x: 8, y: 4, gridPos: true, w: 0.7, d: 0.7 }
+  ];
+  const S = H.S, saved = [S.rows, S.board, S.group];
+  try {
+    S.rows = gridRows; S.board = "B01"; S.group = "ALL"; H.T.pos = null;
+    const note = H.pos3DNote();
+    assert.match(note, /無實際座標，為排列示意網格（2 個焊墊）/, "全板為 gridPos 時必須明確警示無實際座標");
+  } finally {
+    [S.rows, S.board, S.group] = saved; H.T.pos = null;
+  }
 });
 
 test("受控座標匯入 → buildRows → 3D 示意位置皆為有限值（使用者實際資料路徑）", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
