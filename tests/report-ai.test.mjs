@@ -41,6 +41,12 @@ test("AI 分析資料：含失效模式交叉比對、能力信賴區間、X̄ �
   assert.equal(typeof out["管制狀態"]["製程穩定"], "boolean");
   assert.ok(out["多重比較"]["單板異常檢定次數"] > 0);
   assert.match(out["規格來源"], /示範規格/);
+  const controlIssues = out["系統偵測問題清單"].filter(x => x["面向"] === "管制圖規則");
+  assert.ok(controlIssues.some(x => !x["問題"].startsWith(out["量測項目"])), "應覆蓋未選取項目的控制圖問題");
+  for (const issue of controlIssues) {
+    assert.ok(issue["事實"].some(x => /平均.*z=.*LCL=.*UCL=/.test(x)), "控制圖問題應保留數值證據");
+    assert.ok(issue["事實"].some(x => /尚未校準/.test(x)), "也須保留校準限制");
+  }
   assert.deepEqual(errs, []);
 });
 

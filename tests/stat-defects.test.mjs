@@ -168,6 +168,9 @@ test("L3 固定 seed X̄ 模擬：每板 n_i 正規化，依 Phase I t(df) 參�
   checkReference(fixedN[5], 5, 125, 100);
   checkReference(alternating[1], 1, 313, 288);
   checkReference(alternating[25], 25, 313, 288);
+  const smallDf = simulate(Array(5).fill(2));
+  checkReference(smallDf[2], 2, 10, 5);
+  assert.ok(c.tP(3 / Math.sqrt(1 - 2 / 10), 5) > 0.01, "df=5 的有限樣本參考不能誤稱固定為常態 0.27%");
 
   const rows = [];
   for (let b = 0; b < 25; b++) for (let i = 0; i < (b % 2 ? 25 : 1); i++) rows.push({ board: `B${b + 1}`, pad: `P${i}`, comp: `P${i}`, group: "G", volume: 100 + (b % 2 ? 2 : 0) + (i - 12) * 0.1, height: 120, area: 100 });
@@ -180,6 +183,19 @@ test("L3 固定 seed X̄ 模擬：每板 n_i 正規化，依 Phase I t(df) 參�
     assert.ok(Math.abs(p.ucl - (A.gMean + 3 * expectedSd)) < 1e-12, `B${i + 1} 的 UCL 應依 n_i 調整`);
     assert.ok(Math.abs(p.z - (p.v - A.gMean) / expectedSd) < 1e-12, `B${i + 1} 的 z 應與界限同分母`);
   }
+});
+
+test("L3 小自由度邊界：analyze 的 5 板×2 點符合 Phase I t(5) 參考", () => {
+  const nrm = normal(mulberry32(20261104)), trials = 2000;
+  let hits = 0;
+  for (let trial = 0; trial < trials; trial++) {
+    const rows = Array.from({ length: 10 }, (_, i) => ({ board: `B${Math.floor(i / 2)}`, pad: `P${i % 2}`, group: "G", volume: 100 + nrm() }));
+    const A = c.analyze(st(rows));
+    assert.equal(A.xs.rejected, false);
+    hits += A.xs.pts.filter(p => Math.abs(p.z) > 3).length;
+  }
+  const p = c.tP(3 / Math.sqrt(1 - 2 / 10), 5), total = trials * 5;
+  assert.ok(Math.abs(hits - total * p) <= 6 * Math.sqrt(total * p * (1 - p)), `${hits}/${total} 應依 t(5) 參考 ${p} 判讀，不套用常態 0.27%`);
 });
 
 test("L3 零組內變異的總覽、能力頁、報告與 AI payload 明確呈現未知及保留 Ppk", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
@@ -219,6 +235,17 @@ test("L3 零組內變異的總覽、能力頁、報告與 AI payload 明確呈�
   assert.notEqual(payload.能力.Ppk, null, "AI payload 應保留可估 Ppk");
   assert.equal(payload.管制狀態.製程穩定, null);
   assert.match(payload.管制狀態.製程穩定狀態, /無法判定：組內變異為零，X̄ 界限無法估計/);
+  S.rows = Array.from({ length: 25 }, (_, i) => ({ board: `B${i + 1}`, pad: "P1", group: "G", volume: i === 24 ? 130 : 100 + i % 2 }));
+  for (const chart of ["imr", "ewma", "cusum"]) {
+    S.chart = chart;
+    w.eval("S.A=analyze(S)");
+    assert.equal(S.A.stable, null, "X̄ 穩定性仍為未知");
+    assert.equal(S.A.chartRejected, false, `${chart} 應可獨立判異`);
+    assert.ok(S.A.nel.flag.size > 0, `${chart} 不得因 X̄ 拒算而遺失有效訊號`);
+    hook.setTab("control");
+    assert.match(w.document.querySelector("#nelsonTbl").textContent, /觸發/);
+    assert.doesNotMatch(w.document.querySelector("#nelsonTbl").textContent, /無法判定/);
+  }
   dom.window.close();
 });
 

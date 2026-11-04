@@ -2889,12 +2889,14 @@ function analyzeView(st,B){
   // 判異規則：顯示用依所選管制圖與其適用規則；X̄ 圖與量測層的 nelX 相同
   const RULES={xbars:null,xbarr:null,imr:null,p:[1,2,3,4],ewma:[1],cusum:[1]};
   const series=st.chart==="imr"?imr.pts:st.chart==="p"?pc.pts:st.chart==="ewma"?ewma:st.chart==="cusum"?cuz:st.chart==="xbarr"?xr.pts:xs.pts;
+  const chartRejected=isZeroSd||(st.chart==="imr"?imr.rejected:st.chart==="xbarr"?xr.rejected:["p","ewma","cusum"].includes(st.chart)?boards.length<5:xs.rejected);
+  const chartReason=chartRejected?(isZeroSd?"製程變異為零":st.chart==="imr"?imr.reason:st.chart==="xbarr"?xr.reason:["p","ewma","cusum"].includes(st.chart)?"子群組（板數）不足（需 ≥5）":xs.reason):"";
   let nel;
   if(st.chart==="xbars"||!RULES.hasOwnProperty(st.chart))nel=B.nelX;
-  else{nel=nelson(series.map(p=>p.z),RULES[st.chart]||null);if(isZeroSd||xs.rejected||(st.chart==="xbarr"&&xr.rejected)||(st.chart==="imr"&&imr.rejected))nel=nelZero()}
+  else{nel=chartRejected?nelZero():nelson(series.map(p=>p.z),RULES[st.chart]||null)}
   const mode=st.capDistMode||"auto",th=st.pauseThreshold||15,cap=Object.assign({},B.cap);
   lazy(cap,"nonNormal",()=>B.nonNormalOf(mode));
-  const A={m,sp:B.sp,rows,boards,byBoard:B.byBoard,N:B.N,gMean:B.gMean,overallSd:B.overallSd,sigmaW:B.sigmaW,sigmaLT:B.sigmaLT,mixed:B.mixed,nbar:B.nbar,xs,xr,imr,pc,ewma,cusum:B.cusum,series,nel,nelX:B.nelX,stable:B.stable,cap,hasSpec:B.hasSpec,unitMismatch:B.unitMismatch,
+  const A={m,sp:B.sp,rows,boards,byBoard:B.byBoard,N:B.N,gMean:B.gMean,overallSd:B.overallSd,sigmaW:B.sigmaW,sigmaLT:B.sigmaLT,mixed:B.mixed,nbar:B.nbar,xs,xr,imr,pc,ewma,cusum:B.cusum,series,nel,chartRejected,chartReason,nelX:B.nelX,stable:B.stable,cap,hasSpec:B.hasSpec,unitMismatch:B.unitMismatch,
     ad:B.ad,sw:B.sw,sk:B.sk,groups:B.groups,eta2:B.eta2,pareto:B.pareto,defRows:B.defRows,rHA:B.rHA,msa:B.msa,rX:B.rX,rY:B.rY,coordN:B.coordN,xOut:B.xOut,pOut:B.pOut,worst:B.worst,pads,sqDir:st.sqDir==="X"?"X":"Y"};
   lazy(A,"nonNormal",()=>B.nonNormalOf(mode));lazy(A,"pauseDecay",()=>B.pauseOf(th));lazy(A,"printerCorr",B.printerOf);lazy(A,"spatialAutocorr",B.spatialOf);
   A.xv=B.xv||(B.xv=crossValidate(A));   // 交叉驗證只讀量測層欄位（管制狀態用 nelX），與所選管制圖無關
@@ -4933,6 +4935,7 @@ function detectIssues(st,onStage){
           limit:limTxt,
           z:topList(r.idx.map(i=>`${boards[i]} z=${f(z[i],2)}`),10),
           p:"不適用（整批 Nelson 規則誤報率尚未校準）",
+          aiFacts:[`${boards[zMaxIdx]} 平均 ${f(bm[zMaxIdx],2)} ${u(k)}；z=${f(z[zMaxIdx],2)}；n=${counts[zMaxIdx]}；CL=${f(mu,2)}；LCL=${f(pts[zMaxIdx].lcl,2)}；UCL=${f(pts[zMaxIdx].ucl,2)}`,"整批 Nelson 誤報率尚未校準；舊 MR 模擬表不適用。"],
           facts:[
             `${lab(k)} X̄ 圖（每板平均、群組＝全部）：Nelson 規則 ${r.id}（${r.name}）於 ${bStr} 觸發；最大偏離板 ${boards[zMaxIdx]} 平均 ${f(bm[zMaxIdx],2)} ${u(k)}（z = ${f(z[zMaxIdx],2)}），${limTxt}`,
             ...(faFact?[faFact]:[])
@@ -6357,7 +6360,7 @@ function renderControl(){
         {data:uv,borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},{data:lv,borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},{data:c==="imr"?s.map(()=>clv):s.map(x=>x.cl),borderColor:css("--accent"),borderWidth:1.2,pointRadius:0}]},options:baseOpts()})}
   }
   const pts=A.series;
-  $("#nelsonTbl").innerHTML=`<thead><tr><th>規則</th><th>狀態</th><th>觸發點</th><th>錫膏印刷常見對應原因</th></tr></thead><tbody>`+A.nel.rules.map(r=>`<tr><td>${r.name}</td><td>${r.na?'<span class="pill na">不適用</span>':A.stable===null?'<span class="pill na">無法判定</span>':r.idx.length?(r.id===7?'<span class="pill warn">觸發</span>':'<span class="pill ng">觸發</span>'):'<span class="pill ok">通過</span>'}</td><td class="mono" style="font-size:var(--fs-caption)">${r.idx.length?r.idx.map(i=>pts[i].lab).join(" "):"—"}</td><td class="note">${r.na?"此管制圖不適用此規則（僅 X̄ / I-MR 使用全部 8 條；P' 圖用 1–4；EWMA / CUSUM 僅用 1）":A.stable===null?esc(A.xs.reason):r.hint}</td></tr>`).join("")+"</tbody>";
+  $("#nelsonTbl").innerHTML=`<thead><tr><th>規則</th><th>狀態</th><th>觸發點</th><th>錫膏印刷常見對應原因</th></tr></thead><tbody>`+A.nel.rules.map(r=>`<tr><td>${r.name}</td><td>${r.na?'<span class="pill na">不適用</span>':A.chartRejected?'<span class="pill na">無法判定</span>':r.idx.length?(r.id===7?'<span class="pill warn">觸發</span>':'<span class="pill ng">觸發</span>'):'<span class="pill ok">通過</span>'}</td><td class="mono" style="font-size:var(--fs-caption)">${r.idx.length?r.idx.map(i=>pts[i].lab).join(" "):"—"}</td><td class="note">${r.na?"此管制圖不適用此規則（僅 X̄ / I-MR 使用全部 8 條；P' 圖用 1–4；EWMA / CUSUM 僅用 1）":A.chartRejected?esc(A.chartReason):r.hint}</td></tr>`).join("")+"</tbody>";
 }
 
 /* ---------- 能力 ---------- */
@@ -8411,7 +8414,7 @@ function aiPayload(){const A=S.A;return{試產回合:curRun()?curRun().name:"",�
   常態性:{AD:+f(A.ad.A,3),p:+f(A.ad.p,4),SW:A.sw&&A.sw.valid?{W:+f(A.sw.w,4),p:+f(A.sw.p,4)}:null,偏態:+f(A.sk.skew,2),峰度:+f(A.sk.kurt,2)},Nelson:A.nel.rules.filter(r=>r.idx.length&&!r.na).map(r=>({管制圖:chartName(),規則:r.name,點:r.idx.map(i=>A.series[i].lab)})),
   各板:A.byBoard.map(b=>({板:b.board,平均:+f(b.mean,2),σ:+f(b.sd,2),不良:b.defects})),元件群組統計:A.groups.map(g=>({群組:g.g,平均:+f(g.mean,2),σ:+f(g.sd,2)})),
   不良柏拉圖:Object.fromEntries(Object.entries(A.pareto).map(([k,v])=>[DEFECTS[k],v])),交叉驗證:A.xv.rows.map(x=>({面向:x.k,判定:x.st,依據:x.ev})),
-  系統偵測問題清單:S.F.slice(0,15).map(x=>({編號:x.id,嚴重度:LVL[x.lv],面向:x.cat,問題:x.title,事實:x.cat==="管制圖規則"?x.facts.slice(1,2):x.facts.slice(0,3),系統推論:x.cause,信心:x.conf,佐證:x.corrob})),
+  系統偵測問題清單:S.F.slice(0,15).map(x=>({編號:x.id,嚴重度:LVL[x.lv],面向:x.cat,問題:x.title,事實:x.aiFacts||x.facts.slice(0,3),系統推論:x.cause,信心:x.conf,佐證:x.corrob})),
   前15不良焊墊:A.defRows.slice(0,15).map(r=>({板:r.board,焊墊:r.pad,體積:r.volume,高度:r.height,面積:r.area,偏移X:r.offx,偏移Y:r.offy,判定:r.codes.map(c=>DEFECTS[c])})),
   進階:advSummary(A)}}
 function advSummary(A){const W=advAnalyze(S,A);return{EWMA越界:A.ewma.filter(p=>p.v>p.ucl||p.v<p.lcl).map(p=>p.lab),CUSUM訊號:A.cusum.pts.filter(p=>p.cp>A.cusum.h||p.cm>A.cusum.h).map(p=>p.lab),
