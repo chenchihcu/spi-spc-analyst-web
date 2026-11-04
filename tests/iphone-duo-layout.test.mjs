@@ -128,6 +128,10 @@ test('6. PR 2 DOM 元件：#duoToggleBtn 與 #duoThumbDock 向量圖示與無障
   assert.ok($('#duoNextBoardBtn'), '需有下一板按鈕 #duoNextBoardBtn');
   assert.ok($('#duoRightTabBtn'), '需有副欄切換按鈕 #duoRightTabBtn');
   assert.ok($('#duoSwapPaneBtn'), '需有左右欄互換按鈕 #duoSwapPaneBtn');
+  const exitBtn = $('#duoExitBtn');
+  assert.ok(exitBtn, '需有退出按鈕 #duoExitBtn');
+  assert.equal(exitBtn.textContent, '退出', 'Duo 模式下退出操作需可見');
+  assert.equal(exitBtn.getAttribute('aria-label'), '退出雙螢幕檢視', '退出按鈕需有明確名稱');
   assert.ok($('#duoCurBoard'), '需有目前板號 #duoCurBoard');
   assert.ok($('#duoTotBoards'), '需有總板數 #duoTotBoards');
 });
@@ -348,4 +352,54 @@ test('13. PR 4 觸覺回饋微動效與左欄緊湊表格 (DUO-GAP-11, DUO-GAP-1
 
   // b. DUO-GAP-13 緊湊表格內距
   assert.match(htmlSource, /body\.duo-mode\s+\.duo-pane-left\s+\.tbl\s+td\{[^}]*padding:5px 6px!important/i, '左欄表格單元格內距需緊湊化至 5px 6px');
+});
+
+test('14. 一般手機高度不自動進入 Duo；硬體分割可進入並可退出', { skip: !JSDOM && '未安裝 jsdom' }, () => {
+  const makeDom = ({ width, height, horizontal = false, vertical = false }) => {
+    const mql = {};
+    const dom = new JSDOM(htmlSource.replace(/<script src=[^>]+><\/script>/g, ''), {
+      runScripts: 'dangerously',
+      url: 'https://example.test/',
+      beforeParse(w) {
+        w.SPI_TEST_HOOK = {};
+        Object.defineProperty(w, 'innerWidth', { value: width, configurable: true });
+        Object.defineProperty(w, 'innerHeight', { value: height, configurable: true });
+        w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === 'measureText' ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
+        w.HTMLCanvasElement.prototype.toDataURL = () => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+        w.matchMedia = (query) => {
+          const state = { matches: query === '(horizontal-viewport-segments: 2)' ? horizontal : query === '(vertical-viewport-segments: 2)' ? vertical : false, listener: null };
+          mql[query] = state;
+          return { get matches() { return state.matches; }, addEventListener(_name, fn) { state.listener = fn; } };
+        };
+        w.ResizeObserver = class { observe() {} };
+        w.MutationObserver = class { observe() {} disconnect() {} };
+        w.scrollTo = () => {};
+        w.Chart = class { constructor() {} destroy() {} static register() {} static defaults = { font: {} }; };
+      },
+    });
+    return { dom, mql };
+  };
+
+  for (const [width, height] of [[320, 700], [320, 844], [390, 700], [390, 844]]) {
+    const { dom } = makeDom({ width, height });
+    const { S } = dom.window.SPI_TEST_HOOK;
+    assert.equal(S.duo.active, false, `${width}×${height} 普通手機視窗不應自動進入 Duo`);
+    assert.equal(dom.window.document.body.classList.contains('duo-mode'), false, '普通手機應保留單欄導覽');
+    assert.ok(dom.window.document.querySelector('nav.mtab'), '底部導覽應存在');
+    dom.window.close();
+  }
+
+  const { dom, mql } = makeDom({ width: 900, height: 700, horizontal: true });
+  const { S } = dom.window.SPI_TEST_HOOK;
+  const exit = dom.window.document.querySelector('#duoExitBtn');
+  assert.equal(S.duo.active, true, '明確的橫向硬體分割訊號應自動進入 Duo');
+  assert.equal(exit.hidden, false, 'Duo 啟用時退出按鈕應顯示');
+  exit.click();
+  assert.equal(S.duo.active, false, '點擊退出應離開 Duo');
+  assert.equal(S.duo.manualOverride, true, '退出後應記錄使用者覆寫');
+  assert.equal(dom.window.document.body.classList.contains('duo-mode'), false, '退出後應恢復單欄導覽');
+  mql['(horizontal-viewport-segments: 2)'].listener();
+  assert.equal(S.duo.active, false, '硬體姿態通知不應覆蓋使用者的退出選擇');
+  assert.doesNotMatch(htmlSource, /tableMq2|duoMq2/, 'Duo 自動判斷不可依賴一般 viewport 寬高猜測');
+  dom.window.close();
 });

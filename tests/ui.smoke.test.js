@@ -24,6 +24,7 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
       w.Chart = class { constructor(_c, cfg) { if (!cfg || !cfg.data) throw new Error("圖表設定錯誤"); } destroy() {} static register() {} };
       w.claude = { use: async (n) => (n === "downloads" ? { save: async () => {} } : null) };
       withIdb(w);
+      w.SPI_TEST_HOOK = {};
     },
   });
   const w = dom.window, d = w.document, $ = (s) => d.querySelector(s);
@@ -67,7 +68,15 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   assert.equal(d.querySelectorAll("#issList details.iss-card[open]").length, 0, "換回合後全部收合");
   change($("#selRun"), "1"); tab("issues");
   d.querySelector('#pmap [data-ent="b:B13"]').click();
-  assert.ok(d.querySelectorAll(".iss-card").length >= 1 && d.querySelectorAll(".iss-card").length < 12, "點選板格應只顯示該板相關問題");
+  const hook = w.SPI_TEST_HOOK;
+  const relatedIssues = hook.issueList();
+  const boardOrder = [...new Set(hook.S.rows.map(r => r.board))];
+  const concernsBoard = issue => issue.ents.some(ent => ent === "b:B13"
+    || (ent.startsWith("drift:") && boardOrder.indexOf("B13") >= boardOrder.indexOf(ent.slice(6))));
+  assert.ok(relatedIssues.length >= 1, "選板後仍應有與 B13 相關的問題");
+  assert.ok(relatedIssues.every(concernsBoard), "選板後問題清單的每張卡都應涵蓋 B13");
+  const filteredIds = new Set(relatedIssues.map(issue => `iss-${issue.id}`));
+  assert.ok([...d.querySelectorAll("#issList .iss-card")].every(card => filteredIds.has(card.id)), "畫面不得顯示未通過 B13 關聯篩選的問題卡");
   d.querySelector("#pmapClear").click();
   d.querySelector("#issList [data-go]").click();
   assert.equal($("#ctxBar").hidden, false, "前往證據頁時應顯示來源提示");

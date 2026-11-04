@@ -3,16 +3,32 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
-import { generateStableData, rowsToCsv } from '../tools/gen-stable.mjs';
+import { generateStableData, makeNormal, mulberry32, rowsToCsv } from '../tools/gen-stable.mjs';
 
 const require = createRequire(import.meta.url);
 const { loadCore, baseState } = require('./_load.js');
 
 const core = loadCore();
 
+// X̄ 誤報模擬使用列級 i.i.d. 常態值；generateStableData 含有同板共變的隨機效應，
+// 適合舊的整體判定基準，但不符合 Phase I t(df) 參考的獨立樣本假設。
+function generateIidStableData({ nb = 25, shift = 0, seed = 1 } = {}) {
+  const normal = makeNormal(mulberry32((seed ^ 0x51A7E) >>> 0));
+  return generateStableData({ nb, shift, stroke: true, seed }).map((r) => {
+    const b = Number(r.board.slice(1));
+    const shiftB = b > nb - 8 ? shift : 0;
+    r.height = +(120 + 3.5 * normal()).toFixed(1);
+    r.area = +(100 + shiftB + 4 * normal()).toFixed(1);
+    r.volume = +(r.height / 120 * r.area * (1 + 0.025 * normal())).toFixed(1);
+    r.offx = +(10 * normal()).toFixed(1);
+    r.offy = +(10 * normal()).toFixed(1);
+    return r;
+  });
+}
+
 const CMP_FIELDS = ['board', 'pad', 'comp', 'group', 'x', 'y', 'w', 'd', 'stroke', 'height', 'area', 'volume', 'offx', 'offy'];
 
-test('6.1 stable-25.csv 驗證：seed 1、25 板 CSV 往返一致且穩定製程整體判定為正常', () => {
+test('6.1 stable-25.csv 驗證：seed 1 CSV 往返一致；含同板效應的舊資料依新 X̄ 界限發出警示', () => {
   const csvPath = path.join(import.meta.dirname, 'fixtures', 'stable-25.csv');
   assert.ok(fs.existsSync(csvPath), 'stable-25.csv 應存在');
   const txt = fs.readFileSync(csvPath, 'utf8');
@@ -36,9 +52,9 @@ test('6.1 stable-25.csv 驗證：seed 1、25 板 CSV 往返一致且穩定製程
   const iss = core.detectIssues(st);
   const vd = iss.meta.verdict;
 
-  assert.equal(vd.level, 'ok', '整體判定等級應為 ok');
-  assert.equal(vd.label, '正常', '整體判定標籤應為正常');
-  assert.ok(iss.every(x => x.level === '資訊' || x.lv === 'info'), '穩定製程 seed 1 不得有嚴重或警示問題卡');
+  assert.equal(vd.level, 'warn', '同板共變造成的板平均變異應反映為警示');
+  assert.equal(vd.label, '警示', '整體判定標籤應為警示');
+  assert.ok(iss.some(x => x.cat === '管制圖規則' && (x.level === '警示' || x.lv === 'warn')), '警示應由新 X̄ 界限觸發的 Nelson 規則說明');
 });
 
 test('6.1 verdict-sim-expected.json 期望檔與附錄 C 稽核參考判定比對（一致率 ≥85%）', () => {
@@ -77,12 +93,12 @@ test('6.1 verdict-sim-expected.json 期望檔與附錄 C 稽核參考判定比�
   }
 });
 
-test('M-18 回歸：穩定製程 25 板 seed 3 不出現多變量離群卡（小樣本門檻校準前 U1 QFP d²=26.3 > 18.42 誤報）', () => {
+test('M-18 回歸：25 板 seed 3 不出現多變量離群卡（X̄ 規則另列同板效應警示）', () => {
   const rows = generateStableData({ nb: 25, shift: 0, stroke: true, seed: 3 });
   const st = baseState(core, { rows, metrics: ['volume', 'hpct', 'area', 'offx', 'offy'], metric: 'volume', group: 'ALL', chart: 'xbars' });
   const iss = core.detectIssues(st);
   assert.equal(iss.filter(x => x.cat === '多變量離群').length, 0);
-  assert.equal(iss.meta.verdict.level, 'ok');
+  assert.ok(iss.some(x => x.cat === '管制圖規則' && (x.level === '警示' || x.lv === 'warn')));
 });
 
 test('空間群聚回歸：穩定製程不出現空間群聚卡（Moran 標準誤校正前 25 板 seed 23/72/76/182、50 板 seed 141 的 Z 為 2.66–4.08 誤報）', () => {
@@ -91,7 +107,7 @@ test('空間群聚回歸：穩定製程不出現空間群聚卡（Moran 標準�
     const st = baseState(core, { rows, metrics: ['volume', 'hpct', 'area', 'offx', 'offy'], metric: 'volume', group: 'ALL', chart: 'xbars' });
     const iss = core.detectIssues(st);
     assert.equal(iss.filter(x => x.cat === '空間群聚').length, 0, `${nb} 板 seed ${seed} 不應出現空間群聚卡`);
-    assert.equal(iss.meta.verdict.level, 'ok', `${nb} 板 seed ${seed} 整體判定應為正常`);
+    assert.ok(iss.some(x => x.cat === '管制圖規則'), `${nb} 板 seed ${seed} 的新 X̄ 界限卡應獨立於空間群聚判讀`);
   }
 });
 
@@ -100,7 +116,7 @@ const isSlow = process.env.RUN_SLOW === '1';
 test('[slow] 6.1 整體判定模擬：seed 1–200 蒙地卡羅驗收（25/50 板、SHIFT 0/3）', () => {
   const expPath = path.join(import.meta.dirname, 'fixtures', 'verdict-sim-expected.json');
   const expected = JSON.parse(fs.readFileSync(expPath, 'utf8'));
-  const runs = expected.runs || expected;
+  const runs = expected.iidRuns || expected.runs || expected;
   const maxSeed = isSlow ? 200 : 2;
 
   const configs = [
@@ -115,7 +131,7 @@ test('[slow] 6.1 整體判定模擬：seed 1–200 蒙地卡羅驗收（25/50 �
     const rawExp = runs[cfg.expKey] || runs[cfg.key];
     const expSeeds = Array.isArray(rawExp) ? rawExp : rawExp.seeds;
     for (let s = 1; s <= maxSeed; s++) {
-      const directRows = generateStableData({ nb: cfg.nb, shift: cfg.shift, stroke: true, seed: s });
+      const directRows = generateIidStableData({ nb: cfg.nb, shift: cfg.shift, seed: s });
       const rows = s === 1 ? core.parseCSV(rowsToCsv(directRows)).rows : directRows;
       const st = baseState(core, {
         rows,
