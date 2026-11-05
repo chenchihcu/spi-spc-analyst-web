@@ -180,8 +180,8 @@ test("L3 固定 seed X̄ 模擬：每板 n_i 正規化，依 Phase I t(df) 參�
   for (let i = 0; i < A.byBoard.length; i++) {
     const n = A.byBoard[i].n, p = A.xs.pts[i], expectedSd = A.sigmaW / Math.sqrt(n);
     assert.ok(Math.abs(p.sd - expectedSd) < 1e-12, `B${i + 1} 的 z 分母應為 σ̂組內/√n_i`);
-    assert.ok(Math.abs(p.ucl - (A.gMean + 3 * expectedSd)) < 1e-12, `B${i + 1} 的 UCL 應依 n_i 調整`);
-    assert.ok(Math.abs(p.z - (p.v - A.gMean) / expectedSd) < 1e-12, `B${i + 1} 的 z 應與界限同分母`);
+    assert.ok(Math.abs(p.ucl - (A.xs.cl + 3 * expectedSd)) < 1e-12, `B${i + 1} 的 UCL 應依 n_i 調整`);
+    assert.ok(Math.abs(p.z - (p.v - A.xs.cl) / expectedSd) < 1e-12, `B${i + 1} 的 z 應與界限同分母`);
   }
 });
 
@@ -449,7 +449,8 @@ test("D-M03: |Cpk| > 50 即使規格中心未超過 10σ 也要產生單位不�
   assert.ok(Math.abs(A.cap.cpk - 633.3333) < 0.01, `反例需重現 Cpk 約 633.33，實得 ${A.cap.cpk}`);
   const issue = c.detectIssues(S).find(x => x.rule_id === "M-03 單位不符");
   assert.ok(issue, "|Cpk| > 50 必須觸發 M-03");
-  assert.match(issue.rule_name, /\|Cpk\|>50/);
+  assert.match(issue.rule_name, />10σ/);
+  assert.doesNotMatch(issue.rule_name, /\|Cpk\|>50/);
   assert.ok(issue.facts.some(x => /Cpk/.test(x)), "卡片需呈現觸發規則的 Cpk 證據");
 });
 
@@ -507,7 +508,7 @@ test("D-SPACE: 群組置中後的空間偏相關自由度扣除群組效果", ()
   assert.match(issue.z, /df = 56/, "n=60、3 個群組估計效果及 1 個斜率，自由度應為 60−3−1=56");
 });
 
-test("D-XBAR: 25 板樣本數不等時，X̄ 圖與 Nelson 卡使用同一加權總平均和規則", () => {
+test("D-XBAR: 25 板樣本數不等時，X̄ 圖中心為板均之均且與 Nelson 卡規則集合一致", () => {
   const means = [-0.03200873977039009, -0.7153201182372868, -0.9299620600650087, -0.47056447621434927, -0.8342999551678076,
     -0.6503820777870715, -0.49709215166512877, -0.7804447775706649, -0.7475894769886509, -0.07431758241727948,
     -0.3035069709876552, 0.11985174287110567, -0.19516100140754133, 0.3628164096735418, 0.21218805422540754,
@@ -523,7 +524,9 @@ test("D-XBAR: 25 板樣本數不等時，X̄ 圖與 Nelson 卡使用同一加權
   const cards = c.detectIssues(S).filter(x => x.category === "管制圖規則" && x.metric === "體積");
   const cardRules = Array.from(new Set(Array.from(cards, x => Number(x.rule_id.match(/(\d+)$/)[1])))).sort((a, b) => a - b);
   const chartRules = Array.from(A.nelX.rules.filter(r => r.idx.length && r.id !== 7), r => r.id).sort((a, b) => a - b);
-  assert.ok(Math.abs(A.xs.cl - c.mean(rows.map(r => r.volume))) < 1e-10, "X̄ 中心線應為依各板量測數加權的總平均");
+  const boardMeanCl = c.mean(A.byBoard.map(b => b.mean));
+  assert.ok(Math.abs(A.xs.cl - boardMeanCl) < 1e-10, "X̄ 中心線應為板均之均（每板一權重）");
+  assert.ok(Math.abs(A.gMean - c.mean(rows.map(r => r.volume))) < 1e-10, "gMean 仍為依焊墊數加權的總平均");
   assert.deepEqual(chartRules, cardRules, `X̄ 圖觸發 ${chartRules.join(",")}，卡片觸發 ${cardRules.join(",")}`);
   for (let i = 0; i < A.xs.pts.length; i++) {
     const p = A.xs.pts[i], n = A.byBoard[i].n;
