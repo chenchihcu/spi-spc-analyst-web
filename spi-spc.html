@@ -888,7 +888,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.14.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.14.1</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -1961,6 +1961,8 @@ function erf(x){return 1-erfc(x)}
 const Phi=z=>z<0?0.5*erfc(-z/Math.SQRT2):1-0.5*erfc(z/Math.SQRT2);
 function invPhi(p){const a=[-39.69683028665376,220.9460984245205,-275.9285104469687,138.357751867269,-30.66479806614716,2.506628277459239],b=[-54.47609879822406,161.5858368580409,-155.6989798598866,66.80131188771972,-13.28068155288572],c=[-0.007784894002430293,-0.3223964580411365,-2.400758277161838,-2.549732539343734,4.374664141464968,2.938163982698783],d=[0.007784695709041462,0.3224671290700398,2.445134137142996,3.754408661907416],pl=0.02425;let q,r;if(p<pl){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1)}if(p>1-pl){q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1)}q=p-0.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1)}
 function pearson(x,y){const n=x.length;if(n<3)return NaN;const mx=mean(x),my=mean(y);let sxy=0,sxx=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-mx,dy=y[i]-my;sxy+=dx*dy;sxx+=dx*dx;syy+=dy*dy}return sxy/Math.sqrt(sxx*syy)}
+function adSampleHash(vals){let h=2166136261>>>0;const fin=[];for(const x of vals)if(Number.isFinite(x))fin.push(x);fin.sort((a,b)=>a-b);for(let i=0;i<fin.length;i++){const v=fin[i];h^=(Math.imul(Math.floor(v*1e6)>>>0,2654435761)>>>0);h=Math.imul(h,16777619)>>>0;h^=i>>>0}return (h^fin.length)>>>0}
+function adSample(vals,max=4000){if(vals.length<=max)return vals;const fin=[];for(const x of vals)if(Number.isFinite(x))fin.push(x);if(fin.length<=max)return fin.length===vals.length?vals:fin;fin.sort((a,b)=>a-b);const n=fin.length,rng=(a=>()=>{a+=0x6D2B79F5;a=Math.imul(a^a>>>15,a|1);a^=a+Math.imul(a^a>>>7,a|61);return((a^a>>>14)>>>0)/4294967296})(adSampleHash(vals)||1);const idx=new Uint32Array(n);for(let i=0;i<n;i++)idx[i]=i;for(let i=0;i<max;i++){const j=i+Math.floor(rng()*(n-i)),t=idx[i];idx[i]=idx[j];idx[j]=t}const out=new Array(max);for(let i=0;i<max;i++)out[i]=fin[idx[i]];return out}
 function andersonDarling(vals){const n=vals.length;if(n<8)return{A:NaN,p:NaN};const s=Float64Array.from(vals);s.sort();const m=mean(s),d=sd(s);if(!d)return{A:NaN,p:NaN};const F=new Float64Array(n),invD=1/d;for(let i=0;i<n;i++)F[i]=Math.min(Math.max(Phi((s[i]-m)*invD),1e-12),1-1e-12);let S=0;for(let i=0;i<n;i++)S+=(2*i+1)*(Math.log(F[i])+Math.log(1-F[n-1-i]));const A=-n-S/n,As=A*(1+0.75/n+2.25/(n*n));let p;if(As>=0.6)p=Math.exp(1.2937-5.709*As+0.0186*As*As);else if(As>=0.34)p=Math.exp(0.9177-4.279*As-1.38*As*As);else if(As>=0.2)p=1-Math.exp(-8.318+42.796*As-59.938*As*As);else p=1-Math.exp(-13.436+101.14*As-223.73*As*As);return{A:As,p:Math.min(Math.max(p,0),1)}}
 function skewKurt(a){const n=a.length;if(n<4)return{skew:NaN,kurt:NaN};const m=mean(a),d=sd(a);if(!d)return{skew:NaN,kurt:NaN};let s3=0,s4=0;for(const v of a){const z=(v-m)/d;s3+=z**3;s4+=z**4}const G1=(n/((n-1)*(n-2)))*s3;const G2=((n*(n+1))/((n-1)*(n-2)*(n-3)))*s4-(3*(n-1)*(n-1))/((n-2)*(n-3));return{skew:G1,kurt:G2}}
 
@@ -3559,7 +3561,7 @@ function advAnalyze(st,A){const m=A.m,G=st.rows.filter(r=>isAllGrp(st.group)||r.
 /* ============ 問題偵測引擎 ============
    逐面向掃描全部量測項目，輸出「事實 / 推論 / 佐證」結構化的問題清單 */
 function med(a){if(!a||!a.length)return NaN;if(a instanceof Float64Array){const s=a.slice();s.sort();return s.length?quant(s,.5):NaN}let hasBad=false;for(let i=0;i<a.length;i++){const v=a[i];if(v==null||!isFinite(v)){hasBad=true;break}}const s=hasBad?Float64Array.from(a.filter(v=>v!=null&&isFinite(v))):Float64Array.from(a);s.sort();return s.length?quant(s,.5):NaN} /* 型別陣列排序：大量資料時比比較函式排序快數倍，結果相同 */
-function robust(v){const m=med(v);if(!isFinite(m))return{m:NaN,s:NaN};const ad=new Float64Array(v.length);for(let i=0;i<v.length;i++)ad[i]=Math.abs(v[i]-m);ad.sort();let s=(ad.length?quant(ad,.5):NaN)*1.4826;if(!(s>1e-9))s=sd(v)||1e-9;return{m,s}}
+function robust(v){const m=med(v);if(!isFinite(m))return{m:NaN,s:NaN};const ad=new Float64Array(v.length);for(let i=0;i<v.length;i++)ad[i]=Math.abs(v[i]-m);ad.sort();let s=(ad.length?quant(ad,.5):NaN)*1.4826;if(!(s>1e-9)){const sv=sd(v);s=sv>1e-9?sv:NaN}return{m,s}}
 /* 扣除長期趨勢：以長度為週期整數倍的移動平均估計趨勢（各類別權重相同），回傳殘差 */
 function detrend(v,P){const n=v.length;if(n<P+2)return v.slice();const tr=v.map((_,i)=>{const lo=Math.max(0,Math.min(i-Math.floor(P/2),n-P));let s=0;for(let j=lo;j<lo+P;j++)s+=v[j];return s/P});return v.map((x,i)=>x-tr[i])}
 function winsor(v){const{m,s}=robust(v);return v.map(x=>Math.min(m+3*s,Math.max(m-3*s,x)))}
@@ -3780,7 +3782,8 @@ function isoScan(R,st,k,gIdx){const byG=new Map();if(gIdx){for(const g of Object
       const diff=x-S.m,z=diff*invSg;
       if(over||(Math.abs(z)>=5&&Math.abs(diff)>=eff))cands.push({r,g,k,x,z,over,sp,S})}}
   return{cells,cands}}
-function poissonSf(k,l){if(k<=0)return 1;if(!(l>0))return 0;if(k===1)return-Math.expm1(-l);let c=Math.exp(-l),s=0;for(let i=0;i<k;i++){s+=c;c*=l/(i+1)}return Math.max(0,1-s)}
+function poissonLogSumExp(logs){if(!logs.length)return-Infinity;let m=-Infinity;for(const t of logs)if(t>m)m=t;if(!isFinite(m))return m;let s=0;for(const t of logs)if(isFinite(t))s+=Math.exp(t-m);return m+Math.log(s)}
+function poissonSf(k,l){if(k<=0)return 1;if(!(l>0))return 0;if(k===1)return-Math.expm1(-l);const logs=[];let logTerm=-l;for(let i=0;i<k;i++){logs.push(logTerm);logTerm+=Math.log(l)-Math.log(i+1)}const logCdf=poissonLogSumExp(logs);if(logCdf>-1e-12)return Math.max(0,-Math.expm1(logCdf));return Math.max(0,Math.min(1,1-Math.exp(logCdf)))}
 /* tools/gen-stable-table.json 的內嵌副本（tests 核對兩者一致）：依板數查表，不在表中取較大板數，>200 取 200 */
 const GEN_TABLE_NB=[10,15,20,25,30,40,50,75,100,150,200];
 const GEN_TABLE={
@@ -4807,7 +4810,7 @@ function detectIssues(st,onStage){
       const tt=r*Math.sqrt(df/Math.max(1e-12,1-r*r)),p=tP(Math.abs(tt),df);if(!(Math.abs(r)>=.3&&p<.001))continue;
       const mx=mean(xs),my=mean(ys);let sxy=0,sxx=0;xs.forEach((x,i)=>{sxy+=(x-mx)*(ys[i]-my);sxx+=(x-mx)**2});const sl=sxy/sxx,rg=Math.max(...xs)-Math.min(...xs);
       add({lv:"warn",cat:"空間分布",sig:{t:"grad",k,ax,sl,along:ax===(st.sqDir==="X"?"x":"y")},title:`${lab(k)}沿 ${ax.toUpperCase()} 方向有梯度（${ax==="x"?(sl<0?"左高右低":"左低右高"):(sl<0?"下高上低":"下低上高")}）`,ents:["s:"+ax],score:2+Math.abs(r)*2,
-        rule_id:"空間偏相關 |r|≥0.30 且 p<0.001",rule_name:"扣除元件群組平均後焊墊殘差與座標之 Pearson 相關檢定",metric:lab(k),
+        rule_id:"空間偏相關 |r|≥0.30 且 p<0.001",rule_name:"扣除元件群組平均後焊墊殘差與座標之 Pearson 相關檢定（自由度 N−群組數−1）",metric:lab(k),
         boards:"全部板",subboard:subOf(R),group:groups.join("; "),refdes:"全部元件",pads:`全部焊墊（${P.length} 個真實座標位置）`,
         observed:`斜率 ${sgn(sl)}${f(sl,3)} ${u(k)}/mm（跨距 ${f(rg,0)} mm 約變化 ${f(Math.abs(sl*rg),1)} ${u(k)}）`,
         limit:"|r| ≥ 0.30 且 p < 0.001",z:`r = ${f(r,2)}（t = ${f(tt,2)}，df = ${df}）`,p:p<.001?"< 0.001":f(p,4),
@@ -5105,7 +5108,7 @@ function detectIssues(st,onStage){
   });
   // 6.1 整體判定（與畫面選擇無關：只由卡片嚴重度與最差群組 Cpk / 該群組內 AD 常態性決定）
   const wAll=worstCap(null),ngCards=F.filter(x=>x.lv==="ng"),warnCards=F.filter(x=>x.lv==="warn");
-  if(wAll&&wAll._v){const v=wAll._v;wAll.adP=andersonDarling(v.length>4000?v.filter((_,i)=>i%Math.ceil(v.length/4000)===0):v).p}
+  if(wAll&&wAll._v){const v=wAll._v;wAll.adP=andersonDarling(adSample(v)).p}
   for(const c of capCells)delete c._v;
   const reasons=[];let vLevel="ok";
   if(ngCards.length){vLevel="ng";reasons.push(`有 ${ngCards.length} 張嚴重問題卡（${ngCards.slice(0,3).map(x=>"#"+x.id+" "+x.title).join("、")}${ngCards.length>3?"…":""}）`)}
@@ -5692,7 +5695,7 @@ function fmMd(F, st){
 |---|---|---|---|
 `+Me.modes.map(m=>`| ${m.name} | ${m.verdict} | ${(m.dims||[]).join("、")||"—"} | ${[m.need||"",...(m.sup||[]).map(e=>"✓ "+e.d+"："+e.txt),...(m.con||[]).map(e=>"✗ "+e.d+"："+e.txt),...(m.rules&&m.rules.length?[`規則來源：${m.rules.join("、")}`]:[])].filter(Boolean).join("<br>").replace(/\|/g,"／")} |`).join("\n")+"\n";
 }
-if(typeof module!=="undefined")module.exports={issuesMd,fmMd,rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,areaRatio,maxThkForAR,detectIssues,overallVerdict,compareRuns,dfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,groupBasisOfRow,groupBasisForRows,groupBasisLabel,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml};
+if(typeof module!=="undefined")module.exports={issuesMd,fmMd,rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,adSample,adSampleHash,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,areaRatio,maxThkForAR,detectIssues,overallVerdict,compareRuns,dfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,groupBasisOfRow,groupBasisForRows,groupBasisLabel,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml};
 </script>
 <script>
 
@@ -6951,11 +6954,11 @@ function renderLISAUI(){
   const spanY = Math.max(maxY - minY, 1);
 
   const colorMap = {
-    HH: "#ef4444",
-    LL: "#3b82f6",
-    LH: "#93c5fd",
-    HL: "#f97316",
-    NS: "rgba(148, 163, 184, 0.45)"
+    HH: css("--lisa-hh"),
+    LL: css("--lisa-ll"),
+    LH: css("--lisa-lh"),
+    HL: css("--lisa-hl"),
+    NS: css("--lisa-ns")
   };
 
   for (const p of pts) {
@@ -6964,8 +6967,10 @@ function renderLISAUI(){
     ctx.beginPath();
     const r = p.quad === "NS" ? 3 : 5.5;
     ctx.arc(px, py, r, 0, 2 * Math.PI);
+    if (p.quad === "NS") ctx.globalAlpha = 0.45;
     ctx.fillStyle = colorMap[p.quad] || colorMap.NS;
     ctx.fill();
+    if (p.quad === "NS") ctx.globalAlpha = 1;
     if (p.quad !== "NS") {
       ctx.strokeStyle = "#ffffff";
       ctx.lineWidth = 1;
