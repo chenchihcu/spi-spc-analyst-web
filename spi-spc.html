@@ -888,7 +888,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.14.1</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.14.2</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -2695,8 +2695,9 @@ function analyzeBase(st){
   const hasWithinSigma=isFinite(sigmaW)&&sigmaW>0;
   const bmr=byBoard.slice(1).map((b,i)=>Math.abs(b.mean-byBoard[i].mean)),sB=isZeroSd?NaN:(bmr.length?mean(bmr):0)/1.128||sigmaW/Math.sqrt(nbar);
   // S 圖：每板的組內合併標準差；中心線 c4(n)·σ̂、界限 ±3σ̂√(1−c4²)，依每板自由度調整
-  // X̄ 圖中心線是整體總平均（依每板有效量測數加權）；Nelson 問題卡沿用相同 grand mean。
-  const xs={cl:gMean,sB,rejected:false,reason:"",subgroupWarning:"",pts:byBoard.map(b=>{const se=hasWithinSigma?sigmaW/Math.sqrt(b.n):NaN;return{lab:b.board,v:b.mean,sd:se,ucl:isZeroSd||!hasWithinSigma?NaN:gMean+3*se,lcl:isZeroSd||!hasWithinSigma?NaN:gMean-3*se,z:isZeroSd?0:(b.mean-gMean)/se}}),
+  // X̄ 圖中心線為板均之均（每板一權重）；Nelson 問題卡（detectIssues）沿用同一板均之均。
+  const xCL=byBoard.length?mean(byBoard.map(b=>b.mean)):gMean;
+  const xs={cl:xCL,sB,rejected:false,reason:"",subgroupWarning:"",pts:byBoard.map(b=>{const se=hasWithinSigma?sigmaW/Math.sqrt(b.n):NaN;return{lab:b.board,v:b.mean,sd:se,ucl:isZeroSd||!hasWithinSigma?NaN:xCL+3*se,lcl:isZeroSd||!hasWithinSigma?NaN:xCL-3*se,z:isZeroSd?0:(b.mean-xCL)/se}}),
     s:byBoard.map(b=>{const bp=bPool.get(b.board)||{s:b.sd,df:b.n-1};if(!(bp.df>=1)||!hasWithinSigma||isZeroSd)return{lab:b.board,v:isZeroSd?0:NaN,cl:NaN,ucl:NaN,lcl:NaN};const c=c4(bp.df+1),cl=c*sigmaW,h=3*sigmaW*Math.sqrt(Math.max(1-c*c,0));return{lab:b.board,v:bp.s,cl,ucl:cl+h,lcl:Math.max(0,cl-h)}})};
   if(boards.length<5){
     xs.rejected=true;xs.reason=`子群組（板數）不足（需 ≥5，本資料 n=${boards.length}）`;
@@ -4504,7 +4505,7 @@ function detectIssues(st,onStage){
     if(centerHit)evidence.push(`${lab(k)} 規格中心 ${f(sc,1)} ${u(k)}，資料平均 ${f(kMu,1)} ${u(k)}，相差 ${isFinite(zDiff)?f(zDiff,1)+"σ":"非零（σ=0）"}（門檻 >10σ），涵蓋全部焊墊`);
     for(const c of cpkHits)evidence.push(`群組 ${c.g} 的 Cpk = ${f(c.cpk)}（|Cpk| > 50；n = ${c.n}，組內 σ = ${f(c.sw,2)} ${u(k)}）`);
     add({lv:"warn",cat:"規格設定",sig:{t:"unit",k},title:`疑似單位不符（${centerHit?"規格中心距資料平均 >10σ":"|Cpk|>50"}）`,ents:[`s:${k}`],score:5,
-      rule_id:"M-03 單位不符",rule_name:"規格中心距資料平均 >10σ 或 |Cpk|>50",metric:lab(k),
+      rule_id:"M-03 單位不符",rule_name:"規格中心距資料平均 >10σ（σ=0 時中心不等即觸發）",metric:lab(k),
       boards:"全部板",subboard:subOf(R),group:groups.join("; "),refdes:"全部元件",pads:`全部焊墊（${nPads} 個）`,
       observed:`平均 ${f(kMu,1)} ${u(k)}${cpkWitness?`；群組 ${cpkWitness.g} Cpk ${f(cpkWitness.cpk)}`:""}`,
       limit:`規格 ${f(s.lsl,1)}–${f(s.usl,1)} ${u(k)}（中心距資料平均 >10σ 或 |Cpk|>50 觸發）`,
@@ -4920,7 +4921,7 @@ function detectIssues(st,onStage){
       for(const row of R){const v=row[k];if(v==null||!isFinite(v))continue;const bi=bPos.get(row.board);if(bi==null)continue;
         total+=v;Nx++;sums[bi]+=v;counts[bi]++;let a=cells[bi].get(row.group);if(!a)cells[bi].set(row.group,a=[]);a.push(v)}
       let ssw=0,dfw=0;for(const cell of cells)for(const vals of cell.values())if(vals.length>1){const cm=mean(vals);for(const v of vals)ssw+=(v-cm)**2;dfw+=vals.length-1}
-      const mu=Nx?total/Nx:NaN,sW=dfw>0?Math.sqrt(ssw/dfw):NaN,bm=sums.map((v,i)=>counts[i]?v/counts[i]:NaN);
+      const bm=sums.map((v,i)=>counts[i]?v/counts[i]:NaN),mu=bm.some(v=>isFinite(v))?mean(bm.filter(v=>isFinite(v))):NaN,sW=dfw>0?Math.sqrt(ssw/dfw):NaN;
       if(nb<5||!(sW>0)||bm.some(v=>!isFinite(v)))continue;
       const pts=bm.map((v,i)=>{const se=sW/Math.sqrt(counts[i]);return{lab:boards[i],v,sd:se,ucl:mu+3*se,lcl:mu-3*se,z:(v-mu)/se}}),z=pts.map(p=>p.z),nel=nelson(z),wCap=worstCap(k),sp=st.specs[k];
       for(const r of nel.rules){if(!r.idx.length||r.id===7)continue;
