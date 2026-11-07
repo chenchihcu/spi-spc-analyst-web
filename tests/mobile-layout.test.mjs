@@ -10,6 +10,25 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
 const htmlSource = fs.readFileSync(path.join(ROOT, 'spi-spc.html'), 'utf8');
 
+test('明亮狀態文字在介面與報告白紙底色上的對比至少 4.5', () => {
+  function luminance(hex) {
+    const channels = hex.match(/\w{2}/g).map(value => parseInt(value, 16) / 255);
+    const linear = channels.map(value => value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4);
+    return linear.reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0);
+  }
+  for (const selector of [':root', '.report-preview']) {
+    const start = htmlSource.indexOf(selector === ':root' ? ':root{' : '.report-preview{--');
+    assert.ok(start >= 0, `${selector} 需宣告明亮色彩 token`);
+    const rule = htmlSource.slice(start).split('}')[0];
+    for (const name of ['ok', 'warn', 'ng']) {
+      const foreground = luminance(rule.match(new RegExp(`--${name}:#([0-9a-f]{6})`, 'i'))[1]);
+      const background = luminance(rule.match(new RegExp(`--${name}-soft:#([0-9a-f]{6})`, 'i'))[1]);
+      const contrast = (Math.max(foreground, background) + 0.05) / (Math.min(foreground, background) + 0.05);
+      assert.ok(contrast >= 4.5, `${selector} ${name} 對比 ${contrast}`);
+    }
+  }
+});
+
 let JSDOM, VirtualConsole;
 try {
   ({ JSDOM, VirtualConsole } = (await import('jsdom')).default || (await import('jsdom')));
@@ -201,8 +220,8 @@ test('6. PWA 與進階無障礙 (Apple Touch Icon, scroll-margin, 44px 報告標
   assert.match(htmlSource, /<link\s+rel="apple-touch-icon"/i, '需有 apple-touch-icon');
   assert.match(htmlSource, /<meta\s+name="apple-mobile-web-app-title"\s+content="SPI·SPC">/i, '需有 apple-mobile-web-app-title');
 
-  // b. WCAG 2.2 AA 對比度：--warn 應為 #9B650E (4.75:1)
-  assert.match(htmlSource, /--warn:\s*#9B650E/i, '--warn 需符合 WCAG AA 4.5:1 標準 (#9B650E)');
+  // b. 明亮警示色在淡色警示底上的對比約 5.14；數值門檻由上方色彩測試驗證。
+  assert.match(htmlSource, /--warn:\s*#87570B/i, '--warn 需使用已驗證對比的明亮警示色');
 
   // c. 表單 scroll-margin 防固定頂底欄遮擋
   assert.match(htmlSource, /scroll-margin-bottom:\s*calc\(var\(--tabbar-h\)\s*\+\s*var\(--safe-b\)\s*\+\s*16px\)/i, '表單輸入需配置 scroll-margin-bottom');
