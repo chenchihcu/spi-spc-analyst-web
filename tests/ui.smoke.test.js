@@ -53,14 +53,22 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   assert.equal(d.querySelectorAll("#issList details.iss-card:not([open])").length, 0, "全部展開");
   $("#issCollapse").click();
   assert.equal(d.querySelectorAll("#issList details.iss-card[open]").length, 0, "全部收合");
-  // 頂端不再重複規格輸入；資料與規格頁分為子分頁
+  // 頂端不再重複規格輸入；資料與規格頁分為 6 個子分頁（匯入資料、規格設定、回合管理、鋼板與開孔、資料庫、AI 設定）
   assert.equal(d.querySelector("#inLsl"), null, "規格輸入只保留在資料與規格頁");
-  assert.equal(d.querySelectorAll("#p-data .subtab").length, 4);
+  assert.equal(d.querySelectorAll("#p-data .subtab").length, 6);
   // 子分頁鍵盤：只有選取中的在 Tab 順序，左右鍵切換
-  assert.deepEqual([...d.querySelectorAll("#p-data .subtab")].map((b) => b.tabIndex), [0, -1, -1, -1]);
+  assert.deepEqual([...d.querySelectorAll("#p-data .subtab")].map((b) => b.tabIndex), [0, -1, -1, -1, -1, -1]);
   d.querySelector("#p-data .subtabs").dispatchEvent(new w.KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
-  assert.equal(d.querySelector('#p-data .subtab[data-sub="runs"]').getAttribute("aria-selected"), "true", "右鍵切到回合管理");
+  assert.equal(d.querySelector('#p-data .subtab[data-sub="specs"]').getAttribute("aria-selected"), "true", "右鍵切到規格設定");
+  d.querySelector("#p-data .subtabs").dispatchEvent(new w.KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+  assert.equal(d.querySelector('#p-data .subtab[data-sub="runs"]').getAttribute("aria-selected"), "true", "再按右鍵切到回合管理");
   d.querySelector("#p-data .subtabs").dispatchEvent(new w.KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+  // 驗證新整合的 UI/UX 入口與轉跳（記錄庫膠囊群組、全域時段篩選、子視圖切換器、AI 精簡狀態列、分析報告匯出整合）
+  assert.ok(d.querySelector("header.top .db-capsule-group #btnOpenRecModal"), "頂欄應有整合的記錄庫膠囊群組");
+  assert.ok(d.querySelector(".rail #railTimeWrap #inTimeStart"), "時段篩選應整合於全域分析設定列 .rail");
+  assert.ok(d.querySelector('#p-report #btnExpMd') && d.querySelector('#p-report #btnExpBoard') && d.querySelector('#p-report #btnExpDef'), "匯出按鈕應整合於分析報告頁");
+  assert.ok(d.querySelector('#p-ai #aiCompactBar #btnGoAiCfg'), "AI 分析頁頂部應有單行精簡狀態列與設定轉跳鈕");
+  assert.ok(d.querySelector('#p-data [data-sub="ai-cfg"] #aiSettingsCard'), "AI 詳細設定卡應收折於資料與規格頁的 AI 設定子分頁");
   // 換回合後，先前展開的問題不會自動展開
   d.querySelector("#iss-1 > summary").click();
   assert.equal(d.querySelector("#iss-1").open, true);
