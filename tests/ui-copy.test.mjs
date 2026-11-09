@@ -24,6 +24,16 @@ const forbidden = [
   'label:"體積 Volume"',
   "Reasoning Effort",
   "高 (high)",
+  "Executive &",
+  "Process &",
+  "Stencil &",
+  "批號 (Lot)",
+  "面別 (Side)",
+  "版本 (Rev)",
+  "收件人 (To)",
+  "副本 (Cc)",
+  "本版尚未提供（規劃中）",
+  "解讀：X̄ 圖看",
 ];
 
 test("spi-spc.html 不含禁用教學段與英文譯名", () => {
