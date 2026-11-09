@@ -814,16 +814,16 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 .ui-ico--folder{width:18px;height:18px}
 .ui-ico--hint{width:20px;height:20px;color:var(--accent)}
 .chip-rec-lib{display:inline-flex;align-items:center;gap:6px;font-weight:500;cursor:pointer}
-.startup-db-banner{margin-bottom:12px;background:var(--accent-soft);border:1px solid var(--accent);display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:var(--r);flex-wrap:wrap;gap:10px}
-.startup-db-banner__main{display:flex;align-items:center;gap:10px;flex:1 1 300px;min-width:0}
-.startup-db-banner__body{min-width:0}
-.startup-db-banner__title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.startup-db-banner__title{color:var(--accent-ink);font-size:var(--fs-body)}
-.startup-db-banner__pill{font-size:var(--fs-caption);background:var(--surface)}
-.startup-db-banner__cloud{color:var(--ink);font-size:var(--fs-caption)}
-.startup-db-banner__actions{gap:8px;margin:0;align-items:center}
-.startup-db-banner__btn{padding:6px 12px;font-size:var(--fs-ui)}
-.startup-db-banner__dismiss{padding:6px 10px;font-size:var(--fs-caption);background:transparent;border:none;cursor:pointer;color:var(--muted)}
+.startup-db-banner{margin-bottom:8px;background:var(--accent-soft);border:1px solid var(--accent);display:flex;flex-wrap:nowrap;justify-content:space-between;align-items:center;padding:3px 10px;min-height:32px;border-radius:var(--r);gap:8px;overflow-x:auto}
+.startup-db-banner__main{display:inline-flex;align-items:center;gap:6px;min-width:0;flex:1 1 auto;overflow:hidden}
+.startup-db-banner__body{display:inline-flex;align-items:center;gap:6px;min-width:0;flex:1 1 auto;overflow:hidden}
+.startup-db-banner__title-row{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap}
+.startup-db-banner__title{color:var(--accent-ink);font-size:var(--fs-caption);font-weight:600}
+.startup-db-banner__pill{font-size:var(--fs-caption);background:var(--surface);padding:1px 6px;border-radius:4px}
+.startup-db-banner__cloud{color:var(--ink);font-size:var(--fs-caption);white-space:nowrap}
+.startup-db-banner__actions{display:inline-flex;gap:6px;margin:0;align-items:center;flex-shrink:0}
+.startup-db-banner__btn{padding:2px 8px;font-size:var(--fs-caption);min-height:28px;white-space:nowrap}
+.startup-db-banner__dismiss{padding:2px 6px;font-size:var(--fs-caption);background:transparent;border:none;cursor:pointer;color:var(--muted);min-height:24px;white-space:nowrap}
 .db-modal-panel--xs{max-width:420px;margin:auto}
 .db-modal-panel--sm{max-width:440px;margin:auto}
 .db-modal-panel--rec{max-width:480px;margin:auto}
@@ -878,10 +878,10 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 .db-capsule-group>.chip.chipBtn:hover{background:var(--surface)}
 .db-capsule-group>.chip-rec-lib{background:var(--surface);border:1px solid var(--line);font-weight:600}
 @media(max-width:600px),(pointer:coarse) and (max-height:500px){.db-capsule-group{display:none!important}}
-.startup-db-banner{padding:6px 12px!important;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.startup-db-banner__main{display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 auto}
-.startup-db-banner__body{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0;flex:1 1 auto}
-.startup-db-banner__title-row{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}
+.startup-db-banner{padding:3px 10px!important;display:flex!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:space-between!important;gap:8px!important}
+.startup-db-banner__main{display:inline-flex!important;align-items:center!important;gap:6px!important;min-width:0!important;flex:1 1 auto!important}
+.startup-db-banner__body{display:inline-flex!important;align-items:center!important;gap:6px!important;min-width:0!important;flex:1 1 auto!important}
+.startup-db-banner__title-row{display:inline-flex!important;align-items:center!important;gap:6px!important;flex-shrink:0!important}
 .rail-time-wrap{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;position:relative}
 .rail-time-pop{display:inline-flex;align-items:flex-end;gap:6px;flex-wrap:wrap;padding:6px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px}
 @media(max-width:600px),(pointer:coarse) and (max-height:500px){
@@ -912,7 +912,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.14.3</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.15.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <div class="db-capsule-group" role="group" aria-label="雲端記錄庫與套用狀態">
@@ -999,26 +999,20 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 <div class="tabs-bar">
 <button type="button" class="tab-scroll" id="tabScrollL" aria-label="向左捲動頁籤" hidden>‹</button>
 <nav class="tabs" role="tablist" aria-label="分析頁籤">
-  <span class="tabgrp" aria-hidden="true">找問題</span>
+  <button class="tab" role="tab" data-tab="data" aria-selected="false">資料與規格</button>
   <button class="tab" role="tab" data-tab="issues" aria-selected="true">問題偵測</button>
   <button class="tab" role="tab" data-tab="overview">總覽</button>
-  <span class="tabgrp" aria-hidden="true">看證據</span>
   <button class="tab" role="tab" data-tab="control">管制圖</button>
   <button class="tab" role="tab" data-tab="capability">製程能力</button>
   <button class="tab" role="tab" data-tab="sim3d">3D 錫膏模擬</button>
-  <span class="tabgrp" aria-hidden="true">深入分析</span>
   <button class="tab tab--sub" role="tab" data-tab="cross" data-tab-group="deep">交叉驗證</button>
   <button class="tab tab--sub" role="tab" data-tab="adv" data-tab-group="deep">進階分析</button>
   <button class="tab tab--sub" role="tab" data-tab="stats" data-tab-group="deep">統計資料</button>
-  <span class="tabgrp" aria-hidden="true">改善與比較</span>
   <button class="tab tab--sub" role="tab" data-tab="compare" data-tab-group="improve">試產比較</button>
   <button class="tab tab--sub" role="tab" data-tab="dfm" data-tab-group="improve">DFM 建議</button>
   <button class="tab tab--sub" role="tab" data-tab="lab" data-tab-group="improve">實驗驗證</button>
-  <span class="tabgrp" aria-hidden="true">診斷與報告</span>
   <button class="tab" role="tab" data-tab="ai">AI 分析</button>
   <button class="tab" role="tab" data-tab="report">分析報告</button>
-  <span class="tabgrp" aria-hidden="true">設定</span>
-  <button class="tab" role="tab" data-tab="data">資料與規格</button>
 </nav>
 <button type="button" class="tab-scroll" id="tabScrollR" aria-label="向右捲動頁籤" hidden>›</button>
 </div>
@@ -1036,7 +1030,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
           <span class="pill startup-db-banner__pill">試產 1 · 鋼板 V1</span>
           <span class="note startup-db-banner__cloud" id="bannerCloudState">連線確認中…</span>
         </div>
-        <div id="bannerRecentRuns" style="margin-top:6px;display:flex;flex-wrap:nowrap;overflow-x:auto;gap:6px;align-items:center" hidden></div>
+        <div id="bannerRecentRuns" style="display:inline-flex;flex-wrap:nowrap;overflow-x:auto;gap:6px;align-items:center;margin:0" hidden></div>
       </div>
     </div>
     <div class="row startup-db-banner__actions">
@@ -9893,7 +9887,7 @@ function updateStartupDbBanner() {
             qBadge = `<span class="pill bad" style="font-size:var(--fs-caption);padding:1px 6px">⚠ ${r.qualitySnapshot.totalDefects} 缺點</span>`;
           }
         }
-        return `<button type="button" class="chipbtn banner-run-chip" data-id="${esc(r.id)}" style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;font-size:var(--fs-caption);border:1px solid var(--line);border-radius:6px;background:var(--surface);cursor:pointer;min-height:34px" title="一鍵載入批號 ${esc(r.lot)}">
+        return `<button type="button" class="chipbtn banner-run-chip" data-id="${esc(r.id)}" style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;font-size:var(--fs-caption);border:1px solid var(--line);border-radius:6px;background:var(--surface);cursor:pointer;min-height:26px;white-space:nowrap" title="一鍵載入批號 ${esc(r.lot)}">
           <span style="font-weight:600">🕒 ${esc(r.lot)}</span>
           <span class="note" style="font-size:var(--fs-caption)">${esc(r.part || "—")} (${esc(r.side || "ALL")})</span>
           ${qBadge}
