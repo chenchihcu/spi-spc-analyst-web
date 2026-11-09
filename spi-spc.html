@@ -814,6 +814,16 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 .ui-ico--folder{width:18px;height:18px}
 .ui-ico--hint{width:20px;height:20px;color:var(--accent)}
 .chip-rec-lib{display:inline-flex;align-items:center;gap:6px;font-weight:500;cursor:pointer}
+.chip-export-hub{display:inline-flex;align-items:center;gap:6px;font-weight:500;cursor:pointer}
+.export-group-card{padding:12px 14px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface)}
+.export-items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
+.exp-item-card{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:6px;gap:8px}
+.exp-item-card:hover{background:var(--surface)}
+.exp-item-main{display:flex;align-items:flex-start;gap:8px;min-width:0;flex:1 1 auto}
+.exp-item-info{display:flex;flex-direction:column;gap:2px;min-width:0}
+.exp-item-title{font-size:var(--fs-ui);font-weight:500;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.exp-item-desc{font-size:var(--fs-caption);color:var(--muted);line-height:1.3}
+.aux-data-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
 .startup-db-banner{margin-bottom:8px;background:var(--accent-soft);border:1px solid var(--accent);display:flex;flex-wrap:nowrap;justify-content:space-between;align-items:center;padding:3px 10px;min-height:32px;border-radius:var(--r);gap:8px;overflow-x:auto}
 .startup-db-banner__main{display:inline-flex;align-items:center;gap:6px;min-width:0;flex:1 1 auto;overflow:hidden}
 .startup-db-banner__body{display:inline-flex;align-items:center;gap:6px;min-width:0;flex:1 1 auto;overflow:hidden}
@@ -877,6 +887,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 .db-capsule-group>.chip.chipBtn{border:none;background:transparent;border-radius:999px;min-height:32px;padding:3px 10px}
 .db-capsule-group>.chip.chipBtn:hover{background:var(--surface)}
 .db-capsule-group>.chip-rec-lib{background:var(--surface);border:1px solid var(--line);font-weight:600}
+.db-capsule-group>.chip-export-hub{background:var(--surface);border:1px solid var(--line);font-weight:600}
 @media(max-width:600px),(pointer:coarse) and (max-height:500px){.db-capsule-group{display:none!important}}
 .startup-db-banner{padding:3px 10px!important;display:flex!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:space-between!important;gap:8px!important}
 .startup-db-banner__main{display:inline-flex!important;align-items:center!important;gap:6px!important;min-width:0!important;flex:1 1 auto!important}
@@ -912,13 +923,14 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.15.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.15.1</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <div class="db-capsule-group" role="group" aria-label="雲端記錄庫與套用狀態">
       <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
       <button type="button" class="chip chipBtn load-state" id="statePlace" data-state="idle" title="選取座標檔"><span class="light" aria-hidden="true"></span><span>座標檔：未套用</span></button>
       <button type="button" class="chip chipBtn chip-rec-lib" id="btnOpenRecModal" title="開啟量測紀錄與座標檔資料庫，選取歷史檔案載入分析"><svg class="ui-ico ui-ico--folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>記錄庫 ▾</button>
+      <button type="button" class="chip chipBtn chip-export-hub" id="btnOpenExportModal" title="開啟資料與報告匯出中心，支援依角色一覽下載與批次打包"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>匯出 ▾</button>
     </div>
     <button type="button" class="chip chipBtn duo-toggle-btn" id="duoToggleBtn" title="切換折疊雙欄模式" aria-label="切換雙欄模式" aria-pressed="false"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:18px;height:18px"><rect x="3" y="4" width="8" height="16" rx="2"/><rect x="13" y="4" width="8" height="16" rx="2"/></svg>雙欄 ▾</button>
     <span class="chip" title="目前分析的試產回合" hidden>回合 <b id="srcName">範例資料</b> · <b id="srcBoards" class="num">—</b> 板 · <b id="srcPads" class="num">—</b> 焊墊</span>
@@ -1413,6 +1425,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
         <label for="chkRep10"><input type="checkbox" id="chkRep10" checked aria-label="10. 方法附錄"> 10. 方法附錄</label>
       </div>
       <div class="row" style="gap:8px;flex-wrap:wrap">
+        <button type="button" class="primary" id="btnHubExport" title="開啟全站資料與報告匯出中心"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>匯出中心 ▾</button>
         <button type="button" class="primary" id="btnRepPdf">匯出 PDF 報告</button>
         <button type="button" id="btnRepPrint">列印整頁報告</button>
         <button type="button" id="btnExpMd">分析報告 .md</button>
@@ -1508,6 +1521,63 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
         <h4 class="imp-step-title">⑤ 檢查預覽與套用</h4>
         <div class="row"><label class="row" style="font-size:var(--fs-ui)"><input type="radio" name="impMode" value="new" checked> 新增為新回合</label><input type="text" id="inRunName" aria-label="新回合名稱" placeholder="回合名稱，例：試產 2 · 鋼板 V2" style="min-width:min(100%,220px)">
           <label class="row" style="font-size:var(--fs-ui)"><input type="radio" name="impMode" value="replace"> 取代目前回合</label><button class="primary" id="btnApply">套用匯入</button></div>
+      <!-- ③ 輔助工程檢驗資料整合卡片 -->
+      <div class="card" id="cardAuxData" style="margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">
+          <h4 style="margin:0;font-size:var(--fs-ui);display:flex;align-items:center;gap:6px">
+            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent)"></span>
+            ③ 輔助工程檢驗資料 (AOI / GR&R / 幾何焊墊)
+          </h4>
+          <span class="note" style="font-size:var(--fs-caption)">選填 · 交叉驗證、量測系統分析與 DFM 開孔覆寫</span>
+        </div>
+        <p class="note" style="margin:0 0 10px;font-size:var(--fs-caption)">可在此處快速上傳輔助檢驗數據，或至各對應分頁操作；資料自動跨頁雙向連動。</p>
+        <div class="aux-data-grid">
+          <!-- AOI 檢驗結果 -->
+          <div class="card" style="padding:10px 12px;background:var(--surface2);border:1px solid var(--line);border-radius:6px;display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <b style="font-size:var(--fs-ui)">AOI 檢驗結果</b>
+              <span class="pill" id="impAoiBadge">未載入</span>
+            </div>
+            <div class="note" id="impAoiInfo" style="font-size:var(--fs-caption);min-height:2.6em">用於「交叉驗證」分頁比對 SPI 與 AOI 缺點重合度。</div>
+            <div class="row" style="gap:6px;margin-top:auto">
+              <label for="impAoiFile" style="cursor:pointer;margin:0">
+                <input type="file" id="impAoiFile" accept=".csv,.txt,.tsv" class="sr" aria-label="上傳 AOI 結果 CSV">
+                <span class="chipbtn" style="border:1px solid var(--line);padding:3px 8px;font-size:var(--fs-caption);display:inline-flex;align-items:center">選取 CSV</span>
+              </label>
+              <button type="button" class="btn-sm" id="btnImpAoiSample" style="font-size:var(--fs-caption);padding:3px 8px">載入範例</button>
+            </div>
+          </div>
+          <!-- GR&R 重複量測 -->
+          <div class="card" style="padding:10px 12px;background:var(--surface2);border:1px solid var(--line);border-radius:6px;display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <b style="font-size:var(--fs-ui)">GR&R 重複量測</b>
+              <span class="pill" id="impGrrBadge">未載入</span>
+            </div>
+            <div class="note" id="impGrrInfo" style="font-size:var(--fs-caption);min-height:2.6em">用於「實驗驗證」分頁評估量測系統重複性與再現性。</div>
+            <div class="row" style="gap:6px;margin-top:auto">
+              <label for="impGrrFile" style="cursor:pointer;margin:0">
+                <input type="file" id="impGrrFile" accept=".csv,.txt,.tsv" class="sr" aria-label="上傳重複量測 CSV">
+                <span class="chipbtn" style="border:1px solid var(--line);padding:3px 8px;font-size:var(--fs-caption);display:inline-flex;align-items:center">選取 CSV</span>
+              </label>
+              <button type="button" class="btn-sm" id="btnImpGrrSample" style="font-size:var(--fs-caption);padding:3px 8px">載入範例</button>
+            </div>
+          </div>
+          <!-- 幾何焊墊清單 -->
+          <div class="card" style="padding:10px 12px;background:var(--surface2);border:1px solid var(--line);border-radius:6px;display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <b style="font-size:var(--fs-ui)">幾何焊墊清單</b>
+              <span class="pill" id="impGeomBadge">未載入</span>
+            </div>
+            <div class="note" id="impGeomInfo" style="font-size:var(--fs-caption);min-height:2.6em">用於「鋼板與開孔」分頁覆寫開孔尺寸與 DFM 寬深比計算。</div>
+            <div class="row" style="gap:6px;margin-top:auto">
+              <label for="impGeomPadFile" style="cursor:pointer;margin:0">
+                <input type="file" id="impGeomPadFile" accept=".csv,.txt,.tsv" class="sr" aria-label="匯入幾何焊墊清單 CSV">
+                <span class="chipbtn" style="border:1px solid var(--line);padding:3px 8px;font-size:var(--fs-caption);display:inline-flex;align-items:center">選取 CSV</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
       </div>
     </div>
   </div>
@@ -1774,6 +1844,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
       <div class="sheet-sec-title">資料與設定</div>
       <div class="sheet-list">
         <button type="button" class="sheet-row" id="mBtnOpenRecModal"><span style="display:inline-flex;align-items:center;gap:8px"><svg class="ui-ico ui-ico--folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>記錄庫</span><span class="sheet-arrow">›</span></button>
+        <button type="button" class="sheet-row" id="mBtnOpenExportModal"><span style="display:inline-flex;align-items:center;gap:8px"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:18px;height:18px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>匯出中心</span><span class="sheet-arrow">›</span></button>
         <button type="button" class="sheet-row" data-mtab="data"><span>資料與規格</span><span class="sheet-arrow">›</span></button>
       </div>
 
@@ -1906,6 +1977,231 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
         <button type="button" id="btnRecPickerGoImport" style="font-size:var(--fs-ui)">＋ 匯入新檔</button>
         <button type="button" id="btnRecPickerCloseBottom" class="primary" style="font-size:var(--fs-ui)">完成</button>
       </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 全域資料與報告匯出中心 (Export Deliverables Hub) -->
+<div class="db-modal" id="exportCenterModal" role="dialog" aria-modal="true" aria-label="資料與報告匯出中心" hidden>
+  <div class="db-modal-panel" style="max-width:880px;max-height:90vh;display:flex;flex-direction:column">
+    <div class="sheet-head" style="padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:var(--surface)">
+      <div style="display:flex;align-items:center;gap:10px">
+        <svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:20px;height:20px;color:var(--accent)"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <h3 style="margin:0;font-size:var(--fs-input)">資料與報告匯出中心</h3>
+      </div>
+      <button type="button" class="sheet-close" id="exportCenterClose" aria-label="關閉匯出中心">✕</button>
+    </div>
+    
+    <div style="padding:12px 18px;background:var(--surface);display:flex;flex-direction:column;gap:12px;overflow-y:auto;flex:1 1 auto">
+      <!-- 頂部摘要與快速一鍵打包 -->
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border-radius:8px;border:1px solid var(--line)">
+        <div>
+          <b style="font-size:var(--fs-ui)">當前回合交付摘要</b>
+          <div class="note" id="exportCenterSummary" style="font-size:var(--fs-caption);margin-top:2px">尚無載入回合數據</div>
+        </div>
+        <button type="button" class="primary" id="btnDownloadStandardBundle" style="display:inline-flex;align-items:center;gap:6px">
+          <svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          一鍵下載標準交付包 (PDF+XLSX+DFM)
+        </button>
+      </div>
+
+      <!-- 批次下載操作列 -->
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;padding:6px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--line)">
+        <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;margin:0;font-size:var(--fs-ui);font-weight:500">
+          <input type="checkbox" id="chkExportSelectAll" aria-label="全選所有匯出項目"> 全選所有項目
+        </label>
+        <div style="display:inline-flex;align-items:center;gap:10px">
+          <span id="exportQueueStatus" class="note" style="font-size:var(--fs-caption)"></span>
+          <button type="button" id="btnDownloadSelected" class="primary btn-sm" style="font-size:var(--fs-ui)">下載已勾選項目 (<span id="exportSelectedCount">0</span>)</button>
+        </div>
+      </div>
+
+      <!-- 分類卡片 1: 管理與決策層 -->
+      <div class="export-group-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <b style="font-size:var(--fs-ui);color:var(--ink)">管理與決策層 (Executive &amp; Management)</b>
+          <span class="note" style="font-size:var(--fs-caption)">經理人、主管與客戶審查</span>
+        </div>
+        <div class="export-items-grid">
+          <div class="exp-item-card">
+            <div class="exp-item-main">
+              <input type="checkbox" class="exp-item-chk" data-type="rep-pdf" id="chkExpPdf" aria-label="勾選完整分析報告 PDF">
+              <div class="exp-item-info">
+                <div class="exp-item-title"><label for="chkExpPdf" style="cursor:pointer;margin:0">完整 SPC 分析報告</label><span class="pill">.pdf</span></div>
+                <div class="exp-item-desc">包含圖表、製程能力與判定總結</div>
+              </div>
+            </div>
+            <button type="button" class="btn-sm" data-exp-act="rep-pdf" title="立即下載完整 PDF 報告">下載</button>
+          </div>
+
+          <div class="exp-item-card">
+            <div class="exp-item-main">
+              <input type="checkbox" class="exp-item-chk" data-type="rep-pdf-lite" id="chkExpPdfLite" aria-label="勾選精簡版分析報告 PDF">
+              <div class="exp-item-info">
+                <div class="exp-item-title"><label for="chkExpPdfLite" style="cursor:pointer;margin:0">精簡版分析報告</label><span class="pill">.pdf</span></div>
+                <div class="exp-item-desc">壓縮圖檔小於 5MB，便於 Email 寄送</div>
+              </div>
+            </div>
+            <button type="button" class="btn-sm" data-exp-act="rep-pdf-lite" title="立即下載精簡版 PDF 報告">下載</button>
+          </div>
+
+          <div class="exp-item-card">
+            <div class="exp-item-main">
+              <input type="checkbox" class="exp-item-chk" data-type="ai-md" id="chkExpAiMd" aria-label="勾選 AI 智能診斷報告 Markdown">
+              <div class="exp-item-info">
+                <div class="exp-item-title"><label for="chkExpAiMd" style="cursor:pointer;margin:0">AI 智能診斷報告</label><span class="pill">.md</span></div>
+                <div class="exp-item-desc">LLM 製程根因推理與工程改進行動</div>
+              </div>
+            </div>
+            <button type="button" class="btn-sm" data-exp-act="ai-md" title="立即下載 AI 報告 Markdown">下載</button>
+          </div>
+
+          <div class="exp-item-card">
+            <div class="exp-item-main">
+              <input type="checkbox" class="exp-item-chk" data-type="rep-md" id="chkExpRepMd" aria-label="勾選完整分析報告 Markdown">
+              <div class="exp-item-info">
+                <div class="exp-item-title"><label for="chkExpRepMd" style="cursor:pointer;margin:0">完整分析報告</label><span class="pill">.md</span></div>
+                <div class="exp-item-desc">結構化純文字完整分析結論</div>
+              </div>
+            </div>
+            <button type="button" class="btn-sm" data-exp-act="rep-md" title="立即下載分析報告 Markdown">下載</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 分類卡片 2: 製程改善與工程分析 -->
+      <div class="export-group-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <b style="font-size:var(--fs-ui);color:var(--ink)">製程改善與工程分析 (Process &amp; Engineering)</b>
+          <span class="note" style="font-size:var(--fs-caption)">SMT 製程工程師、品保與資料庫分析</span>
+        </div>
+        <div class="export-items-grid">
+          <div class="exp-item-card">
+            <div class="exp-item-main">
+              <input type="checkbox" class="exp-item-chk" data-type="iss-xlsx" id="chkExpIssXlsx" aria-label="勾選問題清單 Excel">
+              <div class="exp-item-info">
+                <div class="exp-item-title"><label for="chkExpIssXlsx" style="cursor:pointer;margin:0">問題偵測缺陷清單</label><span class="pill">.xlsx</span></div>
+                <div class="exp-item-desc">完整問題統計與 Excel 試算表</div>
+              </div>
+            </div>
+            <button type="button" class="btn-sm" data-exp-act="iss-xlsx" title="立即下載問題清單 Excel">下載</button>
+          </div>
+
+          <div class="exp-item-card">
+            <div class="exp-item-main">
+              <input type="checkbox" class="exp-item-chk" data-type="iss-csv" id="chkExpIssCsv" aria-label="勾選問題清單 CSV">
+              <div class="exp-item-info">
+                <div class="exp-item-title"><label for="chkExpIssCsv" style="cursor:pointer;margin:0">問題清單資料庫</label><span class="pill">.csv</span></div>
+                <div class="exp-item-desc">輕量化 CSV 缺陷數據與指標</div>
+              </div>
+            </div>
+            <button type="button" class="btn-sm" data-exp-act="iss-csv" title="立即下載問題清單 CSV">下載</button>
+          </div>
+
+          <div class="exp-item-card">
+            <div class="exp-item-main">
+              <input type="checkbox" class="exp-item-chk" data-type="correction-json" id="chkExpCorrJson" aria-label="勾選印刷機補償參數 JSON">
+              <div class="exp-item-info">
+                <div class="exp-item-title"><label for="chkExpCorrJson" style="cursor:pointer;margin:0">印刷機補償參數</label><span class="pill">.json</span></div>
+                <div class="exp-item-desc">錫膏印刷機自動閉環偏移修正參數</div>
+              </div>
+            </div>
+            <button type="button" class="btn-sm" data-exp-act="correction-json" title="立即下載補償參數 JSON">下載</button>
+          </div>
+
+          <div class="exp-item-card">
+            <div class="exp-item-main">
+              <input type="checkbox" class="exp-item-chk" data-type="stats-csv" id="chkExpStatsCsv" aria-label="勾選管制圖異常焊墊 CSV">
+              <div class="exp-item-info">
+                <div class="exp-item-title"><label for="chkExpStatsCsv" style="cursor:pointer;margin:0">管制圖異常焊墊清單</label><span class="pill">.csv</span></div>
+                <div class="exp-item-desc">偏離 ±3σ 管制界限之焊墊統計清單</div>
+              </div>
+            </div>
+            <button type="button" class="btn-sm" data-exp-act="stats-csv" title="立即下載管制圖 CSV">下載</button>
+          </div>
+
+          <div class="exp-item-card">
+            <div class="exp-item-main">
+              <input type="checkbox" class="exp-item-chk" data-type="board-csv" id="chkExpBoardCsv" aria-label="勾選各板良率彙總 CSV">
+              <div class="exp-item-info">
+                <div class="exp-item-title"><label for="chkExpBoardCsv" style="cursor:pointer;margin:0">各板統計彙總表</label><span class="pill">.csv</span></div>
+                <div class="exp-item-desc">每塊基板之均值、標準差與合格率</div>
+              </div>
+            </div>
+            <button type="button" class="btn-sm" data-exp-act="board-csv" title="立即下載各板良率 CSV">下載</button>
+          </div>
+
+          <div class="exp-item-card">
+            <div class="exp-item-main">
+              <input type="checkbox" class="exp-item-chk" data-type="def-csv" id="chkExpDefCsv" aria-label="勾選不良焊墊明細 CSV">
+              <div class="exp-item-info">
+                <div class="exp-item-title"><label for="chkExpDefCsv" style="cursor:pointer;margin:0">不良焊墊明細表</label><span class="pill">.csv</span></div>
+                <div class="exp-item-desc">違反規格上下限之焊墊明細數值</div>
+              </div>
+            </div>
+            <button type="button" class="btn-sm" data-exp-act="def-csv" title="立即下載不良焊墊 CSV">下載</button>
+          </div>
+
+          <div class="exp-item-card">
+            <div class="exp-item-main">
+              <input type="checkbox" class="exp-item-chk" data-type="cmp-md" id="chkExpCmpMd" aria-label="勾選試產回合比較報告 Markdown">
+              <div class="exp-item-info">
+                <div class="exp-item-title"><label for="chkExpCmpMd" style="cursor:pointer;margin:0">試產回合比較報告</label><span class="pill">.md</span></div>
+                <div class="exp-item-desc">跨回合前後對比與製程改善結論</div>
+              </div>
+            </div>
+            <button type="button" class="btn-sm" data-exp-act="cmp-md" title="立即下載對比結論 Markdown">下載</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 分類卡片 3: 鋼板設計與 Layout -->
+      <div class="export-group-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <b style="font-size:var(--fs-ui);color:var(--ink)">鋼板設計與 Layout (Stencil &amp; Layout)</b>
+          <span class="note" style="font-size:var(--fs-caption)">鋼板開孔廠商與硬體工程師</span>
+        </div>
+        <div class="export-items-grid">
+          <div class="exp-item-card">
+            <div class="exp-item-main">
+              <input type="checkbox" class="exp-item-chk" data-type="dfm-csv" id="chkExpDfmCsv" aria-label="勾選 DFM 鋼板開孔建議表 CSV">
+              <div class="exp-item-info">
+                <div class="exp-item-title"><label for="chkExpDfmCsv" style="cursor:pointer;margin:0">DFM 鋼板開孔建議表</label><span class="pill">.csv</span></div>
+                <div class="exp-item-desc">寬深比、面積比檢驗與開孔尺寸修正</div>
+              </div>
+            </div>
+            <button type="button" class="btn-sm" data-exp-act="dfm-csv" title="立即下載 DFM 建議 CSV">下載</button>
+          </div>
+
+          <div class="exp-item-card">
+            <div class="exp-item-main">
+              <input type="checkbox" class="exp-item-chk" data-type="dfm-md" id="chkExpDfmMd" aria-label="勾選 DFM 改善建議說明書 Markdown">
+              <div class="exp-item-info">
+                <div class="exp-item-title"><label for="chkExpDfmMd" style="cursor:pointer;margin:0">DFM 改善建議說明書</label><span class="pill">.md</span></div>
+                <div class="exp-item-desc">開孔設計修正說明與 IPC 建議</div>
+              </div>
+            </div>
+            <button type="button" class="btn-sm" data-exp-act="dfm-md" title="立即下載 DFM 說明 Markdown">下載</button>
+          </div>
+
+          <div class="exp-item-card">
+            <div class="exp-item-main">
+              <input type="checkbox" class="exp-item-chk" data-type="snap-3d" id="chkExpSnap3d" aria-label="勾選 3D 錫膏模擬快照 PNG">
+              <div class="exp-item-info">
+                <div class="exp-item-title"><label for="chkExpSnap3d" style="cursor:pointer;margin:0">3D 錫膏模擬高解析快照</label><span class="pill">.png</span></div>
+                <div class="exp-item-desc">全板 3D 錫膏厚度分佈立體渲染截圖</div>
+              </div>
+            </div>
+            <button type="button" class="btn-sm" data-exp-act="snap-3d" title="立即下載 3D 快照 PNG">下載</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sheet-foot" style="padding:10px 18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:var(--surface2);flex:0 0 auto">
+      <span class="note" style="font-size:var(--fs-caption)">所有匯出檔案名稱自動附帶料號與 UTC+8 時間戳</span>
+      <button type="button" class="primary" id="btnExportCenterCloseBottom" style="font-size:var(--fs-ui)">完成</button>
     </div>
   </div>
 </div>
@@ -12043,12 +12339,377 @@ function setupDuoEventBus(){window.addEventListener("spc:duo-pad-select",e=>{con
 if($("#duoSwapPaneBtn"))$("#duoSwapPaneBtn").onclick=()=>{triggerDuoHaptic();swapDuoPanes()};
 setupDuoEventBus();
 setupDuoPostureDetector();
+
+let openExportCenterModal = null;
+let closeExportCenterModal = null;
+
+async function exportRepPdfLite() {
+  if (typeof generateReportPdfBlob !== "function") {
+    toast("PDF 報告產生器尚未就緒");
+    return;
+  }
+  busy(true, "產生精簡版 PDF 報告中…");
+  try {
+    const res = await generateReportPdfBlob({ lite: true });
+    const fn = (typeof pdfFileName === "function" ? pdfFileName() : "SPI-SPC-Report.pdf").replace(/\.pdf$/i, "_lite.pdf");
+    const url = URL.createObjectURL(res.blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = fn;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    toast(`已匯出精簡版 PDF 報告 ${fn}`);
+  } catch (err) {
+    toast("精簡版 PDF 產生失敗：" + (err.message || err));
+  } finally {
+    busy(false);
+  }
+}
+
+async function triggerExportByType(type) {
+  switch (type) {
+    case "rep-pdf":
+      if ($("#btnRepPdf")) {
+        if (typeof $("#btnRepPdf").onclick === "function") await $("#btnRepPdf").onclick();
+        else $("#btnRepPdf").click();
+      }
+      break;
+    case "rep-pdf-lite":
+      await exportRepPdfLite();
+      break;
+    case "ai-md":
+      if (!S.ai) {
+        toast("尚未執行 AI 診斷，請至 AI 分析分頁產生報告");
+      } else if ($("#btnAIMd")) {
+        $("#btnAIMd").click();
+      }
+      break;
+    case "rep-md":
+      if ($("#btnExpMd")) $("#btnExpMd").click();
+      break;
+    case "iss-xlsx":
+      if ($("#btnIssXlsx")) {
+        if (typeof $("#btnIssXlsx").onclick === "function") await $("#btnIssXlsx").onclick();
+        else $("#btnIssXlsx").click();
+      }
+      break;
+    case "iss-csv":
+      if ($("#btnIssCsv")) $("#btnIssCsv").click();
+      break;
+    case "correction-json":
+      if ($("#btnExportCorrectionJson")) $("#btnExportCorrectionJson").click();
+      break;
+    case "stats-csv":
+      if ($("#btnStatsCsv")) $("#btnStatsCsv").click();
+      break;
+    case "board-csv":
+      if ($("#btnExpBoard")) $("#btnExpBoard").click();
+      break;
+    case "def-csv":
+      if ($("#btnExpDef")) $("#btnExpDef").click();
+      break;
+    case "cmp-md":
+      if ($("#btnCmpMd")) $("#btnCmpMd").click();
+      break;
+    case "dfm-csv":
+      if ($("#btnDfmCsv")) $("#btnDfmCsv").click();
+      break;
+    case "dfm-md":
+      if ($("#btnDfmMd")) $("#btnDfmMd").click();
+      break;
+    case "snap-3d":
+      if ($("#btnDl3d")) $("#btnDl3d").click();
+      break;
+    default:
+      console.warn("未知匯出項目：", type);
+  }
+}
+
+async function downloadDeliverablesQueue(types) {
+  if (!types || !types.length) return;
+  const statusEl = $("#exportQueueStatus");
+  let idx = 0;
+  for (const t of types) {
+    idx++;
+    if (statusEl) statusEl.textContent = `佇列下載中 (${idx}/${types.length})…`;
+    try {
+      await triggerExportByType(t);
+    } catch (e) {
+      console.warn("Export item error:", t, e);
+    }
+    if (idx < types.length) {
+      await new Promise(r => setTimeout(r, 450));
+    }
+  }
+  if (statusEl) {
+    statusEl.textContent = `已完成 ${types.length} 項交付物下載`;
+    setTimeout(() => { if (statusEl) statusEl.textContent = ""; }, 4000);
+  }
+}
+
+function updateAuxDataStatus() {
+  const cur = typeof curRun === "function" ? curRun() : null;
+  const aoiCount = cur && cur.aoi && Array.isArray(cur.aoi) ? cur.aoi.length : 0;
+  const bAoi = $("#impAoiBadge"), iAoi = $("#impAoiInfo");
+  if (bAoi) {
+    bAoi.textContent = aoiCount > 0 ? `已載入 (${aoiCount})` : "未載入";
+    bAoi.style.background = aoiCount > 0 ? "var(--ok-soft)" : "";
+    bAoi.style.color = aoiCount > 0 ? "var(--ok)" : "";
+  }
+  if (iAoi && aoiCount > 0) iAoi.textContent = `已載入 ${aoiCount} 筆 AOI 缺點紀錄，可至「交叉驗證」分頁查看重合度。`;
+
+  const grrOk = !!(S && S.grr && S.grr.N);
+  const bGrr = $("#impGrrBadge"), iGrr = $("#impGrrInfo");
+  if (bGrr) {
+    bGrr.textContent = grrOk ? `已載入 (${S.grr.N || 0})` : "未載入";
+    bGrr.style.background = grrOk ? "var(--ok-soft)" : "";
+    bGrr.style.color = grrOk ? "var(--ok)" : "";
+  }
+  if (iGrr && grrOk) iGrr.textContent = `已載入重複量測數據，可至「實驗驗證」分頁評估量測系統。`;
+
+  const geomCount = S && S.geometryPads && Array.isArray(S.geometryPads) ? S.geometryPads.length : 0;
+  const bGeom = $("#impGeomBadge"), iGeom = $("#impGeomInfo");
+  if (bGeom) {
+    bGeom.textContent = geomCount > 0 ? `已載入 (${geomCount})` : "未載入";
+    bGeom.style.background = geomCount > 0 ? "var(--ok-soft)" : "";
+    bGeom.style.color = geomCount > 0 ? "var(--ok)" : "";
+  }
+  if (iGeom && geomCount > 0) iGeom.textContent = `已載入 ${geomCount} 個幾何焊墊，已覆寫開孔尺寸與 DFM 寬深比。`;
+}
+
+function setupAuxData() {
+  const fAoi = $("#impAoiFile");
+  if (fAoi) {
+    fAoi.onchange = e => {
+      const fl = e.target.files && e.target.files[0];
+      if (!fl) return;
+      fl.text().then(t => {
+        try {
+          if (typeof parseAOI === "function") {
+            const cur = curRun();
+            if (cur) cur.aoi = parseAOI(t);
+            if (typeof saveRunsSoon === "function") saveRunsSoon();
+            if (typeof renderAOI === "function") renderAOI();
+            updateAuxDataStatus();
+            toast("已匯入 AOI 結果");
+          }
+        } catch (er) {
+          if ($("#impAoiInfo")) $("#impAoiInfo").textContent = er.message;
+        }
+      });
+    };
+  }
+
+  const btnAoiSample = $("#btnImpAoiSample");
+  if (btnAoiSample) {
+    btnAoiSample.onclick = () => {
+      if (typeof sampleAOI === "function" && typeof parseAOI === "function") {
+        const cur = curRun();
+        if (cur) cur.aoi = parseAOI(sampleAOI(S));
+        if (typeof saveRunsSoon === "function") saveRunsSoon();
+        if (typeof renderAOI === "function") renderAOI();
+        updateAuxDataStatus();
+        toast("已載入範例 AOI 結果");
+      } else if ($("#btnAoiSample")) {
+        $("#btnAoiSample").click();
+        updateAuxDataStatus();
+      }
+    };
+  }
+
+  const fGrr = $("#impGrrFile");
+  if (fGrr) {
+    fGrr.onchange = e => {
+      const fl = e.target.files && e.target.files[0];
+      if (!fl) return;
+      fl.text().then(t => {
+        try {
+          if (typeof parseGRR === "function") {
+            S.grr = parseGRR(t);
+            if (typeof renderGRR === "function") renderGRR();
+            updateAuxDataStatus();
+            toast("已匯入 GR&R 數據");
+          }
+        } catch (er) {
+          if ($("#impGrrInfo")) $("#impGrrInfo").textContent = er.message;
+        }
+      });
+    };
+  }
+
+  const btnGrrSample = $("#btnImpGrrSample");
+  if (btnGrrSample) {
+    btnGrrSample.onclick = () => {
+      if (typeof sampleGRR === "function" && typeof parseGRR === "function") {
+        S.grr = parseGRR(sampleGRR());
+        if (typeof renderGRR === "function") renderGRR();
+        updateAuxDataStatus();
+        toast("已載入範例 GR&R 數據");
+      } else if ($("#btnGrrSample")) {
+        $("#btnGrrSample").click();
+        updateAuxDataStatus();
+      }
+    };
+  }
+
+  const fGeom = $("#impGeomPadFile");
+  if (fGeom) {
+    fGeom.onchange = e => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      const rd = new FileReader();
+      rd.onload = () => {
+        if (typeof parseGeometryPadListCsv === "function") {
+          const p = parseGeometryPadListCsv(rd.result);
+          if (!p.ok) {
+            toast("幾何焊墊清單：" + p.error);
+            e.target.value = "";
+            return;
+          }
+          S.geometryPads = p.pads;
+          if (typeof persist === "function") persist();
+          if (typeof updatePadCoverageState === "function") updatePadCoverageState();
+          if (typeof recompute === "function") recompute();
+          if (typeof renderGeomPadStatus === "function") renderGeomPadStatus();
+          updateAuxDataStatus();
+          toast(`已匯入 ${p.pads.length} 個幾何焊墊`);
+          e.target.value = "";
+        }
+      };
+      rd.readAsText(f);
+    };
+  }
+  updateAuxDataStatus();
+}
+
+function setupExportCenter() {
+  const modal = $("#exportCenterModal");
+  if (!modal) return;
+  let returnFocus = null;
+
+  function updateSelectedCount() {
+    const checked = modal.querySelectorAll(".exp-item-chk:checked");
+    const all = modal.querySelectorAll(".exp-item-chk");
+    const countEl = $("#exportSelectedCount");
+    if (countEl) countEl.textContent = checked.length;
+    const chkAll = $("#chkExportSelectAll");
+    if (chkAll) {
+      chkAll.checked = (checked.length === all.length && all.length > 0);
+      chkAll.indeterminate = (checked.length > 0 && checked.length < all.length);
+    }
+  }
+
+  function open() {
+    if (modal.hidden) returnFocus = document.activeElement;
+    modal.hidden = false;
+    modal.classList.add("open");
+
+    const cur = typeof curRun === "function" ? curRun() : null;
+    const src = cur && typeof runSrc === "function" ? runSrc(cur) : null;
+    const part = (src && src.part) || (S && S.part) || "未指定料號";
+    const rev = (src && src.rev) || "V1";
+    const lot = (src && src.lot) || (S && S.lot) || "未指定批號";
+    const rowCount = (S && S.R && S.R.length) ? S.R.length : 0;
+    const summaryEl = $("#exportCenterSummary");
+    if (summaryEl) {
+      summaryEl.textContent = `料號：${part} (${rev}) · 批號：${lot} · 焊墊筆數：${rowCount.toLocaleString()}`;
+    }
+    updateSelectedCount();
+    const btnBundle = $("#btnDownloadStandardBundle");
+    if (btnBundle) btnBundle.focus();
+  }
+  openExportCenterModal = open;
+
+  function close() {
+    modal.classList.remove("open");
+    modal.hidden = true;
+    if (returnFocus && returnFocus.isConnected) returnFocus.focus();
+    returnFocus = null;
+  }
+  closeExportCenterModal = close;
+
+  const btnOpen = $("#btnOpenExportModal");
+  if (btnOpen) btnOpen.onclick = open;
+
+  const mBtnOpen = $("#mBtnOpenExportModal");
+  if (mBtnOpen) {
+    mBtnOpen.onclick = () => {
+      if (typeof moreSheetCtrl !== "undefined" && moreSheetCtrl) moreSheetCtrl.close();
+      open();
+    };
+  }
+
+  const btnHub = $("#btnHubExport");
+  if (btnHub) btnHub.onclick = open;
+
+  const closeBtn = $("#exportCenterClose");
+  if (closeBtn) closeBtn.onclick = close;
+
+  const closeBottomBtn = $("#btnExportCenterCloseBottom");
+  if (closeBottomBtn) closeBottomBtn.onclick = close;
+
+  modal.addEventListener("click", e => {
+    if (e.target === modal) {
+      close();
+      return;
+    }
+    const actBtn = e.target.closest("[data-exp-act]");
+    if (actBtn) {
+      const type = actBtn.dataset.expAct;
+      triggerExportByType(type);
+    }
+  });
+
+  modal.addEventListener("keydown", e => {
+    if (e.key === "Escape") {
+      e.stopPropagation();
+      close();
+    }
+  });
+
+  const chkAll = $("#chkExportSelectAll");
+  if (chkAll) {
+    chkAll.onchange = () => {
+      const val = chkAll.checked;
+      modal.querySelectorAll(".exp-item-chk").forEach(c => { c.checked = val; });
+      updateSelectedCount();
+    };
+  }
+
+  modal.querySelectorAll(".exp-item-chk").forEach(chk => {
+    chk.onchange = updateSelectedCount;
+  });
+
+  const btnStandard = $("#btnDownloadStandardBundle");
+  if (btnStandard) {
+    btnStandard.onclick = () => {
+      toast("開始下載標準試產交付包（PDF + XLSX + DFM CSV）");
+      downloadDeliverablesQueue(["rep-pdf", "iss-xlsx", "dfm-csv"]);
+    };
+  }
+
+  const btnSelected = $("#btnDownloadSelected");
+  if (btnSelected) {
+    btnSelected.onclick = () => {
+      const checked = modal.querySelectorAll(".exp-item-chk:checked");
+      if (!checked || !checked.length) {
+        toast("請先勾選欲下載的交付項目");
+        return;
+      }
+      const types = Array.from(checked).map(c => c.dataset.type).filter(Boolean);
+      toast(`開始批次下載 ${types.length} 項交付物`);
+      downloadDeliverablesQueue(types);
+    };
+  }
+}
+
 setupRecPicker();
+setupExportCenter();
+setupAuxData();
 updateStartupDbBanner();
 /* 測試用：只有測試在載入前設定 window.SPI_TEST_HOOK 時才公開內部函式 */
 if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{importSearchMatch,renderImportSourceSummary,updateImportWorkflow,showImportValidationError,clearImportValidationError});
 if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")window.SPI_TEST_HOOK.specDownloadInfo=specDownloadInfo;
-if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,renderLISAUI,renderRelChartUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,calcShapeFactor,getSolderGrainTexture,getRealPasteMat,createSolderPasteGeometry,selectPadForProfile,highlightSelectedPad3D,focusPad3D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus});
+if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,renderLISAUI,renderRelChartUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,calcShapeFactor,getSolderGrainTexture,getRealPasteMat,createSolderPasteGeometry,selectPadForProfile,highlightSelectedPad3D,focusPad3D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus,setupExportCenter,openExportCenterModal,closeExportCenterModal,triggerExportByType,downloadDeliverablesQueue,updateAuxDataStatus,setupAuxData});
 if($("#geomPadFile"))$("#geomPadFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{const p=parseGeometryPadListCsv(rd.result);if(!p.ok){toast("幾何焊墊清單："+p.error);e.target.value="";return}S.geometryPads=p.pads;persist();updatePadCoverageState();recompute();renderGeomPadStatus();toast(`已匯入 ${p.pads.length} 個幾何焊墊`);e.target.value=""};rd.readAsText(f)});
 if($("#geomPadClear"))$("#geomPadClear").onclick=()=>{S.geometryPads=null;S.padCoverage=null;S.pendingVerify=false;persist();updatePadCoverageState();recompute();renderGeomPadStatus()};
 const initHash=(location.hash||"").slice(1);
