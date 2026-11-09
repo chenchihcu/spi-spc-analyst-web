@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { loadCore, baseState } from "./_load.js";
+import fs from "node:fs";
+import path from "node:path";
+import { loadCore, baseState, HTML } from "./_load.js";
 
 const c = loadCore();
 
@@ -91,4 +93,37 @@ test("FIX-11 空間梯度 rule_name 揭露 N−G−1 自由度", () => {
   }
   const issue = c.detectIssues(st(rows)).find((x) => x.rule_id.startsWith("空間偏相關"));
   if (issue) assert.match(issue.rule_name, /N−群組數−1/);
+});
+
+test("v10.14.3: issuesMd 匯出與 APP 版本更新時間整合", () => {
+  const md = c.issuesMd([], { source: "測試資料", stencil: 120 });
+  assert.ok(md.includes("版本："), "issuesMd 應包含版本標頭");
+  assert.ok(md.includes("產生時間："), "issuesMd 應包含產生時間");
+  assert.ok(!md.includes("版本：undefined"), "issuesMd 不得顯示 undefined");
+});
+
+test("v10.14.3: X̄-S 管制圖小樣本副標不包含原始 HTML 標籤", () => {
+  const html = fs.readFileSync(HTML, "utf8");
+  assert.doesNotMatch(html, /A\.xs\.subgroupWarning \? ` · <span class="note">/, "warnText 不得帶有 raw span 標籤");
+  assert.doesNotMatch(html, /A\.xs\.reason \? ` · <span class="pill warn">/, "rejText 不得帶有 raw span 標籤");
+});
+
+test("v10.14.3: 刮刀方向卡事實欄無 aB 內部變數名、DFM 轉移效率卡無 VERIFY", () => {
+  const html = fs.readFileSync(HTML, "utf8");
+  assert.doesNotMatch(html, /門檻 aB =/, "刮刀方向事實欄不得出現內部變數名 門檻 aB");
+  assert.ok(html.includes("Bonferroni 門檻 α ="), "刮刀方向事實欄應顯示 Bonferroni 門檻 α");
+  assert.doesNotMatch(html, /面積比：VERIFY，缺焊墊尺寸/, "DFM 轉移效率卡不得殘留 VERIFY");
+  assert.ok(html.includes("面積比：${PENDING_VERIFY_LABEL}，缺焊墊尺寸"), "DFM 轉移效率卡應使用 PENDING_VERIFY_LABEL");
+});
+
+test("v10.14.3: 焊墊位置穩健 Cpk 0.995~1.00 邊界精度呈現消除語意矛盾", () => {
+  const html = fs.readFileSync(HTML, "utf8");
+  assert.ok(html.includes("mcFmt=mc>=0.995&&mc<1?f(mc,3):f(mc)"), "穩健 Cpk 邊界應自動啟用 3 位小數精度");
+});
+
+test("v10.14.3: 全板級與重複不良卡 group 支援 topList 截斷防膨脹", () => {
+  const html = fs.readFileSync(HTML, "utf8");
+  assert.doesNotMatch(html, /group:groups\.join\("; "\)/, "全板級問題卡不得直接 groups.join 造成數百群組傾印");
+  assert.ok(html.includes("group:topList(groups,10)"), "全板級問題卡應採用 topList(groups,10)");
+  assert.ok(html.includes("group:topList([...new Set(offenders.map(o=>o.group))],10)"), "M-09 重複不良卡應採用 topList 截斷群組");
 });
