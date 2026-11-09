@@ -106,8 +106,30 @@ test("開機首頁顯示範例提示列，點擊頂端或提示列按鈕可開�
   $("#btnOpenRecModal").click();
   await tick(30);
   assert.ok(!modal.hidden && modal.classList.contains("open"), "點擊頂端按鈕應開啟選取視窗");
+  assert.equal($("#boxPickSpi").hidden, false, "一般入口預設開啟量測記錄分頁");
+  assert.equal($("#boxPickPlace").hidden, true, "一般入口預設隱藏座標庫分頁");
+  assert.notEqual($("#pickQualitySeg").style.display, "none", "一般入口顯示品質狀態篩選");
   $("#btnRecPickerCloseBottom").click();
   assert.ok(modal.hidden, "點擊完成按鈕應關閉視窗");
+
+  // 5. 驗證從座標檔入口開啟後再從一般入口開啟，分頁狀態不殘留
+  $("#btnSelectPlace").click();
+  await tick(30);
+  assert.ok(!modal.hidden && modal.classList.contains("open"), "點擊座標選取按鈕應開啟選取視窗");
+  assert.equal($("#boxPickPlace").hidden, false, "座標選取入口應切換至座標庫分頁");
+  assert.equal($("#boxPickSpi").hidden, true, "座標選取入口應隱藏量測記錄分頁");
+  assert.equal($("#pickQualitySeg").style.display, "none", "座標庫分頁應隱藏品質狀態篩選");
+  $("#recPickerClose").click();
+  assert.ok(modal.hidden, "關閉選取視窗");
+
+  // 再次點擊一般入口（例如橫幅按鈕），應回到量測記錄分頁
+  $("#btnBannerLoadDb").click();
+  await tick(30);
+  assert.ok(!modal.hidden && modal.classList.contains("open"));
+  assert.equal($("#boxPickSpi").hidden, false, "再次從一般入口開啟應重設回量測記錄分頁");
+  assert.equal($("#boxPickPlace").hidden, true, "座標庫分頁應隱藏");
+  assert.notEqual($("#pickQualitySeg").style.display, "none", "品質狀態篩選應重新顯示");
+  $("#recPickerClose").click();
 
   assert.deepEqual(errs, []);
 });

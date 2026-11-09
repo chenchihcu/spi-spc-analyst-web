@@ -89,6 +89,12 @@ def database(page, evidence, note):
         expect(page.locator("#recPickerNotice")).to_contain_text("座標檔 0 筆")
         if placement:
             expect(page.locator("#pickQualitySeg")).to_be_hidden()
+            expect(page.locator("#boxPickPlace")).to_be_visible()
+            expect(page.locator("#boxPickSpi")).to_be_hidden()
+        else:
+            expect(page.locator("#pickQualitySeg")).to_be_visible()
+            expect(page.locator("#boxPickSpi")).to_be_visible()
+            expect(page.locator("#boxPickPlace")).to_be_hidden()
         note("picker entry", selector=selector, placement=placement, viewport=page.viewport_size)
         page.screenshot(path=evidence / ("picker-" + selector[1:] + ".png"))
         page.locator("#recPickerClose").click()

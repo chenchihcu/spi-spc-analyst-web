@@ -8191,7 +8191,7 @@ $("#selVendor").onchange=()=>{try{localStorage.setItem("spi-vendor",$("#selVendo
 $("#selSide").onchange=reconvert;
 $("#placeUnit").onchange=()=>{if(PLACE)$("#placeUnit").value=PLACE.unit};
 $("#placeClear").onclick=()=>{PLACE=null;placeSave();placeShow();reconvert();clearImportFieldErrors("btnSelectPlace");renderImportSourceSummary();updateImportWorkflow()};
-$("#btnSelectPlace").onclick=()=>{$("#btnOpenRecModal").click();$("#btnPickPlace").click()};
+$("#btnSelectPlace").onclick=()=>{if(typeof openRecPickerModal==="function")openRecPickerModal("place");else{$("#btnOpenRecModal")?.click();$("#btnPickPlace")?.click()}};
 async function saveControlledPlacement(fl,part,rev,side,unit){
   if(RecDB.mode!=="cloud")throw new Error("請先登入並連線到雲端資料庫");
   if(!RecDB.isAdmin){await RecDB.list();if(!RecDB.isAdmin)throw new Error("只有管理者可以上傳座標檔")}
@@ -9616,8 +9616,8 @@ function updateLoadStates(){const run=curRun(),src=runSrc(run),unmatched=src?.un
   const applied=valid&&src.placeId;
   set("#statePlace",LOAD_ERROR.place?"error":applied?"ok":"idle",LOAD_ERROR.place?`座標檔：${LOAD_ERROR.place}`:applied?"座標檔：已套用":PLACE?"座標檔：已選取":"座標檔：未套用");
 }
-$("#stateSpi").onclick=()=>{const refs=runSrc(curRun())?.unmatchedRefs||[];if(refs.length){$("#unmatchedRefsTitle").textContent=`無座標位號（${refs.length}）`;$("#unmatchedRefsList").textContent=refs.join("、");openModal("unmatchedRefsModal","[data-close]")}else $("#btnOpenRecModal").click()};
-$("#statePlace").onclick=()=>{$("#btnOpenRecModal").click();$("#btnPickPlace").click()};
+$("#stateSpi").onclick=()=>{const refs=runSrc(curRun())?.unmatchedRefs||[];if(refs.length){$("#unmatchedRefsTitle").textContent=`無座標位號（${refs.length}）`;$("#unmatchedRefsList").textContent=refs.join("、");openModal("unmatchedRefsModal","[data-close]")}else if(typeof openRecPickerModal==="function")openRecPickerModal("spi");else $("#btnOpenRecModal")?.click()};
+$("#statePlace").onclick=()=>{if(typeof openRecPickerModal==="function")openRecPickerModal("place");else{$("#btnOpenRecModal")?.click();$("#btnPickPlace")?.click()}};
 function srcLine(s){return s?`批號 ${s.lot}｜產品料號 ${s.part}${s.supplierWo?"｜廠商工單 "+s.supplierWo:""}${s.outsourceWo?"｜委外工單 "+s.outsourceWo:""}${s.side?"｜"+s.side+" 面":""}｜原始檔 ${s.name}（SHA-256 ${String(s.sha256).slice(0,12)}…，${s.user}，${fmtTime(s.created)}）${s.placePart?`｜座標檔 ${s.placePart} ${s.placeRev}`:""}`:""}
 /* ---------- 資料庫頁 ---------- */
 let REC_CONFIRM=null,REC_VER={};
@@ -10236,19 +10236,47 @@ async function renderRecPicker(force) {
   }
 }
 
+let openRecPickerModal = null;
 function setupRecPicker() {
   const modal = $("#recPickerModal");
   if (!modal) return;
   let pickerReturnFocus = null;
-  function open() {
+
+  function setPickerTab(tab, shouldRender = false) {
+    PICKER_TAB = tab === "place" ? "place" : "spi";
+    const bSpi = $("#btnPickSpi"), bPlace = $("#btnPickPlace");
+    if (bSpi && bPlace) {
+      if (PICKER_TAB === "place") {
+        bPlace.classList.add("active");
+        bPlace.style.background = "var(--surface)";
+        bSpi.classList.remove("active");
+        bSpi.style.background = "transparent";
+      } else {
+        bSpi.classList.add("active");
+        bSpi.style.background = "var(--surface)";
+        bPlace.classList.remove("active");
+        bPlace.style.background = "transparent";
+      }
+    }
+    if ($("#boxPickSpi")) $("#boxPickSpi").hidden = (PICKER_TAB === "place");
+    if ($("#boxPickPlace")) $("#boxPickPlace").hidden = (PICKER_TAB !== "place");
+    if ($("#pickQualitySeg")) $("#pickQualitySeg").style.display = (PICKER_TAB === "place" ? "none" : "inline-flex");
+    if (shouldRender) renderRecPicker();
+  }
+
+  function open(wantTab = "spi") {
+    const targetTab = typeof wantTab === "string" && wantTab === "place" ? "place" : "spi";
     if (modal.hidden) pickerReturnFocus = document.activeElement;
     modal.hidden = false;
     modal.classList.add("open");
     PICKER_HIGHLIGHT = null;
+    setPickerTab(targetTab, false);
     renderRecPicker(true);
     const qIn = $("#recPickerQ");
     if (qIn) qIn.focus();
   }
+  openRecPickerModal = open;
+
   function close() {
     modal.classList.remove("open");
     modal.hidden = true;
@@ -10258,16 +10286,16 @@ function setupRecPicker() {
   }
 
   const btnOpen = $("#btnOpenRecModal");
-  if (btnOpen) btnOpen.onclick = open;
+  if (btnOpen) btnOpen.onclick = () => open("spi");
   const mBtnOpen = $("#mBtnOpenRecModal");
   if (mBtnOpen) {
     mBtnOpen.onclick = () => {
       if (typeof moreSheetCtrl !== "undefined" && moreSheetCtrl) moreSheetCtrl.close();
-      open();
+      open("spi");
     };
   }
   const btnBanner = $("#btnBannerLoadDb");
-  if (btnBanner) btnBanner.onclick = open;
+  if (btnBanner) btnBanner.onclick = () => open("spi");
   const btnBannerImport = $("#btnBannerGoImport");
   if (btnBannerImport) {
     btnBannerImport.onclick = () => {
@@ -10299,26 +10327,8 @@ function setupRecPicker() {
 
   const bSpi = $("#btnPickSpi"), bPlace = $("#btnPickPlace");
   if (bSpi && bPlace) {
-    bSpi.onclick = () => {
-      PICKER_TAB = "spi";
-      bSpi.classList.add("active");
-      bSpi.style.background = "var(--surface)";
-      bPlace.classList.remove("active");
-      bPlace.style.background = "transparent";
-      if ($("#boxPickSpi")) $("#boxPickSpi").hidden = false;
-      if ($("#boxPickPlace")) $("#boxPickPlace").hidden = true;
-      renderRecPicker();
-    };
-    bPlace.onclick = () => {
-      PICKER_TAB = "place";
-      bPlace.classList.add("active");
-      bPlace.style.background = "var(--surface)";
-      bSpi.classList.remove("active");
-      bSpi.style.background = "transparent";
-      if ($("#boxPickSpi")) $("#boxPickSpi").hidden = true;
-      if ($("#boxPickPlace")) $("#boxPickPlace").hidden = false;
-      renderRecPicker();
-    };
+    bSpi.onclick = () => setPickerTab("spi", true);
+    bPlace.onclick = () => setPickerTab("place", true);
   }
 
   if ($("#recPickerQ")) $("#recPickerQ").oninput = () => renderRecPicker();
