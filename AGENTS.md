@@ -53,6 +53,9 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
 - **效能重構須結果逐位元相同**：只替換實作（迴圈、緩衝、快取），不改公式、門檻與加總順序。萬筆以上資料避免在巢狀迴圈中建立中間陣列（`.map().filter().reduce()`），改用單趟累加或預先索引；Bootstrap／Monte Carlo 前先過顯著性門檻，非必要時延遲計算。
   - 檢查：`tests/golden.test.mjs`、`npm run test:slow` 不變；`node --test tests/core.test.js` 與 `node tools/bench-large.mjs` 下 5 萬筆級 `analyze`、`detectIssues` 各 **<3 秒**（硬門檻）；本機優化目標 **<1 秒**。
   - 出處：v9.13.0、`docs/spec-perf-large-dataset-rfc.md`、步驟 6 效能除錯紀錄（2026-10-17）。
+- **大量群組/焊墊清單字串膨脹阻斷（Array String Explosion Guard）**：問題偵測清單組裝卡片時（`detectIssues`），全板級規則（子板、單位、漂移、梯度、刮刀、擦拭、對位、量測等 8 處）與 M-09 重複不良卡之清單欄位（`group`、`refdes`、`p`、`pads`），嚴禁直接使用無界限的 `.join("; ")`。必須統一經由 `topList(arr, 10)` 截斷保底（超過 10 項時自動顯示 `另 N 個/項`），避免多元件基板導致 UI DOM 渲染卡頓與 Markdown/CSV/XLSX 報表幾何級數膨脹。
+  - 檢查：`node --test tests/spi-audit-fixes.test.mjs` 全板級與重複不良卡 group 支援 topList 截斷測試通過。
+  - 出處：v10.14.3（2026-11-09，656 個元件群組單卡傾印逾 4,000 字元）。
 
 ## 版面與 CSS
 
@@ -71,6 +74,9 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
 - **使用者可見文案只用中文標題、不附英文譯名**：介面、報告預覽、PDF 與匯出標題中，「中文（English）」或「中文 (English)」只保留中文部分。無括號的專名、單位、標準號、檔名保留（例如 Cpk、DFM、SPI、CSV、Johnson、ISO 21747、µm）。不新增「怎麼看」或只重複標題的教學副標；計算結果列、空狀態、錯誤與會改變判讀的警示句保留。
   - 檢查：`tests/ui-copy.test.mjs` 掃描 `spi-spc.html` 禁止 `Executive Summary`、`Closed-Loop Correction`、`<summary>怎麼看</summary>` 等禁用模式。
   - 契約：`docs/spec-ui-copy-rfc.md`。
+- **純文字節點嚴禁內嵌 HTML 標籤（Plain Text Integrity Guard）**：指派給 `.textContent` 的所有變數（如 `#ctrlSub.textContent` 管制圖副標、狀態摘要列等），其下游格式化函式與條件警告（`subgroupWarning`、`reason` 等）必須嚴格維持純文字字串，嚴禁包裝 `<span class="...">` 或 `<div ...>` 原始標籤以防 HTML 洩漏至畫面。
+  - 檢查：`node --test tests/spi-audit-fixes.test.mjs` 管制圖小樣本副標測試通過。
+  - 出處：v10.14.3（2026-11-09，X̄-S 管制圖副標 raw HTML 標籤外露）。
 
 ## 驗證
 
@@ -105,6 +111,9 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
   - 出處：步驟 6 除錯紀錄（2026-10-17）。
 - **build 產物守衛**：`dist/` 只能有 `tools/build-cloudflare.mjs` 允許的檔案，暫存腳本不要放進 `dist/`。
   - 檢查：`npm run build:cloudflare` 不出現 `Unexpected deploy asset`。
+- **SPA 多腳本區塊全域變數跨閉包讀取守衛**：在 `<script id="core">`（匯出核心、計算邏輯）存取全域版本或狀態時，不可假定第二個 `<script>` IIFE 閉包內的 `APP` 物件已完成宣告。讀取處必須優先採用安全回退架構（優先讀取 DOM `#appVer` / `#appBuilt`，次之讀取全域 `APP`），確保在 Node.js 沙箱（`_load.js`）與瀏覽器獨立匯出時均能取得正確版本。
+  - 檢查：`node --test tests/spi-audit-fixes.test.mjs` issuesMd 匯出與版本更新時間整合測試通過。
+  - 出處：v10.14.3（2026-11-09，issuesMd 跨閉包讀取失敗致版本號空白）。
 
 <!-- BEGIN ui-ux-universal (auto-synced; edit C:/Dropbox/AI_Coding_Agent_Governance/Institution/06-ui-ux-universal.md) -->
 > UI/UX work: read C:/Dropbox/AI_Coding_Agent_Governance/Institution/06-ui-ux-universal.md.
