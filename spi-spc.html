@@ -923,7 +923,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.15.1</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.15.2</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <div class="db-capsule-group" role="group" aria-label="雲端記錄庫與套用狀態">
@@ -1386,13 +1386,12 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     </div>
     <button type="button" id="btnGoAiCfg">前往 AI 與配額設定</button>
   </div>
-  <div class="card"><h3>AI 品質工程分析 <small id="aiCardSub">OpenAI gpt-6.1-terra（高推理強度） · 將目前全部統計結果與交叉驗證送出，嚴格區分事實與推論</small></h3>
+  <div class="card"><h3>AI 品質工程分析 <small id="aiCardSub">將目前統計結果與交叉驗證送出，嚴格區分事實與推論</small></h3>
     <div class="notice" id="aiNoticeBox" style="background:var(--surface2);padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:var(--fs-ui);color:var(--ink)">
       <p style="margin:0 0 6px"><b>送出前告知與資料隱私保護：</b></p>
       <ul style="margin:0 0 6px 18px;padding:0;line-height:1.6">
-        <li><b>服務商路徑：</b><span id="aiNoticeServicePath">由本站後端以 API Key 安全轉發至 OpenAI（<code>gpt-6.1-terra</code>，推理能力：<code>high</code>）。</span></li>
-        <li><b>實際送出欄位：</b>試產回合名稱、量測指標、單位、規格窗、鋼板與階梯設定、樣本數與板數、整體平均與 σ、製程能力（Cp/Cpk/Pp/Ppk 及信賴區間）、判異點數與 Nelson 規則、問題清單（嚴重與警示卡片之事實現況與推論）。</li>
-        <li><b>包含的識別資料：</b>板號清單（如序號）、最差焊墊 ID、問題事實中的焊墊名稱（如 U2-05）、試產回合名稱。</li>
+        <li><b>服務商路徑：</b><span id="aiNoticeServicePath">由本站後端以 API Key 安全轉發至設定之服務商。</span></li>
+        <li><b>送出範圍與識別資料：</b>試產回合名稱、量測指標與規格窗、鋼板設定、各板統計與製程能力、Nelson 判異與問題清單（含板號與焊墊名稱）。</li>
         <li><b>AI Gateway 記錄設定：</b><span id="aiGatewayLogNotice">預設不保存提示詞與回應內容（已帶 <code>cf-aig-collect-log-payload: false</code>，僅留存 token 用量 metadata）。</span></li>
       </ul>
       <div class="row" style="align-items:center;margin-top:8px">
@@ -1476,11 +1475,11 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
       <h4 class="imp-step-title">① 格式、面別與受控座標</h4>
       <div class="vendor" id="vendorBox">
         <div class="row">
-          <div class="field"><label for="selVendor">① 加工廠 SPI 格式</label><select id="selVendor"><option value="generic">通用格式（每列一筆量測）</option><option value="lirong">立榮電子（每列一焊墊、各板橫排）</option><option value="zsf">振順豐（絕對值橫排）</option></select></div>
+          <div class="field"><label for="selVendor">加工廠 SPI 格式</label><select id="selVendor"><option value="generic">通用格式（每列一筆量測）</option><option value="lirong">立榮電子（每列一焊墊、各板橫排）</option><option value="zsf">振順豐（絕對值橫排）</option></select></div>
           <div class="field" id="sideField"><label for="selSide">量測面別（必選）</label><select id="selSide" aria-describedby="selSideError"><option value="">請選擇</option><option value="TOP">TOP 面</option><option value="BOT">BOT 面</option></select><span class="note" id="selSideError" aria-live="polite"></span></div>
         </div>
         <div class="row" id="placeRow" hidden>
-          <span class="lbl" style="align-self:center">② 受控座標檔（必選）</span>
+          <span class="lbl" style="align-self:center">受控座標檔（必選）</span>
           <div class="field"><label for="placePart">座標檔產品料號（必填）</label><input type="text" id="placePart" class="mono" list="partList" autocomplete="off" maxlength="64" placeholder="例：301-000100124" aria-describedby="placePartHint"><span class="note" id="placePartHint" aria-live="polite"></span></div>
           <div class="field"><label for="placeRev">版本（必填）</label><input type="text" id="placeRev" maxlength="32" placeholder="例：V5" style="min-width:0;width:min(100%,90px)"></div>
           <button type="button" id="btnSelectPlace" aria-describedby="btnSelectPlaceError">從資料庫選取</button><span class="note" id="btnSelectPlaceError" aria-live="polite"></span>
@@ -1526,11 +1525,10 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">
           <h4 style="margin:0;font-size:var(--fs-ui);display:flex;align-items:center;gap:6px">
             <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent)"></span>
-            ③ 輔助工程檢驗資料 (AOI / GR&R / 幾何焊墊)
+            輔助工程檢驗資料（AOI／GR&R／幾何焊墊）
           </h4>
-          <span class="note" style="font-size:var(--fs-caption)">選填 · 交叉驗證、量測系統分析與 DFM 開孔覆寫</span>
+          <span class="note" style="font-size:var(--fs-caption)">選填 · 與各對應分頁雙向連動</span>
         </div>
-        <p class="note" style="margin:0 0 10px;font-size:var(--fs-caption)">可在此處快速上傳輔助檢驗數據，或至各對應分頁操作；資料自動跨頁雙向連動。</p>
         <div class="aux-data-grid">
           <!-- AOI 檢驗結果 -->
           <div class="card" style="padding:10px 12px;background:var(--surface2);border:1px solid var(--line);border-radius:6px;display:flex;flex-direction:column;gap:6px">
@@ -1611,7 +1609,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     </div>
   </div>
   <div data-sub="ai-cfg" hidden>
-    <div class="card" id="aiSettingsCard"><h3 id="aiSettingsHead">API 金鑰、模型／推理強度與獨立配額設定 <small id="aiKeyBadge"><span class="pill warn">尚未設定金鑰</span></small></h3><div style="display:grid;grid-template-columns:minmax(0,1fr);gap:12px"><div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:var(--fs-ui);font-weight:600">啟用服務商：</span><div class="seg" id="aiProviderSeg" role="group" aria-label="選擇 AI 服務商" style="display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden"><button type="button" data-ai-prov="openai" aria-pressed="true">OpenAI</button><button type="button" data-ai-prov="antigravity" aria-pressed="false">Antigravity</button></div></div><div id="aiAllProvidersSummary" class="row" style="gap:6px;flex-wrap:wrap;font-size:var(--fs-caption)"></div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px"><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKey" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>OpenAI API Key</b></span><span id="aiBadgeOpenai" class="pill warn" style="font-size:var(--fs-caption);padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKey" placeholder="sk-proj-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggle" title="顯示或隱藏 OpenAI API Key">顯示</button></div></div><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKeyAntigravity" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>Antigravity API Key</b></span><span id="aiBadgeAntigravity" class="pill warn" style="font-size:var(--fs-caption);padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKeyAntigravity" placeholder="AIza... / agy-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggleAntigravity" title="顯示或隱藏 Antigravity API Key">顯示</button></div></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap"><div class="field" style="flex:1 1 220px;min-width:0"><label for="selAiModel">模型選擇 (<span id="aiModelProvName">OpenAI</span>)</label><select id="selAiModel" style="width:100%"><option value="gpt-6.1-terra" selected>gpt-6.1-terra（旗艦深度推理 · 推薦）</option><option value="o4-mini">o4-mini（精準數理推理）</option><option value="gpt-5.4">gpt-5.4（通用旗艦）</option><option value="custom">自訂模型名稱…</option></select></div><div class="field" style="flex:0 0 auto"><button type="button" id="btnAiCheckModels" title="用目前服務商的 API Key 查詢實際可用的模型">檢查可用模型</button></div><div class="field" id="aiCustomModelField" hidden style="flex:1 1 180px;min-width:0"><label for="inAiCustomModel">自訂模型名稱</label><input type="text" id="inAiCustomModel" placeholder="例：gpt-6.1-terra" style="width:100%;font-family:var(--f-mono)"></div><div class="field" style="flex:1 1 200px;min-width:0"><label for="selAiEffort">推理強度</label><select id="selAiEffort" style="width:100%"><option value="high" selected>高 — 深度工程根因推理（推薦）</option><option value="medium">中 — 均衡推理深度與速度</option><option value="low">低 — 快速重點摘要</option></select></div><div class="field" style="flex:1 1 220px;min-width:0"><label for="inAiCustomEndpoint">自訂 API 端點 (選填 https://)</label><input type="text" id="inAiCustomEndpoint" placeholder="預設使用官方端點" spellcheck="false" style="width:100%;font-family:var(--f-mono)"></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap;padding-top:4px;border-top:1px dashed var(--line)"><div style="font-size:var(--fs-ui);font-weight:600;color:var(--accent-ink);min-width:140px" id="aiLimitProvTitle">OpenAI 獨立配額上限：</div><div class="field"><label for="inAiDailyLim">每日次數上限 (次/日)</label><input type="number" id="inAiDailyLim" value="20" min="1" max="500" step="1" style="width:96px"></div><div class="field"><label for="inAiTokenLim">每月 Token 上限</label><input type="number" id="inAiTokenLim" value="500000" min="1000" max="10000000" step="10000" style="width:120px"></div><div class="field"><label for="inAiUsdLim">每月費用上限 (USD)</label><input type="number" id="inAiUsdLim" value="5.0" min="0.5" max="500" step="0.5" style="width:96px"></div><div class="row" style="gap:6px"><button type="button" class="primary" id="btnAiSaveCfg">儲存設定</button><button type="button" id="btnAiClearKey" title="清除目前所選服務商的金鑰">清除當前金鑰</button></div></div><div class="row" style="gap:8px;flex-wrap:wrap;font-size:var(--fs-caption);color:var(--muted)"><span class="chip">目前服務商：<b id="aiProviderLabel">OpenAI</b></span><span class="chip">模型：<b class="mono" id="aiModelLabel">gpt-6.1-terra</b></span><span class="chip">推理強度：<b class="mono" id="aiEffortLabel">高</b></span><span class="chip" style="white-space:normal;min-width:0">計價基準：<b id="aiPriceLabel">輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens</b></span><span class="note" id="aiCfgMsg" role="status"></span></div><div class="grid2" style="gap:10px;margin-top:2px"><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-ui);margin-bottom:6px"><b><span id="aiDailyBarProv">OpenAI</span> 今日呼叫次數 (<span id="aiUsageDayLabel">今日</span>)</b><span class="mono" id="aiDailyUsageText">0 / 20 次 (0%)</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiDailyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-ui);margin-bottom:6px;gap:8px;flex-wrap:wrap"><b><span id="aiMonthlyBarProv">OpenAI</span> 本月累計用量 (<span id="aiUsageMonthLabel">本月</span>)</b><span class="mono" id="aiMonthlyUsageText">0 tokens · 預估 $0.00 / $5.00 USD</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiMonthlyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div></div></div></div>
+    <div class="card" id="aiSettingsCard"><h3 id="aiSettingsHead">API 金鑰、模型／推理強度與獨立配額設定 <small id="aiKeyBadge"><span class="pill warn">尚未設定金鑰</span></small></h3><div style="display:grid;grid-template-columns:minmax(0,1fr);gap:12px"><div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:var(--fs-ui);font-weight:600">啟用服務商：</span><div class="seg" id="aiProviderSeg" role="group" aria-label="選擇 AI 服務商" style="display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden"><button type="button" data-ai-prov="openai" aria-pressed="true">OpenAI</button><button type="button" data-ai-prov="antigravity" aria-pressed="false">Antigravity</button></div></div><div id="aiAllProvidersSummary" class="row" style="gap:6px;flex-wrap:wrap;font-size:var(--fs-caption)"></div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px"><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKey" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>OpenAI API Key</b></span><span id="aiBadgeOpenai" class="pill warn" style="font-size:var(--fs-caption);padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKey" placeholder="sk-proj-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggle" title="顯示或隱藏 OpenAI API Key">顯示</button></div></div><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKeyAntigravity" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>Antigravity API Key</b></span><span id="aiBadgeAntigravity" class="pill warn" style="font-size:var(--fs-caption);padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKeyAntigravity" placeholder="AIza... / agy-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggleAntigravity" title="顯示或隱藏 Antigravity API Key">顯示</button></div></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap"><div class="field" style="flex:1 1 220px;min-width:0"><label for="selAiModel">模型選擇 (<span id="aiModelProvName">OpenAI</span>)</label><select id="selAiModel" style="width:100%"><option value="gpt-6.1-terra" selected>gpt-6.1-terra（旗艦深度推理 · 推薦）</option><option value="o4-mini">o4-mini（精準數理推理）</option><option value="gpt-5.4">gpt-5.4（通用旗艦）</option><option value="custom">自訂模型名稱…</option></select></div><div class="field" style="flex:0 0 auto"><button type="button" id="btnAiCheckModels" title="用目前服務商的 API Key 查詢實際可用的模型">檢查可用模型</button></div><div class="field" id="aiCustomModelField" hidden style="flex:1 1 180px;min-width:0"><label for="inAiCustomModel">自訂模型名稱</label><input type="text" id="inAiCustomModel" placeholder="例：gpt-6.1-terra" style="width:100%;font-family:var(--f-mono)"></div><div class="field" style="flex:1 1 200px;min-width:0"><label for="selAiEffort">推理強度</label><select id="selAiEffort" style="width:100%"><option value="high" selected>高 — 深度工程根因推理（推薦）</option><option value="medium">中 — 均衡推理深度與速度</option><option value="low">低 — 快速重點摘要</option></select></div><div class="field" style="flex:1 1 220px;min-width:0"><label for="inAiCustomEndpoint">自訂 API 端點 (選填 https://)</label><input type="text" id="inAiCustomEndpoint" placeholder="預設使用官方端點" spellcheck="false" style="width:100%;font-family:var(--f-mono)"></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap;padding-top:4px;border-top:1px dashed var(--line)"><div style="font-size:var(--fs-ui);font-weight:600;color:var(--accent-ink);min-width:140px" id="aiLimitProvTitle">OpenAI 獨立配額上限：</div><div class="field"><label for="inAiDailyLim">每日次數上限 (次/日)</label><input type="number" id="inAiDailyLim" value="20" min="1" max="500" step="1" style="width:96px"></div><div class="field"><label for="inAiTokenLim">每月 Token 上限</label><input type="number" id="inAiTokenLim" value="500000" min="1000" max="10000000" step="10000" style="width:120px"></div><div class="field"><label for="inAiUsdLim">每月費用上限 USD</label><input type="number" id="inAiUsdLim" value="5.0" min="0.5" max="500" step="0.5" style="width:96px"></div><div class="row" style="gap:6px"><button type="button" class="primary" id="btnAiSaveCfg">儲存設定</button><button type="button" id="btnAiClearKey" title="清除目前所選服務商的金鑰">清除當前金鑰</button></div></div><div class="row" style="gap:8px;flex-wrap:wrap;font-size:var(--fs-caption);color:var(--muted)"><span class="chip" style="white-space:normal;min-width:0">計價基準：<b id="aiPriceLabel">輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens</b></span><span class="note" id="aiCfgMsg" role="status"></span></div><div class="grid2" style="gap:10px;margin-top:2px"><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-ui);margin-bottom:6px"><b><span id="aiDailyBarProv">OpenAI</span> 今日呼叫次數 (<span id="aiUsageDayLabel">今日</span>)</b><span class="mono" id="aiDailyUsageText">0 / 20 次 (0%)</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiDailyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-ui);margin-bottom:6px;gap:8px;flex-wrap:wrap"><b><span id="aiMonthlyBarProv">OpenAI</span> 本月累計用量 (<span id="aiUsageMonthLabel">本月</span>)</b><span class="mono" id="aiMonthlyUsageText">0 tokens · 預估 $0.00 / $5.00 USD</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiMonthlyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div></div></div></div>
   </div>
   <div class="grid2" data-sub="runs" hidden>
     <div class="card"><h3>試產回合管理 <small id="runSaveNote"></small></h3>
@@ -1719,12 +1717,12 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 
     <div class="row" style="margin:16px 0 8px;gap:16px;flex-wrap:wrap">
       <div style="flex:1;min-width:240px">
-        <label for="mailTo" class="lbl" style="font-weight:600">收件人 (To)：</label>
+        <label for="mailTo" class="lbl" style="font-weight:600">收件人：</label>
         <input type="text" id="mailTo" placeholder="選填，多筆以半形逗號或分號分隔 (只用於 mailto)" style="width:100%;box-sizing:border-box;margin-top:4px">
         <span class="note" id="mailToErr" style="color:var(--ng);display:none;font-size:var(--fs-caption)">收件人 Email 格式不正確</span>
       </div>
       <div style="flex:1;min-width:240px">
-        <label for="mailCc" class="lbl" style="font-weight:600">副本 (Cc)：</label>
+        <label for="mailCc" class="lbl" style="font-weight:600">副本：</label>
         <input type="text" id="mailCc" placeholder="選填，多筆以半形逗號或分號分隔" style="width:100%;box-sizing:border-box;margin-top:4px">
         <span class="note" id="mailCcErr" style="color:var(--ng);display:none;font-size:var(--fs-caption)">副本 Email 格式不正確</span>
       </div>
@@ -1772,7 +1770,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
       <button type="button" id="btnSharePdfWithSummary" disabled>連同摘要分享</button>
       <span class="note" id="lblAppleNote" style="font-size:var(--fs-caption);color:var(--muted);display:none">（部分 iPhone 版本此方式不會出現「儲存到檔案」）</span>
       <button type="button" id="btnMailDlPdf" disabled>下載 PDF</button>
-      <button type="button" id="btnMailOpenMailto">開啟郵件 (mailto)</button>
+      <button type="button" id="btnMailOpenMailto">開啟郵件軟體</button>
     </div>
   </div>
 </section>
@@ -2020,7 +2018,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
       <!-- 分類卡片 1: 管理與決策層 -->
       <div class="export-group-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <b style="font-size:var(--fs-ui);color:var(--ink)">管理與決策層 (Executive &amp; Management)</b>
+          <b style="font-size:var(--fs-ui);color:var(--ink)">管理與決策層</b>
           <span class="note" style="font-size:var(--fs-caption)">經理人、主管與客戶審查</span>
         </div>
         <div class="export-items-grid">
@@ -2073,7 +2071,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
       <!-- 分類卡片 2: 製程改善與工程分析 -->
       <div class="export-group-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <b style="font-size:var(--fs-ui);color:var(--ink)">製程改善與工程分析 (Process &amp; Engineering)</b>
+          <b style="font-size:var(--fs-ui);color:var(--ink)">製程改善與工程分析</b>
           <span class="note" style="font-size:var(--fs-caption)">SMT 製程工程師、品保與資料庫分析</span>
         </div>
         <div class="export-items-grid">
@@ -2159,7 +2157,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
       <!-- 分類卡片 3: 鋼板設計與 Layout -->
       <div class="export-group-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <b style="font-size:var(--fs-ui);color:var(--ink)">鋼板設計與 Layout (Stencil &amp; Layout)</b>
+          <b style="font-size:var(--fs-ui);color:var(--ink)">鋼板設計與 Layout</b>
           <span class="note" style="font-size:var(--fs-caption)">鋼板開孔廠商與硬體工程師</span>
         </div>
         <div class="export-items-grid">
@@ -6684,12 +6682,6 @@ function drawCtrl(id,mini){const A=S.A,c=S.chart,ng=css("--ng"),acc=css("--accen
     {label:"CL",data:pts.map(()=>cl*scale),borderColor:acc,borderWidth:1.2,pointRadius:0},...zones]},
     options:baseOpts({...clickOpts(pts.map(p=>p.lab)),plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex===0,callbacks:{label:i=>`${f(i.raw,c==="p"?2:2)}${c==="p"?" %":" "+METRICS[A.m].unit}  ·  z ${f(pts[i.dataIndex].z,2)}`}}}})});
 }
-const HOW={xbars:"每點是一片板所有焊墊的平均，S 圖看板內離散。X̄ 界限採三向管制圖法：以板平均的移動全距估計板間 σ。SPI 每板焊墊多且混合不同元件，若用板內 σ 計算界限會過窄而大量誤報。",
-  xbarr:"X̄-R 管制圖：以合理子群（Rational Subgroups，大小 n=2–10）的平均數 X̄ 與全距 R 建立管制界限。AIAG 標準係數（A2, D3, D4, d2），依據子群平均全距 R̄ 估算製程組內變異 σ̂ = R̄/d2。支援按「板號」或「焊墊」為子群模式，適合連續生產監控與離散組裝驗證。",
-  imr:"追蹤單一焊墊位置跨板的變化，適合追蹤問題焊墊（例如堵孔的 BGA 球）。可從熱圖或「焊墊 Cpk 排行」點選焊墊直接進入。",
-  p:"每板任一量測項目超出規格的焊墊比例。採 Laney P′ 圖：界限隨每板焊墊數變動，並以 σz 修正板間額外變異（每板焊墊多時，傳統 P 圖界限過窄會大量誤報）。P′ 圖反映「不良結果」，X̄ 圖反映「平均偏移」，兩者一起看可判斷是系統性偏移還是局部缺陷。",
-  ewma:"指數加權移動平均，每點融合過去資料（λ = 0.2），對 0.5–1.5σ 的小幅持續漂移比 X̄ 圖敏感，適合抓錫膏乾化、刮刀磨耗造成的緩慢衰退。σ 取自板平均的移動全距（三向管制圖法）。灰點為每板原始平均。",
-  cusum:"累積和管制圖。C+ 累積向上偏移、C− 累積向下偏移（單位 σ），超過 h = 5 即判定偏移已持續發生；曲線開始爬升的那片板，通常就是變化起點，可對照換線、加錫膏或擦拭紀錄。注意：本圖基準為規格目標或整批平均（依設定），若後段上升，前段會先出現向下累積（反之亦然）；變化起點請以「問題偵測」的趨勢漂移（上下兩向分別回推）為準。"};
 function renderControl(){
   if(!hasData()){
     $("#ctrlTitle").textContent="管制圖（無資料）";$("#ctrl2Title").textContent="";$("#ctrl2Card").hidden=true;
@@ -6968,7 +6960,7 @@ function renderCross(){
   const xo=[...A.xOut],po=[...A.pOut],both=xo.filter(b=>A.pOut.has(b));
   const box=(t,arr,cls)=>`<div><div class="fact">${t}</div><div class="row" style="margin-top:4px">${arr.length?arr.map(b=>`<span class="pill ${cls}">${b}</span>`).join(""):'<span class="note">無</span>'}</div></div>`;
   $("#overlap").innerHTML=`<div style="display:grid;gap:12px">${box("兩張圖皆抓到（高信心）",both,"ng")}${box("僅 X̄ 圖異常："+METRICS[A.m].short+" 平均偏移但未超規",xo.filter(b=>!A.pOut.has(b)),"warn")}${box("僅 P′ 圖越界：不良來自其他量測項目或局部焊墊",po.filter(b=>!A.xOut.has(b)),"warn")}
-    <p class="note">解讀：X̄ 圖看「平均是否移動」，P′ 圖看「超規焊墊比例」。兩者重疊代表整片板系統性異常；只出現在一邊，通常是局部焊墊或另一個量測項目造成。</p></div>`;
+    </div>`;
 }
 function divColor(t){const lo=[61,110,143],mid=hex2rgb(css("--surface2")),hi=[200,90,40];const a=t<0?lo:hi,k=Math.min(1,Math.abs(t));return`rgb(${mid.map((m,i)=>Math.round(m+(a[i]-m)*k)).join(",")})`}
 function hex2rgb(h){h=h.replace("#","");if(h.length===3)h=h.split("").map(c=>c+c).join("");return[0,2,4].map(i=>parseInt(h.substr(i,2),16))}
@@ -9295,9 +9287,9 @@ function updateAiStatusLabels(cfgArg){
   if($("#aiEffortLabel"))$("#aiEffortLabel").textContent=effLabel;
   if($("#aiQuickEffort"))$("#aiQuickEffort").textContent=effLabel;
   if($("#aiPriceLabel"))$("#aiPriceLabel").textContent=aiPricingLabel(act,effModel);
-  if($("#aiCardSub"))$("#aiCardSub").textContent=`${meta.label} ${effModel}（推理強度：${effLabel}） · 將目前全部統計結果與交叉驗證送出，嚴格區分事實與推論`;
+  if($("#aiCardSub"))$("#aiCardSub").textContent="將目前統計結果與交叉驗證送出，嚴格區分事實與推論";
   const noticePath=$("#aiNoticeServicePath");
-  if(noticePath)noticePath.innerHTML=`由本站後端以 API Key 安全轉發至 ${esc(meta.label)}（<code>${esc(effModel)}</code>，推理能力：<code>${esc(pCfg.effort)}</code>）。`;
+  if(noticePath)noticePath.innerHTML=`由本站後端以 API Key 安全轉發至 ${esc(meta.label)}。`;
 }
 function syncAiCfgInputs(){
   const cfg=loadAiCfg();
@@ -10040,7 +10032,7 @@ async function renderRecords(force){if(!$("#recSpi"))return;await RecDB.ready;$(
   const del=r=>"";
   const S1=list.filter(r=>r.kind==="spi"&&hit(r)),P1=list.filter(r=>r.kind==="place"&&hit(r));
   const searchClear=$("#recQClear");if(searchClear)searchClear.hidden=!q;
-  const filterState=$("#recFilterState");if(filterState)filterState.textContent=q?`搜尋「${$("#recQ").value.trim()}」：量測 ${S1.length} 筆、座標 ${P1.length} 筆、規格依相同條件篩選。`:`搜尋涵蓋批號、料號、版次、工單／日期、廠商／外包工單、檔名、上傳者與備註。`;
+  const filterState=$("#recFilterState");if(filterState)filterState.textContent=q?`搜尋「${$("#recQ").value.trim()}」：量測 ${S1.length} 筆、座標 ${P1.length} 筆、規格依相同條件篩選。`:"";
   $("#recSpiSub").textContent=`${S1.length} 筆${q?"（篩選後）":""}`;$("#recPlaceSub").textContent=`${P1.length} 筆${q?"（篩選後）":""}`;
   $("#recSpi").innerHTML=S1.length?`<thead><tr><th>批號</th><th>產品料號</th><th>工單</th><th>面別</th><th>原始檔</th><th class="num">板 × 焊墊</th><th>上傳者</th><th>上傳時間</th><th>檔案指紋</th><th></th></tr></thead><tbody>`+S1.map(r=>{
     const wo=[r.workOrder?`製令:${esc(r.workOrder)}`:"",r.measuredDate?`日期:${esc(r.measuredDate)}`:"",r.supplierWo?`廠:${esc(r.supplierWo)}`:"",r.outsourceWo?`委:${esc(r.outsourceWo)}`:""] .filter(Boolean).join("<br>")||"未提供";
@@ -10573,7 +10565,7 @@ async function renderRecPicker(force) {
     tblPlace.innerHTML = P1.length ? `<thead><tr>
       <th>產品料號</th>
       <th>面別</th>
-      <th>版本 (Rev)</th>
+      <th>版次</th>
       <th>單位</th>
       <th class="num">元件數</th>
       <th>受控狀態</th>
@@ -11377,8 +11369,8 @@ function renderReport(){
       </div>
     </div>
     <div class="tbl" style="margin-bottom:20px"><table><tbody>
-      <tr><th>試產回合</th><td><b>${esc(S.source)}</b></td><th>批號 (Lot)</th><td><b>${esc(lot)}</b></td></tr>
-      <tr><th>產品料號</th><td>${esc(part)}</td><th>面別 (Side)</th><td>${esc(side)}</td></tr>
+      <tr><th>試產回合</th><td><b>${esc(S.source)}</b></td><th>批號</th><td><b>${esc(lot)}</b></td></tr>
+      <tr><th>產品料號</th><td>${esc(part)}</td><th>面別</th><td>${esc(side)}</td></tr>
       <tr><th>鋼板厚度</th><td>${S.stencil} µm${stepHtml}</td><th>資料指紋 SHA-256</th><td class="mono" style="font-size:var(--fs-caption)">${esc(sha)}</td></tr>
       <tr><th>分析樣本</th><td>${A.boards.length} 片板 · ${A.pads.length} 焊墊 · 共 ${S.rows.length.toLocaleString()} 筆</td><th>判定規格來源</th><td>${esc(specSrcText())}</td></tr>
     </tbody></table></div></div>`;
@@ -11483,10 +11475,7 @@ function renderReport(){
     <h2 style="font-size:var(--fs-heading);border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">五、不良類型柏拉圖</h2>
     ${P.length>0&&paretoImgUrl?`<div style="text-align:center;margin-bottom:12px"><img src="${paretoImgUrl}" style="width:100%;max-width:760px;height:auto;border:1px solid var(--line);border-radius:6px" alt="不良柏拉圖"></div>`:`<p class="note" style="padding:16px;background:var(--surface2);border-radius:6px">沒有判定不良的焊墊</p>`}
     <p class="note" style="margin-top:4px">一個焊墊可有多種不良，處數 ≥ 不良焊墊數。</p>
-    <div style="margin-top:12px;font-size:var(--fs-caption);color:var(--muted)">
-      <p style="margin:2px 0">重複犯焊墊分析 (M-09)：本版尚未提供（規劃中）</p>
-      <p style="margin:2px 0">不良品矩陣：本版尚未提供（規劃中）</p>
-    </div></div>`;
+</div>`;
 
   const Me=F.meta,modes=(Me&&Me.modes)||[];
   const s7=`<div class="rep-sec" id="repSec7">
@@ -11670,8 +11659,8 @@ async function generateReportPdfBlob(opts={}){
     curY+=8;
     const src=runSrc(curRun()),swo=src&&src.supplierWo?src.supplierWo:"—",owo=src&&src.outsourceWo?src.outsourceWo:"—";
     drawTable(["項目","內容","項目","內容"],[
-      ["試產回合",S.source,"批號 (Lot)",lot],
-      ["產品料號",part,"面別 (Side)",side],
+      ["試產回合",S.source,"批號",lot],
+      ["產品料號",part,"面別",side],
       ["廠商工單",swo,"外包工單",owo],
       ["鋼板厚度",`${S.stencil} µm${S.step&&S.step.on?`（階梯 ${S.step.zones.length} 區，涵蓋 ${stepCovered} 焊墊${stepCovered===0?" ⚠️ 未涵蓋焊墊":""}）`:""}`,"資料指紋",String(sha).slice(0,24)+"…"],
       ["樣本數",`${A.boards.length} 板 · ${A.pads.length} 焊墊 · ${S.rows.length} 筆`,"判定規格",specSrcText()]
@@ -11769,8 +11758,6 @@ async function generateReportPdfBlob(opts={}){
       }catch(e){}
     }else{printText("沒有判定不良的焊墊",14,curY,{size:9});curY+=6}
     printText("一個焊墊可有多種不良，處數 ≥ 不良焊墊數。",14,curY,{size:8});
-    curY+=4;
-    printText("重複犯焊墊分析與不良品矩陣：本版尚未提供（規劃中）",14,curY,{size:8,color:[120,120,120]});
     curY+=6;
   }
 
