@@ -873,6 +873,29 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 .load-state[data-state="error"] .light{background:var(--ng)}
 .load-state>span:last-child{overflow:hidden;text-overflow:ellipsis}
 @media(max-width:720px){.load-state{max-width:44vw;min-height:44px}}
+.db-capsule-group{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:var(--surface2);padding:2px;gap:2px;max-width:100%}
+.db-capsule-group>.chip.chipBtn{border:none;background:transparent;border-radius:999px;min-height:32px;padding:3px 10px}
+.db-capsule-group>.chip.chipBtn:hover{background:var(--surface)}
+.db-capsule-group>.chip-rec-lib{background:var(--surface);border:1px solid var(--line);font-weight:600}
+@media(max-width:600px),(pointer:coarse) and (max-height:500px){.db-capsule-group{display:none!important}}
+.startup-db-banner{padding:6px 12px!important;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.startup-db-banner__main{display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 auto}
+.startup-db-banner__body{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0;flex:1 1 auto}
+.startup-db-banner__title-row{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rail-time-wrap{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;position:relative}
+.rail-time-pop{display:inline-flex;align-items:flex-end;gap:6px;flex-wrap:wrap;padding:6px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px}
+@media(max-width:600px),(pointer:coarse) and (max-height:500px){
+  .rail-time-wrap{display:grid;grid-template-columns:minmax(0,1fr);width:100%}
+  #btnRailTimeToggle{display:none!important}
+  .rail-time-pop,.rail-time-pop[hidden]{display:grid!important;grid-template-columns:minmax(0,1fr);width:100%;gap:8px}
+}
+.panel-subnav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px}
+.panel-subnav__lbl{font-size:var(--fs-caption);color:var(--muted);font-weight:600;margin-right:4px}
+.panel-subnav button{border:1px solid transparent;background:transparent;border-radius:6px;padding:4px 10px;font-size:var(--fs-ui);cursor:pointer;color:var(--ink)}
+.panel-subnav button[aria-current="page"]{background:var(--surface);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.tab.tab--sub{font-size:var(--fs-caption);opacity:.88}
+.ai-compact-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 12px!important}
+@media(pointer:coarse){.panel-subnav button,.db-capsule-group>.chip.chipBtn,#btnRailTimeToggle,#btnGoAiCfg{min-height:44px}}
 </style>
 <!-- 開機期間：瀏覽器可能在主程式執行前先畫出空的問題頁，之後清單填入會把下方內容整片推走（CLS）；主程式跑完才顯示 -->
 <style id="bootHide">#p-issues>:not(.iss-top){visibility:hidden}</style>
@@ -892,9 +915,11 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.14.2</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
-    <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
-    <button type="button" class="chip chipBtn load-state" id="statePlace" data-state="idle" title="選取座標檔"><span class="light" aria-hidden="true"></span><span>座標檔：未套用</span></button>
-    <button type="button" class="chip chipBtn chip-rec-lib" id="btnOpenRecModal" title="開啟量測紀錄與座標檔資料庫，選取歷史檔案載入分析"><svg class="ui-ico ui-ico--folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>記錄庫 ▾</button>
+    <div class="db-capsule-group" role="group" aria-label="雲端記錄庫與套用狀態">
+      <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
+      <button type="button" class="chip chipBtn load-state" id="statePlace" data-state="idle" title="選取座標檔"><span class="light" aria-hidden="true"></span><span>座標檔：未套用</span></button>
+      <button type="button" class="chip chipBtn chip-rec-lib" id="btnOpenRecModal" title="開啟量測紀錄與座標檔資料庫，選取歷史檔案載入分析"><svg class="ui-ico ui-ico--folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>記錄庫 ▾</button>
+    </div>
     <button type="button" class="chip chipBtn duo-toggle-btn" id="duoToggleBtn" title="切換折疊雙欄模式" aria-label="切換雙欄模式" aria-pressed="false"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:18px;height:18px"><rect x="3" y="4" width="8" height="16" rx="2"/><rect x="13" y="4" width="8" height="16" rx="2"/></svg>雙欄 ▾</button>
     <span class="chip" title="目前分析的試產回合" hidden>回合 <b id="srcName">範例資料</b> · <b id="srcBoards" class="num">—</b> 板 · <b id="srcPads" class="num">—</b> 焊墊</span>
     <div class="menuwrap" id="moreWrap" hidden>
@@ -955,8 +980,17 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
             <option value="pad">同一焊墊連續 n 片板</option>
           </select></div>
         <div class="field" id="padField" data-scope="a" hidden><label for="selPad">焊墊</label><select id="selPad"></select></div>
+        <div class="rail-time-wrap" id="railTimeWrap">
+          <button type="button" class="specbtn" id="btnRailTimeToggle" aria-expanded="false" aria-controls="railTimePopover" title="依時間欄位篩選特定時段（UTC+8 閉區間）"><span class="lbl">時段篩選</span> <b id="railTimeSummary">全部時間</b> <span aria-hidden="true">▾</span></button>
+          <div class="rail-time-pop" id="railTimePopover" role="group" aria-label="時間區間篩選" hidden>
+            <div class="field"><label for="inTimeStart">起始時間</label><input type="text" id="inTimeStart" placeholder="例：08:00:00 或 2026-03-01 08:00:00" style="min-width:0;width:min(100%,170px)"></div>
+            <div class="field"><label for="inTimeEnd">結束時間</label><input type="text" id="inTimeEnd" placeholder="例：17:00:00 或 2026-03-01 17:00:00" style="min-width:0;width:min(100%,170px)"></div>
+            <div class="row" style="gap:6px"><button type="button" id="btnTimeFilter">套用篩選</button><button type="button" id="btnTimeFilterClear">清除篩選</button></div>
+            <span class="note" id="timeFilterState" style="margin:0"></span>
+          </div>
+        </div>
         <p class="note" id="railNote" hidden style="margin:0;align-self:center;max-width:42ch"></p>
-        <button class="specbtn" id="railSpecBtn" title="鋼板厚度與規格在「資料與規格 → 匯入與規格」修改"><span class="lbl">鋼板／規格</span> <b id="railSum"></b> <span aria-hidden="true">✎</span></button>
+        <button class="specbtn" id="railSpecBtn" title="鋼板厚度與規格在「資料與規格 → 規格設定」修改"><span class="lbl">鋼板／規格</span> <b id="railSum"></b> <span aria-hidden="true">✎</span></button>
       </div>
     </div>
   </div>
@@ -972,13 +1006,15 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
   <button class="tab" role="tab" data-tab="control">管制圖</button>
   <button class="tab" role="tab" data-tab="capability">製程能力</button>
   <button class="tab" role="tab" data-tab="sim3d">3D 錫膏模擬</button>
-  <button class="tab" role="tab" data-tab="cross">交叉驗證</button>
-  <button class="tab" role="tab" data-tab="adv">進階分析</button>
-  <button class="tab" role="tab" data-tab="stats">統計資料</button>
-  <span class="tabgrp" aria-hidden="true">改善與驗證</span>
-  <button class="tab" role="tab" data-tab="compare">試產比較</button>
-  <button class="tab" role="tab" data-tab="dfm">DFM 建議</button>
-  <button class="tab" role="tab" data-tab="lab">實驗驗證</button>
+  <span class="tabgrp" aria-hidden="true">深入分析</span>
+  <button class="tab tab--sub" role="tab" data-tab="cross" data-tab-group="deep">交叉驗證</button>
+  <button class="tab tab--sub" role="tab" data-tab="adv" data-tab-group="deep">進階分析</button>
+  <button class="tab tab--sub" role="tab" data-tab="stats" data-tab-group="deep">統計資料</button>
+  <span class="tabgrp" aria-hidden="true">改善與比較</span>
+  <button class="tab tab--sub" role="tab" data-tab="compare" data-tab-group="improve">試產比較</button>
+  <button class="tab tab--sub" role="tab" data-tab="dfm" data-tab-group="improve">DFM 建議</button>
+  <button class="tab tab--sub" role="tab" data-tab="lab" data-tab-group="improve">實驗驗證</button>
+  <span class="tabgrp" aria-hidden="true">診斷與報告</span>
   <button class="tab" role="tab" data-tab="ai">AI 分析</button>
   <button class="tab" role="tab" data-tab="report">分析報告</button>
   <span class="tabgrp" aria-hidden="true">設定</span>
@@ -1126,6 +1162,12 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 </section>
 
 <section class="panel" id="p-cross" role="tabpanel" hidden>
+  <nav class="panel-subnav" aria-label="深入分析子視圖切換">
+    <span class="panel-subnav__lbl">深入分析視角：</span>
+    <button type="button" data-subnav-tab="cross">交叉驗證</button>
+    <button type="button" data-subnav-tab="adv">進階分析</button>
+    <button type="button" data-subnav-tab="stats">統計資料</button>
+  </nav>
   <div class="card" id="fmCard"><h3>失效模式交叉比對 </h3>
     <div id="fmTbl"></div><p class="note" id="fmRest" style="margin:6px 0 0"></p></div>
   <div class="card"><h3>交叉驗證矩陣 </h3>
@@ -1144,6 +1186,12 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 </section>
 
 <section class="panel" id="p-adv" role="tabpanel" hidden>
+  <nav class="panel-subnav" aria-label="深入分析子視圖切換">
+    <span class="panel-subnav__lbl">深入分析視角：</span>
+    <button type="button" data-subnav-tab="cross">交叉驗證</button>
+    <button type="button" data-subnav-tab="adv">進階分析</button>
+    <button type="button" data-subnav-tab="stats">統計資料</button>
+  </nav>
   <div class="card">
     <h3>面積比 × 轉移效率 <small id="arSub"></small></h3>
         <div class="legend" id="arLeg"></div>
@@ -1214,6 +1262,12 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 </section>
 
 <section class="panel" id="p-stats" role="tabpanel" hidden>
+  <nav class="panel-subnav" aria-label="深入分析子視圖切換">
+    <span class="panel-subnav__lbl">深入分析視角：</span>
+    <button type="button" data-subnav-tab="cross">交叉驗證</button>
+    <button type="button" data-subnav-tab="adv">進階分析</button>
+    <button type="button" data-subnav-tab="stats">統計資料</button>
+  </nav>
   <div class="card">
     <h3>統計異常點集中清單 <small id="statsSub"></small></h3>
         <div class="row" style="margin-bottom:12px">
@@ -1237,6 +1291,12 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 </section>
 
 <section class="panel" id="p-compare" role="tabpanel" hidden>
+  <nav class="panel-subnav" aria-label="改善與比較子視圖切換">
+    <span class="panel-subnav__lbl">改善與驗證視角：</span>
+    <button type="button" data-subnav-tab="compare">試產比較</button>
+    <button type="button" data-subnav-tab="dfm">DFM 建議</button>
+    <button type="button" data-subnav-tab="lab">實驗驗證</button>
+  </nav>
   <div class="card">
     <h3>試產回合比較 </h3>
         <div class="toolbar">
@@ -1257,6 +1317,12 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 </section>
 
 <section class="panel" id="p-dfm" role="tabpanel" hidden>
+  <nav class="panel-subnav" aria-label="改善與比較子視圖切換">
+    <span class="panel-subnav__lbl">改善與驗證視角：</span>
+    <button type="button" data-subnav-tab="compare">試產比較</button>
+    <button type="button" data-subnav-tab="dfm">DFM 建議</button>
+    <button type="button" data-subnav-tab="lab">實驗驗證</button>
+  </nav>
   <div class="card">
     <h3>DFM 開孔修改建議表 <small id="dfmSub"></small></h3>
         <div class="row"><button class="primary" id="btnDfmCsv">匯出建議表 .csv</button><button id="btnDfmMd">匯出 .md（給鋼板廠／Layout）</button><span class="note" id="dfmState"></span></div>
@@ -1277,6 +1343,12 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 </section>
 
 <section class="panel" id="p-lab" role="tabpanel" hidden>
+  <nav class="panel-subnav" aria-label="改善與比較子視圖切換">
+    <span class="panel-subnav__lbl">改善與驗證視角：</span>
+    <button type="button" data-subnav-tab="compare">試產比較</button>
+    <button type="button" data-subnav-tab="dfm">DFM 建議</button>
+    <button type="button" data-subnav-tab="lab">實驗驗證</button>
+  </nav>
   <div class="card">
     <h3>SPI × 回焊後 AOI／X-ray 關聯 </h3>
         <div class="row"><label class="row" for="aoiFile" style="cursor:pointer"><input type="file" id="aoiFile" accept=".csv,.txt,.tsv" class="sr" aria-label="上傳 AOI 結果 CSV"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">上傳 AOI 結果 CSV</span></label><button id="btnAoiSample">產生範例 AOI 結果</button>
@@ -1299,7 +1371,16 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 </section>
 
 <section class="panel" id="p-ai" role="tabpanel" hidden>
-  <div class="card" id="aiSettingsCard"><h3 id="aiSettingsHead">API 金鑰、模型／推理強度與獨立配額設定 <small id="aiKeyBadge"><span class="pill warn">尚未設定金鑰</span></small></h3><div style="display:grid;grid-template-columns:minmax(0,1fr);gap:12px"><div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:var(--fs-ui);font-weight:600">啟用服務商：</span><div class="seg" id="aiProviderSeg" role="group" aria-label="選擇 AI 服務商" style="display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden"><button type="button" data-ai-prov="openai" aria-pressed="true">OpenAI</button><button type="button" data-ai-prov="antigravity" aria-pressed="false">Antigravity</button></div></div><div id="aiAllProvidersSummary" class="row" style="gap:6px;flex-wrap:wrap;font-size:var(--fs-caption)"></div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px"><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKey" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>OpenAI API Key</b></span><span id="aiBadgeOpenai" class="pill warn" style="font-size:var(--fs-caption);padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKey" placeholder="sk-proj-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggle" title="顯示或隱藏 OpenAI API Key">顯示</button></div></div><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKeyAntigravity" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>Antigravity API Key</b></span><span id="aiBadgeAntigravity" class="pill warn" style="font-size:var(--fs-caption);padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKeyAntigravity" placeholder="AIza... / agy-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggleAntigravity" title="顯示或隱藏 Antigravity API Key">顯示</button></div></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap"><div class="field" style="flex:1 1 220px;min-width:0"><label for="selAiModel">模型選擇 (<span id="aiModelProvName">OpenAI</span>)</label><select id="selAiModel" style="width:100%"><option value="gpt-6.1-terra" selected>gpt-6.1-terra（旗艦深度推理 · 推薦）</option><option value="o4-mini">o4-mini（精準數理推理）</option><option value="gpt-5.4">gpt-5.4（通用旗艦）</option><option value="custom">自訂模型名稱…</option></select></div><div class="field" style="flex:0 0 auto"><button type="button" id="btnAiCheckModels" title="用目前服務商的 API Key 查詢實際可用的模型">檢查可用模型</button></div><div class="field" id="aiCustomModelField" hidden style="flex:1 1 180px;min-width:0"><label for="inAiCustomModel">自訂模型名稱</label><input type="text" id="inAiCustomModel" placeholder="例：gpt-6.1-terra" style="width:100%;font-family:var(--f-mono)"></div><div class="field" style="flex:1 1 200px;min-width:0"><label for="selAiEffort">推理強度</label><select id="selAiEffort" style="width:100%"><option value="high" selected>高 — 深度工程根因推理（推薦）</option><option value="medium">中 — 均衡推理深度與速度</option><option value="low">低 — 快速重點摘要</option></select></div><div class="field" style="flex:1 1 220px;min-width:0"><label for="inAiCustomEndpoint">自訂 API 端點 (選填 https://)</label><input type="text" id="inAiCustomEndpoint" placeholder="預設使用官方端點" spellcheck="false" style="width:100%;font-family:var(--f-mono)"></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap;padding-top:4px;border-top:1px dashed var(--line)"><div style="font-size:var(--fs-ui);font-weight:600;color:var(--accent-ink);min-width:140px" id="aiLimitProvTitle">OpenAI 獨立配額上限：</div><div class="field"><label for="inAiDailyLim">每日次數上限 (次/日)</label><input type="number" id="inAiDailyLim" value="20" min="1" max="500" step="1" style="width:96px"></div><div class="field"><label for="inAiTokenLim">每月 Token 上限</label><input type="number" id="inAiTokenLim" value="500000" min="1000" max="10000000" step="10000" style="width:120px"></div><div class="field"><label for="inAiUsdLim">每月費用上限 (USD)</label><input type="number" id="inAiUsdLim" value="5.0" min="0.5" max="500" step="0.5" style="width:96px"></div><div class="row" style="gap:6px"><button type="button" class="primary" id="btnAiSaveCfg">儲存設定</button><button type="button" id="btnAiClearKey" title="清除目前所選服務商的金鑰">清除當前金鑰</button></div></div><div class="row" style="gap:8px;flex-wrap:wrap;font-size:var(--fs-caption);color:var(--muted)"><span class="chip">目前服務商：<b id="aiProviderLabel">OpenAI</b></span><span class="chip">模型：<b class="mono" id="aiModelLabel">gpt-6.1-terra</b></span><span class="chip">推理強度：<b class="mono" id="aiEffortLabel">高</b></span><span class="chip" style="white-space:normal;min-width:0">計價基準：<b id="aiPriceLabel">輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens</b></span><span class="note" id="aiCfgMsg" role="status"></span></div><div class="grid2" style="gap:10px;margin-top:2px"><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-ui);margin-bottom:6px"><b><span id="aiDailyBarProv">OpenAI</span> 今日呼叫次數 (<span id="aiUsageDayLabel">今日</span>)</b><span class="mono" id="aiDailyUsageText">0 / 20 次 (0%)</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiDailyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-ui);margin-bottom:6px;gap:8px;flex-wrap:wrap"><b><span id="aiMonthlyBarProv">OpenAI</span> 本月累計用量 (<span id="aiUsageMonthLabel">本月</span>)</b><span class="mono" id="aiMonthlyUsageText">0 tokens · 預估 $0.00 / $5.00 USD</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiMonthlyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div></div></div></div><div class="card"><h3>AI 品質工程分析 <small id="aiCardSub">OpenAI gpt-6.1-terra（高推理強度） · 將目前全部統計結果與交叉驗證送出，嚴格區分事實與推論</small></h3>
+  <div class="card ai-compact-bar" id="aiCompactBar">
+    <div class="row" style="gap:8px;flex-wrap:wrap;align-items:center;min-width:0">
+      <span class="chip">服務商：<b id="aiQuickProv">OpenAI</b></span>
+      <span class="chip">模型：<b class="mono" id="aiQuickModel">gpt-6.1-terra</b></span>
+      <span class="chip">推理強度：<b class="mono" id="aiQuickEffort">高</b></span>
+      <span class="note" id="aiQuickUsage">今日 0 / 20 次 · 本月 $0.00 / $5.00 USD</span>
+    </div>
+    <button type="button" id="btnGoAiCfg">前往 AI 與配額設定</button>
+  </div>
+  <div class="card"><h3>AI 品質工程分析 <small id="aiCardSub">OpenAI gpt-6.1-terra（高推理強度） · 將目前全部統計結果與交叉驗證送出，嚴格區分事實與推論</small></h3>
     <div class="notice" id="aiNoticeBox" style="background:var(--surface2);padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:var(--fs-ui);color:var(--ink)">
       <p style="margin:0 0 6px"><b>送出前告知與資料隱私保護：</b></p>
       <ul style="margin:0 0 6px 18px;padding:0;line-height:1.6">
@@ -1337,12 +1418,16 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
         <label for="chkRep9"><input type="checkbox" id="chkRep9" checked aria-label="9. 資料範圍揭露"> 9. 資料範圍揭露</label>
         <label for="chkRep10"><input type="checkbox" id="chkRep10" checked aria-label="10. 方法附錄"> 10. 方法附錄</label>
       </div>
-      <div class="row" style="gap:8px">
+      <div class="row" style="gap:8px;flex-wrap:wrap">
         <button type="button" class="primary" id="btnRepPdf">匯出 PDF 報告</button>
         <button type="button" id="btnRepPrint">列印整頁報告</button>
+        <button type="button" id="btnExpMd">分析報告 .md</button>
+        <button type="button" id="btnExpBoard">各板統計 .csv</button>
+        <button type="button" id="btnExpDef">不良焊墊清單 .csv</button>
         <button type="button" id="btnRepMail" title="以 Email 傳送報告摘要">以 Email 傳送</button>
       </div>
     </div>
+    <p class="note" id="expState" style="margin:6px 0 0"></p>
     <p class="note" id="repPdfStatus" hidden style="margin:10px 0 0"></p>
   </div>
   <div class="report-preview-wrap" id="reportPreviewWrap">
@@ -1359,12 +1444,14 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 </section>
 <section class="panel" id="p-data" role="tabpanel" hidden>
   <div class="subtabs" role="tablist" aria-label="資料與規格分頁">
-    <button role="tab" class="subtab" data-sub="import" aria-selected="true">匯入與規格</button>
+    <button role="tab" class="subtab" data-sub="import" aria-selected="true">匯入資料</button>
+    <button role="tab" class="subtab" data-sub="specs" aria-selected="false">規格設定</button>
     <button role="tab" class="subtab" data-sub="runs" aria-selected="false">回合管理</button>
     <button role="tab" class="subtab" data-sub="stencil" aria-selected="false">鋼板與開孔</button>
     <button role="tab" class="subtab" data-sub="records" aria-selected="false">資料庫</button>
+    <button role="tab" class="subtab" data-sub="ai-cfg" aria-selected="false">AI 設定</button>
   </div>
-  <div class="grid2" data-sub="import">
+  <div data-sub="import">
     <div class="card">
       <h3>匯入 SPI 資料 </h3>
       <ol class="imp-flow" id="impFlowSteps" aria-label="資料匯入步驟">
@@ -1429,6 +1516,8 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
           <label class="row" style="font-size:var(--fs-ui)"><input type="radio" name="impMode" value="replace"> 取代目前回合</label><button class="primary" id="btnApply">套用匯入</button></div>
       </div>
     </div>
+  </div>
+  <div data-sub="specs" hidden>
     <div class="card">
       <h3>規格設定 </h3>
       <div class="row" style="margin-bottom:10px">
@@ -1455,18 +1544,10 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
           <button type="button" id="btnSpecGrpAdd" style="align-self:flex-end">新增覆寫</button>
         </div>
       </div>
-      <h3 style="margin-top:18px">時間區間篩選 <small>依時間欄位篩選特定時段（UTC+8 閉區間）</small></h3>
-      <div class="row" style="margin-bottom:10px">
-        <div class="field"><label for="inTimeStart">起始時間</label><input type="text" id="inTimeStart" placeholder="例：08:00:00 或 2026-03-01 08:00:00" style="min-width:0;width:min(100%,180px);flex:1 1 140px"></div>
-        <div class="field"><label for="inTimeEnd">結束時間</label><input type="text" id="inTimeEnd" placeholder="例：17:00:00 或 2026-03-01 17:00:00" style="min-width:0;width:min(100%,180px);flex:1 1 140px"></div>
-        <button id="btnTimeFilter" style="align-self:flex-end">套用篩選</button>
-        <button id="btnTimeFilterClear" style="align-self:flex-end">清除篩選</button>
-      </div>
-      <p class="note" id="timeFilterState" style="margin-top:0"></p>
-      <h3 style="margin-top:18px">匯出</h3>
-      <div class="row"><button id="btnExpMd">分析報告 .md</button><button id="btnExpBoard">各板統計 .csv</button><button id="btnExpDef">不良焊墊清單 .csv</button></div>
-      <p class="note" id="expState"></p>
     </div>
+  </div>
+  <div data-sub="ai-cfg" hidden>
+    <div class="card" id="aiSettingsCard"><h3 id="aiSettingsHead">API 金鑰、模型／推理強度與獨立配額設定 <small id="aiKeyBadge"><span class="pill warn">尚未設定金鑰</span></small></h3><div style="display:grid;grid-template-columns:minmax(0,1fr);gap:12px"><div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:var(--fs-ui);font-weight:600">啟用服務商：</span><div class="seg" id="aiProviderSeg" role="group" aria-label="選擇 AI 服務商" style="display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden"><button type="button" data-ai-prov="openai" aria-pressed="true">OpenAI</button><button type="button" data-ai-prov="antigravity" aria-pressed="false">Antigravity</button></div></div><div id="aiAllProvidersSummary" class="row" style="gap:6px;flex-wrap:wrap;font-size:var(--fs-caption)"></div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px"><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKey" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>OpenAI API Key</b></span><span id="aiBadgeOpenai" class="pill warn" style="font-size:var(--fs-caption);padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKey" placeholder="sk-proj-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggle" title="顯示或隱藏 OpenAI API Key">顯示</button></div></div><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKeyAntigravity" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>Antigravity API Key</b></span><span id="aiBadgeAntigravity" class="pill warn" style="font-size:var(--fs-caption);padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKeyAntigravity" placeholder="AIza... / agy-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggleAntigravity" title="顯示或隱藏 Antigravity API Key">顯示</button></div></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap"><div class="field" style="flex:1 1 220px;min-width:0"><label for="selAiModel">模型選擇 (<span id="aiModelProvName">OpenAI</span>)</label><select id="selAiModel" style="width:100%"><option value="gpt-6.1-terra" selected>gpt-6.1-terra（旗艦深度推理 · 推薦）</option><option value="o4-mini">o4-mini（精準數理推理）</option><option value="gpt-5.4">gpt-5.4（通用旗艦）</option><option value="custom">自訂模型名稱…</option></select></div><div class="field" style="flex:0 0 auto"><button type="button" id="btnAiCheckModels" title="用目前服務商的 API Key 查詢實際可用的模型">檢查可用模型</button></div><div class="field" id="aiCustomModelField" hidden style="flex:1 1 180px;min-width:0"><label for="inAiCustomModel">自訂模型名稱</label><input type="text" id="inAiCustomModel" placeholder="例：gpt-6.1-terra" style="width:100%;font-family:var(--f-mono)"></div><div class="field" style="flex:1 1 200px;min-width:0"><label for="selAiEffort">推理強度</label><select id="selAiEffort" style="width:100%"><option value="high" selected>高 — 深度工程根因推理（推薦）</option><option value="medium">中 — 均衡推理深度與速度</option><option value="low">低 — 快速重點摘要</option></select></div><div class="field" style="flex:1 1 220px;min-width:0"><label for="inAiCustomEndpoint">自訂 API 端點 (選填 https://)</label><input type="text" id="inAiCustomEndpoint" placeholder="預設使用官方端點" spellcheck="false" style="width:100%;font-family:var(--f-mono)"></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap;padding-top:4px;border-top:1px dashed var(--line)"><div style="font-size:var(--fs-ui);font-weight:600;color:var(--accent-ink);min-width:140px" id="aiLimitProvTitle">OpenAI 獨立配額上限：</div><div class="field"><label for="inAiDailyLim">每日次數上限 (次/日)</label><input type="number" id="inAiDailyLim" value="20" min="1" max="500" step="1" style="width:96px"></div><div class="field"><label for="inAiTokenLim">每月 Token 上限</label><input type="number" id="inAiTokenLim" value="500000" min="1000" max="10000000" step="10000" style="width:120px"></div><div class="field"><label for="inAiUsdLim">每月費用上限 (USD)</label><input type="number" id="inAiUsdLim" value="5.0" min="0.5" max="500" step="0.5" style="width:96px"></div><div class="row" style="gap:6px"><button type="button" class="primary" id="btnAiSaveCfg">儲存設定</button><button type="button" id="btnAiClearKey" title="清除目前所選服務商的金鑰">清除當前金鑰</button></div></div><div class="row" style="gap:8px;flex-wrap:wrap;font-size:var(--fs-caption);color:var(--muted)"><span class="chip">目前服務商：<b id="aiProviderLabel">OpenAI</b></span><span class="chip">模型：<b class="mono" id="aiModelLabel">gpt-6.1-terra</b></span><span class="chip">推理強度：<b class="mono" id="aiEffortLabel">高</b></span><span class="chip" style="white-space:normal;min-width:0">計價基準：<b id="aiPriceLabel">輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens</b></span><span class="note" id="aiCfgMsg" role="status"></span></div><div class="grid2" style="gap:10px;margin-top:2px"><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-ui);margin-bottom:6px"><b><span id="aiDailyBarProv">OpenAI</span> 今日呼叫次數 (<span id="aiUsageDayLabel">今日</span>)</b><span class="mono" id="aiDailyUsageText">0 / 20 次 (0%)</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiDailyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-ui);margin-bottom:6px;gap:8px;flex-wrap:wrap"><b><span id="aiMonthlyBarProv">OpenAI</span> 本月累計用量 (<span id="aiUsageMonthLabel">本月</span>)</b><span class="mono" id="aiMonthlyUsageText">0 tokens · 預估 $0.00 / $5.00 USD</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiMonthlyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div></div></div></div>
   </div>
   <div class="grid2" data-sub="runs" hidden>
     <div class="card"><h3>試產回合管理 <small id="runSaveNote"></small></h3>
@@ -5746,7 +5827,7 @@ function syncControls(){
   renderSpecTbl();
 }
 /* 鋼板與規格只在「資料與規格 → 匯入與規格」修改（只保留一處，避免兩邊不一致）；頂端按鈕直接帶過去 */
-$("#railSpecBtn").onclick=()=>{setTab("data");setSub("import");const el=$("#inStencil2");if(el){el.closest(".card").scrollIntoView({block:"start"});scrollBy(0,-stickyH()-8);el.focus({preventScroll:true})}};
+$("#railSpecBtn").onclick=()=>{setTab("data");setSub("specs");const el=$("#inStencil2");if(el){el.closest(".card").scrollIntoView({block:"start"});scrollBy(0,-stickyH()-8);el.focus({preventScroll:true})}};
 /* ---------- 階梯鋼板區域 ---------- */
 const ZCOL=["#3D6E8F","#B5652B","#7A5BA6","#2C7A4C","#B5487A","#8A7A2C"];
 function persist(){saveRunsSoon();try{localStorage.setItem("spi-stencil",JSON.stringify({t:S.stencil,lo:S.htol.lo,hi:S.htol.hi,step:S.step,aperture:S.aperture,geometryPads:S.geometryPads}))}catch(e){}}
@@ -6136,10 +6217,10 @@ function showPanels(t){const lock=gateOn(t);if(lock){$$(".panel").forEach(p=>p.h
 function renderGate(){const part=runPart();$("#gateMsg").textContent=part
   ?`此回合（料號 ${part}）尚未套用你定義的料號規格。好壞判定、製程能力與所有分析都依你定義並存檔的規格計算；請先到「資料與規格 → 規格設定」確認規格並按「儲存為新版本」。`
   :"此回合沒有產品料號，無法定義料號規格。請從資料庫重新開啟量測紀錄，或重新匯入並填寫產品料號。"}
-$("#btnGateSpec").onclick=()=>{setTab("data");setSub("import");gotoSpecCard();const el=$("#btnSpecSave");if(el&&!el.disabled)el.focus({preventScroll:true})};
+$("#btnGateSpec").onclick=()=>{setTab("data");setSub("specs");gotoSpecCard();const el=$("#btnSpecSave");if(el&&!el.disabled)el.focus({preventScroll:true})};
 $("#btnGateRuns").onclick=()=>{setTab("data");setSub("runs")};
 function renderTab(){if(RENDER_HOLD)return;if(showPanels(S.tab))return;perfSpan("render:"+S.tab,renderTabInner);nextFrame(enhancePanel)}
-function renderTabByName(k){const fn=({issues:renderIssues,overview:renderOverview,compare:renderCompare,dfm:renderDfm,lab:renderLab,control:renderControl,capability:renderCap,sim3d:render3D,cross:renderCross,adv:renderAdv,stats:renderStats,ai:()=>{},report:renderReport,data:()=>{renderSpecTbl();renderZones();renderAperture();renderRuns();if(S.sub==="records")renderRecords(true)}})[k];if(fn)fn()} function renderTabInner(){if(S.duo&&S.duo.active){if(S.tab==="report"||S.duo.leftTab==="report"||S.duo.rightTab==="report"){renderTabByName("report");return}renderTabByName(S.duo.leftTab||S.tab);if(S.duo.rightTab&&S.duo.rightTab!==S.duo.leftTab)renderTabByName(S.duo.rightTab)}else renderTabByName(S.tab)}
+function renderTabByName(k){const fn=({issues:renderIssues,overview:renderOverview,compare:renderCompare,dfm:renderDfm,lab:renderLab,control:renderControl,capability:renderCap,sim3d:render3D,cross:renderCross,adv:renderAdv,stats:renderStats,ai:()=>{},report:renderReport,data:()=>{renderSpecTbl();renderZones();renderAperture();renderRuns();if(S.sub==="records")renderRecords(true);if(S.sub==="ai-cfg")initAiPage()}})[k];if(fn)fn()} function renderTabInner(){if(S.duo&&S.duo.active){if(S.tab==="report"||S.duo.leftTab==="report"||S.duo.rightTab==="report"){renderTabByName("report");return}renderTabByName(S.duo.leftTab||S.tab);if(S.duo.rightTab&&S.duo.rightTab!==S.duo.leftTab)renderTabByName(S.duo.rightTab)}else renderTabByName(S.tab)}
 
 $("#selMetric").onchange=e=>{S.metric=e.target.value;syncControls();recompute()};
 $("#selGroup").onchange=e=>{S.group=e.target.value;recompute()};
@@ -6194,6 +6275,10 @@ function setTab(t, fromHistory = false) {
     const sel = x.dataset.tab === t;
     x.setAttribute("aria-selected", sel);
     x.tabIndex = sel ? 0 : -1;
+  });
+  $$("[data-subnav-tab]").forEach(b => {
+    if (b.dataset.subnavTab === t) b.setAttribute("aria-current", "page");
+    else b.removeAttribute("aria-current");
   });
   syncMobileTabs(t);
   tabIntoView(t);
@@ -7876,7 +7961,7 @@ function askDiscard(msg){return new Promise(ok=>{const m=$("#specConfirmModal");
   m._onClose=()=>{if(!done){done=true;ok(false)}};$("#specConfirmOk").onclick=()=>{done=true;closeModal("specConfirmModal");ok(true)};openModal("specConfirmModal","[data-close]")})}
 /* 套用一個已存檔的料號規格版本（rec 來自資料庫紀錄，spec 為已驗證的規格檔） */
 const partSpecInfo=(rec,spec,groups)=>({id:rec.id,part:rec.part,ver:rec.ver||0,sha:rec.sha256,isDefault:!!rec.isDefault,user:rec.user||"",created:rec.created||0,note:spec.note||"",stencilRef:spec.stencilRef,groups});
-function gotoSpecCard(){const el=$("#partSpecBar");if(el&&el.scrollIntoView){el.closest(".card").scrollIntoView({block:"start"});scrollBy(0,-stickyH()-8)}}
+function gotoSpecCard(){setSub("specs");const el=$("#partSpecBar");if(el&&el.scrollIntoView){el.closest(".card").scrollIntoView({block:"start"});scrollBy(0,-stickyH()-8)}}
 function useSpec(rec,spec){const st=partSpecToState(spec,S.stencil);S.specSrc="part";S.specs=st.specs;S.htol=st.htol;S.specsG=st.specsG;
   S.partSpec=partSpecInfo(rec,spec,st.groups);S.specDraft=null;
   saveRunsSoon();syncControls();recompute()}
@@ -8363,7 +8448,7 @@ $("#btnApply").onclick=async()=>{if(!IMP||!IMP.res)return;const I0=IMP,demo=!!I0
   holdRender(()=>{if(mode==="replace"){const c=curRun();c.rows=rows;c.metrics=runMetrics(metrics,info.heightUnit);c.name=name;c.info=info;c.aoi=null;c.sample=demo;c.cfg=cfg;S.runId=null;switchRun(c.id)}
     else{const id=addRun(name,rows,metrics,cfg,info);if(demo)S.runs.find(r=>r.id===id).sample=true;switchRun(id)}});
   $("#mapBox").hidden=true;IMP=null;IMPORT_FLOW_COMPLETE=true;IMPORT_FLOW_PHASE="";updateImportWorkflow();
-  if(locked){setTab("data");setSub("import");gotoSpecCard();toast(`料號 ${partNo} 尚無料號規格：請確認規格表後按「儲存為新版本」，分析才會開始`)}
+  if(locked){setTab("data");setSub("specs");gotoSpecCard();toast(`料號 ${partNo} 尚無料號規格：請確認規格表後按「儲存為新版本」，分析才會開始`)}
   else{setTab("issues");if(ps)toast(`已套用料號 ${ps.rec.part} 的預設規格 v${ps.rec.ver}`)}})};
 const applyImportHandler=$("#btnApply").onclick;
 $("#btnApply").onclick=async function(event){clearImportValidationError();clearImportFieldErrors();IMPORT_FLOW_PHASE="apply";updateImportWorkflow();try{return await applyImportHandler.call(this,event)}finally{IMPORT_FLOW_PHASE="";const message=$("#parseErr")?.textContent||$("#recNote")?.querySelector(".err")?.textContent||"";if(message)showImportValidationError(message,document.activeElement);updateImportWorkflow()}};
@@ -8565,15 +8650,42 @@ $("#btnExpMd").onclick=()=>{if(needSpec()){const md=reportMd();save("spi-spc-rep
 $("#btnExpBoard").onclick=()=>{if(!needSpec())return;const src=runSrc(curRun()),swo=src&&src.supplierWo?src.supplierWo:"",owo=src&&src.outsourceWo?src.outsourceWo:"";save("board-stats.csv",toCSV([["board","supplier_wo","outsource_wo","n","mean","sd","min","q1","median","q3","max","defect_pads","defect_rate","spec_source"],...S.A.byBoard.map(b=>[b.board,swo,owo,b.n,f(b.mean,3),f(b.sd,3),b.min,f(b.q1,2),f(b.med,2),f(b.q3,2),b.max,b.defects,f(b.p,4),specSrcText()])]))};
 $("#btnExpDef").onclick=()=>needSpec()&&save("defect-pads.csv",toCSV([["board","pad","component","group","volume","height","area","offset_x","offset_y","defects","spec_source"],...S.A.defRows.map(r=>[r.board,r.pad,r.comp,r.group,r.volume,r.height,r.area,r.offx,r.offy,r.codes.map(c=>DEFECTS[c]).join(" / "),specSrcText()])]));
 
+function syncRailTimeUI() {
+  const sum = $("#railTimeSummary");
+  if (sum) {
+    sum.textContent = S.timeFilter ? `${S.timeFilter.start || "起"}~${S.timeFilter.end || "迄"}` : "全部時間";
+  }
+  if (typeof updateRailSummary === "function") updateRailSummary();
+}
+if ($("#btnRailTimeToggle")) {
+  $("#btnRailTimeToggle").onclick = () => {
+    const pop = $("#railTimePopover");
+    if (!pop) return;
+    const open = pop.hidden;
+    pop.hidden = !open;
+    $("#btnRailTimeToggle").setAttribute("aria-expanded", String(open));
+  };
+}
+$$("[data-subnav-tab]").forEach(b => {
+  b.onclick = () => setTab(b.dataset.subnavTab);
+});
+if ($("#btnGoAiCfg")) {
+  $("#btnGoAiCfg").onclick = () => {
+    setTab("data");
+    setSub("ai-cfg");
+  };
+}
 if($("#btnTimeFilter")) $("#btnTimeFilter").onclick = () => {
   const start = $("#inTimeStart") ? $("#inTimeStart").value.trim() : "";
   const end = $("#inTimeEnd") ? $("#inTimeEnd").value.trim() : "";
   applyTimeFilter(start, end);
+  syncRailTimeUI();
 };
 if($("#btnTimeFilterClear")) $("#btnTimeFilterClear").onclick = () => {
   if($("#inTimeStart")) $("#inTimeStart").value = "";
   if($("#inTimeEnd")) $("#inTimeEnd").value = "";
   applyTimeFilter("", "");
+  syncRailTimeUI();
 };
 
 /* ---------- AI ---------- */
@@ -8862,6 +8974,7 @@ function renderAiUsageUI(usageArg,limitsArg,provArg){
   if($("#aiUsageMonthLabel")&&usage&&usage.month)$("#aiUsageMonthLabel").textContent=usage.month;
   if($("#aiDailyUsageText"))$("#aiDailyUsageText").textContent=`${dUsed} / ${dLim} 次 (${dPct}%)`;
   if($("#aiMonthlyUsageText"))$("#aiMonthlyUsageText").textContent=`${tUsed.toLocaleString()} / ${tLim.toLocaleString()} tokens · 預估 $${uUsed.toFixed(2)} / $${uLim.toFixed(2)} USD`;
+  if($("#aiQuickUsage"))$("#aiQuickUsage").textContent=`今日 ${dUsed} / ${dLim} 次 (${dPct}%) · 本月 $${uUsed.toFixed(2)} / $${uLim.toFixed(2)} USD`;
   const barCol=p=>p>=100?"var(--ng)":p>=80?"var(--warn)":"var(--ok)";
   if($("#aiDailyBar")){$("#aiDailyBar").style.width=dPct+"%";$("#aiDailyBar").style.background=barCol(dPct)}
   if($("#aiMonthlyBar")){$("#aiMonthlyBar").style.width=mPct+"%";$("#aiMonthlyBar").style.background=barCol(mPct)}
@@ -8883,10 +8996,13 @@ function updateAiStatusLabels(cfgArg){
   const effModel=effectiveModelOf(pCfg,act);
   const effLabel=AI_EFFORT_LABELS[pCfg.effort]||"高";
   if($("#aiProviderLabel"))$("#aiProviderLabel").textContent=meta.label;
+  if($("#aiQuickProv"))$("#aiQuickProv").textContent=meta.label;
   if($("#aiModelProvName"))$("#aiModelProvName").textContent=meta.label;
   if($("#aiLimitProvTitle"))$("#aiLimitProvTitle").textContent=meta.label+" 獨立配額上限：";
   if($("#aiModelLabel"))$("#aiModelLabel").textContent=effModel;
+  if($("#aiQuickModel"))$("#aiQuickModel").textContent=effModel;
   if($("#aiEffortLabel"))$("#aiEffortLabel").textContent=effLabel;
+  if($("#aiQuickEffort"))$("#aiQuickEffort").textContent=effLabel;
   if($("#aiPriceLabel"))$("#aiPriceLabel").textContent=aiPricingLabel(act,effModel);
   if($("#aiCardSub"))$("#aiCardSub").textContent=`${meta.label} ${effModel}（推理強度：${effLabel}） · 將目前全部統計結果與交叉驗證送出，嚴格區分事實與推論`;
   const noticePath=$("#aiNoticeServicePath");
@@ -11803,7 +11919,9 @@ function updateRailSummary(){
   const basis=groupBasisLabel(currentGroupBasis()),basisText=`分組依據：${basis}`;
   const basisNote=$("#groupBasisNote");if(basisNote)basisNote.textContent=basisText;
   const inferredText=(S.boardInferred||(S.rows&&S.rows.some(r=>r.boardInferred)))?` · 板號為推定（每 ${S.boardInferred||Math.round(S.rows.length/((S.A&&S.A.boards&&S.A.boards.length)||1))} 筆）`:"";
-  chip.textContent=`${runText} · ${metricText} · ${grpText} · ${basisText}${inferredText} ▾`;
+  const timeText=S.timeFilter?` · 時段 ${S.timeFilter.start||"起"}~${S.timeFilter.end||"迄"}`:"";
+  const sumEl=$("#railTimeSummary");if(sumEl)sumEl.textContent=S.timeFilter?`${S.timeFilter.start||"起"}~${S.timeFilter.end||"迄"}`:"全部時間";
+  chip.textContent=`${runText} · ${metricText} · ${grpText} · ${basisText}${timeText}${inferredText} ▾`;
 }
 function setupModalSheet(sheetId,triggerId,closeId,backdropId){
   const sheet=$(sheetId),trig=$(triggerId),cls=$(closeId),bd=$(backdropId);
