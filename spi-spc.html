@@ -889,7 +889,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.14.2</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.14.3</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
@@ -4468,7 +4468,7 @@ function detectIssues(st,onStage){
     if(a.p<.01&&(!isFinite(sp)||rng>=sp*.04)){const om=mean(bm.map(x=>x.m));figAdj[k]={};figs.forEach((fg,i)=>{const v=bm.filter(x=>x.fg===fg).map(x=>x.m);if(v.length)figAdj[k][fg]=mean(v)-om});const lo=figs[fm.indexOf(Math.min(...fm))],hi=figs[fm.indexOf(Math.max(...fm))];
       add({lv:"warn",cat:"子板位置",sig:{t:"fig",k},title:`${lab(k)}有拼板子板位置效應（子板 ${lo} 最低、${hi} 最高）`,ents:["s:figure"],score:2.5+rng/(sp||rng)*5,
         rule_id:"子板 ANOVA p<0.01",rule_name:"單因子變異數分析（子板間差 ≥ 4% 規格寬且 p<0.01）",metric:lab(k),
-        boards:"全部板",subboard:figs.map(x=>"子板 "+x).join("; "),group:groups.join("; "),refdes:"全部元件",pads:`全部焊墊（${nPads} 個）`,
+        boards:"全部板",subboard:figs.map(x=>"子板 "+x).join("; "),group:topList(groups,10),refdes:"全部元件",pads:`全部焊墊（${nPads} 個）`,
         observed:`子板平均差 ${f(rng,1)} ${u(k)}（子板 ${lo} ${f(Math.min(...fm),1)} vs 子板 ${hi} ${f(Math.max(...fm),1)} ${u(k)}）`,
         limit:spObj?`規格 ${f(spObj.lsl,0)}–${f(spObj.usl,0)} ${u(k)}（差門檻 ≥ ${f(sp*.04,1)} ${u(k)}）`:"p < 0.01",
         z:`F = ${f(a.F,2)}`,p:a.p<.001?"< 0.001":f(a.p,4),
@@ -4506,7 +4506,7 @@ function detectIssues(st,onStage){
     for(const c of cpkHits)evidence.push(`群組 ${c.g} 的 Cpk = ${f(c.cpk)}（|Cpk| > 50；n = ${c.n}，組內 σ = ${f(c.sw,2)} ${u(k)}）`);
     add({lv:"warn",cat:"規格設定",sig:{t:"unit",k},title:`疑似單位不符（${centerHit?"規格中心距資料平均 >10σ":"|Cpk|>50"}）`,ents:[`s:${k}`],score:5,
       rule_id:"M-03 單位不符",rule_name:"規格中心距資料平均 >10σ 或 |Cpk|>50",metric:lab(k),
-      boards:"全部板",subboard:subOf(R),group:groups.join("; "),refdes:"全部元件",pads:`全部焊墊（${nPads} 個）`,
+      boards:"全部板",subboard:subOf(R),group:topList(groups,10),refdes:"全部元件",pads:`全部焊墊（${nPads} 個）`,
       observed:`平均 ${f(kMu,1)} ${u(k)}${cpkWitness?`；群組 ${cpkWitness.g} Cpk ${f(cpkWitness.cpk)}`:""}`,
       limit:`規格 ${f(s.lsl,1)}–${f(s.usl,1)} ${u(k)}（中心距資料平均 >10σ 或 |Cpk|>50 觸發）`,
       z:`${isFinite(zDiff)?f(zDiff,1)+"σ":"σ=0"}${cpkWitness?`；${cpkWitness.g} |Cpk|=${f(Math.abs(cpkWitness.cpk))}`:""}`,p:"不適用（非機率檢定）",
@@ -4608,15 +4608,16 @@ function detectIssues(st,onStage){
     }).filter(p=>p&&isFinite(p.cpk));
     if(P.length<2)continue;const mc=med(P.map(p=>p.cpk));
     if(mc<1){
+      const mcFmt=mc>=0.995&&mc<1?f(mc,3):f(mc);
       const worstP=[...P].sort((a,b)=>a.cpk-b.cpk),cc=capCells.find(c=>c.k===k&&c.g===g),nB=P[0]?P[0].n:nb;
       const limStr=`規格 ${f(sp.lsl,0)}–${f(sp.usl,0)} ${u(k)}${k==="hpct"&&st.step&&st.step.on?"（依區域厚度）":""}`;
-      const padDetails=worstP.slice(0,10).map(p=>`${p.pad}（中位數 ${f(p.m,1)} ${u(k)}，穩健 Cpk ${f(p.cpk)}）`).join("、")+(worstP.length>10?` 等另 ${worstP.length-10} 個`:"");
+      const padDetails=worstP.slice(0,10).map(p=>`${p.pad}（中位數 ${f(p.m,1)} ${u(k)}，穩健 Cpk ${p.cpk>=0.995&&p.cpk<1?f(p.cpk,3):f(p.cpk)}）`).join("、")+(worstP.length>10?` 等另 ${worstP.length-10} 個`:"");
       const capCmp=cc?`能力頁 Cpk（板×群組合併 σ）${f(cc.cpk)}（n = ${cc.n}；前者先對每個焊墊位置跨板取中位數與 MAD 再取中位數以排除單板突發與位置間設計差，後者以板×群組組內合併標準差衡量群組整體能力）`:`能力頁 Cpk（板×群組合併 σ）不適用（n < 10）`;
-      add({lv:mc<.67?"ng":"warn",cat:"系統性能力",sig:{t:"sys",g,k,lowSide:med(P.map(p=>p.m))<sp.tgt},title:`${g} ${lab(k)}焊墊位置穩健 Cpk（中位數）${f(mc)}`,ents:["g:"+g],score:2+(1-mc)*4,
+      add({lv:mc<.67?"ng":"warn",cat:"系統性能力",sig:{t:"sys",g,k,lowSide:med(P.map(p=>p.m))<sp.tgt},title:`${g} ${lab(k)}焊墊位置穩健 Cpk（中位數）${mcFmt}`,ents:["g:"+g],score:2+(1-mc)*4,
         rule_id:"焊墊位置穩健 Cpk<1.00",rule_name:`每個焊墊位置跨 ${nB} 板：min(USL−中位數, 中位數−LSL)/(3×1.4826×MAD)，${P.length} 個焊墊位置取中位數 < 1.00`,metric:lab(k),
         boards:"全部板",subboard:subOf(gIdx[g]||[]),group:g,refdes:refOf(worstP.map(p=>p.r)),
         pads:topList(worstP.map(p=>p.pad),10),
-        observed:`焊墊位置穩健 Cpk（中位數）${f(mc)}；群組中位數 ${f(med(P.map(p=>p.m)),1)} ${u(k)}`,
+        observed:`焊墊位置穩健 Cpk（中位數）${mcFmt}；群組中位數 ${f(med(P.map(p=>p.m)),1)} ${u(k)}`,
         limit:limStr,z:`等效 ${f(3*mc,2)}σ`,p:"不適用（能力指標）",
         facts:[
           `全部板（${nb} 片）：${P.length} 個焊墊位置中 ${P.filter(p=>p.cpk<1).length} 個焊墊位置穩健 Cpk < 1.00；最差位置：${padDetails}`,
@@ -4650,7 +4651,7 @@ function detectIssues(st,onStage){
     const bRange=fmtBoards(Array.from({length:nb-s0},(_,i)=>s0+i)),cPeak=Math.max(...(dir>0?cps:cms).slice(s0));
     add({lv:Math.abs(d)>=(spanOf(k)||1e9)*.08||(t&&t.p<.001)?"ng":"warn",cat:"趨勢漂移",sig:{t:"drift",k,dir,b:boards[s0],s0},title:`${lab(k)}自 ${boards[s0]} 起持續${dir>0?"上升":"下降"}`,ents:["drift:"+boards[s0]],score:3+Math.abs(d)/sB*.3,
       rule_id:"CUSUM h=5",rule_name:"表格式 CUSUM（k=0.5σ, h=5σ）越界且前後段 Welch t p<0.01",metric:lab(k),
-      boards:bRange,subboard:subOf(R),group:groups.join("; "),refdes:"全部元件",pads:`全部焊墊（${nPads} 個）`,
+      boards:bRange,subboard:subOf(R),group:topList(groups,10),refdes:"全部元件",pads:`全部焊墊（${nPads} 個）`,
       observed:`${boards[s0]} 起平均 ${f(mean(after),1)} vs 之前 ${f(mean(before),1)} ${u(k)}（差 ${sgn(d)}${f(d,1)}）`,
       limit:`CUSUM 決策界限 h = 5.00σ（σ̂ = ${f(sB,2)} ${u(k)}）`,
       z:`CUSUM 峰值 ${f(cPeak,2)}σ（平均位移 ${sgn(d/sB)}${f(d/sB,2)}σ）`,p:t?(t.p<.001?"< 0.001":f(t.p,4)):"不適用",
@@ -4679,8 +4680,8 @@ function detectIssues(st,onStage){
         ents:offenders.map(o=>"p:"+o.pad),score:3.8+Math.min(2,offenders.length*0.2),
         rule_id:"跨板重複不良焊墊（M-09）",rule_name:"同一焊墊在 ≥ 3 片板發生不良（依規格判定）",metric:"全部量測項目",
         boards:allOffBoards.join("; "),subboard:"全部子板",
-        group:[...new Set(offenders.map(o=>o.group))].join("; "),
-        refdes:[...new Set(offenders.map(o=>o.refdes).filter(Boolean))].join("; "),
+        group:topList([...new Set(offenders.map(o=>o.group))],10),
+        refdes:topList([...new Set(offenders.map(o=>o.refdes).filter(Boolean))],10),
         pads:topList(offenders.map(o=>o.pad),10),
         observed:`${offenders.length} 個焊墊於 ≥ 3 片板出現不良（最嚴重：${topOffStr}）`,
         limit:"同一焊墊不良板數 < 3",z:"不適用",p:"不適用",
@@ -4728,13 +4729,13 @@ function detectIssues(st,onStage){
       const rowFacts=ks.slice(0,10).map(c=>`${lab(k)}｜${c.r.board}｜${c.g}｜${c.r.pad}｜${c.cmpStr}｜z = ${f(c.z,2)}（${c.lv==="ng"?"嚴重":"警示"}）`);
       if(ks.length>10)rowFacts.push(`另 ${ks.length-10} 筆極端焊墊（共 ${ks.length} 筆）`);
       if(faNote)rowFacts.push(faNote);
-      const pVals=[...cellP.values()];
-      const pStr=pVals.length?pVals.map(x=>`Poisson p=${x.pv<.0001?x.pv.toExponential(2):f(x.pv,4)}（λ=${x.lam<.001?x.lam.toExponential(2):f(x.lam,4)}, k=${x.k}, 門檻 ${thr<.0001?thr.toExponential(2):f(thr,4)}）`).join("; "):"不適用（僅 |z|≥5 候選）";
+      const pVals=[...cellP.entries()].map(([g,x])=>({g,...x})).sort((a,b)=>a.pv-b.pv);
+      const pStr=pVals.length?topList(pVals.map(x=>`${x.g}: Poisson p=${x.pv<.0001?x.pv.toExponential(2):f(x.pv,4)}（λ=${x.lam<.001?x.lam.toExponential(2):f(x.lam,4)}, k=${x.k}, 門檻 ${thr<.0001?thr.toExponential(2):f(thr,4)}）`),10):"不適用（僅 |z|≥5 候選）";
       add({lv:cardLv,cat:"孤立極端焊墊",sig:{t:"iso",k,boards:bIdxs.map(i=>boards[i]),pads:ks.map(c=>c.r.pad),rows:ks},
         title:`${lab(k)}有 ${ks.length} 處孤立極端焊墊（${ks.slice(0,3).map(c=>`${c.r.board}/${c.r.pad}`).join("、")}${ks.length>3?"…":""}）`,
         ents:[...new Set(ents)],score:zmax+ks.length*.2,
         rule_id:"孤立極端焊墊（D-30）",rule_name:"超規或群組內穩健 |z|≥5 且達最小效果量（排除板級、系統性、焊墊位置與同向趨勢後）",metric:lab(k),
-        boards:bStr,subboard:subOf(ks.map(c=>c.r)),group:gList.join("; "),refdes:refOf(ks.map(c=>c.r)),
+        boards:bStr,subboard:subOf(ks.map(c=>c.r)),group:topList(gList,10),refdes:refOf(ks.map(c=>c.r)),
         pads:topList(ks.map(c=>c.r.pad),10),
         observed:topList(ks.map(c=>`${f(c.x,1)}`),10),
         limit:topList(ks.map(c=>c.limStr),10),
@@ -4812,7 +4813,7 @@ function detectIssues(st,onStage){
       const mx=mean(xs),my=mean(ys);let sxy=0,sxx=0;xs.forEach((x,i)=>{sxy+=(x-mx)*(ys[i]-my);sxx+=(x-mx)**2});const sl=sxy/sxx,rg=Math.max(...xs)-Math.min(...xs);
       add({lv:"warn",cat:"空間分布",sig:{t:"grad",k,ax,sl,along:ax===(st.sqDir==="X"?"x":"y")},title:`${lab(k)}沿 ${ax.toUpperCase()} 方向有梯度（${ax==="x"?(sl<0?"左高右低":"左低右高"):(sl<0?"下高上低":"下低上高")}）`,ents:["s:"+ax],score:2+Math.abs(r)*2,
         rule_id:"空間偏相關 |r|≥0.30 且 p<0.001",rule_name:"扣除元件群組平均後焊墊殘差與座標之 Pearson 相關檢定（自由度 N−群組數−1）",metric:lab(k),
-        boards:"全部板",subboard:subOf(R),group:groups.join("; "),refdes:"全部元件",pads:`全部焊墊（${P.length} 個真實座標位置）`,
+        boards:"全部板",subboard:subOf(R),group:topList(groups,10),refdes:"全部元件",pads:`全部焊墊（${P.length} 個真實座標位置）`,
         observed:`斜率 ${sgn(sl)}${f(sl,3)} ${u(k)}/mm（跨距 ${f(rg,0)} mm 約變化 ${f(Math.abs(sl*rg),1)} ${u(k)}）`,
         limit:"|r| ≥ 0.30 且 p < 0.001",z:`r = ${f(r,2)}（t = ${f(tt,2)}，df = ${df}）`,p:p<.001?"< 0.001":f(p,4),
         facts:[`扣除 ${Object.keys(gm).length} 個元件群組效果後（全部板／全部焊墊），${lab(k)}與 ${ax.toUpperCase()} 座標相關 r = ${f(r,2)}（t = ${f(tt,2)}，df = ${df}，p ${p<.001?"< 0.001":"= "+f(p,3)}，門檻 |r| ≥ 0.30）`,`板面 ${f(rg,0)} mm 範圍內變化約 ${f(Math.abs(sl*rg),1)} ${u(k)}`],
@@ -4831,13 +4832,13 @@ function detectIssues(st,onStage){
       const title=`${lab(k)}在${SK.label[0]}／${SK.label[1]}行程有差異${SK.fromField?"":"（方向為推定）"}`;
       add({lv,cat:"刮刀方向",sig:{t:"stroke",k,d:t.ma-t.mb,fromField:SK.fromField},title,ents:["s:stroke"],score:1.5+(pCal<.01?1:0),
         rule_id:"刮刀方向檢定（D-64 迴歸校準）",rule_name:`${nb} 片板平均扣除趨勢後 ${SK.label[0]} ${n0} 片 vs ${SK.label[1]} ${n1} 片（OLS 二次趨勢＋奇偶指標校準）`,metric:lab(k),
-        boards:"全部板",subboard:subOf(R),group:groups.join("; "),refdes:"全部元件",pads:`全部焊墊（${nPads} 個）`,
+        boards:"全部板",subboard:subOf(R),group:topList(groups,10),refdes:"全部元件",pads:`全部焊墊（${nPads} 個）`,
         observed:`${SK.label[0]}比${SK.label[1]}${t.ma-t.mb>0?"高":"低"} ${f(Math.abs(t.ma-t.mb),2)} ${u(k)}`,
         limit:`校準後 p < ${f(aB,5)}（M=${mShape.length} 項目門檻）`,
         z:`Welch t = ${f(t.t,2)}；迴歸 t = ${calS&&isFinite(calS.t)?f(-calS.t,2):"—"}`,   // strokeCalP 以 cls=1 為指標，取負號使方向與 Welch（cls0 − cls1）一致
         p:`名目 p = ${f(t.p,4)}；校正後 p = ${f(pCal,4)}`,
         facts:[
-          `${nb} 片板的板平均（全部焊墊），扣除 4 片移動平均趨勢後，${SK.label[0]} ${n0} 片 vs ${SK.label[1]} ${n1} 片，Welch t：${SK.label[0]}比${SK.label[1]}${t.ma-t.mb>0?"高":"低"} ${f(Math.abs(t.ma-t.mb),2)} ${u(k)}（名目 p = ${f(t.p,4)}，校正後 p = ${f(pCal,4)}，門檻 aB = ${f(aB,4)}）`,
+          `${nb} 片板的板平均（全部焊墊），扣除 4 片移動平均趨勢後，${SK.label[0]} ${n0} 片 vs ${SK.label[1]} ${n1} 片，Welch t：${SK.label[0]}比${SK.label[1]}${t.ma-t.mb>0?"高":"低"} ${f(Math.abs(t.ma-t.mb),2)} ${u(k)}（名目 p = ${f(t.p,4)}，校正後 p = ${f(pCal,4)}，Bonferroni 門檻 α = ${f(aB,4)}）`,
           SK.fromField?"行程方向取自資料欄位":"資料沒有刮刀方向欄，依板序奇偶推定；請在匯入時對應方向欄或在規格設定指定印刷方式"
         ],
         cause:"前後刮刀壓力、角度或磨耗不一致",conf:SK.fromField?"中":"低",action:ACT.stroke,ev:evBars(`刮刀方向平均${lab(k)}`,SK.label,[mean(bm.filter((_,i)=>SK.cls[i]===0)),mean(bm.filter((_,i)=>SK.cls[i]===1))],[],u(k)),go:{tab:"adv",metric:k,group:"ALL"}})}
@@ -4845,7 +4846,7 @@ function detectIssues(st,onStage){
     const pWipe=wipeCalP(bm,N);if(!(isFinite(pWipe)&&pWipe<aB))continue;
     add({lv:pWipe<aB/5?"warn":"info",cat:"擦拭週期",sig:{t:"wipe",k,sl,ph},title:`${lab(k)}隨擦拭後片數${sl>0?"上升":"下降"}（每 ${N} 片擦拭）`,ents:["s:wipe"],score:1.5+(pWipe<.01?1:0),
       rule_id:"擦拭週期檢定（D-64 自助法校準）",rule_name:`板平均縮尾去趨勢後對 ${N} 個擦拭起點取最大 |r|（參數式自助法 B=${CAL_B} 校準）`,metric:lab(k),
-      boards:"全部板",subboard:subOf(R),group:groups.join("; "),refdes:"全部元件",pads:`全部焊墊（${nPads} 個）`,
+      boards:"全部板",subboard:subOf(R),group:topList(groups,10),refdes:"全部元件",pads:`全部焊墊（${nPads} 個）`,
       observed:`每多印 1 片變化 ${sgn(sl)}${f(sl,2)} ${u(k)}（r = ${f(r,2)}）`,
       limit:`校準後 p < ${f(aB,5)}（每 ${N} 片週期）`,
       z:`r = ${f(r,2)}`,p:`名目 p = ${f(p0!=null?p0:pBonf/N,4)}；校正後 p = ${f(pWipe,4)}`,
@@ -4858,7 +4859,7 @@ function detectIssues(st,onStage){
     const maxV=Math.max(...arr.map(x=>vf(x.a))),spOx=st.specs.offx,spStr=spOx?`（偏移規格 ±${f(spOx.usl,0)} µm）`:"";
     add({lv:arr.length>1||arr.some(x=>dOf(x.b))?"ng":"warn",cat:"對位",sig:{t:"align",ty,bs:arr.map(x=>x.b)},title,ents:arr.map(x=>"b:"+x.b),score:2.5+arr.length*.3,
       rule_id:rId,rule_name:rName,metric:"X 偏移; Y 偏移",
-      boards:bStr,subboard:subOf(aRs),group:groups.join("; "),refdes:"全部元件",pads:`全部焊墊（${nPads} 個）`,
+      boards:bStr,subboard:subOf(aRs),group:topList(groups,10),refdes:"全部元件",pads:`全部焊墊（${nPads} 個）`,
       observed:topList(arr.map(fact),6),limit:limTxt+spStr,z:`最大 ${f(maxV,1)} µm`,p:"不適用（最小平方法幾何擬合）",
       facts:arr.slice(0,6).map(x=>`${fact(x)}（界限：${limTxt}，全部焊墊）`),cause,conf:"中",action:actTxt,
       ev:evSeries("offx",null,arr.map(x=>x.b),vt,boards.map(b=>{const a=al.find(x=>x.b===b);return a?vf(a.a):NaN})),go:{tab:"adv",board:arr[0].b}})};
@@ -4877,7 +4878,7 @@ function detectIssues(st,onStage){
     if(!geo){if(isFinite(te)&&te<vt*.9)add({lv:"warn",cat:"設計 DFM",sig:{t:"lowte",g,ar,te},title:`${g} 轉移效率偏低（${f(te,1)}%，焊墊尺寸未知，面積比無法判定）`,ents:["g:"+g],score:2.5,
       rule_id:"轉移效率 <90% 目標",rule_name:"群組平均體積轉移效率 < 0.90 × 目標值（缺焊墊尺寸，未判定面積比）",metric:"體積",
       boards:"全部板",subboard:subOf(rsAll),group:g,refdes:refOf(rsAll),pads:topList(rsAll.map(r=>r.pad),10),
-      observed:`平均轉移效率 ${f(te,1)}%（面積比：VERIFY，缺焊墊尺寸）`,limit:`目標 ${vt}%（門檻 ≥ ${f(vt*.9,1)}%）`,z:"不適用（群組平均效率）",p:"不適用（群組平均效率）",
+      observed:`平均轉移效率 ${f(te,1)}%（面積比：${PENDING_VERIFY_LABEL}，缺焊墊尺寸）`,limit:`目標 ${vt}%（門檻 ≥ ${f(vt*.9,1)}%）`,z:"不適用（群組平均效率）",p:"不適用（群組平均效率）",
       facts:[`全部板（${g} 焊墊 ${rsAll.slice(0,5).map(r=>r.pad).join("、")}${rsAll.length>5?` 等 ${rsAll.length} 個`:""}）：平均轉移效率 ${f(te,1)}%（目標 ${vt}%，門檻 ${f(vt*.9,1)}%）`,`資料沒有焊墊／開孔尺寸，面積比與最大可用厚度無法計算；請在「設計」頁填寫指定 L × W 後再判讀，目前鋼板 ${thk} µm`],
       cause:"面積比未知，無法區分開孔幾何（面積比不足）或非幾何因素（孔壁粗糙、錫膏粒徑、開孔殘留）",conf:"低",action:ACT.lowte,go:{tab:"dfm",group:"ALL",metric:"volume"}});
       continue}
@@ -4903,7 +4904,7 @@ function detectIssues(st,onStage){
       const top5Txt=top5.map(d=>`${d.r.board}/${d.r.pad}（實測 ${f(d.r.volume,1)}% vs 預測 ${f(d.pr,1)}%，比值 ${f(d.rt,2)}）`).join("、");
       add({lv:"warn",cat:"量測",sig:{t:"msa",r},title:`體積與高度×面積不一致（組內 r = ${f(r,2)}）`,ents:["s:msa"],score:3,
         rule_id:"量測一致性組內 r<0.75",rule_name:"體積與（高度×面積÷鋼板厚度）扣除元件群組平均後之相關係數 r < 0.75",metric:"體積; 高度%厚; 面積",
-        boards:"全部板",subboard:subOf(R),group:groups.join("; "),refdes:refOf(top5.map(d=>d.r)),
+        boards:"全部板",subboard:subOf(R),group:topList(groups,10),refdes:refOf(top5.map(d=>d.r)),
         pads:`全部焊墊（偏離最大：${top5.map(d=>d.r.pad).join("; ")}）`,
         observed:`組內相關 r = ${f(r,3)}（未扣除群組 r = ${f(MC.r,3)}）；體積÷預測值中位數 ${f(MC.med,3)}`,
         limit:"組內相關 r ≥ 0.75（理論比值 ≈ 1.00）",z:`r = ${f(r,3)}`,p:"不適用（相關門檻檢定）",
@@ -5663,8 +5664,8 @@ function fmKbDetailsHtml(ruleIds){
 function issuesMd(F, st){
   if(!F)F=(st&&st.F)||S.F||[];
   if(!st)st=S;
-  const ver=typeof APP!=="undefined"?APP.ver:"";
-  const built=typeof APP!=="undefined"?APP.built:"";
+  const ver=typeof document!=="undefined"?(($("#appVer")||{}).textContent||""):(typeof APP!=="undefined"?APP.ver:"");
+  const built=typeof document!=="undefined"?(($("#appBuilt")||{}).textContent||""):(typeof APP!=="undefined"?APP.built:"");
   const src=st.source||"";
   const sten=st.stencil||"";
   const stepOn=st.step&&st.step.on;
@@ -6331,8 +6332,8 @@ function renderControl(){
   $("#ctrlTitle").textContent=t[0]+` · ${METRICS[S.metric].label}`;$("#ctrl2Title").textContent=t[1];$("#ctrl2Card").hidden=!t[1];
   const cl=c==="imr"?A.imr.cl:c==="p"?A.pc.cl*100:c==="xbarr"?(A.xr&&A.xr.cl):A.xs.cl;
   const ewOut=A.ewma.filter(p=>p.v>p.ucl||p.v<p.lcl).map(p=>p.lab),cuOut=A.cusum.pts.filter(p=>p.cp>A.cusum.h||p.cm>A.cusum.h).map(p=>p.lab),cuStart=A.cusum.pts.findIndex(p=>p.cp>A.cusum.h||p.cm>A.cusum.h);
-  const warnText = A.xs.subgroupWarning ? ` · <span class="note">${A.xs.subgroupWarning}</span>` : "";
-  const rejText = A.xs.reason ? ` · <span class="pill warn">${A.xs.reason}</span>` : "";
+  const warnText = A.xs.subgroupWarning ? " · " + A.xs.subgroupWarning : "";
+  const rejText = A.xs.reason ? " · " + A.xs.reason : "";
   const sBStr = `σ̂(板平均) ${f(A.xs.sB,3)} ${u}（＝板平均 MR̄ ${f(A.xs.sB*1.128,3)} ÷ 1.128，三向法）`;
   $("#ctrlSub").textContent=c==="p"?`P' 圖（Laney）p̄ = ${f(cl,2)} %，σz = ${f(A.pc.sigZ,2)}${A.pc.sigZ>1?"（板間變異大於二項式，界限已放寬）":A.pc.sigZ<1?"（σz < 1：板間變異小於二項式預期，界限已收窄）":""}`
     :c==="ewma"?`CL ${f(A.gMean,2)} ${u} · ${sBStr} · 越界 ${ewOut.length?ewOut.join("、"):"無"}${A.ewma.subgroupWarning?" · "+A.ewma.subgroupWarning:""}${A.ewma.reason?" · "+A.ewma.reason:""}`
