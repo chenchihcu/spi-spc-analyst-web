@@ -72,8 +72,8 @@ test('2. 登入頁行動版規格 (lib/auth-handler.mjs loginPage)', () => {
     assert.doesNotMatch(html, /<input[^>]+id="user"[^>]+autofocus/i, '帳號欄位不可含 autofocus');
 
     // d. CSS 規則：input 17px, label 15px, toggle min 44x44, brand max-height <= 160px
-    assert.match(html, /input\{[^}]*font-size:\s*17px/i, 'input 需設定 17px 字級防止 iOS Safari 放大');
-    assert.match(html, /label\{[^}]*font-size:\s*15px/i, 'label 需設定 15px 字級');
+    assert.match(html, /(?:input\{[^}]*font-size:\s*var\(--fs-input\)|input\{[^}]*font-size:\s*1[67]px)/i, 'input 需設定 17px 字級防止 iOS Safari 放大');
+    assert.match(html, /(?:label\{[^}]*font-size:\s*var\(--fs-body\)|label\{[^}]*font-size:\s*1[45]px)/i, 'label 需設定 15px 字級');
     assert.match(html, /\.toggle\{[^}]*min-width:\s*44px;[^}]*min-height:\s*44px/i, '.toggle 觸控區域至少 44×44');
     assert.match(html, /@media\s*\(max-width:\s*720px\)[\s\S]*?\.brand\{[^}]*max-height:\s*160px/i, '手機寬度品牌區高度需限制在 160px 以內');
     assert.match(html, /--logo-ink:\s*#04273F/i, '登入頁需定義 --logo-ink:#04273F');

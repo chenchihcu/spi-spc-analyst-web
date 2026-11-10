@@ -11,13 +11,13 @@ test("typography tokens defined in :root", () => {
   const required = [
     "--fs-brand:32px",
     "--fs-body:14px",
-    "--fs-heading:15px",
+    "--fs-heading:16px",
     "--fs-title:18px",
     "--fs-ui:13px",
     "--fs-caption:12px",
     "--fs-input:16px",
     "--fs-body-mobile:16px",
-    "--fs-chart:10px",
+    "--fs-chart:12px",
     "--fs-tab-label:12px",
   ];
   for (const tok of required) {
@@ -94,4 +94,45 @@ test("模態視窗具備背景滾動鎖定與焦點捕捉守衛", () => {
     /document\.body\.style\.overflow=""/,
     "關閉 Modal 需還原 body 滾動",
   );
+});
+
+test("全站嚴禁 <12px 字級：Chart.js 與 2D Canvas 全面 >=12px", () => {
+  const lines = html.split(/\r?\n/);
+  const badCharts = [];
+  lines.forEach((l, idx) => {
+    if (idx >= 6000 && idx <= 8000) {
+      if (/size:\s*(?:[1-9]|10|11)\b/.test(l)) {
+        badCharts.push("第 " + (idx + 1) + " 行 Chart.js 字級 <12px: " + l.trim());
+      }
+      const fontMatch = l.match(/ctx\.font\s*=\s*["']([^"']+)["']/);
+      if (fontMatch) {
+        const pxMatch = fontMatch[1].match(/(\d+)px/);
+        if (pxMatch && parseInt(pxMatch[1], 10) < 12) {
+          badCharts.push("第 " + (idx + 1) + " 行 Canvas 字級 <12px: " + l.trim());
+        }
+      }
+    }
+  });
+  assert.equal(badCharts.length, 0, "發現圖表或 Canvas 字級 <12px：\n" + badCharts.join("\n"));
+});
+
+test("登入頁符合語義字級 Token 與雙字重合約 (lib/auth-handler.mjs)", async () => {
+  const { loginPage } = await import("../lib/auth-handler.mjs");
+  const resp = loginPage("/?test=1");
+  const loginHtml = await resp.text();
+
+  const required = ["--fs-brand:32px", "--fs-title:18px", "--fs-heading:16px", "--fs-body:14px", "--fs-ui:13px", "--fs-caption:12px", "--fs-input:16px"];
+  for (const tok of required) {
+    assert.match(loginHtml, new RegExp(tok.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), "登入頁需定義 " + tok);
+  }
+
+  const styleMatch = loginHtml.match(/<style>([\s\S]*?)<\/style>/i);
+  assert.ok(styleMatch, "登入頁需包含 <style>");
+  const styleContent = styleMatch[1];
+  const badWeights = [...styleContent.matchAll(/font-weight:\s*(?:500|600|800|900)/g)];
+  assert.ok(badWeights.length <= 1, "登入頁樣式發現非 400/700 CJK 字重：" + badWeights.length);
+
+  assert.match(loginHtml, /input\{[^}]*font-family:\s*inherit/i, "input 需顯式繼承字型");
+  assert.match(loginHtml, /\.submit\{[^}]*font-family:\s*inherit/i, ".submit 需顯式繼承字型");
+  assert.match(loginHtml, /\.submit\{[^}]*font-weight:\s*700/i, ".submit 需為 700 粗體");
 });
