@@ -45,7 +45,7 @@
   --c-hairline:rgba(24,32,27,.10);
   --tbl-sticky-shadow:2px 0 5px rgba(24,32,27,.08);
   --fs-brand:32px;--fs-brand-narrow:28px;--fs-kpi:30px;--fs-title:18px;--fs-heading:15px;--fs-body:14px;--fs-ui:13px;--fs-caption:12px;--fs-icon:18px;--fs-chart:10px;
-  --fs-input:16px;--fs-body-mobile:16px;--fs-nav-title:17px;--fs-rail:15px;--fs-label-mobile:13px;--fs-tab-label:11px;--fs-issue-title-mobile:16px;
+  --fs-input:16px;--fs-body-mobile:16px;--fs-nav-title:17px;--fs-rail:15px;--fs-label-mobile:13px;--fs-tab-label:12px;--fs-issue-title-mobile:16px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0F1311;--surface:#171C19;--surface2:#212923;--ink:#E4E9E4;--muted:#98A39B;--line:#2D3731;
@@ -73,7 +73,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-
 .brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .mitcorp-logo{display:block;height:26px;width:auto;color:var(--logo-ink);flex-shrink:0}
 .brand-sep{width:1px;height:22px;background:var(--line);flex-shrink:0}
-.brand h1{font-family:var(--f-display);font-size:var(--fs-brand);font-weight:600;letter-spacing:.02em;line-height:1}
+.brand h1{font-family:var(--f-display);font-size:var(--fs-brand);font-weight:700;letter-spacing:.02em;line-height:1}
 .brand .tag{font-size:var(--fs-caption);color:var(--muted);letter-spacing:.08em}
 .chipBtn{border:none;min-height:0;cursor:pointer;font:inherit;font-size:var(--fs-caption);color:var(--ink)}.chipBtn:hover{background:var(--line)}
 /* hidden 屬性一律隱藏：避免 .panel{display:grid} 等規則蓋過瀏覽器預設，導致未選取的頁籤也顯示 */
@@ -99,7 +99,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-
 }
 /* ---------- v9.7 瀏覽體驗：精簡頁首、可收合卡片、本頁目錄、回到頂端 ---------- */
 .brand .ver{font-size:var(--fs-caption);color:var(--muted);white-space:nowrap}
-.brand .ver b{font-weight:500;color:var(--ink)}
+.brand .ver b{font-weight:700;color:var(--ink)}
 .toprow{gap:8px}
 .menuwrap{position:relative}
 .menu{position:absolute;right:0;top:calc(100% + 6px);z-index:30;min-width:200px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.14);padding:6px;display:grid;gap:2px}
@@ -126,7 +126,7 @@ details.iss-card>summary:hover{background:var(--surface2)}
 details.iss-card>summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .iss-sum-l{display:flex;gap:6px;align-items:center;white-space:nowrap;min-width:92px}
 .iss-sum-t{min-width:0}
-.iss-sum-t b{display:block;font-size:var(--fs-body);font-weight:600;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iss-sum-t b{display:block;font-size:var(--fs-body);font-weight:700;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .iss-sum-t span{display:block;font-size:var(--fs-caption);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .iss-spark{width:120px;height:30px;display:block}
 .iss-spark text{display:none}
@@ -213,7 +213,7 @@ table.show-all tr.more-row{display:table-row}
 .shareRow{display:flex;gap:8px;margin:10px 0;align-items:center}.shareRow input{flex:1;min-width:0;font-family:var(--f-mono);font-size:var(--fs-caption)}
 .shareHint{font-size:var(--fs-caption);color:var(--muted);margin:8px 0 14px}
 .chip{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-caption);padding:3px 10px;border-radius:999px;background:var(--surface2);color:var(--muted);white-space:nowrap}
-.chip b{color:var(--ink);font-weight:500}
+.chip b{color:var(--ink);font-weight:700}
 .sticky{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg)}
 .rail{padding-block:10px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px 16px;align-items:flex-end}
 .vsep{width:1px;height:34px;background:var(--line);align-self:flex-end}
@@ -263,7 +263,7 @@ table.show-all tr.more-row{display:table-row}
 /* 首頁橫幅「最近記錄」：先預留一列晶片高度，非同步載入後不推動下方內容；過多時橫向捲動而不換行 */
 #bannerRecentRuns{min-height:34px}
 #bannerRecentRuns .banner-run-chip{flex:0 0 auto;white-space:nowrap}
-.chipbtn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink);font-weight:500}
+.chipbtn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
 .linkbtn{background:none;border:none;padding:0;min-height:0;color:var(--accent-ink);text-decoration:underline;font-size:var(--fs-caption)}
 .acts{display:grid;gap:8px;margin:0;padding:0;list-style:none}
 .acts li{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
@@ -274,19 +274,19 @@ table.show-all tr.more-row{display:table-row}
 .field{display:flex;flex-direction:column;gap:3px;min-width:0}
 .field label{font-size:var(--fs-caption);color:var(--muted);letter-spacing:.06em}
 select{max-width:100%}
-select,input[type=number],input[type=text],input[type=password],textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:6px 9px;min-height:34px;scroll-margin-top:calc(var(--navbar-h) + var(--safe-t) + 16px);scroll-margin-bottom:calc(var(--tabbar-h) + var(--safe-b) + 16px)}
+select,input[type=number],input[type=text],input[type=password],textarea{font:inherit;font-family:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:6px 9px;min-height:34px;scroll-margin-top:calc(var(--navbar-h) + var(--safe-t) + 16px);scroll-margin-bottom:calc(var(--tabbar-h) + var(--safe-b) + 16px)}
 #p-report label, #p-mail label{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:4px 6px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 input[type=number]{width:88px;font-family:var(--f-mono)}
 select:focus-visible,input:focus-visible,textarea:focus-visible,button:focus-visible,.tab:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-button{font:inherit;cursor:pointer;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:6px 12px;min-height:34px}
+button{font:inherit;font-family:inherit;cursor:pointer;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:6px 12px;min-height:34px}
 button:hover{border-color:var(--muted)}
-button.primary{background:var(--accent);border-color:var(--accent);color:var(--on-strong);font-weight:500}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--on-strong);font-weight:700}
 button:disabled{opacity:.5;cursor:default}
 .tabs-bar{display:flex;align-items:center;gap:4px;margin-top:4px;border-bottom:1px solid var(--line)}
 .tabs{display:flex;flex:1 1 auto;min-width:0;gap:2px;overflow-x:auto;scrollbar-width:none}
 .tab-scroll{flex:0 0 auto;min-width:44px;min-height:44px;padding:0 10px;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:var(--fs-input);line-height:1;display:inline-flex;align-items:center;justify-content:center}
 .tab{background:none;border:none;border-bottom:2px solid transparent;border-radius:0;padding:8px 14px;color:var(--muted);white-space:nowrap;min-height:40px;flex-shrink:0}
-.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:500}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:700}
 /* 頁籤列可左右滑動時，在有更多頁籤的一側淡出提示 */
 .tabs.fr{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 40px),transparent)}
 .tabs.fl{-webkit-mask-image:linear-gradient(90deg,transparent,#000 40px);mask-image:linear-gradient(90deg,transparent,#000 40px)}
@@ -323,10 +323,10 @@ button:disabled{opacity:.5;cursor:default}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:2px}
 .kpi .k{font-size:var(--fs-caption);color:var(--muted);letter-spacing:.06em}
-.kpi .v{font-family:var(--f-display);font-size:var(--fs-kpi);font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi .v{font-family:var(--f-display);font-size:var(--fs-kpi);font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
 .kpi .s{font-size:var(--fs-caption);color:var(--muted)}
 .kpi.ok .v{color:var(--ok)}.kpi.warn .v{color:var(--warn)}.kpi.ng .v{color:var(--ng)}
-.pill{display:inline-block;font-size:var(--fs-caption);font-weight:500;padding:1px 9px;border-radius:999px;white-space:nowrap}
+.pill{display:inline-block;font-size:var(--fs-caption);font-weight:700;padding:1px 9px;border-radius:999px;white-space:nowrap}
 .pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.warn{background:var(--warn-soft);color:var(--warn)}.pill.ng{background:var(--ng-soft);color:var(--ng)}.pill.na{background:var(--surface2);color:var(--muted)}
 .verdict{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;padding:16px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface)}
 .verdict .mark{width:10px;align-self:stretch;border-radius:3px}
@@ -344,10 +344,16 @@ button:disabled{opacity:.5;cursor:default}
 .tbl-scroll-hint{font-size:var(--fs-caption);color:var(--muted);text-align:right;margin:4px 0 0}
 table{border-collapse:collapse;width:100%;font-size:var(--fs-ui)}
 th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
-th{font-size:var(--fs-caption);color:var(--muted);font-weight:500;letter-spacing:.04em;white-space:nowrap}
+th{font-size:var(--fs-caption);color:var(--muted);font-weight:700;letter-spacing:.04em;white-space:nowrap}
 td.num,th.num{text-align:right}
-.xv td:first-child{white-space:nowrap;font-weight:500}
+.xv td:first-child{white-space:nowrap;font-weight:700}
 .note{font-size:var(--fs-caption);color:var(--muted)}
+.empty-state{text-align:center;padding:36px 20px;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-radius:var(--r);background:var(--surface2)}
+.empty-state h3,.empty-state .title{font-size:var(--fs-heading);font-weight:700;color:var(--ink);margin:0}
+.empty-state p,.empty-state .desc{font-size:var(--fs-body);color:var(--muted);margin:0;max-width:460px;line-height:1.5}
+.empty-state .act{margin-top:8px}
+.empty-row td,.empty-cell{text-align:center;padding:24px 16px!important;color:var(--muted);font-size:var(--fs-body)}
+
 .fact{font-size:var(--fs-caption);color:var(--muted);letter-spacing:.06em}
 .view3d{position:relative;height:min(52vh,440px,calc(100dvh - var(--stickyH,140px) - 160px));min-height:min(240px,calc(100dvh - var(--stickyH,140px) - 160px));border-radius:var(--r);overflow:hidden;background:var(--surface2);touch-action:none;cursor:grab}
 .view3d canvas{display:block}
@@ -373,10 +379,10 @@ td.num,th.num{text-align:right}
 #impValidationSummary{margin:8px 0;padding:8px 10px;border:1px solid var(--ng);border-radius:6px;background:var(--surface2)}
 #impSourceSummary{margin:8px 0;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--surface2)}
 .imp-source-grid{display:grid;grid-template-columns:minmax(110px,auto) minmax(0,1fr);gap:4px 10px;margin:6px 0 0}
-.imp-source-grid dt{font-weight:600}
+.imp-source-grid dt{font-weight:700}
 .imp-source-grid dd{margin:0;min-width:0;overflow-wrap:anywhere}
 @media(max-width:420px){.imp-source-grid{grid-template-columns:1fr;gap:1px}.imp-source-grid dd{margin:0 0 6px 0}}
-.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-ink);font-weight:500}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-ink);font-weight:700}
 .ai-out{font-size:var(--fs-body);line-height:1.75;max-width:80ch}
 .ai-out h4{font-size:var(--fs-heading);margin:16px 0 4px}
 .ai-out ul{margin:4px 0;padding-left:20px}
@@ -434,7 +440,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   .brand{justify-content:center;width:100%;column-gap:8px;row-gap:2px;flex-wrap:wrap}
   .brand .mitcorp-logo{height:16px}
   .brand .brand-sep{height:14px}
-  .brand h1{font-size:var(--fs-nav-title)!important;font-weight:600!important;line-height:44px;margin:0;text-align:center}
+  .brand h1{font-size:var(--fs-nav-title)!important;font-weight:700!important;line-height:44px;margin:0;text-align:center}
   .brand .ver{flex:0 0 100%;min-width:0;max-width:100%;font-size:var(--fs-caption)!important;line-height:1.2;text-align:center;white-space:normal;overflow-wrap:anywhere}
   .brand .ver .num{white-space:nowrap}
 
@@ -452,7 +458,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     background:var(--surface);
     border:1px solid var(--line);
     font-size:var(--fs-rail);
-    font-weight:500;
+    font-weight:700;
     color:var(--ink);
     box-shadow:0 1px 3px rgba(0,0,0,0.06);
     cursor:pointer;
@@ -497,7 +503,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     -webkit-tap-highlight-color:transparent;
   }
   .mtab-btn svg{display:block;width:22px;height:22px}
-  .mtab-btn span{font-size:var(--fs-tab-label)!important;font-weight:600;line-height:1}
+  .mtab-btn span{font-size:var(--fs-tab-label)!important;font-weight:700;line-height:1}
   .mtab-btn[aria-selected="true"],.mtab-btn.active{color:var(--accent)}
 
   .sheet-modal:not(.open){display:none!important}
@@ -517,9 +523,9 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   }
   .sheet-handle{width:36px;height:5px;border-radius:999px;background:var(--line);margin:0 auto 4px;align-self:center}
   .sheet-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:8px;border-bottom:0.5px solid var(--c-hairline)}
-  .sheet-head h3{font-size:var(--fs-nav-title);font-weight:600;margin:0}
+  .sheet-head h3{font-size:var(--fs-nav-title);font-weight:700;margin:0}
   .sheet-close{all:unset;cursor:pointer;font-size:var(--fs-icon);min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted)}
-  .sheet-sec-title{font-size:var(--fs-ui)!important;font-weight:600;color:var(--muted);letter-spacing:0.04em;padding:10px 4px 4px}
+  .sheet-sec-title{font-size:var(--fs-ui)!important;font-weight:700;color:var(--muted);letter-spacing:0.04em;padding:10px 4px 4px}
   .sheet-list{display:flex;flex-direction:column;background:var(--surface2);border-radius:var(--r-card);overflow:hidden}
   .sheet-row{
     all:unset;
@@ -530,7 +536,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     min-height:52px;
     padding:0 16px;
     font-size:var(--fs-body-mobile);
-    font-weight:500;
+    font-weight:700;
     color:var(--ink);
     border-bottom:0.5px solid var(--c-hairline);
     cursor:pointer;
@@ -731,9 +737,9 @@ body.duo-mode .report-preview{
 .duo-thumb-dock{display:none;position:fixed;bottom:calc(var(--safe-b) + 12px);left:calc(var(--safe-l) + 12px);right:calc(var(--safe-r) + 12px);z-index:50;justify-content:space-between;pointer-events:none}
 body.duo-mode .duo-thumb-dock{display:flex!important}
 .duo-thumb-dock>div{pointer-events:auto;display:flex;align-items:center;gap:6px;background:var(--c-bar);backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);border:1px solid var(--line);border-radius:999px;padding:4px 8px;box-shadow:0 4px 16px rgba(0,0,0,0.12)}
-.thumb-btn{min-width:44px;min-height:44px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:var(--fs-ui);font-weight:500;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform 0.08s ease,background 0.15s ease!important}
+.thumb-btn{min-width:44px;min-height:44px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:var(--fs-ui);font-weight:700;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform 0.08s ease,background 0.15s ease!important}
 .thumb-btn:active{background:var(--line);transform:scale(0.96)!important}
-.thumb-label{font-size:var(--fs-caption);font-weight:600;color:var(--muted);padding:0 6px}
+.thumb-label{font-size:var(--fs-caption);font-weight:700;color:var(--muted);padding:0 6px}
 .iss-card.duo-selected{outline:2px solid var(--accent)!important;background:var(--surface2)!important}
 
 /* ---------- 資料庫選取中樞 Modal (跨裝置 Desktop & Mobile) ---------- */
@@ -802,7 +808,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 }
 .rec-card-title {
   font-size:var(--fs-heading);
-  font-weight: 600;
+  font-weight:700;
   color: var(--ink);
 }
 .rec-card-sub {
@@ -813,22 +819,22 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 .ui-ico{display:inline-block;vertical-align:middle;flex-shrink:0;color:currentColor}
 .ui-ico--folder{width:18px;height:18px}
 .ui-ico--hint{width:20px;height:20px;color:var(--accent)}
-.chip-rec-lib{display:inline-flex;align-items:center;gap:6px;font-weight:500;cursor:pointer}
-.chip-export-hub{display:inline-flex;align-items:center;gap:6px;font-weight:500;cursor:pointer}
+.chip-rec-lib{display:inline-flex;align-items:center;gap:6px;font-weight:700;cursor:pointer}
+.chip-export-hub{display:inline-flex;align-items:center;gap:6px;font-weight:700;cursor:pointer}
 .export-group-card{padding:12px 14px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface)}
 .export-items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
 .exp-item-card{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:6px;gap:8px}
 .exp-item-card:hover{background:var(--surface)}
 .exp-item-main{display:flex;align-items:flex-start;gap:8px;min-width:0;flex:1 1 auto}
 .exp-item-info{display:flex;flex-direction:column;gap:2px;min-width:0}
-.exp-item-title{font-size:var(--fs-ui);font-weight:500;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.exp-item-title{font-size:var(--fs-ui);font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .exp-item-desc{font-size:var(--fs-caption);color:var(--muted);line-height:1.3}
 .aux-data-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
 .startup-db-banner{margin-bottom:8px;background:var(--accent-soft);border:1px solid var(--accent);display:flex;flex-wrap:nowrap;justify-content:space-between;align-items:center;padding:3px 10px;min-height:32px;border-radius:var(--r);gap:8px;overflow-x:auto}
 .startup-db-banner__main{display:inline-flex;align-items:center;gap:6px;min-width:0;flex:1 1 auto;overflow:hidden}
 .startup-db-banner__body{display:inline-flex;align-items:center;gap:6px;min-width:0;flex:1 1 auto;overflow:hidden}
 .startup-db-banner__title-row{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;white-space:nowrap}
-.startup-db-banner__title{color:var(--accent-ink);font-size:var(--fs-caption);font-weight:600}
+.startup-db-banner__title{color:var(--accent-ink);font-size:var(--fs-caption);font-weight:700}
 .startup-db-banner__pill{font-size:var(--fs-caption);background:var(--surface);padding:1px 6px;border-radius:4px}
 .startup-db-banner__cloud{color:var(--ink);font-size:var(--fs-caption);white-space:nowrap}
 .startup-db-banner__actions{display:inline-flex;gap:6px;margin:0;align-items:center;flex-shrink:0}
@@ -875,7 +881,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 .rec-card-actions .primary {
   flex: 1 1 auto;
   font-size:var(--fs-ui);
-  font-weight: 600;
+  font-weight:700;
 }
 .load-state{display:inline-flex;align-items:center;gap:6px;min-height:36px;max-width:min(36vw,260px);font-size:var(--fs-caption);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .load-state .light{width:10px;height:10px;border-radius:50%;background:var(--muted);flex:none}
@@ -886,8 +892,8 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 .db-capsule-group{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:var(--surface2);padding:2px;gap:2px;max-width:100%}
 .db-capsule-group>.chip.chipBtn{border:none;background:transparent;border-radius:999px;min-height:32px;padding:3px 10px}
 .db-capsule-group>.chip.chipBtn:hover{background:var(--surface)}
-.db-capsule-group>.chip-rec-lib{background:var(--surface);border:1px solid var(--line);font-weight:600}
-.db-capsule-group>.chip-export-hub{background:var(--surface);border:1px solid var(--line);font-weight:600}
+.db-capsule-group>.chip-rec-lib{background:var(--surface);border:1px solid var(--line);font-weight:700}
+.db-capsule-group>.chip-export-hub{background:var(--surface);border:1px solid var(--line);font-weight:700}
 @media(max-width:600px),(pointer:coarse) and (max-height:500px){.db-capsule-group{display:none!important}}
 .startup-db-banner{padding:3px 10px!important;display:flex!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:space-between!important;gap:8px!important}
 .startup-db-banner__main{display:inline-flex!important;align-items:center!important;gap:6px!important;min-width:0!important;flex:1 1 auto!important}
@@ -901,9 +907,9 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
   .rail-time-pop,.rail-time-pop[hidden]{display:grid!important;grid-template-columns:minmax(0,1fr);width:100%;gap:8px}
 }
 .panel-subnav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px}
-.panel-subnav__lbl{font-size:var(--fs-caption);color:var(--muted);font-weight:600;margin-right:4px}
+.panel-subnav__lbl{font-size:var(--fs-caption);color:var(--muted);font-weight:700;margin-right:4px}
 .panel-subnav button{border:1px solid transparent;background:transparent;border-radius:6px;padding:4px 10px;font-size:var(--fs-ui);cursor:pointer;color:var(--ink)}
-.panel-subnav button[aria-current="page"]{background:var(--surface);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.panel-subnav button[aria-current="page"]{background:var(--surface);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
 .tab.tab--sub{font-size:var(--fs-caption);opacity:.88}
 .ai-compact-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 12px!important}
 @media(pointer:coarse){.panel-subnav button,.db-capsule-group>.chip.chipBtn,#btnRailTimeToggle,#btnGoAiCfg{min-height:44px}}
@@ -923,7 +929,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.15.3</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.15.4</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <div class="db-capsule-group" role="group" aria-label="雲端記錄庫與套用狀態">
@@ -1609,7 +1615,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     </div>
   </div>
   <div data-sub="ai-cfg" hidden>
-    <div class="card" id="aiSettingsCard"><h3 id="aiSettingsHead">API 金鑰、模型／推理強度與獨立配額設定 <small id="aiKeyBadge"><span class="pill warn">尚未設定金鑰</span></small></h3><div style="display:grid;grid-template-columns:minmax(0,1fr);gap:12px"><div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:var(--fs-ui);font-weight:600">啟用服務商：</span><div class="seg" id="aiProviderSeg" role="group" aria-label="選擇 AI 服務商" style="display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden"><button type="button" data-ai-prov="openai" aria-pressed="true">OpenAI</button><button type="button" data-ai-prov="antigravity" aria-pressed="false">Antigravity</button></div></div><div id="aiAllProvidersSummary" class="row" style="gap:6px;flex-wrap:wrap;font-size:var(--fs-caption)"></div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px"><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKey" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>OpenAI API Key</b></span><span id="aiBadgeOpenai" class="pill warn" style="font-size:var(--fs-caption);padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKey" placeholder="sk-proj-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggle" title="顯示或隱藏 OpenAI API Key">顯示</button></div></div><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKeyAntigravity" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>Antigravity API Key</b></span><span id="aiBadgeAntigravity" class="pill warn" style="font-size:var(--fs-caption);padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKeyAntigravity" placeholder="AIza... / agy-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggleAntigravity" title="顯示或隱藏 Antigravity API Key">顯示</button></div></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap"><div class="field" style="flex:1 1 220px;min-width:0"><label for="selAiModel">模型選擇 (<span id="aiModelProvName">OpenAI</span>)</label><select id="selAiModel" style="width:100%"><option value="gpt-6.1-terra" selected>gpt-6.1-terra（旗艦深度推理 · 推薦）</option><option value="o4-mini">o4-mini（精準數理推理）</option><option value="gpt-5.4">gpt-5.4（通用旗艦）</option><option value="custom">自訂模型名稱…</option></select></div><div class="field" style="flex:0 0 auto"><button type="button" id="btnAiCheckModels" title="用目前服務商的 API Key 查詢實際可用的模型">檢查可用模型</button></div><div class="field" id="aiCustomModelField" hidden style="flex:1 1 180px;min-width:0"><label for="inAiCustomModel">自訂模型名稱</label><input type="text" id="inAiCustomModel" placeholder="例：gpt-6.1-terra" style="width:100%;font-family:var(--f-mono)"></div><div class="field" style="flex:1 1 200px;min-width:0"><label for="selAiEffort">推理強度</label><select id="selAiEffort" style="width:100%"><option value="high" selected>高 — 深度工程根因推理（推薦）</option><option value="medium">中 — 均衡推理深度與速度</option><option value="low">低 — 快速重點摘要</option></select></div><div class="field" style="flex:1 1 220px;min-width:0"><label for="inAiCustomEndpoint">自訂 API 端點 (選填 https://)</label><input type="text" id="inAiCustomEndpoint" placeholder="預設使用官方端點" spellcheck="false" style="width:100%;font-family:var(--f-mono)"></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap;padding-top:4px;border-top:1px dashed var(--line)"><div style="font-size:var(--fs-ui);font-weight:600;color:var(--accent-ink);min-width:140px" id="aiLimitProvTitle">OpenAI 獨立配額上限：</div><div class="field"><label for="inAiDailyLim">每日次數上限 (次/日)</label><input type="number" id="inAiDailyLim" value="20" min="1" max="500" step="1" style="width:96px"></div><div class="field"><label for="inAiTokenLim">每月 Token 上限</label><input type="number" id="inAiTokenLim" value="500000" min="1000" max="10000000" step="10000" style="width:120px"></div><div class="field"><label for="inAiUsdLim">每月費用上限 USD</label><input type="number" id="inAiUsdLim" value="5.0" min="0.5" max="500" step="0.5" style="width:96px"></div><div class="row" style="gap:6px"><button type="button" class="primary" id="btnAiSaveCfg">儲存設定</button><button type="button" id="btnAiClearKey" title="清除目前所選服務商的金鑰">清除當前金鑰</button></div></div><div class="row" style="gap:8px;flex-wrap:wrap;font-size:var(--fs-caption);color:var(--muted)"><span class="chip" style="white-space:normal;min-width:0">計價基準：<b id="aiPriceLabel">輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens</b></span><span class="note" id="aiCfgMsg" role="status"></span></div><div class="grid2" style="gap:10px;margin-top:2px"><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-ui);margin-bottom:6px"><b><span id="aiDailyBarProv">OpenAI</span> 今日呼叫次數 (<span id="aiUsageDayLabel">今日</span>)</b><span class="mono" id="aiDailyUsageText">0 / 20 次 (0%)</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiDailyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-ui);margin-bottom:6px;gap:8px;flex-wrap:wrap"><b><span id="aiMonthlyBarProv">OpenAI</span> 本月累計用量 (<span id="aiUsageMonthLabel">本月</span>)</b><span class="mono" id="aiMonthlyUsageText">0 tokens · 預估 $0.00 / $5.00 USD</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiMonthlyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div></div></div></div>
+    <div class="card" id="aiSettingsCard"><h3 id="aiSettingsHead">API 金鑰、模型／推理強度與獨立配額設定 <small id="aiKeyBadge"><span class="pill warn">尚未設定金鑰</span></small></h3><div style="display:grid;grid-template-columns:minmax(0,1fr);gap:12px"><div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:var(--fs-ui);font-weight:700">啟用服務商：</span><div class="seg" id="aiProviderSeg" role="group" aria-label="選擇 AI 服務商" style="display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden"><button type="button" data-ai-prov="openai" aria-pressed="true">OpenAI</button><button type="button" data-ai-prov="antigravity" aria-pressed="false">Antigravity</button></div></div><div id="aiAllProvidersSummary" class="row" style="gap:6px;flex-wrap:wrap;font-size:var(--fs-caption)"></div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px"><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKey" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>OpenAI API Key</b></span><span id="aiBadgeOpenai" class="pill warn" style="font-size:var(--fs-caption);padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKey" placeholder="sk-proj-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggle" title="顯示或隱藏 OpenAI API Key">顯示</button></div></div><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKeyAntigravity" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>Antigravity API Key</b></span><span id="aiBadgeAntigravity" class="pill warn" style="font-size:var(--fs-caption);padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKeyAntigravity" placeholder="AIza... / agy-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggleAntigravity" title="顯示或隱藏 Antigravity API Key">顯示</button></div></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap"><div class="field" style="flex:1 1 220px;min-width:0"><label for="selAiModel">模型選擇 (<span id="aiModelProvName">OpenAI</span>)</label><select id="selAiModel" style="width:100%"><option value="gpt-6.1-terra" selected>gpt-6.1-terra（旗艦深度推理 · 推薦）</option><option value="o4-mini">o4-mini（精準數理推理）</option><option value="gpt-5.4">gpt-5.4（通用旗艦）</option><option value="custom">自訂模型名稱…</option></select></div><div class="field" style="flex:0 0 auto"><button type="button" id="btnAiCheckModels" title="用目前服務商的 API Key 查詢實際可用的模型">檢查可用模型</button></div><div class="field" id="aiCustomModelField" hidden style="flex:1 1 180px;min-width:0"><label for="inAiCustomModel">自訂模型名稱</label><input type="text" id="inAiCustomModel" placeholder="例：gpt-6.1-terra" style="width:100%;font-family:var(--f-mono)"></div><div class="field" style="flex:1 1 200px;min-width:0"><label for="selAiEffort">推理強度</label><select id="selAiEffort" style="width:100%"><option value="high" selected>高 — 深度工程根因推理（推薦）</option><option value="medium">中 — 均衡推理深度與速度</option><option value="low">低 — 快速重點摘要</option></select></div><div class="field" style="flex:1 1 220px;min-width:0"><label for="inAiCustomEndpoint">自訂 API 端點 (選填 https://)</label><input type="text" id="inAiCustomEndpoint" placeholder="預設使用官方端點" spellcheck="false" style="width:100%;font-family:var(--f-mono)"></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap;padding-top:4px;border-top:1px dashed var(--line)"><div style="font-size:var(--fs-ui);font-weight:700;color:var(--accent-ink);min-width:140px" id="aiLimitProvTitle">OpenAI 獨立配額上限：</div><div class="field"><label for="inAiDailyLim">每日次數上限 (次/日)</label><input type="number" id="inAiDailyLim" value="20" min="1" max="500" step="1" style="width:96px"></div><div class="field"><label for="inAiTokenLim">每月 Token 上限</label><input type="number" id="inAiTokenLim" value="500000" min="1000" max="10000000" step="10000" style="width:120px"></div><div class="field"><label for="inAiUsdLim">每月費用上限 USD</label><input type="number" id="inAiUsdLim" value="5.0" min="0.5" max="500" step="0.5" style="width:96px"></div><div class="row" style="gap:6px"><button type="button" class="primary" id="btnAiSaveCfg">儲存設定</button><button type="button" id="btnAiClearKey" title="清除目前所選服務商的金鑰">清除當前金鑰</button></div></div><div class="row" style="gap:8px;flex-wrap:wrap;font-size:var(--fs-caption);color:var(--muted)"><span class="chip" style="white-space:normal;min-width:0">計價基準：<b id="aiPriceLabel">輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens</b></span><span class="note" id="aiCfgMsg" role="status"></span></div><div class="grid2" style="gap:10px;margin-top:2px"><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-ui);margin-bottom:6px"><b><span id="aiDailyBarProv">OpenAI</span> 今日呼叫次數 (<span id="aiUsageDayLabel">今日</span>)</b><span class="mono" id="aiDailyUsageText">0 / 20 次 (0%)</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiDailyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-ui);margin-bottom:6px;gap:8px;flex-wrap:wrap"><b><span id="aiMonthlyBarProv">OpenAI</span> 本月累計用量 (<span id="aiUsageMonthLabel">本月</span>)</b><span class="mono" id="aiMonthlyUsageText">0 tokens · 預估 $0.00 / $5.00 USD</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiMonthlyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div></div></div></div>
   </div>
   <div class="grid2" data-sub="runs" hidden>
     <div class="card"><h3>試產回合管理 <small id="runSaveNote"></small></h3>
@@ -1660,10 +1666,10 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     </div>
     <div id="sharePreBox">
       <div class="row" style="margin:12px 0;gap:20px;flex-wrap:wrap">
-        <div><span class="lbl">分享回合</span><div class="num" id="shareRunName" style="font-size:var(--fs-input);font-weight:600">-</div></div>
-        <div><span class="lbl">筆數</span><div class="num" id="shareRowCount" style="font-size:var(--fs-input);font-weight:600">-</div></div>
-        <div><span class="lbl">預估大小</span><div class="num" id="shareEstSize" style="font-size:var(--fs-input);font-weight:600">-</div></div>
-        <div><span class="lbl">有效期限</span><div class="num" style="font-size:var(--fs-input);font-weight:600">30 天</div></div>
+        <div><span class="lbl">分享回合</span><div class="num" id="shareRunName" style="font-size:var(--fs-input);font-weight:700">-</div></div>
+        <div><span class="lbl">筆數</span><div class="num" id="shareRowCount" style="font-size:var(--fs-input);font-weight:700">-</div></div>
+        <div><span class="lbl">預估大小</span><div class="num" id="shareEstSize" style="font-size:var(--fs-input);font-weight:700">-</div></div>
+        <div><span class="lbl">有效期限</span><div class="num" style="font-size:var(--fs-input);font-weight:700">30 天</div></div>
       </div>
       <p class="note" style="margin:8px 0;color:var(--ink)">
         <b>注意事項：</b>開啟者須登入本站才能存取；建立分享時，此回合的量測資料與設定將上傳並保存在本站伺服器（供授權同事檢視）。
@@ -1673,7 +1679,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
       </div>
     </div>
     <div id="sharePostBox" hidden style="margin-top:16px">
-      <p id="shareMsg" role="status" style="margin:0 0 8px;font-weight:600">已成功建立分享連結！</p>
+      <p id="shareMsg" role="status" style="margin:0 0 8px;font-weight:700">已成功建立分享連結！</p>
       <div class="shareRow" id="shareRow" hidden>
         <input type="text" id="shareUrl" readonly aria-label="分享連結網址" style="flex:1">
         <button type="button" class="primary" id="btnCopyShare">複製網址</button>
@@ -1717,25 +1723,25 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 
     <div class="row" style="margin:16px 0 8px;gap:16px;flex-wrap:wrap">
       <div style="flex:1;min-width:240px">
-        <label for="mailTo" class="lbl" style="font-weight:600">收件人：</label>
+        <label for="mailTo" class="lbl" style="font-weight:700">收件人：</label>
         <input type="text" id="mailTo" placeholder="選填，多筆以半形逗號或分號分隔 (只用於 mailto)" style="width:100%;box-sizing:border-box;margin-top:4px">
         <span class="note" id="mailToErr" style="color:var(--ng);display:none;font-size:var(--fs-caption)">收件人 Email 格式不正確</span>
       </div>
       <div style="flex:1;min-width:240px">
-        <label for="mailCc" class="lbl" style="font-weight:600">副本：</label>
+        <label for="mailCc" class="lbl" style="font-weight:700">副本：</label>
         <input type="text" id="mailCc" placeholder="選填，多筆以半形逗號或分號分隔" style="width:100%;box-sizing:border-box;margin-top:4px">
         <span class="note" id="mailCcErr" style="color:var(--ng);display:none;font-size:var(--fs-caption)">副本 Email 格式不正確</span>
       </div>
     </div>
 
     <div style="margin:8px 0">
-      <label for="mailSubject" class="lbl" style="font-weight:600">郵件主旨：</label>
-      <input type="text" id="mailSubject" style="width:100%;box-sizing:border-box;margin-top:4px;font-weight:600">
+      <label for="mailSubject" class="lbl" style="font-weight:700">郵件主旨：</label>
+      <input type="text" id="mailSubject" style="width:100%;box-sizing:border-box;margin-top:4px;font-weight:700">
     </div>
 
     <div style="margin:12px 0">
       <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:4px">
-        <label for="mailBody" class="lbl" style="font-weight:600">郵件內文／摘要：</label>
+        <label for="mailBody" class="lbl" style="font-weight:700">郵件內文／摘要：</label>
         <button type="button" class="linkbtn" id="btnMailCopySummary">複製摘要</button>
       </div>
       <textarea id="mailBody" rows="7" style="width:100%;box-sizing:border-box;font-family:inherit;font-size:var(--fs-ui);line-height:1.5;padding:8px"></textarea>
@@ -1746,7 +1752,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     </div>
 
     <div style="margin:16px 0;padding:12px;background:var(--surface2);border-radius:6px;border:1px solid var(--line)">
-      <div class="lbl" style="font-weight:600;margin-bottom:8px">包含章節：</div>
+      <div class="lbl" style="font-weight:700;margin-bottom:8px">包含章節：</div>
       <div class="row" style="gap:12px;flex-wrap:wrap">
         <label for="chkMailRep1"><input type="checkbox" id="chkMailRep1" checked aria-label="封面"> 封面</label>
         <label for="chkMailRep2"><input type="checkbox" id="chkMailRep2" checked aria-label="摘要"> 摘要</label>
@@ -1882,12 +1888,12 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
           <b style="color:var(--accent-ink);font-size:var(--fs-ui)">雲端資料庫需登入帳號</b>
           <div class="note" style="margin-top:2px;font-size:var(--fs-caption)">量測與座標資料庫 100% 依託 Cloudflare 雲端，請登入以存取產線資料。</div>
         </div>
-        <a href="/__login" class="primary" style="display:inline-flex;align-items:center;text-decoration:none;font-size:var(--fs-caption);padding:6px 14px;border-radius:6px;min-height:34px;font-weight:600">前往登入</a>
+        <a href="/__login" class="primary" style="display:inline-flex;align-items:center;text-decoration:none;font-size:var(--fs-caption);padding:6px 14px;border-radius:6px;min-height:34px;font-weight:700">前往登入</a>
       </div>
 
       <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px">
         <div class="seg" role="tablist" style="display:inline-flex;border:1px solid var(--line);border-radius:8px;padding:2px;background:var(--surface2)">
-          <button type="button" class="seg-btn active" id="btnPickSpi" style="padding:5px 14px;border:none;border-radius:6px;background:var(--surface);font-weight:500;cursor:pointer;font-size:var(--fs-ui)">量測記錄 (<span id="countPickSpi">0</span>)</button>
+          <button type="button" class="seg-btn active" id="btnPickSpi" style="padding:5px 14px;border:none;border-radius:6px;background:var(--surface);font-weight:700;cursor:pointer;font-size:var(--fs-ui)">量測記錄 (<span id="countPickSpi">0</span>)</button>
           <button type="button" class="seg-btn" id="btnPickPlace" style="padding:5px 14px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-size:var(--fs-ui)">座標檔庫 (<span id="countPickPlace">0</span>)</button>
         </div>
         <div class="rec-picker-search" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;flex:1 1 240px;max-width:420px">
@@ -1900,7 +1906,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 
       <!-- SMT 產線快捷過濾列 -->
       <div id="recFilterBar" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:6px 10px;background:var(--surface2);border-radius:8px">
-        <span class="note" style="font-size:var(--fs-caption);font-weight:600">篩選：</span>
+        <span class="note" style="font-size:var(--fs-caption);font-weight:700">篩選：</span>
         <select id="pickPartFilter" aria-label="依產品料號篩選" style="font-size:var(--fs-caption);padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--surface)">
           <option value="">全部料號</option>
         </select>
@@ -2006,7 +2012,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 
       <!-- 批次匯出操作列 -->
       <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;padding:6px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--line)">
-        <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;margin:0;font-size:var(--fs-ui);font-weight:500">
+        <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;margin:0;font-size:var(--fs-ui);font-weight:700">
           <input type="checkbox" id="chkExportSelectAll" aria-label="全選所有匯出項目"> 全選所有項目
         </label>
         <div style="display:inline-flex;align-items:center;gap:10px">
@@ -6484,7 +6490,7 @@ function renderStats(){
             return`<td class="mono">${cell.d>0?`<span class="pill warn">${cell.d}/${cell.n}</span>`:`${cell.d}/${cell.n}`}</td>`;
           }).join("")+`</tr>`;
       }).join("");
-      const foot=`<tfoot><tr style="font-weight:600;background:var(--surface2)"><td>總計</td><td class="mono">${pfm.totalN}</td><td class="mono">${pfm.totalD}</td><td class="mono">${(pfm.overallRate*100).toFixed(1)}%</td>`+
+      const foot=`<tfoot><tr style="font-weight:700;background:var(--surface2)"><td>總計</td><td class="mono">${pfm.totalN}</td><td class="mono">${pfm.totalD}</td><td class="mono">${(pfm.overallRate*100).toFixed(1)}%</td>`+
         pfm.groups.map(g=>{
           const gt=pfm.groupTotals[g];
           return`<td class="mono">${gt.d}/${gt.n} (${(gt.rate*100).toFixed(1)}%)</td>`;
@@ -6807,8 +6813,8 @@ function renderCap(){
           <p class="note" style="margin:0">${isSkewed ? `⚠️ 原始數據偏離常態分佈（偏態 ${f(A.sk.skew, 2)}），常態 Cpk 可能失真；建議依 ${nn.method} 評估能力。` : `數據經 ${nn.method} 檢驗轉換，提供非對稱公差之等效能力評估。`}</p>
         </div>
         <div style="display:flex;gap:16px;align-items:center">
-          <div style="text-align:right"><span class="note">轉換等效 Ppk</span><div class="num" style="font-size:var(--fs-icon);font-weight:600">${ppkVal}</div></div>
-          <div style="text-align:right"><span class="note">等效預估 PPM</span><div class="num" style="font-size:var(--fs-icon);font-weight:600">${ppmVal}</div></div>
+          <div style="text-align:right"><span class="note">轉換等效 Ppk</span><div class="num" style="font-size:var(--fs-icon);font-weight:700">${ppkVal}</div></div>
+          <div style="text-align:right"><span class="note">等效預估 PPM</span><div class="num" style="font-size:var(--fs-icon);font-weight:700">${ppmVal}</div></div>
         </div>
       </div>`;
     } else {
@@ -7265,7 +7271,7 @@ function renderPauseDecayUI(){
     + pauseRes.events.map((e, idx) => `<tr>
       <td class="num mono">#${idx + 1}</td>
       <td class="mono">${e.prevBoard}</td>
-      <td class="num mono" style="${e.pauseDurationMin > pauseRes.safeDwellLimitMin ? 'color:var(--ng);font-weight:600' : ''}">${e.pauseDurationMin}</td>
+      <td class="num mono" style="${e.pauseDurationMin > pauseRes.safeDwellLimitMin ? 'color:var(--ng);font-weight:700' : ''}">${e.pauseDurationMin}</td>
       <td class="mono">${e.postBoard}</td>
       <td>${e.pauseDurationMin > pauseRes.safeDwellLimitMin ? '<span class="pill warn">強制執行溶劑擦拭</span>' : '<span class="pill ok">常態印刷</span>'}</td>
     </tr>`).join("") + `</tbody>`;
@@ -7434,7 +7440,7 @@ function renderCompare(){if(S.runs.length<2){$("#cmpTbl").innerHTML="";$("#cmpLe
   const tgt=S.specs.volume.tgt;
   $("#cmpTbl").innerHTML=`<thead><tr><th>元件群組</th><th class="num">面積比</th><th class="num">轉移效率 %</th><th class="num">錫量 CV %</th><th class="num">${METRICS[S.cmpM].short} Ppk</th><th class="num">不良 PPM（全部判定項目）</th><th>判定</th></tr></thead><tbody>`+R.map(x=>{const pill={改善:"ok",惡化:"ng",有好有壞:"warn",無顯著差異:"na"}[x.verdict];
     const gLabel = x.g === "整體" && (x.b.ppkGroup || x.a.ppkGroup) ? `整體（最差群組 ${x.b.ppkGroup || x.a.ppkGroup}）` : x.g;
-    return`<tr${x.g==="整體"?' style="font-weight:500"':""}><td>${gLabel}</td><td class="num mono">${ar(x.a.ar,x.b.ar)}</td>
+    return`<tr${x.g==="整體"?' style="font-weight:700"':""}><td>${gLabel}</td><td class="num mono">${ar(x.a.ar,x.b.ar)}</td>
     <td class="num mono">${f(x.a.te,1)} → ${f(x.b.te,1)} ${x.sigTE?arrow(1,Math.abs(x.b.te-tgt)<Math.abs(x.a.te-tgt)):""}${pv(x.tTE&&x.tTE.p)}</td>
     <td class="num mono">${f(x.a.cv,1)} → ${f(x.b.cv,1)}</td>
     <td class="num mono">${f(x.a.ppk)} → ${f(x.b.ppk)} ${x.sigC?arrow(1,x.dC>0):""}</td>
@@ -7555,7 +7561,7 @@ function renderGRR(){const G=S.grr;const ms=G?G.metrics:["volume"];if(!ms.includ
     <div class="tbl" style="margin-top:10px"><table><thead><tr><th>變異來源</th><th class="num">σ（${u}）</th><th class="num">貢獻 %</th><th>說明</th></tr></thead><tbody>
     <tr><td>重複性 EV</td><td class="num mono">${f(R.ev,3)}</td><td class="num mono">${pc(R.ev)}</td><td class="note">同一人同一焊墊重複量測的差異${R.pooled?"（含合併之交互作用）":"（機台本身）"}</td></tr>
     ${R.b>1?`<tr><td>再現性 AV</td><td class="num mono">${f(R.av,3)}</td><td class="num mono">${pc(R.av)}</td><td class="note">操作員／重新載入造成的差異</td></tr><tr><td>交互作用</td><td class="num mono">${R.pooled?"—":f(R.inter,3)}</td><td class="num mono">${R.pooled?"0.0%":pc(R.inter)}</td><td class="note">p = ${f(R.pInt,3)}${R.pooled?" > 0.25（已併入重複性）":R.pInt>.25?"（不顯著）":""}</td></tr>`:""}
-    <tr style="font-weight:500"><td>GR&amp;R 合計</td><td class="num mono">${f(R.grr,3)}</td><td class="num mono">${pc(R.grr)}</td><td></td></tr><tr><td>焊墊間 PV</td><td class="num mono">${f(R.pv,3)}</td><td class="num mono">${pc(R.pv)}</td><td></td></tr></tbody></table></div>
+    <tr style="font-weight:700"><td>GR&amp;R 合計</td><td class="num mono">${f(R.grr,3)}</td><td class="num mono">${pc(R.grr)}</td><td></td></tr><tr><td>焊墊間 PV</td><td class="num mono">${f(R.pv,3)}</td><td class="num mono">${pc(R.pv)}</td><td></td></tr></tbody></table></div>
     <p style="margin:10px 0 0"><span class="lbl fact">推論</span> ${worst<10?"SPI 程式量測可信，可直接採信本系統的能力與問題偵測結論（信心 高）。":worst<30?"量測誤差佔一定比例，Cpk 會被低估；細微差異（例如刮刀前後差）需謹慎解讀（信心 中）。":"量測誤差過大，先改善 SPI 程式（基準面、翹曲補償、照明、焊墊 ROI）再採信其他結論（信心 高）。"}</p>`}
 $("#grrFile").onchange=e=>{const fl=e.target.files[0];if(!fl)return;fl.text().then(t=>{try{S.grr=parseGRR(t);renderGRR()}catch(er){$("#grrState").textContent=er.message}})};
 $("#btnGrrSample").onclick=()=>{S.grr=parseGRR(sampleGRR(S));renderGRR()};
@@ -8129,7 +8135,7 @@ function build3D(){safeBoard2D();if(!T.ok||!window.THREE||!T||!T.root||!T.root.c
   const note=pos3DNote(),hud=$("#hud");
   if(hud&&note){
     const isGrid=note.includes("無實際座標");
-    hud.insertAdjacentHTML("beforeend",`<br><span class="note${isGrid?' warn':''}" style="${isGrid?'color:#f59e0b;font-weight:600':''}">${esc(note)}</span>`);
+    hud.insertAdjacentHTML("beforeend",`<br><span class="note${isGrid?' warn':''}" style="${isGrid?'color:#f59e0b;font-weight:700':''}">${esc(note)}</span>`);
   }
   const warnEl=$("#grid3dWarn");
   if(warnEl){
@@ -8236,10 +8242,10 @@ function renderSpecTbl(){const sm=S.specSrc==="sample",part=runPart(),v=specView
 $("#btnSpecGrpAdd").onclick=()=>{const g=$("#selSpecGrp").value,k=$("#selSpecGrpM").value;if(!g||!runPart())return;const d=specDraft();
   if(d.groups[g]&&d.groups[g][k]){toast("這個元件群組已有此項目的覆寫");return}(d.groups[g]=d.groups[g]||{})[k]=specWin(d.specs[k]);d.dirty=true;saveRunsSoon();renderSpecTbl()};
 /* 對話框：焦點移入、Esc＝取消，關閉後焦點回到開啟它的按鈕 */
-function openModal(id,focusSel){const m=$("#"+id);m._ret=document.activeElement;m.hidden=false;m.classList.add("open");
-  m.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>closeModal(id));m.onkeydown=e=>{if(e.key==="Escape"){e.preventDefault();e.stopPropagation();closeModal(id)}};
+function openModal(id,focusSel){const m=$("#"+id);m._ret=document.activeElement;m.hidden=false;m.classList.add("open");document.body.style.overflow="hidden";
+  m.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>closeModal(id));m.onkeydown=e=>{if(e.key==="Escape"){e.preventDefault();e.stopPropagation();closeModal(id)}else if(e.key==="Tab"){const f=[...m.querySelectorAll('button:not([disabled]),[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(el=>el.offsetParent!==null);if(f.length>0){const first=f[0],last=f[f.length-1];if(e.shiftKey&&document.activeElement===first){last.focus();e.preventDefault()}else if(!e.shiftKey&&document.activeElement===last){first.focus();e.preventDefault()}}}};;
   const el=m.querySelector(focusSel||"button,input,textarea,select");if(el)setTimeout(()=>el.focus(),0)}
-function closeModal(id){const m=$("#"+id);if(m.hidden)return;m.classList.remove("open");m.hidden=true;const cb=m._onClose;m._onClose=null;if(cb)cb();if(m._ret&&m._ret.focus)m._ret.focus()}
+function closeModal(id){const m=$("#"+id);if(m.hidden)return;m.classList.remove("open");m.hidden=true;if(!document.querySelector(".open[role=dialog],.db-modal.open"))document.body.style.overflow="";const cb=m._onClose;m._onClose=null;if(cb)cb();if(m._ret&&m._ret.focus)m._ret.focus()}
 function askDiscard(msg){return new Promise(ok=>{const m=$("#specConfirmModal");let done=false;$("#specConfirmMsg").textContent=msg;
   m._onClose=()=>{if(!done){done=true;ok(false)}};$("#specConfirmOk").onclick=()=>{done=true;closeModal("specConfirmModal");ok(true)};openModal("specConfirmModal","[data-close]")})}
 /* 套用一個已存檔的料號規格版本（rec 來自資料庫紀錄，spec 為已驗證的規格檔） */
@@ -9269,7 +9275,7 @@ function renderAiUsageUI(usageArg,limitsArg,provArg){
       const du=(u&&u.dailyRequests)||0;
       const dl=pc?pc.dailyReqLimit:20;
       const isAct=pId===act;
-      return `<span class="chip" style="${isAct?"border-color:var(--accent);font-weight:600":""}">${esc(m.label)}: <b class="mono">${du}/${dl}</b> 次/日</span>`;
+      return `<span class="chip" style="${isAct?"border-color:var(--accent);font-weight:700":""}">${esc(m.label)}: <b class="mono">${du}/${dl}</b> 次/日</span>`;
     }).join("");
   }
 }
@@ -10176,7 +10182,7 @@ function updateStartupDbBanner() {
           }
         }
         return `<button type="button" class="chipbtn banner-run-chip" data-id="${esc(r.id)}" style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;font-size:var(--fs-caption);border:1px solid var(--line);border-radius:6px;background:var(--surface);cursor:pointer;min-height:26px;white-space:nowrap" title="一鍵載入批號 ${esc(r.lot)}">
-          <span style="font-weight:600">🕒 ${esc(r.lot)}</span>
+          <span style="font-weight:700">🕒 ${esc(r.lot)}</span>
           <span class="note" style="font-size:var(--fs-caption)">${esc(r.part || "—")} (${esc(r.side || "ALL")})</span>
           ${qBadge}
         </button>`;
@@ -10547,7 +10553,7 @@ async function renderRecPicker(force) {
           ${r.note ? `<br><span style="color:var(--ink)">備註: ${esc(r.note)}</span>` : ""}
         </div>
         <div class="rec-card-actions" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
-          ${!["pending_review","superseded"].includes(r.lifecycle)?`<button class="primary" data-pact="load" data-id="${esc(r.id)}" style="flex:1 1 120px;min-height:44px;font-size:var(--fs-body);font-weight:600">載入分析</button>`:""}
+          ${!["pending_review","superseded"].includes(r.lifecycle)?`<button class="primary" data-pact="load" data-id="${esc(r.id)}" style="flex:1 1 120px;min-height:44px;font-size:var(--fs-body);font-weight:700">載入分析</button>`:""}
           <button data-pact="ver" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-ui)">驗證</button>
           <button data-pact="open" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-ui)">調整</button>
           ${again && again.length ? `<button data-pact="goto" data-id="${esc(again[0].id)}" style="min-height:44px;font-size:var(--fs-ui)">已重新匯入 →</button>` : !pt && canReimport(r) ? `<button data-pact="reimport" data-id="${esc(r.id)}" style="min-height:44px;font-size:var(--fs-ui)">重新受控匯入</button>` : ""}
@@ -10668,6 +10674,7 @@ function setupRecPicker() {
     if (modal.hidden) pickerReturnFocus = document.activeElement;
     modal.hidden = false;
     modal.classList.add("open");
+    document.body.style.overflow = "hidden";
     PICKER_HIGHLIGHT = null;
     setPickerTab(targetTab, false);
     renderRecPicker(true);
@@ -10679,6 +10686,7 @@ function setupRecPicker() {
   function close() {
     modal.classList.remove("open");
     modal.hidden = true;
+    if (!document.querySelector(".open[role=dialog],.db-modal.open")) document.body.style.overflow = "";
     PICKER_CONFIRM = null;
     if (pickerReturnFocus && pickerReturnFocus.isConnected) pickerReturnFocus.focus();
     pickerReturnFocus = null;
@@ -10904,6 +10912,13 @@ function setupRecPicker() {
     if (e.key === "Escape") {
       e.stopPropagation();
       close();
+    } else if (e.key === "Tab") {
+      const f = [...modal.querySelectorAll('button:not([disabled]),[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(el => el.offsetParent !== null);
+      if (f.length > 0) {
+        const first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); }
+        else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
+      }
     }
   });
 
@@ -11380,7 +11395,7 @@ function renderReport(){
   const s2=`<div class="rep-sec" id="repSec2">
     <h2 style="font-size:var(--fs-heading);border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">一、執行摘要</h2>
     <div style="padding:12px 16px;border-radius:8px;margin-bottom:16px;background:${ov.level==='ng'?'var(--ng-soft,#fee)':ov.level==='warn'?'var(--warn-soft,#fff8e6)':'var(--ok-soft,#eef9f2)'};border:1px solid ${ov.level==='ng'?'var(--ng)':ov.level==='warn'?'var(--warn)':'var(--ok)'}">
-      <div style="font-size:var(--fs-heading);font-weight:600;margin-bottom:4px">整體判定：${ov.label}</div>
+      <div style="font-size:var(--fs-heading);font-weight:700;margin-bottom:4px">整體判定：${ov.label}</div>
       <ul style="margin:0;padding-left:20px;font-size:var(--fs-ui)">${(ov.reasons||["製程穩定且能力足夠"]).map(r=>`<li>${esc(r)}</li>`).join("")}</ul>
     </div>
     <div class="kpis" style="margin-bottom:16px">
@@ -12650,6 +12665,13 @@ function setupExportCenter() {
     if (e.key === "Escape") {
       e.stopPropagation();
       close();
+    } else if (e.key === "Tab") {
+      const f = [...modal.querySelectorAll('button:not([disabled]),[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(el => el.offsetParent !== null);
+      if (f.length > 0) {
+        const first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); }
+        else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
+      }
     }
   });
 
