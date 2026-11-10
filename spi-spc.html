@@ -214,6 +214,7 @@ table.show-all tr.more-row{display:table-row}
 .vsep{width:1px;height:34px;background:var(--line);align-self:flex-end}
 .how{margin:-4px 0 10px;font-size:var(--fs-caption);color:var(--muted)}
 .how summary{cursor:pointer;width:max-content;color:var(--accent-ink)}
+.demo-tools,#sim3dDisplayOpts{margin:0;max-width:100%;font-size:var(--fs-body);color:var(--ink)}
 .how p{margin:6px 0 0;max-width:72ch;line-height:1.65}
 .click-hint{font-size:var(--fs-caption);color:var(--muted)}
 .tabgrp{align-self:center;font-size:var(--fs-caption);letter-spacing:.08em;color:var(--muted);padding:0 4px 0 12px;white-space:nowrap;border-left:1px solid var(--line);margin-left:6px}
@@ -917,7 +918,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     <svg class="mitcorp-logo" viewBox="0 0 248 45" width="143" height="26" fill="currentColor" fill-rule="evenodd" role="img" aria-label="Mitcorp"><path d="M13.8,-0.0L28.5,-0.1L29.2,0.0L30.6,1.0L31.5,2.9L34.7,29.0L35.0,29.8L36.2,30.2L37.5,29.8L38.3,28.2L46.9,3.5L48.0,1.5L48.8,0.8L50.5,-0.1L66.3,0.0L67.6,1.0L68.4,3.2L68.4,30.8L68.3,32.2L67.7,33.8L66.0,34.8L62.8,35.0L59.2,34.8L57.7,33.8L57.3,31.5L57.3,5.8L56.7,4.5L55.2,4.0L53.0,4.7L52.0,6.5L43.5,31.5L42.2,33.3L41.2,34.1L38.2,34.8L28.8,34.8L26.0,34.0L24.6,32.5L24.0,29.8L20.9,5.8L20.2,4.5L18.5,4.0L17.0,4.5L16.5,5.2L12.3,26.8L11.3,30.0L10.5,31.5L8.4,33.8L6.3,35.0L2.2,35.7L1.2,35.7L0.0,35.0L0.0,30.2L1.2,29.6L4.5,28.9L5.4,28.0L6.2,26.2L10.7,3.0L11.9,1.0L13.8,-0.0ZM73.2,-0.0L83.8,0.0L84.6,1.3L84.5,4.2L83.8,5.4L82.8,5.7L75.5,5.8L73.2,5.5L72.7,4.8L72.5,2.8L72.6,1.0L73.2,-0.0ZM90.0,1.7L95.5,1.6L97.2,2.1L97.8,2.8L98.2,4.0L98.3,8.5L98.6,9.2L99.3,9.7L109.8,9.8L110.9,10.2L111.4,12.0L110.9,13.2L110.2,13.6L99.8,13.7L98.8,14.1L98.2,15.5L98.3,27.0L99.0,29.8L100.5,30.9L104.2,31.1L112.5,30.9L113.1,31.5L113.2,33.0L113.0,33.8L112.2,34.6L110.5,35.0L104.5,35.3L95.8,35.1L92.0,33.9L89.9,32.2L88.9,30.5L88.4,27.5L88.4,5.5L88.6,3.0L89.2,2.1L90.0,1.7ZM130.5,9.2L135.5,9.3L144.3,10.0L145.5,10.4L146.1,11.0L146.2,13.2L145.7,14.0L145.0,14.3L140.3,13.8L133.0,13.6L129.5,13.9L127.0,14.9L125.1,17.0L124.3,20.0L124.3,24.0L125.1,27.8L127.0,29.8L130.0,30.9L137.5,31.1L145.2,30.4L146.0,31.0L146.3,32.0L146.2,33.5L145.5,34.3L142.5,35.0L135.2,35.4L129.5,35.4L124.0,34.9L120.5,33.9L118.2,32.8L116.1,30.8L115.1,29.2L114.0,25.5L113.9,20.0L115.0,15.8L116.1,14.0L118.2,12.0L120.5,10.8L124.2,9.8L130.5,9.2ZM161.8,9.5L168.5,9.3L174.8,9.9L178.2,10.8L180.2,11.8L182.8,14.0L183.9,15.8L184.7,18.8L184.9,24.5L184.7,26.2L183.8,29.2L181.8,32.0L178.8,33.9L175.5,34.9L166.0,35.7L156.8,34.8L153.8,33.8L152.0,32.9L150.4,31.5L149.2,30.0L148.3,28.0L147.9,25.5L148.0,18.2L149.1,15.0L151.0,12.8L154.0,11.0L158.0,9.8L161.8,9.5ZM203.0,9.5L209.8,9.4L210.7,10.5L210.8,11.8L210.5,12.8L209.5,13.6L201.8,13.9L200.2,14.2L199.2,14.8L198.7,16.0L198.7,31.0L198.3,33.5L197.5,34.5L196.2,34.9L190.5,34.8L189.1,33.8L188.8,32.0L188.7,15.2L189.2,12.5L190.0,11.7L191.9,10.8L197.2,9.8L203.0,9.5ZM224.0,9.5L230.5,9.3L237.9,9.8L242.2,10.9L244.2,12.0L246.2,14.0L247.0,15.2L247.8,17.3L247.8,27.8L246.9,30.0L245.9,31.5L244.8,32.6L242.8,33.8L240.0,34.8L232.2,35.5L223.2,35.4L222.6,36.0L222.4,36.8L222.2,43.5L221.3,44.8L213.5,44.8L212.6,43.5L212.4,41.8L212.6,13.0L213.2,11.7L214.6,10.8L218.5,9.9L224.0,9.5ZM75.5,9.9L79.0,9.8L81.5,10.0L82.8,10.8L83.4,12.0L83.5,32.2L83.0,33.8L81.5,34.8L75.5,34.8L74.1,34.0L73.7,33.2L73.6,12.0L74.0,10.8L75.5,9.9ZM163.2,13.0L160.8,14.0L159.4,15.2L158.3,18.8L158.1,22.5L158.3,26.5L159.2,29.2L160.5,30.8L162.8,31.8L166.0,32.1L169.8,31.8L172.0,30.8L173.0,29.8L173.9,28.2L174.4,25.0L174.4,21.8L173.9,16.5L173.0,15.0L171.9,14.0L168.5,12.9L163.2,13.0ZM226.0,13.0L223.5,13.5L222.7,14.0L222.4,14.5L222.5,30.5L224.0,31.6L227.5,31.9L232.5,31.9L235.0,31.0L236.0,30.1L237.0,28.7L237.7,25.5L237.8,20.8L237.0,16.2L235.3,14.0L233.0,13.1L230.2,12.8L226.0,13.0Z"/></svg>
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.15.7</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.15.8</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <div class="db-capsule-group" role="group" aria-label="雲端記錄庫與套用狀態">
@@ -1101,9 +1102,14 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
         <button type="button" data-m="real" aria-pressed="true">真實外觀</button><button type="button" data-m="heatmap" aria-pressed="false">品質熱圖</button></div></div>
       <div class="field"><label>著色</label><div class="seg" id="segColor">
         <button data-v="status" aria-pressed="true">判定</button><button data-v="height">高度偏差</button><button data-v="volume">體積偏差</button></div></div>
-      <div class="field"><label for="inExag">高度放大 <span id="exagOut" class="num">20×</span></label><input type="range" id="inExag" min="5" max="60" step="1" value="20"></div>
-      <label class="row" for="chkGhost" style="font-size:var(--fs-ui)"><input type="checkbox" id="chkGhost" checked aria-label="顯示鋼板開孔標稱外框"> 顯示鋼板開孔標稱外框</label>
-      <label class="row" for="chkBridgeWarn" style="font-size:var(--fs-ui)"><input type="checkbox" id="chkBridgeWarn" checked aria-label="標示橋接警戒圈"> 標示橋接警戒圈</label>
+      <details class="how" id="sim3dDisplayOpts">
+        <summary>顯示選項</summary>
+        <div class="row" style="margin-top:8px">
+          <div class="field"><label for="inExag">高度放大 <span id="exagOut" class="num">20×</span></label><input type="range" id="inExag" min="5" max="60" step="1" value="20"></div>
+          <label class="row" for="chkGhost" style="font-size:var(--fs-ui)"><input type="checkbox" id="chkGhost" checked aria-label="顯示鋼板開孔標稱外框"> 顯示鋼板開孔標稱外框</label>
+          <label class="row" for="chkBridgeWarn" style="font-size:var(--fs-ui)"><input type="checkbox" id="chkBridgeWarn" checked aria-label="標示橋接警戒圈"> 標示橋接警戒圈</label>
+        </div>
+      </details>
     </div>
     <div class="legend" id="leg3d" style="margin-top:10px"></div>
     <div id="grid3dWarn" class="banner warn" style="display:none;margin:8px 0;padding:8px 12px;background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn);border-radius:4px;font-size:var(--fs-caption)">
@@ -1219,7 +1225,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
   <div class="card" id="cardRelChart">
     <h3>關係圖 <small id="relChartSub"></small></h3>
     <div class="toolbar"><div class="field"><label for="selRelChart">圖種</label>
-      <select id="selRelChart"><option value="specScatter">規格散點（面積 × 高度）</option><option value="quad">四象限（AR × 轉移效率）</option><option value="corr">相關（高度 × 面積）</option><option value="parallel">平行座標</option><option value="radar">Radar（體積／面積／高度）</option></select></div></div>
+      <select id="selRelChart"><option value="specScatter">規格散點（體積 × 高度）</option><option value="parallel">平行座標</option><option value="radar">Radar（體積／面積／高度）</option></select></div></div>
     <div id="relChartMsg" class="note" style="margin:8px 0"></div>
     <div class="chartbox tall"><canvas id="cRelChart" role="img" aria-label="關係圖"></canvas></div>
   </div></div>
@@ -1288,20 +1294,20 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
   </div></div>
     <div data-subview="lab" hidden><div class="card">
     <h3>SPI × 回焊後 AOI／X-ray 關聯 </h3>
-        <div class="row"><label class="row" for="aoiFile" style="cursor:pointer"><input type="file" id="aoiFile" accept=".csv,.txt,.tsv" class="sr" aria-label="上傳 AOI 結果 CSV"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">上傳 AOI 結果 CSV</span></label><button id="btnAoiSample">產生範例 AOI 結果</button>
+        <div class="row"><label class="row" for="aoiFile" style="cursor:pointer"><input type="file" id="aoiFile" accept=".csv,.txt,.tsv" class="sr" aria-label="上傳 AOI 結果 CSV"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">上傳 AOI 結果 CSV</span></label><details class="how demo-tools"><summary>範例資料</summary><button id="btnAoiSample">產生範例 AOI 結果</button></details>
       <div class="field"><label for="aoiM">SPI 量測項目</label><select id="aoiM"></select></div><div class="field"><label for="aoiBw">分箱寬度</label><input type="number" id="aoiBw" value="10" min="1" max="50" step="1"></div><span class="note" id="aoiState"></span></div>
     <div id="aoiOut" style="margin-top:10px"></div>
     <div class="chartbox" id="aoiChartBox" hidden><canvas id="cAoi" role="img" aria-label="SPI 量測值分箱的回焊不良率"></canvas></div>
   </div>
   <div class="card">
     <h3>印刷參數 DOE <small id="doeSub"></small></h3>
-        <div class="row"><div class="field"><label for="doeResp">反應變數</label><select id="doeResp"></select></div><button id="btnDoeSample">載入 DOE 範例回合</button><span class="note" id="doeState"></span></div>
+        <div class="row"><div class="field"><label for="doeResp">反應變數</label><select id="doeResp"></select></div><details class="how demo-tools"><summary>範例資料</summary><button id="btnDoeSample">載入 DOE 範例回合</button></details><span class="note" id="doeState"></span></div>
     <div id="doeOut" style="margin-top:10px"></div>
     <div class="grid2" id="doeCharts" style="margin-top:10px"></div>
   </div>
   <div class="card">
     <h3>簡易 GR&amp;R </h3>
-        <div class="row"><label class="row" for="grrFile" style="cursor:pointer"><input type="file" id="grrFile" accept=".csv,.txt,.tsv" class="sr" aria-label="上傳重複量測 CSV"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">上傳重複量測 CSV</span></label><button id="btnGrrSample">產生範例重複量測</button>
+        <div class="row"><label class="row" for="grrFile" style="cursor:pointer"><input type="file" id="grrFile" accept=".csv,.txt,.tsv" class="sr" aria-label="上傳重複量測 CSV"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">上傳重複量測 CSV</span></label><details class="how demo-tools"><summary>範例資料</summary><button id="btnGrrSample">產生範例重複量測</button></details>
       <div class="field"><label for="grrM">量測項目</label><select id="grrM"></select></div><span class="note" id="grrState"></span></div>
     <div id="grrOut" style="margin-top:10px"></div>
   </div></div>
@@ -1321,11 +1327,14 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
   <div class="card"><h3>AI 品質工程分析 <small id="aiCardSub">嚴格區分事實與推論之品質工程診斷</small></h3>
     <div class="notice" id="aiNoticeBox" style="background:var(--surface2);padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:var(--fs-ui);color:var(--ink)">
       <p style="margin:0 0 6px"><b>送出前告知與資料隱私保護：</b></p>
-      <ul style="margin:0 0 6px 18px;padding:0;line-height:1.6">
-        <li><b>服務商路徑：</b><span id="aiNoticeServicePath">由本站後端以 API Key 安全轉發至設定之服務商。</span></li>
-        <li><b>送出範圍與識別資料：</b>試產回合名稱、量測指標與規格窗、鋼板設定、各板統計與製程能力、Nelson 判異與問題清單（含板號與焊墊名稱）。</li>
-        <li><b>AI Gateway 記錄設定：</b><span id="aiGatewayLogNotice">預設不保存提示詞與回應內容（已帶 <code>cf-aig-collect-log-payload: false</code>，僅留存 token 用量 metadata）。</span></li>
-      </ul>
+      <details class="how" id="aiNoticeDetails">
+        <summary>查看送出範圍與記錄方式</summary>
+        <ul style="margin:8px 0 6px 18px;padding:0;line-height:1.6">
+          <li><b>服務商路徑：</b><span id="aiNoticeServicePath">由本站後端以 API Key 安全轉發至設定之服務商。</span></li>
+          <li><b>送出範圍與識別資料：</b>試產回合名稱、量測指標與規格窗、鋼板設定、各板統計與製程能力、Nelson 判異與問題清單（含板號與焊墊名稱）。</li>
+          <li><b>AI Gateway 記錄設定：</b><span id="aiGatewayLogNotice">預設不保存提示詞與回應內容（已帶 <code>cf-aig-collect-log-payload: false</code>，僅留存 token 用量 metadata）。</span></li>
+        </ul>
+      </details>
       <div class="row" style="align-items:center;margin-top:8px">
         <label class="row" for="aiAnon" style="cursor:pointer;font-size:var(--fs-ui);align-items:center"><input type="checkbox" id="aiAnon" aria-label="送出前匿名化板號與焊墊"> <b>送出前匿名化板號與焊墊</b>（板號轉為 B01…、焊墊轉為 P001…，分析回覆後自動還原）</label>
       </div>
@@ -1417,7 +1426,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
       <h4 class="imp-step-title">② 選擇量測檔或貼上資料</h4>
       <div class="drop" id="drop">拖放 CSV 或 Excel（.xlsx）檔到這裡，或 <label for="fileIn" style="color:var(--accent);cursor:pointer;text-decoration:underline"><input type="file" id="fileIn" accept=".csv,.txt,.tsv,.xlsx" class="sr" aria-label="選擇 SPI 量測檔案">選擇檔案</label></div>
       <textarea id="pasteIn" aria-label="貼上 CSV 文字" placeholder="或直接貼上 CSV 文字…" style="margin-top:8px"></textarea>
-      <div class="row" style="margin-top:8px"><button class="primary" id="btnRead">讀取欄位</button><button id="btnPhme">載入 PHME 格式範例</button><span class="err" id="parseErr" role="status" aria-live="polite"></span></div>
+      <div class="row" style="margin-top:8px"><button class="primary" id="btnRead">讀取欄位</button><details class="how demo-tools"><summary>範例資料</summary><button id="btnPhme">載入 PHME 格式範例</button></details><span class="err" id="parseErr" role="status" aria-live="polite"></span></div>
       <div id="impDupNotice" class="note" role="status" hidden style="margin-top:8px;padding:8px 12px;border-radius:8px;background:var(--accent-soft);color:var(--accent-ink)"></div>
       <div id="mapBox" hidden style="margin-top:12px;display:grid;gap:10px">
         <div id="impSourceSummary" hidden role="group" aria-label="匯入來源與資料脈絡"></div>
@@ -1478,34 +1487,15 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
         </div>
       </div>
     </div>
-<div class="card" data-sub="specs">
-    <h3>階梯鋼板與位置設定 </h3>
-    <div class="row"><label class="row" style="font-size:var(--fs-ui)"><input type="checkbox" id="chkStep"> 啟用階梯鋼板</label><button id="btnAddZone">新增區域</button><span class="note" id="zoneSum"></span></div>
-    
-<div class="card" data-sub="specs">
-    <h3>鋼板開孔設定 </h3>
-        <div class="tbl"><table id="apTbl"></table></div>
-    
-  </div>
-  
-  <div data-sub="ai-cfg" hidden>
-    <div class="card" id="aiSettingsCard"><h3 id="aiSettingsHead">API 金鑰、模型／推理強度與獨立配額設定 <small id="aiKeyBadge"><span class="pill warn">尚未設定金鑰</span></small></h3><div style="display:grid;grid-template-columns:minmax(0,1fr);gap:12px"><div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:var(--fs-ui);font-weight:700">啟用服務商：</span><div class="seg" id="aiProviderSeg" role="group" aria-label="選擇 AI 服務商" style="display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden"><button type="button" data-ai-prov="openai" aria-pressed="true">OpenAI</button><button type="button" data-ai-prov="antigravity" aria-pressed="false">Antigravity</button></div></div><div id="aiAllProvidersSummary" class="row" style="gap:6px;flex-wrap:wrap;font-size:var(--fs-caption)"></div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px"><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKey" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>OpenAI API Key</b></span><span id="aiBadgeOpenai" class="pill warn" style="font-size:var(--fs-caption);padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKey" placeholder="sk-proj-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggle" title="顯示或隱藏 OpenAI API Key">顯示</button></div></div><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKeyAntigravity" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>Antigravity API Key</b></span><span id="aiBadgeAntigravity" class="pill warn" style="font-size:var(--fs-caption);padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKeyAntigravity" placeholder="AIza... / agy-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggleAntigravity" title="顯示或隱藏 Antigravity API Key">顯示</button></div></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap"><div class="field" style="flex:1 1 220px;min-width:0"><label for="selAiModel">模型選擇 (<span id="aiModelProvName">OpenAI</span>)</label><select id="selAiModel" style="width:100%"><option value="gpt-6.1-terra" selected>gpt-6.1-terra（旗艦深度推理 · 推薦）</option><option value="o4-mini">o4-mini（精準數理推理）</option><option value="gpt-5.4">gpt-5.4（通用旗艦）</option><option value="custom">自訂模型名稱…</option></select></div><div class="field" style="flex:0 0 auto"><button type="button" id="btnAiCheckModels" title="用目前服務商的 API Key 查詢實際可用的模型">檢查可用模型</button></div><div class="field" id="aiCustomModelField" hidden style="flex:1 1 180px;min-width:0"><label for="inAiCustomModel">自訂模型名稱</label><input type="text" id="inAiCustomModel" placeholder="例：gpt-6.1-terra" style="width:100%;font-family:var(--f-mono)"></div><div class="field" style="flex:1 1 200px;min-width:0"><label for="selAiEffort">推理強度</label><select id="selAiEffort" style="width:100%"><option value="high" selected>高 — 深度工程根因推理（推薦）</option><option value="medium">中 — 均衡推理深度與速度</option><option value="low">低 — 快速重點摘要</option></select></div><div class="field" style="flex:1 1 220px;min-width:0"><label for="inAiCustomEndpoint">自訂 API 端點 (選填 https://)</label><input type="text" id="inAiCustomEndpoint" placeholder="預設使用官方端點" spellcheck="false" style="width:100%;font-family:var(--f-mono)"></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap;padding-top:4px;border-top:1px dashed var(--line)"><div style="font-size:var(--fs-ui);font-weight:700;color:var(--accent-ink);min-width:140px" id="aiLimitProvTitle">OpenAI 獨立配額上限：</div><div class="field"><label for="inAiDailyLim">每日次數上限 (次/日)</label><input type="number" id="inAiDailyLim" value="20" min="1" max="500" step="1" style="width:96px"></div><div class="field"><label for="inAiTokenLim">每月 Token 上限</label><input type="number" id="inAiTokenLim" value="500000" min="1000" max="10000000" step="10000" style="width:120px"></div><div class="field"><label for="inAiUsdLim">每月費用上限 USD</label><input type="number" id="inAiUsdLim" value="5.0" min="0.5" max="500" step="0.5" style="width:96px"></div><div class="row" style="gap:6px"><button type="button" class="primary" id="btnAiSaveCfg">儲存設定</button><button type="button" id="btnAiClearKey" title="清除目前所選服務商的金鑰">清除當前金鑰</button></div></div><div class="row" style="gap:8px;flex-wrap:wrap;font-size:var(--fs-caption);color:var(--muted)"><span class="chip" style="white-space:normal;min-width:0">計價基準：<b id="aiPriceLabel">輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens</b></span><span class="note" id="aiCfgMsg" role="status"></span></div><div class="grid2" style="gap:10px;margin-top:2px"><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-ui);margin-bottom:6px"><b><span id="aiDailyBarProv">OpenAI</span> 今日呼叫次數 (<span id="aiUsageDayLabel">今日</span>)</b><span class="mono" id="aiDailyUsageText">0 / 20 次 (0%)</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiDailyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-ui);margin-bottom:6px;gap:8px;flex-wrap:wrap"><b><span id="aiMonthlyBarProv">OpenAI</span> 本月累計用量 (<span id="aiUsageMonthLabel">本月</span>)</b><span class="mono" id="aiMonthlyUsageText">0 tokens · 預估 $0.00 / $5.00 USD</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiMonthlyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div></div></div></div>
-  </div>
-  <div class="grid2" data-sub="runs" hidden>
-    <div class="card"><h3>試產回合管理 <small id="runSaveNote"></small></h3>
-      <div id="runLegacy" role="status" hidden></div>
-      <div class="tbl"><table id="runTbl"></table></div>
-      <div class="row" style="margin-top:8px"><button id="btnAddB">新增範例：改版 B 回合</button><button id="btnSample">還原範例並清除已保存的回合</button></div></div>
-  </div>
-  <div class="card" data-sub="stencil" hidden>
+    <div class="card" data-sub="specs">
     <h3>階梯鋼板與位置設定 </h3>
     <div class="row"><label class="row" style="font-size:var(--fs-ui)"><input type="checkbox" id="chkStep"> 啟用階梯鋼板</label><button id="btnAddZone">新增區域</button><span class="note" id="zoneSum"></span></div>
     <div class="tbl" style="margin-top:10px"><table id="zoneTbl"></table></div>
     <p class="note">位置設定：先在表格選取一個區域（「框選」欄），再於下方板面圖上拖曳框出範圍，該區域會自動改為「座標區域」。座標單位 mm，與 SPI 資料 X / Y 相同。</p>
     <canvas class="heat" id="zoneMap" width="900" height="600" style="touch-action:none;cursor:crosshair" role="img" aria-label="階梯鋼板區域位置圖，可拖曳框選"></canvas>
     <div class="legend" id="zoneLeg" style="margin-top:8px"></div>
-  </div>
-  <div class="card" data-sub="stencil" hidden>
+    </div>
+    <div class="card" data-sub="specs">
     <h3>鋼板開孔設定 </h3>
         <div class="tbl"><table id="apTbl"></table></div>
     <p class="note" id="apNote"></p>
@@ -1515,6 +1505,16 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     </div>
     <p class="note" id="geomPadStatus" style="margin:6px 0 0">幾何焊墊清單用於開孔覆蓋率；不寫入量測 X/Y。逐焊墊 CSV 開孔仍優先於幾何。</p>
     <div class="tbl" id="geomUncoveredBox" hidden style="margin-top:8px;max-height:200px;overflow:auto"><table id="geomUncoveredTbl"></table></div>
+    </div>
+  </div>
+  <div data-sub="ai-cfg" hidden>
+    <div class="card" id="aiSettingsCard"><h3 id="aiSettingsHead">API 金鑰、模型／推理強度與獨立配額設定 <small id="aiKeyBadge"><span class="pill warn">尚未設定金鑰</span></small></h3><div style="display:grid;grid-template-columns:minmax(0,1fr);gap:12px"><div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:var(--fs-ui);font-weight:700">啟用服務商：</span><div class="seg" id="aiProviderSeg" role="group" aria-label="選擇 AI 服務商" style="display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden"><button type="button" data-ai-prov="openai" aria-pressed="true">OpenAI</button><button type="button" data-ai-prov="antigravity" aria-pressed="false">Antigravity</button></div></div><div id="aiAllProvidersSummary" class="row" style="gap:6px;flex-wrap:wrap;font-size:var(--fs-caption)"></div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px"><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKey" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>OpenAI API Key</b></span><span id="aiBadgeOpenai" class="pill warn" style="font-size:var(--fs-caption);padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKey" placeholder="sk-proj-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggle" title="顯示或隱藏 OpenAI API Key">顯示</button></div></div><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKeyAntigravity" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>Antigravity API Key</b></span><span id="aiBadgeAntigravity" class="pill warn" style="font-size:var(--fs-caption);padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKeyAntigravity" placeholder="AIza... / agy-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggleAntigravity" title="顯示或隱藏 Antigravity API Key">顯示</button></div></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap"><div class="field" style="flex:1 1 220px;min-width:0"><label for="selAiModel">模型選擇 (<span id="aiModelProvName">OpenAI</span>)</label><select id="selAiModel" style="width:100%"><option value="gpt-6.1-terra" selected>gpt-6.1-terra（旗艦深度推理 · 推薦）</option><option value="o4-mini">o4-mini（精準數理推理）</option><option value="gpt-5.4">gpt-5.4（通用旗艦）</option><option value="custom">自訂模型名稱…</option></select></div><div class="field" style="flex:0 0 auto"><button type="button" id="btnAiCheckModels" title="用目前服務商的 API Key 查詢實際可用的模型">檢查可用模型</button></div><div class="field" id="aiCustomModelField" hidden style="flex:1 1 180px;min-width:0"><label for="inAiCustomModel">自訂模型名稱</label><input type="text" id="inAiCustomModel" placeholder="例：gpt-6.1-terra" style="width:100%;font-family:var(--f-mono)"></div><div class="field" style="flex:1 1 200px;min-width:0"><label for="selAiEffort">推理強度</label><select id="selAiEffort" style="width:100%"><option value="high" selected>高 — 深度工程根因推理（推薦）</option><option value="medium">中 — 均衡推理深度與速度</option><option value="low">低 — 快速重點摘要</option></select></div><div class="field" style="flex:1 1 220px;min-width:0"><label for="inAiCustomEndpoint">自訂 API 端點 (選填 https://)</label><input type="text" id="inAiCustomEndpoint" placeholder="預設使用官方端點" spellcheck="false" style="width:100%;font-family:var(--f-mono)"></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap;padding-top:4px;border-top:1px dashed var(--line)"><div style="font-size:var(--fs-ui);font-weight:700;color:var(--accent-ink);min-width:140px" id="aiLimitProvTitle">OpenAI 獨立配額上限：</div><div class="field"><label for="inAiDailyLim">每日次數上限 (次/日)</label><input type="number" id="inAiDailyLim" value="20" min="1" max="500" step="1" style="width:96px"></div><div class="field"><label for="inAiTokenLim">每月 Token 上限</label><input type="number" id="inAiTokenLim" value="500000" min="1000" max="10000000" step="10000" style="width:120px"></div><div class="field"><label for="inAiUsdLim">每月費用上限 USD</label><input type="number" id="inAiUsdLim" value="5.0" min="0.5" max="500" step="0.5" style="width:96px"></div><div class="row" style="gap:6px"><button type="button" class="primary" id="btnAiSaveCfg">儲存設定</button><button type="button" id="btnAiClearKey" title="清除目前所選服務商的金鑰">清除當前金鑰</button></div></div><div class="row" style="gap:8px;flex-wrap:wrap;font-size:var(--fs-caption);color:var(--muted)"><span class="chip" style="white-space:normal;min-width:0">計價基準：<b id="aiPriceLabel">輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens</b></span><span class="note" id="aiCfgMsg" role="status"></span></div><div class="grid2" style="gap:10px;margin-top:2px"><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-ui);margin-bottom:6px"><b><span id="aiDailyBarProv">OpenAI</span> 今日呼叫次數 (<span id="aiUsageDayLabel">今日</span>)</b><span class="mono" id="aiDailyUsageText">0 / 20 次 (0%)</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiDailyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-ui);margin-bottom:6px;gap:8px;flex-wrap:wrap"><b><span id="aiMonthlyBarProv">OpenAI</span> 本月累計用量 (<span id="aiUsageMonthLabel">本月</span>)</b><span class="mono" id="aiMonthlyUsageText">0 tokens · 預估 $0.00 / $5.00 USD</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiMonthlyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div></div></div></div>
+  </div>
+  <div class="grid2" data-sub="runs" hidden>
+    <div class="card"><h3>試產回合管理 <small id="runSaveNote"></small></h3>
+      <div id="runLegacy" role="status" hidden></div>
+      <div class="tbl"><table id="runTbl"></table></div>
+      <details class="how demo-tools" style="margin-top:8px"><summary>範例資料</summary><div class="row" style="margin-top:8px"><button id="btnAddB">新增範例：改版 B 回合</button><button id="btnSample">還原範例並清除已保存的回合</button></div></details></div>
   </div>
   </section>
 
@@ -5970,13 +5970,16 @@ const vlines={id:"vlines",afterDatasetsDraw(ch,_,o){if(!o||!o.lines)return;const
 if(window.Chart)Chart.register(vlines);
 
 /* ---------- 控制項 ---------- */
+const REL_CHART_UI=new Set(["specScatter","parallel","radar"]);
+function normalizeRelChart(v){return REL_CHART_UI.has(v)?v:"specScatter"}
 function fillSelect(el,opts,val){const e=x=>String(x).replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));el.innerHTML=opts.map(o=>`<option value="${e(o[0])}">${e(o[1])}</option>`).join("");if(val!=null&&opts.some(o=>o[0]===val))el.value=val}
 function syncControls(){
   fillSelect($("#selMetric"),S.metrics.map(k=>[k,METRICS[k].label]),S.metric);
   const groups=[...new Set(S.rows.map(r=>r.group))];
   fillSelect($("#selGroup"),[["ALL","全部元件"],...groups.map(g=>[g,g])],S.group);
   $("#selChart").value=S.chart;
-  if($("#selRelChart"))$("#selRelChart").value=S.relChart||"specScatter";
+  S.relChart=normalizeRelChart(S.relChart);
+  if($("#selRelChart"))$("#selRelChart").value=S.relChart;
   if($("#selXrSize"))$("#selXrSize").value=String(S.xrSize||"4");
   if($("#selXrMode"))$("#selXrMode").value=S.xrMode||"board";
   const sp=specOfGroup(S,isAllGrp(S.group)?null:S.group,S.metric);
@@ -6396,7 +6399,7 @@ function renderTabByName(k){const fn=({issues:renderIssues,overview:renderOvervi
 $("#selMetric").onchange=e=>{S.metric=e.target.value;syncControls();recompute()};
 $("#selGroup").onchange=e=>{S.group=e.target.value;recompute()};
 $("#selChart").onchange=e=>{S.chart=e.target.value;applyScope();recompute()};
-if($("#selRelChart"))$("#selRelChart").onchange=e=>{S.relChart=e.target.value;};
+if($("#selRelChart"))$("#selRelChart").onchange=e=>{S.relChart=normalizeRelChart(e.target.value);if($("#selRelChart").value!==S.relChart)$("#selRelChart").value=S.relChart;};
 if($("#selXrSize"))$("#selXrSize").onchange=e=>{S.xrSize=+e.target.value;recompute()};
 if($("#selXrMode"))$("#selXrMode").onchange=e=>{S.xrMode=e.target.value;recompute()};
 $("#selPad").onchange=e=>{S.pad=e.target.value;recompute()};

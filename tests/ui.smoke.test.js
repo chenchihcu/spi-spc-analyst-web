@@ -105,6 +105,10 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   tab("improve"); d.querySelector('[data-subnav-improve="compare"]').click();
   d.querySelector('[data-subnav-improve="dfm"]').click();
   $("#btnSample").click();
+  hook.S.relChart = "quad";
+  change($("#selMetric"), $("#selMetric").value);
+  assert.equal(hook.S.relChart, "specScatter", "已移除的關係圖種應回到規格散點");
+  assert.equal($("#selRelChart").value, "specScatter");
 
   assert.deepEqual(errs, []);
 });
