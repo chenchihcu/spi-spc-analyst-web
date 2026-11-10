@@ -127,10 +127,23 @@ test("D-02 / R-MAIL：整頁「轉寄」畫面 (#mail) 欄位與無彈窗規範"
   assert.ok(d.querySelector("#btnMailOpenMailto"), "存在開啟郵件按鈕 #btnMailOpenMailto");
   assert.ok(d.querySelector("#btnMailBack"), "存在返回報告按鈕 #btnMailBack");
 
-  // 4. 10 個章節勾選框皆存在
+  // 4. 轉寄頁共用報告頁章節勾選（無第二組核取方塊）
+  assert.ok(d.querySelector("#mailChapterSummary"), "存在轉寄章節摘要 #mailChapterSummary");
+  assert.ok(d.querySelector("#btnMailEditChapters"), "存在前往報告調整章節連結");
+  assert.equal(d.querySelector("#chkMailRep1"), null, "不得再存在獨立轉寄章節勾選框");
   for (let i = 1; i <= 10; i++) {
-    assert.ok(d.querySelector("#chkMailRep" + i), `存在轉寄章節 ${i} 勾選框`);
+    assert.ok(d.querySelector("#chkRep" + i), `報告頁章節 #chkRep${i} 仍存在`);
   }
+  assert.ok(H.getMailChapters, "公開 getMailChapters hook");
+  assert.ok(H.getReportChapters, "公開 getReportChapters hook");
+  const chk1 = d.querySelector("#chkRep1");
+  const before = H.getMailChapters()[1];
+  chk1.checked = !chk1.checked;
+  chk1.dispatchEvent(new dom.window.Event("change", { bubbles: true }));
+  assert.equal(H.getMailChapters()[1], chk1.checked, "轉寄 PDF 章節設定跟隨報告頁 #chkRep*");
+  assert.match(d.querySelector("#mailChapterSummary").textContent, /目前勾選|未勾選/, "章節摘要隨勾選更新");
+  chk1.checked = before;
+  chk1.dispatchEvent(new dom.window.Event("change", { bubbles: true }));
 
   // 5. 無 modal 規範檢驗：全檔不含 showModal 與 <dialog>
   const fileContent = fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "spi-spc.html"), "utf8");
