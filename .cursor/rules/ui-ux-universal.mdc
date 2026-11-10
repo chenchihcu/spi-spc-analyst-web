@@ -73,7 +73,7 @@ alwaysApply: false
 - 長中文文字在表格 / 標籤要省略(elide)並用 tooltip 顯示完整內容,不靜默截斷。
 - 確認無缺字方塊(□ tofu);字型要涵蓋 CJK。
 - 在最小可用寬度下檢查內容是否被切除(clipping)。
-- CJK 字重優先用 `400` 與 `700`,避免 `500` / `600`(Windows 渲染不一致)。
+- CJK 字重標準：全系統（含桌面 Qt 與 Web）統一採用 `400` (`font-normal`) 與 `700` (`font-bold`) 雙字重；嚴禁使用 `500` (`font-medium`)、`600` (`font-semibold`)、`800` (`font-extrabold`)、`900` (`font-black`)，杜絕 Windows 非 Retina 螢幕 CJK 合成粗體筆畫糊化與跨頁粗細漂移。
 
 ## 7. 表單密度 [全]
 
@@ -96,7 +96,12 @@ alwaysApply: false
 
 ## 9. Web / 響應式 [Web]
 
-- 字型以共用 `--font-sans`、`--font-display`、`--font-mono` 或既有等價 token 為正本；繁中 fallback 涵蓋 PingFang TC、Segoe UI、Microsoft JhengHei、Noto Sans TC 等可用系統字型，不強依賴外部 CDN。表單控制項繼承字型；動態數值／KPI 用 `tabular-nums`。
+- 字型以共用 `--font-sans` 與 `--font-mono`（或既有等價 token）為正本；西文字型優先且繁中 fallback 涵蓋 Noto Sans TC、PingFang TC、Microsoft JhengHei 等可用系統字型，不強依賴外部 CDN。表單控制項（input, select, textarea, button）必須顯式繼承字型 token (`font-family: inherit`)；動態數值、單號與 KPI 數值使用 `font-mono tabular-nums`。
+- 字級規範與語義 Token 原則：
+  - 嚴格禁止小於 12px 的任意自訂字級（嚴禁 `text-[10px]`、`text-[11px]`）。
+  - 標題與 KPI 必須使用語義字級 Token（如 `text-kpi` 30px、`text-kpi-sm` 24px、`text-heading-page` 18px、`text-heading-section` 16px、`text-subhead` 13px），禁止使用裸 `text-lg`、`text-xl`、`text-2xl`、`text-3xl`。
+  - 內文、表單與表格得採語義 Token 與標準階梯雙軌對等使用：標準內文與標籤為 14px（`text-body` / `text-sm`，粗體為 `font-bold`）；輔助微文案、狀態標籤與時間戳記為 12px（`text-meta` / `text-xs`）。
+  - 桌機表單輸入框標準字級為 14px（`text-sm` / `text-body`），禁止於桌機縮小為 12px；行動端輸入框維持 ≥ 16px（例如 `text-base sm:text-sm`）以防止 iOS Safari 自動放大破壞視圖。
 - 有手機響應式需求時，viewport 使用 `width=device-width, initial-scale=1, viewport-fit=cover` 並保留使用者縮放；不加入 `user-scalable=no` 或鎖死最大縮放。
 - 一般內容在 320 CSS px 下重排並保持操作可達；本質為二維的資料表／圖表可保留必要局部捲動。只有表格確實於 ≤767px 轉為 block 卡片時，才在該表格作用域隱藏 `colgroup` 並驗證 WebKit 欄寬；不得全域隱藏所有 colgroup。
 - 相同語意內容優先用同一 DOM 配合 CSS 斷點重排，避免雙份 Desktop／Mobile 節點干擾焦點、可存取名稱及測試；不同功能的導覽以角色和範圍精確定位，不因測試衝突刪除必要入口。

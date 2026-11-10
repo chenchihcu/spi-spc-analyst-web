@@ -923,7 +923,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.15.2</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.15.3</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <div class="db-capsule-group" role="group" aria-label="雲端記錄庫與套用狀態">
@@ -938,8 +938,8 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
       <button class="chip chipBtn" id="btnMore" aria-haspopup="menu" aria-expanded="false" aria-controls="moreMenu">更多 ▾</button>
       <div class="menu" id="moreMenu" role="menu" hidden>
         <p class="menu-user" id="userChip" hidden>帳號 <b id="userName"></b></p>
-        <button role="menuitem" id="btnTheme" title="切換明亮或深色主題">主題：明亮（切換深色）</button>
-        <button role="menuitem" id="btnPrint" hidden title="列印目前頁籤，或在列印視窗選「另存為 PDF」">列印／存成 PDF</button>
+        <button role="menuitem" id="btnTheme" title="切換明亮或深色主題">主題：明亮（深色模式）</button>
+        <button role="menuitem" id="btnPrint" hidden title="列印目前頁籤，或在列印視窗選「另存為 PDF」">列印／匯出 PDF</button>
         <button role="menuitem" id="btnShare" hidden title="把目前的回合與畫面做成連結，傳給同事開啟">分享連結</button>
         <button role="menuitem" id="btnMyShares" hidden title="檢視與管理自己建立的分享連結">我的分享</button>
         <a role="menuitem" id="logoutLink" href="/__logout" hidden>登出</a>
@@ -1116,7 +1116,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     <div class="card"><h3>直方圖與常態曲線 <small id="histSub"></small></h3>
             <div class="legend"><span><i class="sq" style="background:var(--series2)"></i>實測分布</span><span><i style="border-color:var(--accent)"></i>常態擬合</span><span><i class="dash" style="border-color:var(--ng)"></i>LSL / USL</span></div>
       <div class="chartbox tall"><canvas id="cHist" role="img" aria-label="直方圖"></canvas></div></div>
-    <div class="card"><h3>常態機率圖 Q-Q <small id="qqSub"></small></h3>
+    <div class="card"><h3>常態機率圖 <small id="qqSub"></small></h3>
             <div class="chartbox tall"><canvas id="cQQ" role="img" aria-label="常態機率圖"></canvas></div></div>
   </div>
   <div class="card"><h3>各板盒鬚圖 </h3>
@@ -1130,7 +1130,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
       <button id="btnWorst">跳到最差板</button>
       <button id="btnPlay" aria-pressed="false">逐板播放</button>
       <button type="button" id="btn3dTouch" aria-pressed="false" title="手機預設單指上下捲動頁面；開啟後可單指旋轉 3D">操作 3D</button>
-      <button type="button" id="btnDl3d">下載 3D 圖</button>
+      <button type="button" id="btnDl3d">匯出 3D 圖</button>
       <div class="field"><label>外觀模式</label><div class="seg" id="seg3dRenderMode">
         <button type="button" data-m="real" aria-pressed="true">真實外觀</button><button type="button" data-m="heatmap" aria-pressed="false">品質熱圖</button></div></div>
       <div class="field"><label>著色</label><div class="seg" id="segColor">
@@ -1179,7 +1179,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
   <div class="card"><h3>交叉驗證矩陣 </h3>
         <div class="tbl"><table class="xv" id="xvTbl"></table></div></div>
   <div class="grid2">
-    <div class="card"><h3>高度 × 面積 散佈 <small id="scSub"></small></h3>
+    <div class="card"><h3>高度與面積散佈圖 <small id="scSub"></small></h3>
       <div class="chartbox tall"><canvas id="cScatter" role="img" aria-label="高度與面積散佈圖"></canvas></div></div>
     <div class="card"><h3>焊墊位置熱圖 <small id="heatSub"></small></h3>
       <canvas class="heat" id="heat" width="900" height="600" role="img" aria-label="依焊墊位置的平均值熱圖"></canvas>
@@ -1386,7 +1386,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     </div>
     <button type="button" id="btnGoAiCfg">前往 AI 與配額設定</button>
   </div>
-  <div class="card"><h3>AI 品質工程分析 <small id="aiCardSub">將目前統計結果與交叉驗證送出，嚴格區分事實與推論</small></h3>
+  <div class="card"><h3>AI 品質工程分析 <small id="aiCardSub">嚴格區分事實與推論之品質工程診斷</small></h3>
     <div class="notice" id="aiNoticeBox" style="background:var(--surface2);padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:var(--fs-ui);color:var(--ink)">
       <p style="margin:0 0 6px"><b>送出前告知與資料隱私保護：</b></p>
       <ul style="margin:0 0 6px 18px;padding:0;line-height:1.6">
@@ -1669,7 +1669,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
         <b>注意事項：</b>開啟者須登入本站才能存取；建立分享時，此回合的量測資料與設定將上傳並保存在本站伺服器（供授權同事檢視）。
       </p>
       <div class="row" style="margin-top:16px">
-        <button type="button" class="primary" id="btnConfirmShare">確認建立分享連結</button>
+        <button type="button" class="primary" id="btnConfirmShare">確定建立分享連結</button>
       </div>
     </div>
     <div id="sharePostBox" hidden style="margin-top:16px">
@@ -1682,7 +1682,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
         <button type="button" class="chipbtn danger" id="btnRevokeCurrent">撤銷此連結</button>
         <span id="revokeConfirmSpan" hidden>
           確定要撤銷此連結嗎？撤銷後將立刻失效：
-          <button type="button" class="danger" id="btnConfirmRevokeCurrent">確認撤銷</button>
+          <button type="button" class="danger" id="btnConfirmRevokeCurrent">確定撤銷</button>
           <button type="button" id="btnCancelRevokeCurrent">取消</button>
         </span>
         <span class="note" id="shareRevokeMsg"></span>
@@ -1769,7 +1769,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
       <button type="button" class="primary" id="btnSharePdf" disabled>分享 PDF 到郵件…</button>
       <button type="button" id="btnSharePdfWithSummary" disabled>連同摘要分享</button>
       <span class="note" id="lblAppleNote" style="font-size:var(--fs-caption);color:var(--muted);display:none">（部分 iPhone 版本此方式不會出現「儲存到檔案」）</span>
-      <button type="button" id="btnMailDlPdf" disabled>下載 PDF</button>
+      <button type="button" id="btnMailDlPdf" disabled>匯出 PDF</button>
       <button type="button" id="btnMailOpenMailto">開啟郵件軟體</button>
     </div>
   </div>
@@ -1848,8 +1848,8 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 
       <div class="sheet-sec-title">操作與帳號</div>
       <div class="sheet-list" id="sheetUserTools">
-        <button type="button" class="sheet-row" id="mBtnTheme"><span>主題：明亮（切換深色）</span><span class="sheet-arrow">›</span></button>
-        <button type="button" class="sheet-row" id="mBtnPrint" hidden><span>列印／存成 PDF</span><span class="sheet-arrow">›</span></button>
+        <button type="button" class="sheet-row" id="mBtnTheme"><span>主題：明亮（深色模式）</span><span class="sheet-arrow">›</span></button>
+        <button type="button" class="sheet-row" id="mBtnPrint" hidden><span>列印／匯出 PDF</span><span class="sheet-arrow">›</span></button>
         <button type="button" class="sheet-row" id="mBtnShare" hidden><span>分享連結</span><span class="sheet-arrow">›</span></button>
         <button type="button" class="sheet-row" id="mBtnMyShares" hidden><span>我的分享</span><span class="sheet-arrow">›</span></button>
         <a class="sheet-row" id="mLogoutLink" href="/__logout" hidden><span>登出</span><span class="sheet-arrow">›</span></a>
@@ -2000,18 +2000,18 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
         </div>
         <button type="button" class="primary" id="btnDownloadStandardBundle" style="display:inline-flex;align-items:center;gap:6px">
           <svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          一鍵下載標準交付包 (PDF+XLSX+DFM)
+          一鍵匯出標準交付包 (PDF+XLSX+DFM)
         </button>
       </div>
 
-      <!-- 批次下載操作列 -->
+      <!-- 批次匯出操作列 -->
       <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;padding:6px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--line)">
         <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;margin:0;font-size:var(--fs-ui);font-weight:500">
           <input type="checkbox" id="chkExportSelectAll" aria-label="全選所有匯出項目"> 全選所有項目
         </label>
         <div style="display:inline-flex;align-items:center;gap:10px">
           <span id="exportQueueStatus" class="note" style="font-size:var(--fs-caption)"></span>
-          <button type="button" id="btnDownloadSelected" class="primary btn-sm" style="font-size:var(--fs-ui)">下載已勾選項目 (<span id="exportSelectedCount">0</span>)</button>
+          <button type="button" id="btnDownloadSelected" class="primary btn-sm" style="font-size:var(--fs-ui)">匯出已勾選項目 (<span id="exportSelectedCount">0</span>)</button>
         </div>
       </div>
 
@@ -2030,7 +2030,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
                 <div class="exp-item-desc">包含圖表、製程能力與判定總結</div>
               </div>
             </div>
-            <button type="button" class="btn-sm" data-exp-act="rep-pdf" title="立即下載完整 PDF 報告">下載</button>
+            <button type="button" class="btn-sm" data-exp-act="rep-pdf" title="立即匯出完整 PDF 報告">匯出</button>
           </div>
 
           <div class="exp-item-card">
@@ -2041,7 +2041,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
                 <div class="exp-item-desc">壓縮圖檔小於 5MB，便於 Email 寄送</div>
               </div>
             </div>
-            <button type="button" class="btn-sm" data-exp-act="rep-pdf-lite" title="立即下載精簡版 PDF 報告">下載</button>
+            <button type="button" class="btn-sm" data-exp-act="rep-pdf-lite" title="立即匯出精簡版 PDF 報告">匯出</button>
           </div>
 
           <div class="exp-item-card">
@@ -2052,7 +2052,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
                 <div class="exp-item-desc">LLM 製程根因推理與工程改進行動</div>
               </div>
             </div>
-            <button type="button" class="btn-sm" data-exp-act="ai-md" title="立即下載 AI 報告 Markdown">下載</button>
+            <button type="button" class="btn-sm" data-exp-act="ai-md" title="立即匯出 AI 報告 Markdown">匯出</button>
           </div>
 
           <div class="exp-item-card">
@@ -2063,7 +2063,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
                 <div class="exp-item-desc">結構化純文字完整分析結論</div>
               </div>
             </div>
-            <button type="button" class="btn-sm" data-exp-act="rep-md" title="立即下載分析報告 Markdown">下載</button>
+            <button type="button" class="btn-sm" data-exp-act="rep-md" title="立即匯出分析報告 Markdown">匯出</button>
           </div>
         </div>
       </div>
@@ -2083,7 +2083,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
                 <div class="exp-item-desc">完整問題統計與 Excel 試算表</div>
               </div>
             </div>
-            <button type="button" class="btn-sm" data-exp-act="iss-xlsx" title="立即下載問題清單 Excel">下載</button>
+            <button type="button" class="btn-sm" data-exp-act="iss-xlsx" title="立即匯出問題清單 Excel">匯出</button>
           </div>
 
           <div class="exp-item-card">
@@ -2094,7 +2094,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
                 <div class="exp-item-desc">輕量化 CSV 缺陷數據與指標</div>
               </div>
             </div>
-            <button type="button" class="btn-sm" data-exp-act="iss-csv" title="立即下載問題清單 CSV">下載</button>
+            <button type="button" class="btn-sm" data-exp-act="iss-csv" title="立即匯出問題清單 CSV">匯出</button>
           </div>
 
           <div class="exp-item-card">
@@ -2105,7 +2105,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
                 <div class="exp-item-desc">錫膏印刷機自動閉環偏移修正參數</div>
               </div>
             </div>
-            <button type="button" class="btn-sm" data-exp-act="correction-json" title="立即下載補償參數 JSON">下載</button>
+            <button type="button" class="btn-sm" data-exp-act="correction-json" title="立即匯出補償參數 JSON">匯出</button>
           </div>
 
           <div class="exp-item-card">
@@ -2116,7 +2116,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
                 <div class="exp-item-desc">偏離 ±3σ 管制界限之焊墊統計清單</div>
               </div>
             </div>
-            <button type="button" class="btn-sm" data-exp-act="stats-csv" title="立即下載管制圖 CSV">下載</button>
+            <button type="button" class="btn-sm" data-exp-act="stats-csv" title="立即匯出管制圖 CSV">匯出</button>
           </div>
 
           <div class="exp-item-card">
@@ -2127,7 +2127,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
                 <div class="exp-item-desc">每塊基板之均值、標準差與合格率</div>
               </div>
             </div>
-            <button type="button" class="btn-sm" data-exp-act="board-csv" title="立即下載各板良率 CSV">下載</button>
+            <button type="button" class="btn-sm" data-exp-act="board-csv" title="立即匯出各板良率 CSV">匯出</button>
           </div>
 
           <div class="exp-item-card">
@@ -2138,7 +2138,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
                 <div class="exp-item-desc">違反規格上下限之焊墊明細數值</div>
               </div>
             </div>
-            <button type="button" class="btn-sm" data-exp-act="def-csv" title="立即下載不良焊墊 CSV">下載</button>
+            <button type="button" class="btn-sm" data-exp-act="def-csv" title="立即匯出不良焊墊 CSV">匯出</button>
           </div>
 
           <div class="exp-item-card">
@@ -2149,7 +2149,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
                 <div class="exp-item-desc">跨回合前後對比與製程改善結論</div>
               </div>
             </div>
-            <button type="button" class="btn-sm" data-exp-act="cmp-md" title="立即下載對比結論 Markdown">下載</button>
+            <button type="button" class="btn-sm" data-exp-act="cmp-md" title="立即匯出對比結論 Markdown">匯出</button>
           </div>
         </div>
       </div>
@@ -2169,7 +2169,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
                 <div class="exp-item-desc">寬深比、面積比檢驗與開孔尺寸修正</div>
               </div>
             </div>
-            <button type="button" class="btn-sm" data-exp-act="dfm-csv" title="立即下載 DFM 建議 CSV">下載</button>
+            <button type="button" class="btn-sm" data-exp-act="dfm-csv" title="立即匯出 DFM 建議 CSV">匯出</button>
           </div>
 
           <div class="exp-item-card">
@@ -2180,7 +2180,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
                 <div class="exp-item-desc">開孔設計修正說明與 IPC 建議</div>
               </div>
             </div>
-            <button type="button" class="btn-sm" data-exp-act="dfm-md" title="立即下載 DFM 說明 Markdown">下載</button>
+            <button type="button" class="btn-sm" data-exp-act="dfm-md" title="立即匯出 DFM 說明 Markdown">匯出</button>
           </div>
 
           <div class="exp-item-card">
@@ -2191,7 +2191,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
                 <div class="exp-item-desc">全板 3D 錫膏厚度分佈立體渲染截圖</div>
               </div>
             </div>
-            <button type="button" class="btn-sm" data-exp-act="snap-3d" title="立即下載 3D 快照 PNG">下載</button>
+            <button type="button" class="btn-sm" data-exp-act="snap-3d" title="立即匯出 3D 快照 PNG">匯出</button>
           </div>
         </div>
       </div>
@@ -10037,10 +10037,10 @@ async function renderRecords(force){if(!$("#recSpi"))return;await RecDB.ready;$(
   $("#recSpi").innerHTML=S1.length?`<thead><tr><th>批號</th><th>產品料號</th><th>工單</th><th>面別</th><th>原始檔</th><th class="num">板 × 焊墊</th><th>上傳者</th><th>上傳時間</th><th>檔案指紋</th><th></th></tr></thead><tbody>`+S1.map(r=>{
     const wo=[r.workOrder?`製令:${esc(r.workOrder)}`:"",r.measuredDate?`日期:${esc(r.measuredDate)}`:"",r.supplierWo?`廠:${esc(r.supplierWo)}`:"",r.outsourceWo?`委:${esc(r.outsourceWo)}`:""] .filter(Boolean).join("<br>")||"未提供";
     return `<tr><td><b>${esc(r.lot||"未提供")}</b></td><td>${esc(r.part)} ${esc(r.rev||"")}<br><span class="note">${esc(r.lifecycle==="active"?"有效":r.lifecycle==="pending_review"?"待管理者判定":r.lifecycle==="superseded"?"已被修正":"舊資料・未受控")}</span></td><td style="font-size:var(--fs-caption)">${wo}</td><td>${esc(r.side||"—")}</td><td>${esc(r.name)}<br><span class="note">${r.bytes<1024?`${r.bytes} B`:`${(r.bytes/1024).toFixed(0)} KB`}</span></td><td class="num mono">${r.boards||"—"} × ${r.pads||"—"}</td><td>${esc(r.user)}</td><td class="mono" style="white-space:nowrap">${esc(fmtTime(r.created))}</td><td>${fp(r)}</td>
-    <td><div class="rec-act">${r.lifecycle!=="pending_review"?`<button data-ract="open" data-id="${esc(r.id)}">${r.lifecycle==="superseded"?"歷史檢視":"開啟分析"}</button>`:""}<button data-ract="dl" data-id="${esc(r.id)}">下載原始檔</button><button data-ract="ver" data-id="${esc(r.id)}">驗證</button>${del(r)}</div></td></tr>`;
+    <td><div class="rec-act">${r.lifecycle!=="pending_review"?`<button data-ract="open" data-id="${esc(r.id)}">${r.lifecycle==="superseded"?"歷史檢視":"開啟分析"}</button>`:""}<button data-ract="dl" data-id="${esc(r.id)}">匯出原始檔</button><button data-ract="ver" data-id="${esc(r.id)}">驗證</button>${del(r)}</div></td></tr>`;
   }).join("")+"</tbody>":`<tbody><tr><td colspan="10" class="note">${q?"沒有符合的量測紀錄":"尚無量測紀錄。在「匯入與規格」匯入檔案並填寫批號、產品料號後，原始檔會自動存到這裡。"}</td></tr></tbody>`;
   $("#recPlace").innerHTML=P1.length?`<thead><tr><th>產品料號</th><th>版次／面別</th><th>原始檔</th><th class="num">元件數</th><th>上傳者</th><th>上傳時間</th><th>檔案指紋</th><th></th></tr></thead><tbody>`+P1.map(r=>`<tr${PLACE&&PLACE.recId===r.id?' style="background:var(--accent-soft)"':""}><td><b>${esc(r.part)}</b></td><td>${esc(r.rev)} ${esc(r.side)}<br><span class="note">${esc(r.lifecycle==="active"?"有效":r.lifecycle==="archived"?"已封存":"舊資料・未受控")}</span></td><td>${esc(r.name)}</td><td class="num mono">${r.comps||"—"}</td><td>${esc(r.user)}</td><td class="mono" style="white-space:nowrap">${esc(fmtTime(r.created))}</td><td>${fp(r)}</td>
-    <td><div class="rec-act">${PLACE&&PLACE.recId===r.id?'<span class="pill ok">目前已選取</span>':r.lifecycle==="active"&&r.validation_source==="server_verified"?`<button data-ract="use" data-id="${esc(r.id)}">選取座標檔</button>`:""}${RecDB.isAdmin&&r.lifecycle==="active"?`<button data-ract="archive" data-id="${esc(r.id)}">封存</button>`:""}<button data-ract="dl" data-id="${esc(r.id)}">下載原始檔</button><button data-ract="ver" data-id="${esc(r.id)}">驗證</button>${del(r)}</div></td></tr>`).join("")+"</tbody>":`<tbody><tr><td class="note">${q?"沒有符合的座標檔":"尚無座標檔。請由管理者先上傳並登錄。"}</td></tr></tbody>`;
+    <td><div class="rec-act">${PLACE&&PLACE.recId===r.id?'<span class="pill ok">目前已選取</span>':r.lifecycle==="active"&&r.validation_source==="server_verified"?`<button data-ract="use" data-id="${esc(r.id)}">選取座標檔</button>`:""}${RecDB.isAdmin&&r.lifecycle==="active"?`<button data-ract="archive" data-id="${esc(r.id)}">封存</button>`:""}<button data-ract="dl" data-id="${esc(r.id)}">匯出原始檔</button><button data-ract="ver" data-id="${esc(r.id)}">驗證</button>${del(r)}</div></td></tr>`).join("")+"</tbody>":`<tbody><tr><td class="note">${q?"沒有符合的座標檔":"尚無座標檔。請由管理者先上傳並登錄。"}</td></tr></tbody>`;
   await renderRecSpecs(list,hit,fp);
   if($("#recAuditBox").open)renderAudit()}
 /* 料號規格版本（kind:"spec"）不在一般清單內，依料號另外取；REC_SPECS 供按鈕與稽核頁對照版本號 */
@@ -10053,7 +10053,7 @@ async function renderRecSpecs(list,hit,fp){const tb=$("#recSpec");if(!tb)return;
   $("#recSpecSub").textContent=`${L.length} 個版本${q?"（篩選後）":""}`;
   const applied=S.partSpec&&S.partSpec.id;
   tb.innerHTML=L.length?`<thead><tr><th>產品料號</th><th>版本</th><th style="min-width:12em">備註</th><th>建立者</th><th>建立時間</th><th>檔案指紋</th><th></th></tr></thead><tbody>`+L.map(r=>`<tr${applied===r.id?' style="background:var(--accent-soft)"':""}><td>${esc(r.part)}</td><td class="mono" style="white-space:nowrap">v${r.ver}${r.isDefault?' <span class="pill ok">預設</span>':""}</td><td>${esc(r.note||"—")}</td><td>${esc(r.user)}</td><td class="mono" style="white-space:nowrap">${esc(fmtTime(r.created))}</td><td>${fp(r)}</td>
-    <td><div class="rec-act">${applied===r.id?'<span class="pill ok">目前套用</span>':(r.part===cur&&S.specSrc!=="sample"?`<button data-ract="suse" data-id="${esc(r.id)}">套用到目前回合</button>`:"")}${r.isDefault?"":`<button data-ract="sdef" data-id="${esc(r.id)}">設為預設</button>`}<button data-ract="dl" data-id="${esc(r.id)}">下載 JSON</button><button data-ract="ver" data-id="${esc(r.id)}">驗證</button></div></td></tr>`).join("")+"</tbody>"
+    <td><div class="rec-act">${applied===r.id?'<span class="pill ok">目前套用</span>':(r.part===cur&&S.specSrc!=="sample"?`<button data-ract="suse" data-id="${esc(r.id)}">套用到目前回合</button>`:"")}${r.isDefault?"":`<button data-ract="sdef" data-id="${esc(r.id)}">設為預設</button>`}<button data-ract="dl" data-id="${esc(r.id)}">匯出 JSON</button><button data-ract="ver" data-id="${esc(r.id)}">驗證</button></div></td></tr>`).join("")+"</tbody>"
     :`<tbody><tr><td class="note">${q?"沒有符合的料號規格":parts.length?"這些料號都還沒有規格版本。在「規格設定」填好規格後按「儲存為新版本」。":"尚無料號。匯入量測紀錄後，可在「規格設定」為該料號儲存規格。"}</td></tr></tbody>`}
 /* 稽核頁：把紀錄 id 換成看得懂的版本（料號規格 v<n>、座標檔版本＋面別）；已刪除或不在清單內的顯示代碼前 6 碼 */
 function auditFp(e){
@@ -10126,14 +10126,14 @@ $("#recCard").addEventListener("click",async e=>{const b=e.target.closest("[data
   try{if(act==="open")return openRecord(rec);
     if(act==="sdef"){b.disabled=true;await RecDB.setDefaultSpec(id);if(S.partSpec&&S.partSpec.part===rec.part){S.partSpec.isDefault=S.partSpec.id===id;saveRunsSoon()}await renderRecords(true);toast(`已將料號 ${rec.part} 規格 v${rec.ver} 設為預設`);return}
     if(act==="suse"){if(specDirty()&&!(await askDiscard(`套用 v${rec.ver} 會清除表單中未儲存的規格修改。`)))return;useSpec(rec,await loadSpecRec(rec));renderRecords();toast(`已套用料號 ${rec.part} 規格 v${rec.ver}`);return}
-    if(act==="dl"&&rec.kind==="spec"){const g=await RecDB.get(rec),dl=specDownloadInfo(rec),fn=dl.filename;await saveBytes(fn,g.bytes);const warning=dl.warning?`；${dl.warning}`:"";$("#recState").textContent=`已下載 ${fn}${warning}`;if(!g.ok){$("#recState").innerHTML=`<span class="err">已下載 ${esc(fn)}（注意：檔案指紋與存檔時不同）${esc(warning)}</span>`;toast("注意：檔案指紋與存檔時不同")}else if(dl.warning)toast(dl.warning);return}
-    if(act==="dl"){const g=await RecDB.get(rec);await saveBytes(rec.name,g.bytes);if(!g.ok){$("#recState").innerHTML=`<span class="err">已下載 ${esc(rec.name)}（注意：檔案指紋與上傳時不同）</span>`;toast("注意：檔案指紋與上傳時不同")}else{$("#recState").textContent="已下載 "+rec.name}return}
+    if(act==="dl"&&rec.kind==="spec"){const g=await RecDB.get(rec),dl=specDownloadInfo(rec),fn=dl.filename;await saveBytes(fn,g.bytes);const warning=dl.warning?`；${dl.warning}`:"";$("#recState").textContent=`已匯出 ${fn}${warning}`;if(!g.ok){$("#recState").innerHTML=`<span class="err">已匯出 ${esc(fn)}（注意：檔案指紋與存檔時不同）${esc(warning)}</span>`;toast("注意：檔案指紋與存檔時不同")}else if(dl.warning)toast(dl.warning);return}
+    if(act==="dl"){const g=await RecDB.get(rec);await saveBytes(rec.name,g.bytes);if(!g.ok){$("#recState").innerHTML=`<span class="err">已匯出 ${esc(rec.name)}（注意：檔案指紋與上傳時不同）</span>`;toast("注意：檔案指紋與上傳時不同")}else{$("#recState").textContent="已匯出 "+rec.name}return}
     if(act==="ver"){b.disabled=true;b.textContent="驗證中…";try{const g=await RecDB.get(rec);REC_VER[id]={ok:g.ok}}catch(er){REC_VER[id]={ok:false,msg:er.message}}renderRecords();return}
     if(act==="use"){await usePlaceRec(rec);renderRecords();toast(`已改用座標檔 ${rec.part} ${rec.rev}`);if(IMP&&IMP.raw)reconvert();return}
     if(act==="archive"){if(!window.confirm(`封存 ${rec.part} ${rec.rev} ${rec.side}？`))return;await RecDB.manage(id,"archive_place");if(PLACE?.recId===id){PLACE=null;placeSave();placeShow()}await renderRecords(true);updateLoadStates();toast("座標檔已封存");return}
     if(act==="del"){if(REC_CONFIRM!==id){REC_CONFIRM=id;renderRecords();setTimeout(()=>{if(REC_CONFIRM===id){REC_CONFIRM=null;renderRecords()}},6000);return}
       REC_CONFIRM=null;await RecDB.del(id);if(PLACE&&PLACE.recId===id){PLACE=null;placeSave();placeShow()}delete REC_VER[id];await renderRecords(true);toast(`已刪除 ${rec.kind==="spi"?"批號 "+rec.lot:"座標檔 "+rec.part+" "+rec.rev}（稽核紀錄保留）`)}}
-  catch(er){if(er&&er.code==="declined")$("#recState").textContent="已取消下載";else $("#recState").innerHTML=`<span class="err">${esc(er.message||String(er))}</span>`;renderRecords()}});
+  catch(er){if(er&&er.code==="declined")$("#recState").textContent="已取消匯出";else $("#recState").innerHTML=`<span class="err">${esc(er.message||String(er))}</span>`;renderRecords()}});
 
 /* ---------- 開機載入中樞與資料庫選取視窗 (Record Picker) ---------- */
 let BANNER_DISMISSED = false;
@@ -10506,7 +10506,7 @@ async function renderRecPicker(force) {
             <button class="btn-sm" data-pact="ver" data-id="${esc(r.id)}" title="檢查原檔指紋與座標對應">驗證</button>
             <button class="btn-sm" data-pact="open" data-id="${esc(r.id)}" title="開啟至匯入對應面板以檢視或調整欄位">調整</button>
             ${editBtn(r)}
-            <button class="btn-sm" data-pact="dl" data-id="${esc(r.id)}">下載</button>
+            <button class="btn-sm" data-pact="dl" data-id="${esc(r.id)}">匯出</button>
             ${RecDB.isAdmin&&r.lifecycle==="pending_review"?`<span class="sep" aria-hidden="true"></span><button class="btn-sm" data-pact="new-batch" data-id="${esc(r.id)}">新一批</button><button class="btn-sm" data-pact="correct" data-id="${esc(r.id)}">修正既有</button>`:""}
             ${delBtn(r)}
           </div>
@@ -10553,7 +10553,7 @@ async function renderRecPicker(force) {
           ${again && again.length ? `<button data-pact="goto" data-id="${esc(again[0].id)}" style="min-height:44px;font-size:var(--fs-ui)">已重新匯入 →</button>` : !pt && canReimport(r) ? `<button data-pact="reimport" data-id="${esc(r.id)}" style="min-height:44px;font-size:var(--fs-ui)">重新受控匯入</button>` : ""}
           ${RecDB.isAdmin&&r.lifecycle==="pending_review"?`<button data-pact="new-batch" data-id="${esc(r.id)}">新一批</button><button data-pact="correct" data-id="${esc(r.id)}">修正既有</button>`:""}
           ${editBtn(r)}
-          <button data-pact="dl" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-ui)">下載</button>
+          <button data-pact="dl" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-ui)">匯出</button>
           ${delBtn(r)}
         </div>
       </div>`;
@@ -10590,7 +10590,7 @@ async function renderRecPicker(force) {
             ${isCur ? '<span class="pill ok">目前已選取</span>' : selectable?`<button class="primary btn-sm" data-pact="use-place" data-id="${esc(r.id)}">選取</button>`:r.lifecycle==="archived"?`<span class="note" title="${ARCHIVED_TIP}">不可用於新匯入</span>`:""}
             <button class="btn-sm" data-pact="ver" data-id="${esc(r.id)}" title="檢查原檔指紋並列出引用的量測">驗證</button>
             ${editBtn(r)}
-            <button class="btn-sm" data-pact="dl" data-id="${esc(r.id)}">下載</button>
+            <button class="btn-sm" data-pact="dl" data-id="${esc(r.id)}">匯出</button>
             ${RecDB.isAdmin&&(selectable||r.validation_source==="legacy")?'<span class="sep" aria-hidden="true"></span>':""}
             ${RecDB.isAdmin&&selectable?`<button class="btn-sm" data-pact="archive-place" data-id="${esc(r.id)}">封存</button>`:""}
             ${RecDB.isAdmin&&r.validation_source==="legacy"?`<button class="btn-sm" data-pact="register-legacy-place" data-id="${esc(r.id)}">驗證納管</button>`:""}
@@ -10627,7 +10627,7 @@ async function renderRecPicker(force) {
           ${RecDB.isAdmin&&selectable?`<button data-pact="archive-place" data-id="${esc(r.id)}">封存</button>`:""}
           ${RecDB.isAdmin&&r.validation_source==="legacy"?`<button data-pact="register-legacy-place" data-id="${esc(r.id)}">驗證納管</button>`:""}
           <button data-pact="ver" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-ui)">驗證</button>
-          <button data-pact="dl" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-ui)">下載</button>
+          <button data-pact="dl" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-ui)">匯出</button>
           ${delBtn(r)}
         </div>
       </div>`;
@@ -11010,7 +11010,7 @@ function setupRecPicker() {
         const g = await RecDB.get(rec);
         await saveBytes(rec.name, g.bytes);
         if (!g.ok) toast("注意：檔案指紋與上傳時不同");
-        else toast("已下載 " + rec.name);
+        else toast("已匯出 " + rec.name);
         return;
       }
       if (act === "ver" && RecDB.mode === "cloud") {
@@ -11052,7 +11052,7 @@ function setupRecPicker() {
     }
   });
 }
-/* ---------- 列印／存成 PDF：列印目前頁籤，固定用淺色，頁首附回合與設定資訊 ---------- */
+/* ---------- 列印／匯出 PDF：列印目前頁籤，固定用淺色，頁首附回合與設定資訊 ---------- */
 const IN_CLAUDE=!!window.claude||/(^|\.)claude(usercontent)?\.(ai|com)$/.test(location.hostname);
 let prTheme=null;
 let prOpenPrev=null;
@@ -11067,7 +11067,7 @@ function formatUtc8Date(date, fmt="YYYY/MM/DD HH:mm:ss"){
 }
 function safeFn(str){return String(str||"").replace(/[\\/:*?"<>|\s]+/g,"_").replace(/^_+|_+$/g,"")||"NA"}
 function specDownloadInfo(rec){const raw=rec&&rec.ver!=null?String(rec.ver).trim():"",hasVersion=!!raw&&!/^(?:undefined|null)$/i.test(raw),version=hasVersion?safeFn(raw):"",filename=`料號規格_${safeFn(rec&&rec.part)}_${hasVersion?`v${version}`:"版本未知"}.json`;
-  return{filename,warning:hasVersion?"":"這筆規格紀錄沒有版本號；下載檔名已標示「版本未知」"}}
+  return{filename,warning:hasVersion?"":"這筆規格紀錄沒有版本號；匯出檔名已標示「版本未知」"}}
 function pdfFileName(){
   const src=runSrc(curRun());
   const part=safeFn((src&&src.part)||S.part||"SAMPLE");
@@ -11282,7 +11282,7 @@ if($("#btnDl3d")){
     busy(true,"產生 3D 快照中…");
     try{
       const res=await capture3DImage();
-      if(!res.ok){toast("無法下載 3D 快照："+(res.reason||"未知錯誤"));return}
+      if(!res.ok){toast("無法匯出 3D 快照："+(res.reason||"未知錯誤"));return}
       const run=curRun()?curRun().name:S.source||"回合";
       const board=S.board||"板號";
       const ts=formatUtc8Date(new Date(),"YYYYMMDD-HHmm");
@@ -11290,8 +11290,8 @@ if($("#btnDl3d")){
       const a=document.createElement("a");
       a.href=res.dataUrl;a.download=fn;
       document.body.appendChild(a);a.click();a.remove();
-      toast(`已下載 3D 模擬圖 ${fn}`);
-    }catch(e){toast("下載失敗："+e.message)}
+      toast(`已匯出 3D 模擬圖 ${fn}`);
+    }catch(e){toast("匯出失敗："+e.message)}
     finally{busy(false)}
   };
 }
@@ -12088,7 +12088,7 @@ if($("#btnSharePdf")){
       navigator.share(shareData).catch(err=>{
         if(err&&err.name==="AbortError")return;
         const stText=$("#mailStatusText");
-        if(stText)stText.innerHTML=`<span class="bad">分享失敗：${esc(err.message||String(err))}，可改用下方「下載 PDF」或「開啟郵件」。</span>`;
+        if(stText)stText.innerHTML=`<span class="bad">分享失敗：${esc(err.message||String(err))}，可改用下方「匯出 PDF」或「開啟郵件」。</span>`;
       });
     }
   };
@@ -12105,7 +12105,7 @@ if($("#btnSharePdfWithSummary")){
       navigator.share(shareData).catch(err=>{
         if(err&&err.name==="AbortError")return;
         const stText=$("#mailStatusText");
-        if(stText)stText.innerHTML=`<span class="bad">分享失敗：${esc(err.message||String(err))}，可改用下方「下載 PDF」或「開啟郵件」。</span>`;
+        if(stText)stText.innerHTML=`<span class="bad">分享失敗：${esc(err.message||String(err))}，可改用下方「匯出 PDF」或「開啟郵件」。</span>`;
       });
     }
   };
@@ -12119,7 +12119,7 @@ if($("#btnMailDlPdf")){
     a.href=url;a.download=fn;
     document.body.appendChild(a);a.click();a.remove();
     setTimeout(()=>URL.revokeObjectURL(url),10000);
-    toast(`已下載 PDF 報告 ${fn}`);
+    toast(`已匯出 PDF 報告 ${fn}`);
   };
 }
 if($("#btnMailOpenMailto")){
@@ -12295,7 +12295,7 @@ syncMoreTools();
 function applyTheme(t, save){
   const mode=t==="dark"?"dark":"light";
   document.documentElement.setAttribute("data-theme",mode);
-  const lbl=mode==="dark"?"主題：深色（切換明亮）":"主題：明亮（切換深色）";
+  const lbl=mode==="dark"?"主題：深色（明亮模式）":"主題：明亮（深色模式）";
   if($("#btnTheme"))$("#btnTheme").textContent=lbl;
   if($("#mBtnTheme")){const s=$("#mBtnTheme").querySelector("span");if(s)s.textContent=lbl}
   if(save){try{localStorage.setItem("spi-theme",mode)}catch(e){}}
@@ -12417,7 +12417,7 @@ async function downloadDeliverablesQueue(types) {
   let idx = 0;
   for (const t of types) {
     idx++;
-    if (statusEl) statusEl.textContent = `佇列下載中 (${idx}/${types.length})…`;
+    if (statusEl) statusEl.textContent = `佇列匯出中 (${idx}/${types.length})…`;
     try {
       await triggerExportByType(t);
     } catch (e) {
@@ -12428,7 +12428,7 @@ async function downloadDeliverablesQueue(types) {
     }
   }
   if (statusEl) {
-    statusEl.textContent = `已完成 ${types.length} 項交付物下載`;
+    statusEl.textContent = `已完成 ${types.length} 項交付物匯出`;
     setTimeout(() => { if (statusEl) statusEl.textContent = ""; }, 4000);
   }
 }
@@ -12669,7 +12669,7 @@ function setupExportCenter() {
   const btnStandard = $("#btnDownloadStandardBundle");
   if (btnStandard) {
     btnStandard.onclick = () => {
-      toast("開始下載標準試產交付包（PDF + XLSX + DFM CSV）");
+      toast("開始匯出標準試產交付包（PDF + XLSX + DFM CSV）");
       downloadDeliverablesQueue(["rep-pdf", "iss-xlsx", "dfm-csv"]);
     };
   }
@@ -12679,11 +12679,11 @@ function setupExportCenter() {
     btnSelected.onclick = () => {
       const checked = modal.querySelectorAll(".exp-item-chk:checked");
       if (!checked || !checked.length) {
-        toast("請先勾選欲下載的交付項目");
+        toast("請先勾選欲匯出的交付項目");
         return;
       }
       const types = Array.from(checked).map(c => c.dataset.type).filter(Boolean);
-      toast(`開始批次下載 ${types.length} 項交付物`);
+      toast(`開始批次匯出 ${types.length} 項交付物`);
       downloadDeliverablesQueue(types);
     };
   }
