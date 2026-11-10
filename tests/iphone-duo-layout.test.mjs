@@ -96,7 +96,7 @@ test('4. JSDOM: 彈窗結構與多工雙欄容器完整性', { skip: !JSDOM && '
   const grid2Containers = $$('.grid2');
   assert.ok(grid2Containers.length >= 8, `需存在足夠的 .grid2 容器（目前發現 ${grid2Containers.length} 個）`);
   for (const g of grid2Containers) {
-    assert.ok(g.closest('.panel, #p-overview, #p-control, #p-cross, #p-adv, #p-ai, #p-capability, .card'), '.grid2 需存在於合法的頁籤或卡片容器內');
+    assert.ok(g.closest('.panel, #p-overview, #p-control, #p-deep, #p-improve, #p-ai, #p-capability, .card'), '.grid2 需存在於合法的頁籤或卡片容器內');
   }
 });
 
@@ -117,7 +117,7 @@ test('6. PR 2 DOM 元件：#duoToggleBtn 與 #duoThumbDock 向量圖示與無障
   assert.ok(toggleBtn, '需存在 #duoToggleBtn');
   assert.equal(toggleBtn.getAttribute('aria-label'), '切換雙欄模式', '需有 aria-label="切換雙欄模式"');
   assert.equal(toggleBtn.getAttribute('aria-pressed'), 'false', '預設 aria-pressed="false"');
-  assert.ok(toggleBtn.querySelector('svg'), '需包含向量 SVG 圖示');
+  assert.ok(toggleBtn.textContent.includes('雙欄') || toggleBtn.querySelector('svg'), '雙欄切換需有文字標籤或向量圖示');
   assert.doesNotMatch(toggleBtn.innerHTML, /📱|💻|✨/, '不可包含 emoji 圖示');
 
   // b. 底部拇指微型操作 Dock

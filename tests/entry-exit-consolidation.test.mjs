@@ -78,20 +78,19 @@ test("整合資料上傳入口與下載出口介面結構與互動契約驗證",
   // 卡片 2: CAD 受控座標
   const placeRow = document.getElementById("placeRow");
   const btnSelectPlace = document.getElementById("btnSelectPlace");
-  const placeIn = document.getElementById("placeIn");
+  const placeState = document.getElementById("placeState");
   assert.ok(placeRow, "應包含 CAD 受控座標區塊 #placeRow");
   assert.ok(btnSelectPlace, "CAD 座標區塊應包含從資料庫選取按鈕 #btnSelectPlace");
-  assert.ok(placeIn, "CAD 座標區塊應包含管理者上傳輸入 #placeIn");
+  assert.ok(placeState, "CAD 座標區塊應顯示座標狀態 #placeState");
+  assert.ok(document.getElementById("upPlaceFile"), "記錄庫視窗應提供受控座標上傳 #upPlaceFile");
 
-  // 卡片 3: 輔助工程資料 (AOI / GR&R / 幾何焊墊)
-  const cardAuxData = document.getElementById("cardAuxData");
-  assert.ok(cardAuxData, "應存在輔助工程資料卡片 #cardAuxData");
-  const impAoiFile = document.getElementById("impAoiFile");
-  const impGrrFile = document.getElementById("impGrrFile");
-  const impGeomPadFile = document.getElementById("impGeomPadFile");
-  assert.ok(impAoiFile, "輔助卡片應提供 AOI 檔案上傳輸入");
-  assert.ok(impGrrFile, "輔助卡片應提供 GR&R 檔案上傳輸入");
-  assert.ok(impGeomPadFile, "輔助卡片應提供幾何焊墊檔案上傳輸入");
+  // 輔助工程資料改置於改善／實驗驗證子視圖與規格頁
+  const aoiFile = document.getElementById("aoiFile");
+  const grrFile = document.getElementById("grrFile");
+  const geomPadFile = document.getElementById("geomPadFile");
+  assert.ok(aoiFile, "實驗驗證子視圖應提供 AOI 檔案上傳");
+  assert.ok(grrFile, "實驗驗證子視圖應提供 GR&R 檔案上傳");
+  assert.ok(geomPadFile, "規格頁應提供幾何焊墊清單上傳");
 
   // 3. 下載出口介面 (#exportCenterModal) 檢驗
   const exportModal = document.getElementById("exportCenterModal");
@@ -154,15 +153,15 @@ test("整合資料上傳入口與下載出口介面結構與互動契約驗證",
 
   // 6. 既有分頁行內單項匯出按鈕完整性契約 (維護既有使用者肌肉記憶)
   const legacyButtons = [
-    "btnIssXlsx", "btnIssCsv", "btnIssMd",
-    "btnDl3d",
     "btnStatsCsv",
-    "btnCmpMd",
-    "btnDfmCsv", "btnDfmMd", "btnExportCorrectionJson",
-    "btnRepPdf", "btnExpMd", "btnExpBoard", "btnExpDef"
+    "btnExportCorrectionJson",
+    "btnRepPdf", "btnExpDef"
   ];
   legacyButtons.forEach(btnId => {
     const el = document.getElementById(btnId);
     assert.ok(el, `既有行內匯出按鈕 #${btnId} 應被完整保留，不可被刪除`);
   });
+  for (const type of ["rep-md", "iss-csv", "iss-xlsx", "rep-pdf", "snap-3d", "cmp-md", "dfm-csv", "dfm-md"]) {
+    assert.ok(document.querySelector(`[data-exp-act="${type}"]`), `匯出中心應支援 ${type}`);
+  }
 });

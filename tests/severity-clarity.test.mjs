@@ -118,8 +118,8 @@ test("同名回合：舊版高度 % 警示與重新匯入按鈕附上列序，�
   for (let i = 0; i < 100 && !d.querySelector('#tblPickPlace [data-pact="use-place"]'); i++) await tick(20);
   assert.ok(d.querySelector('#tblPickPlace [data-pact="use-place"]'));
   d.querySelector('#tblPickPlace [data-pact="use-place"]').click();
-  for (let i = 0; i < 100 && d.querySelector('#placePart').value !== 'DEMO-05'; i++) await tick(20);
-  assert.equal(d.querySelector('#placePart').value, 'DEMO-05');
+  for (let i = 0; i < 100 && w.SPI_TEST_HOOK.getPlace()?.part !== 'DEMO-05'; i++) await tick(20);
+  assert.equal(w.SPI_TEST_HOOK.getPlace()?.part, 'DEMO-05');
   d.querySelector('#recPickerClose').click();
   d.querySelector('#selSide').value = 'TOP';
   const s = d.querySelector("#selVendor"); s.value = "lirong"; s.dispatchEvent(new w.Event("change"));
@@ -152,11 +152,11 @@ test("同名回合：舊版高度 % 警示與重新匯入按鈕附上列序，�
   assert.equal(btn.textContent, `重新匯入「${name}」（回合表第 ${pos} 列）`);
 
   // 試產比較：舊版回合當 A 或 B，都標明是哪一邊
-  w.eval(`S.cmpA = ${oldId}; S.cmpB = ${newId}; ${H}.setTab("compare")`);
+  w.eval(`S.cmpA = ${oldId}; S.cmpB = ${newId}; ${H}.setTab("improve/compare")`);
   await tick(100);
   assert.match(d.querySelector("#cmpLegacy p").textContent, new RegExp(`A 回合「${name}」是舊版匯入`));
   assert.equal(d.querySelector("#cmpLegacy [data-reimp]").textContent, `重新匯入 A 回合「${name}」`);
-  w.eval(`S.cmpA = ${newId}; S.cmpB = ${oldId}; ${H}.setTab("compare")`);
+  w.eval(`S.cmpA = ${newId}; S.cmpB = ${oldId}; ${H}.setTab("improve/compare")`);
   await tick(100);
   assert.match(d.querySelector("#cmpLegacy p").textContent, new RegExp(`B 回合「${name}」是舊版匯入`));
 

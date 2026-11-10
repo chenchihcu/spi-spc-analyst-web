@@ -46,7 +46,8 @@ test('正式匯出以伺服器目前生命週期為準，讀取失敗時停止',
   hook.RecDB.jfetch = async () => ({ record: { lifecycle: w.__lifecycle } });
   let confirms = 0;
   w.confirm = () => { confirms++; return false; };
-  w.document.querySelector('#btnExpMd').click();
+  w.document.querySelector('#btnOpenExportModal').click();
+  w.document.querySelector('[data-exp-act="rep-md"]').click();
   await new Promise(resolve => setTimeout(resolve, 100));
   assert.equal(downloads, 0);
   assert.equal(confirms, 1);
@@ -57,21 +58,24 @@ test('正式匯出以伺服器目前生命週期為準，讀取失敗時停止',
 
   // 確認後可匯出，檔名加註紀錄狀態
   w.confirm = () => { confirms++; return true; };
-  w.document.querySelector('#btnIssCsv').click();
+  w.document.querySelector('#btnOpenExportModal').click();
+  w.document.querySelector('[data-exp-act="iss-csv"]').click();
   await new Promise(resolve => setTimeout(resolve, 100));
   assert.equal(downloads, 1);
   assert.equal(lastName, 'spi-issues-歷史修正前版本.csv');
 
   w.__lifecycle = 'active';
   confirms = 0;
-  w.document.querySelector('#btnExpMd').click();
+  w.document.querySelector('#btnOpenExportModal').click();
+  w.document.querySelector('[data-exp-act="rep-md"]').click();
   await new Promise(resolve => setTimeout(resolve, 100));
   assert.equal(downloads, 2);
   assert.equal(confirms, 0);
   assert.equal(lastName, 'spi-spc-report.md');
 
   hook.RecDB.jfetch = async () => { throw new Error('offline'); };
-  w.document.querySelector('#btnExpMd').click();
+  w.document.querySelector('#btnOpenExportModal').click();
+  w.document.querySelector('[data-exp-act="rep-md"]').click();
   await new Promise(resolve => setTimeout(resolve, 100));
   assert.equal(downloads, 2);
   assert.equal(hook.curRun().info.src.lifecycle, 'unavailable');

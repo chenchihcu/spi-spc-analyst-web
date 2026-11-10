@@ -127,7 +127,7 @@ test("舊紀錄：驗證顯示無座標引用，一鍵重新受控匯入後建�
   $('#btnSelectPlace').click();
   assert.ok(await until(() => rowOf(d, "#tblPickPlace", "PL-9")?.querySelector('[data-pact="use-place"]')));
   rowOf(d, "#tblPickPlace", "PL-9").querySelector('[data-pact="use-place"]').click();
-  assert.ok(await until(() => $('#placePart').value === 'PL-9'));
+  assert.ok(await until(() => w.SPI_TEST_HOOK.getPlace()?.part === 'PL-9'));
   $('#recPickerClose').click();
   assert.match($("#impSourceSummary").textContent, /原紀錄未記錄座標引用；PL-9 V3 TOP（本次重新受控匯入使用）/);
   assert.doesNotMatch($("#impSourceSummary").textContent, /不套用目前選取座標/);

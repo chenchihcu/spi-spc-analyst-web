@@ -9,6 +9,7 @@ const path = require('path');
 const { createHash } = require('node:crypto');
 const { HTML, withIdb, seedPartSpec } = require('./_load.js');
 import { createCloudHarness, installBrowserCloud } from './_cloud-harness.mjs';
+import { uploadPlaceViaPicker, applyPlaceFromPicker, getPlacePart, until as placeUntil } from './_place-picker.mjs';
 const tick = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const FIXTURES_DIR = path.join(import.meta.dirname, 'fixtures', 'golden');
@@ -57,7 +58,7 @@ async function pick(dom, sel, name, bytes) {
   for (let i = 0; i < 100; i++) {
     await tick(20);
     const d = w.document;
-    if (sel === '#placeIn' ? /已存入資料庫|class="err"/.test(d.querySelector('#placeState').innerHTML)
+    if (sel === '#upPlaceFile' ? /已存入座標檔|上傳失敗|class="err"/.test(d.querySelector('#upPlaceState')?.innerHTML || '')
       : (!d.querySelector('#mapBox').hidden || d.querySelector('#parseErr').textContent)) break;
   }
 }
@@ -77,17 +78,16 @@ async function loadPlacement(dom, filename, cloud) {
     for (let i = 0; i < 100 && !d.querySelector('#tblPickPlace [data-pact="use-place"]'); i++) await tick(20);
     assert.ok(d.querySelector('#tblPickPlace [data-pact="use-place"]'), '受控座標應可選取');
     d.querySelector('#tblPickPlace [data-pact="use-place"]').click();
-    for (let i = 0; i < 100 && d.querySelector('#placePart').value !== 'GOLDEN'; i++) await tick(20);
-    assert.equal(d.querySelector('#placePart').value, 'GOLDEN');
+    await placeUntil(() => dom.window.SPI_TEST_HOOK.getPlace()?.part === 'GOLDEN');
+    assert.equal(getPlacePart(dom.window), 'GOLDEN');
     d.querySelector('#selSide').value = 'TOP';
     setVendor(dom, 'generic');
     return;
   }
   setVendor(dom, 'lirong');
-  d.querySelector('#placePart').value = 'GOLDEN';
-  d.querySelector('#placeRev').value = 'V1';
   const placeBytes = fs.readFileSync(path.join(FIXTURES_DIR, filename));
-  await pick(dom, '#placeIn', filename, placeBytes);
+  await uploadPlaceViaPicker(dom.window, d, { part: 'GOLDEN', rev: 'V1', body: placeBytes, name: filename });
+  await applyPlaceFromPicker(dom.window, d, 'GOLDEN', 'V1');
   setVendor(dom, 'generic');
 }
 
@@ -152,7 +152,8 @@ test('[D-10] no_coords: 空間分布與問題地圖顯示不適用，無空間�
   const spatialIssues = issues.filter(iss => iss.cat === '空間分布');
   assert.equal(spatialIssues.length, 0, '無座標時不得出現空間相關的問題卡');
   const d = dom.window.document;
-  d.querySelector('[data-tab="cross"]').click();
+  d.querySelector('[data-tab="deep"]').click();
+  d.querySelector('[data-subnav-deep="cross"]')?.click();
   await tick(40);
   const heatSub = d.querySelector('#heatSub');
   if (heatSub) {
@@ -285,13 +286,10 @@ test('normal_baseline: 5 板 × 2 焊墊，Volume 敘述統計與座標 join 10/
 test('[D-42] duplicate_refdes_coords: 同面重複位號拒絕受控登錄且不建立紀錄', { skip: !JSDOM && '未安裝 jsdom' }, async () => {
   const { dom, cloud } = await cloudPage();
   await tick(60);
-  const d = dom.window.document;
-  d.querySelector('#placePart').value = 'GOLDEN';
-  d.querySelector('#placeRev').value = 'V1';
-  d.querySelector('#placeSide').value = 'TOP';
-  d.querySelector('#placeUnit').value = 'mm';
-  await pick(dom, '#placeIn', 'duplicate_refdes_coords.placement.csv', fs.readFileSync(path.join(FIXTURES_DIR, 'duplicate_refdes_coords.placement.csv')));
-  assert.match(d.querySelector('#placeState').textContent, /上傳失敗：重複位號/);
+  const w = dom.window, d = dom.window.document;
+  const bytes = fs.readFileSync(path.join(FIXTURES_DIR, 'duplicate_refdes_coords.placement.csv'));
+  await uploadPlaceViaPicker(w, d, { part: 'GOLDEN', rev: 'V1', side: 'TOP', unit: 'mm', body: bytes, name: 'duplicate_refdes_coords.placement.csv' });
+  assert.match(d.querySelector('#upPlaceState').textContent, /上傳失敗：重複位號/);
   const list = await cloud.fetch('/api/records?kind=place');
   assert.equal((await list.json()).records.length, 0, '失敗檔不得佔用受控版次');
 });
