@@ -165,5 +165,5 @@ test('偵測結果快取：存入的是不帶附加欄位的副本；背景結�
   assert.ok(!('rowsRef' in structuredClone(F.slice())), 'slice() 副本不帶附加欄位');
   const fs = await import('node:fs'), html = fs.readFileSync(new URL('../spi-spc.html', import.meta.url), 'utf8');
   assert.match(html, /DetCache\.put\(key,\{F:d\.F\.slice\(\),meta:d\.meta\}\)/, '存入快取時用副本');
-  assert.match(html, /const F_TABS=new Set\(\[[^\]]*"cross"[^\]]*\]\)/, '交叉驗證頁（失效模式比對）在背景偵測完成後重畫');
+  assert.match(html, /const F_TABS=new Set\(\[[^\]]*"deep"[^\]]*"improve"[^\]]*\]\)/, '深入／改善分頁在背景偵測完成後重畫');
 });

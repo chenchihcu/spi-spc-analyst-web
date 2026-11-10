@@ -9,6 +9,7 @@ const { JSDOM } = (() => { try { return require("jsdom"); } catch { return {}; }
 const fs = require("fs");
 const { HTML, withIdb } = require("./_load.js");
 import { createCloudHarness, installBrowserCloud } from './_cloud-harness.mjs';
+import { getPlacePart, until as placeUntil } from './_place-picker.mjs';
 const FIX = new URL("./fixtures/spi-sample.xlsx", import.meta.url);
 const tick = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -47,8 +48,8 @@ test("xlsx：略過空白說明頁、讀到資料頁、欄位自動對應、日�
   for (let i = 0; i < 100 && !d.querySelector('#tblPickPlace [data-pact="use-place"]'); i++) await tick(20);
   assert.ok(d.querySelector('#tblPickPlace [data-pact="use-place"]'), '受控座標應可選取');
   d.querySelector('#tblPickPlace [data-pact="use-place"]').click();
-  for (let i = 0; i < 100 && d.querySelector('#placePart').value !== 'P1'; i++) await tick(20);
-  assert.equal(d.querySelector('#placePart').value, 'P1');
+  await placeUntil(() => getPlacePart(w) === 'P1');
+  assert.equal(getPlacePart(w), 'P1');
   d.querySelector('#selSide').value = 'TOP';
   await pick(dom, "spi-sample.xlsx", fs.readFileSync(FIX));
   assert.equal(d.querySelector("#parseErr").textContent, "", "不應有錯誤");

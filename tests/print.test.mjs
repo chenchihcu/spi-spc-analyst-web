@@ -30,7 +30,9 @@ test("列印：一般網站顯示按鈕；列印前頁首帶回合與版本、�
   const dom = page("https://spi.example/");
   await tick(60);
   const w = dom.window, d = w.document;
-  assert.equal(d.querySelector("#btnPrint").hidden, false);
+  const btnRepPrint = d.querySelector("#btnRepPrint");
+  assert.ok(btnRepPrint, "報告頁應提供列印入口");
+  assert.equal(btnRepPrint.hidden, false);
   d.documentElement.setAttribute("data-theme", "dark");
   w.dispatchEvent(new w.Event("beforeprint"));
   assert.equal(d.documentElement.getAttribute("data-theme"), "light");
@@ -42,10 +44,12 @@ test("列印：一般網站顯示按鈕；列印前頁首帶回合與版本、�
   assert.equal(d.querySelectorAll("#issList details.iss-card[open]").length, 0, "列印後恢復收合");
 });
 
-test("列印：在 claude.ai 內不顯示列印按鈕", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+test("列印：報告頁列印入口始終可用（列印樣式與 beforeprint 仍生效）", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const dom = page("https://example.test/", { claude: { use: async () => null } });
   await tick(60);
-  assert.equal(dom.window.document.querySelector("#btnPrint").hidden, true);
+  const btnRepPrint = dom.window.document.querySelector("#btnRepPrint");
+  assert.ok(btnRepPrint, "報告頁列印入口應存在");
+  assert.equal(btnRepPrint.hidden, false);
 });
 
 test("匯出 CSV：以 = + - @ 開頭的文字前加 '，避免被試算表當成公式；數值不受影響", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
@@ -58,7 +62,11 @@ test("匯出 CSV：以 = + - @ 開頭的文字前加 '，避免被試算表當�
   w.HTMLAnchorElement.prototype.click = () => {};
   // 讓第一個問題的標題以 = 開頭，匯出問題清單 CSV
   w.eval(`S.F[0].title='=1+2 惡意'`);
-  w.document.querySelector("#btnIssCsv").click();
+  const triggerIssCsv = () => {
+    w.document.querySelector("#btnOpenExportModal").click();
+    w.document.querySelector('[data-exp-act="iss-csv"]').click();
+  };
+  triggerIssCsv();
   for (let i = 0; i < 20 && !saved; i++) await tick(20);
   const text = await new Promise((ok) => { const r = new w.FileReader(); r.onload = () => ok(r.result); r.readAsText(saved); });
   assert.match(text, /,'=1\+2 惡意,/, "公式開頭應加上 '");
@@ -66,7 +74,7 @@ test("匯出 CSV：以 = + - @ 開頭的文字前加 '，避免被試算表當�
   // 純數值（含負數）不加 '，維持數值
   saved = null;
   w.eval(`S.F[0].title='-12.5'`);
-  w.document.querySelector("#btnIssCsv").click();
+  triggerIssCsv();
   for (let i = 0; i < 20 && !saved; i++) await tick(20);
   const t2 = await new Promise((ok) => { const r = new w.FileReader(); r.onload = () => ok(r.result); r.readAsText(saved); });
   assert.match(t2, /,-12\.5,/);

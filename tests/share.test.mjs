@@ -97,7 +97,8 @@ test("頁面：分享比較頁時帶兩個回合，並設定比較對象", { ski
   const st = memStore();
   const A = openPage("http://localhost/", st);
   await tick(60);
-  A.dom.window.document.querySelector("[data-tab=compare]").click();
+  A.dom.window.document.querySelector("[data-tab=improve]").click();
+  A.dom.window.document.querySelector('[data-subnav-improve="compare"]')?.click();
   A.dom.window.document.querySelector("#btnShare").click();
   A.dom.window.document.querySelector("#btnConfirmShare").click();
   for (let i = 0; i < 50 && A.dom.window.document.querySelector("#shareRow").hidden; i++) await tick(20);
@@ -105,7 +106,8 @@ test("頁面：分享比較頁時帶兩個回合，並設定比較對象", { ski
   for (let i = 0; i < 50 && B.dom.window.eval("S.runs.length") < 4; i++) await tick(20);
   const b = B.dom.window;
   assert.equal(b.eval("S.runs.length"), 4);
-  assert.equal(b.eval("S.tab"), "compare");
+  assert.equal(b.eval("S.tab"), "improve");
+  assert.equal(b.eval("S.improveSub"), "compare");
   assert.equal(b.eval("S.cmpA+','+S.cmpB"), "3,4");
 });
 
@@ -353,9 +355,11 @@ test("D-58：頁籤切換 pushState、進入 #share 歷史增加、返回還原�
 
   const initLen = w.history.length;
   // 點「試產比較」
-  d.querySelector("[data-tab=compare]").click();
-  assert.equal(w.location.hash, "#compare");
-  assert.equal(w.eval("S.tab"), "compare");
+  d.querySelector("[data-tab=improve]").click();
+  d.querySelector('[data-subnav-improve="compare"]')?.click();
+  assert.equal(w.location.hash, "#improve/compare");
+  assert.equal(w.eval("S.tab"), "improve");
+  assert.equal(w.eval("S.improveSub"), "compare");
   assert.ok(w.history.length >= initLen);
 
   // 點「製程能力」

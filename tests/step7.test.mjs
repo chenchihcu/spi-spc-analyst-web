@@ -160,7 +160,11 @@ test('步驟 7 (D-06): _headers 與 lib/security-headers.mjs CSP 完全一致且
 });
 
 test('步驟 7 (D-07 & 第 7 節): 11 組視口矩陣 data-layout 判定與 CSS 斷點零衝突', () => {
-  assert.doesNotMatch(htmlSource, /min-width:\s*1280px/i, '不可有 min-width: 1280px 斷點');
+  assert.match(
+    htmlSource,
+    /@media\s*\(min-width:\s*1280px\)\s*\{[\s\S]*?header\.top[\s\S]*?flex-wrap:\s*nowrap/i,
+    '桌機 ≥1280px 頁首應強制單列（RFC 介面精簡）'
+  );
   assert.doesNotMatch(htmlSource, /min-width:\s*601px/i, '不可有 min-width: 601px 斷點');
   assert.doesNotMatch(htmlSource, /@media\s*\(max-width:\s*767px\)/i, '不可殘留舊版 @media (max-width:767px) 行動殼層斷點');
   assert.match(
@@ -458,8 +462,8 @@ test('步驟 7 (D-19 & D-52): 觸控裝置 hitRadius: 24、toast <= 4s 含關閉
   for (let i = 0; i < 100 && !document.querySelector('#tblPickPlace [data-pact="use-place"]'); i++) await new Promise(r => setTimeout(r, 20));
   assert.ok(document.querySelector('#tblPickPlace [data-pact="use-place"]'), '受控座標應可供重複匯入時選取');
   document.querySelector('#tblPickPlace [data-pact="use-place"]').click();
-  for (let i = 0; i < 100 && document.getElementById('placePart').value !== 'PART-01'; i++) await new Promise(r => setTimeout(r, 20));
-  assert.equal(document.getElementById('placePart').value, 'PART-01');
+  for (let i = 0; i < 100 && SPI_TEST_HOOK.getPlace()?.part !== 'PART-01'; i++) await new Promise(r => setTimeout(r, 20));
+  assert.equal(SPI_TEST_HOOK.getPlace()?.part, 'PART-01');
   document.getElementById('recPickerClose').click();
   document.getElementById('selSide').value = 'TOP';
   SPI_TEST_HOOK.startImport(csv, 'dup.csv');

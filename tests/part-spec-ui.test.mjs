@@ -10,6 +10,7 @@ const { JSDOM } = (() => { try { return require("jsdom"); } catch { return {}; }
 const fs = require("fs");
 const { HTML, withIdb, loadCore } = require("./_load.js");
 import { createCloudHarness, installBrowserCloud } from './_cloud-harness.mjs';
+import { openPickerTab, getPlacePart } from './_place-picker.mjs';
 const tick = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function page(cloud) {
@@ -80,7 +81,7 @@ test("流程：鋼板厚度必填 → 未定義規格時鎖定 → 驗證與草�
   $("#btnSelectPlace").click();
   assert.ok(await until(() => $("#tblPickPlace [data-pact=use-place]")));
   $("#tblPickPlace [data-pact=use-place]").click();
-  assert.ok(await until(() => $("#placePart").value === 'NEW-1'));
+  assert.ok(await until(() => getPlacePart(w) === 'NEW-1'));
   $("#recPickerClose").click();
   $("#selSide").value = 'TOP';
   await pickFile(dom, "NEW-1_TOP.csv", CSV);
@@ -188,7 +189,7 @@ test("流程：鋼板厚度必填 → 未定義規格時鎖定 → 驗證與草�
   assert.equal(w.eval("S.specDraft"), null, "確認後回到套用的版本");
 
   // 9. 資料庫頁列出料號規格版本；在這裡設為預設 → 稽核頁顯示「設為預設」與前後版本；列印表頭與匯出帶規格來源
-  $("[data-tab=data]").click(); $('.subtab[data-sub="records"]').click(); $("#recReload").click();
+  openPickerTab(d, 'specs'); $("#recPickerReload").click();
   assert.ok(await until(() => d.querySelectorAll("#recSpec tbody tr").length === 2 && /v2/.test($("#recSpec").textContent)));
   const specRows = () => [...d.querySelectorAll("#recSpec tbody tr")].map((tr) => tr.textContent);
   assert.equal(specRows().length, 2);

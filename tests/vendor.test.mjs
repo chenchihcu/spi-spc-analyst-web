@@ -9,6 +9,7 @@ const { JSDOM } = (() => { try { return require("jsdom"); } catch { return {}; }
 const fs = require("fs");
 const { HTML, withIdb, seedPartSpec } = require("./_load.js");
 import { createCloudHarness, installBrowserCloud } from './_cloud-harness.mjs';
+import { uploadPlaceViaPicker, applyPlaceFromPicker, getPlacePart, until as placeUntil } from './_place-picker.mjs';
 import { parseCsv, validatePlacement } from '../lib/controlled-import.mjs';
 const tick = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -33,7 +34,7 @@ async function pick(dom, sel, name, bytes) {
   const w = dom.window, inp = w.document.querySelector(sel);
   Object.defineProperty(inp, "files", { configurable: true, value: [new w.File([bytes], name)] });
   inp.dispatchEvent(new w.Event("change"));
-  for (let i = 0; i < 100; i++) { await tick(20); const d = w.document; if (sel === "#placeIn" ? /個元件|class="err"/.test(d.querySelector("#placeState").innerHTML) : (!d.querySelector("#mapBox").hidden || d.querySelector("#parseErr").textContent)) break; }
+  for (let i = 0; i < 100; i++) { await tick(20); const d = w.document; if (sel === "#upPlaceFile" ? /已存入座標檔|上傳失敗|class="err"/.test(d.querySelector("#upPlaceState")?.innerHTML || "") : (!d.querySelector("#mapBox").hidden || d.querySelector("#parseErr").textContent)) break; }
 }
 function setVendor(dom, v) { const s = dom.window.document.querySelector("#selVendor"); s.value = v; s.dispatchEvent(new dom.window.Event("change")); }
 async function cloudPage() {
@@ -43,11 +44,9 @@ async function cloudPage() {
   await result.dom.window.SPI_TEST_HOOK.RecDB.list();
   return { ...result, cloud };
 }
-function setControlledFields(d, part, rev, side, unit) {
-  d.querySelector('#placePart').value = part;
-  d.querySelector('#placeRev').value = rev;
-  d.querySelector('#placeSide').value = side;
-  d.querySelector('#placeUnit').value = unit;
+async function applyControlledPlace(w, d, part, rev, side, unit, body, name) {
+  await uploadPlaceViaPicker(w, d, { part, rev, side, unit, body, name });
+  await applyPlaceFromPicker(w, d, part, rev);
 }
 function setImportFields(d, part, rev, lot) {
   d.querySelector('#inLot').value = lot;
@@ -67,8 +66,8 @@ async function controlledVendorPage(part) {
   for (let i = 0; i < 100 && !d.querySelector('#tblPickPlace [data-pact="use-place"]'); i++) await tick(20);
   assert.ok(d.querySelector('#tblPickPlace [data-pact="use-place"]'), '受控座標應可選取');
   d.querySelector('#tblPickPlace [data-pact="use-place"]').click();
-  for (let i = 0; i < 100 && d.querySelector('#placePart').value !== part; i++) await tick(20);
-  assert.equal(d.querySelector('#placePart').value, part);
+  await placeUntil(() => getPlacePart(w) === part);
+  assert.equal(getPlacePart(w), part);
   d.querySelector('#recPickerClose').click();
   d.querySelector('#selSide').value = 'TOP';
   const specBytes = w.eval(`(()=>{const sp={schema:"spi-part-spec/1",part:${JSON.stringify(part)},stencilRef:120,specs:{},groups:{},note:"測試"};for(const k of PART_SPEC_METRICS)sp.specs[k]={...DEF_SPECS[k]};return partSpecEncode(sp).bytes})()`);
@@ -91,8 +90,7 @@ test("立榮格式：明確選面後轉成一列一筆，受控座標提供元�
   setVendor(dom, "lirong");
   assert.equal(d.querySelector("#sideField").hidden, false, "選立榮後顯示面別");
   assert.equal(d.querySelector("#placeRow").hidden, false, "選立榮後顯示座標檔");
-  setControlledFields(d, 'DEMO-01', 'V5', 'BOTH', 'mil');
-  await pick(dom, "#placeIn", "X3000_place.csv", Buffer.from(PLACE));
+  await applyControlledPlace(w, d, 'DEMO-01', 'V5', 'BOTH', 'mil', Buffer.from(PLACE), 'X3000_place.csv');
   assert.match(d.querySelector("#placeState").textContent, /料號 DEMO-01 版次 V5.*3 個元件（TOP 2、BOT 1），單位 mil/);
   d.querySelector('#selSide').value = 'TOP';
   await pick(dom, "#fileIn", "DEMO-01_TOP_spi.csv", Buffer.from(WIDE));
@@ -135,10 +133,9 @@ test("立榮格式：明確選面後轉成一列一筆，受控座標提供元�
 test("立榮格式：明確指定面別，座標檔面別不符時提醒；改選面別會重新轉換", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const { dom } = await cloudPage();
   await tick(60);
-  const d = dom.window.document;
+  const w = dom.window, d = w.document;
   setVendor(dom, "lirong");
-  setControlledFields(d, 'DEMO', 'V1', 'BOTH', 'mil');
-  await pick(dom, "#placeIn", "place.csv", Buffer.from(PLACE));
+  await applyControlledPlace(w, d, 'DEMO', 'V1', 'BOTH', 'mil', Buffer.from(PLACE), 'place.csv');
   d.querySelector('#selSide').value = 'BOT';
   await pick(dom, "#fileIn", "DEMO_BOT.csv", Buffer.from(WIDE));
   assert.match(d.querySelector("#mapPrev").textContent, /BOT 面/);
@@ -166,12 +163,11 @@ test("通用格式下讀到立榮橫排檔會自動切換；選立榮卻上傳�
 test("座標檔為 Big5 編碼（台灣廠商常見）也能讀", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const { dom } = await cloudPage();
   await tick(60);
-  const d = dom.window.document;
+  const w = dom.window, d = w.document;
   setVendor(dom, "lirong");
   // 標題「位號,X,Y,封裝」以 Big5 編碼
   const bytes = Buffer.concat([Buffer.from("a6ecb8b9", "hex"), Buffer.from(",X,Y,"), Buffer.from("abcab8cb", "hex"), Buffer.from("\nC1,10.5,20,C0402\nR2,30,5,R0603\n")]);
-  setControlledFields(d, 'B5', 'A', 'TOP', 'mm');
-  await pick(dom, "#placeIn", "big5.csv", bytes);
+  await applyControlledPlace(w, d, 'B5', 'A', 'TOP', 'mm', bytes, 'big5.csv');
   assert.match(d.querySelector("#placeState").textContent, /2 個元件.*單位 mm/);
 });
 
@@ -225,11 +221,11 @@ test("v9.13.3 前匯入的高度 % 回合（沒有 hPctThk）：回合管理與�
   assert.match(d.querySelector("#runTbl").textContent, /高度需重新匯入/);
 
   // 試產比較：與範例回合比較時也警示，並說明差異可能只是換算厚度不同
-  w.eval(`S.cmpA = ${id}; S.cmpB = S.runs.find((r) => r.sample).id; ${H}.setTab("compare")`);
+  w.eval(`S.cmpA = ${id}; S.cmpB = S.runs.find((r) => r.sample).id; ${H}.setTab("improve/compare")`);
   await tick(100);
   assert.equal(d.querySelector("#cmpLegacy").hidden, false, "試產比較顯示警示");
   assert.match(d.querySelector("#cmpLegacy").textContent, /差異可能只是換算厚度不同/);
-  w.eval(`S.cmpA = S.runs.filter((r) => r.sample)[0].id; S.cmpB = S.runs.filter((r) => r.sample)[1].id; ${H}.setTab("compare")`);
+  w.eval(`S.cmpA = S.runs.filter((r) => r.sample)[0].id; S.cmpB = S.runs.filter((r) => r.sample)[1].id; ${H}.setTab("improve/compare")`);
   await tick(100);
   assert.equal(d.querySelector("#cmpLegacy").hidden, true, "比較的兩個回合都正常時不警示");
 

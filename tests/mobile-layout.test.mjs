@@ -154,13 +154,17 @@ test('4. 行動版 DOM 結構與分頁控制 (JSDOM 驗證)', { skip: !JSDOM && 
   assert.ok(moreSheet.querySelector('.sheet-handle'), '需有拖曳把手 .sheet-handle');
 
   // c. 更多 Sheet 內涵蓋全部次要分頁（共 4+9=13 個分頁）
-  const subTabs = $$('#moreSheet [data-mtab]').map(b => b.dataset.mtab);
-  assert.deepEqual(subTabs, ['sim3d', 'cross', 'adv', 'stats', 'compare', 'dfm', 'lab', 'ai', 'report', 'data'], '需涵蓋其餘 10 個分頁');
+  const subTabs = $$('#moreSheet [data-mtab]').map((b) => b.dataset.mtab);
+  assert.deepEqual(
+    subTabs,
+    ['sim3d', 'deep', 'deep', 'deep', 'improve', 'improve', 'improve', 'ai', 'report', 'data'],
+    '需涵蓋其餘 10 個分頁（深入／改善複合路由）'
+  );
 
   // d. 更多 Sheet 內涵蓋操作與帳號
   assert.ok($('#mBtnTheme'), '需有行動版主題切換鈕');
   assert.ok($('#btnTheme'), '需有桌機版主題切換鈕');
-  assert.ok($('#mBtnPrint'), '需有行動版列印鈕');
+  assert.ok($('#mBtnOpenExportModal'), '需有行動版匯出中心入口');
   assert.ok($('#mBtnShare'), '需有行動版分享鈕');
   assert.ok($('#mBtnMyShares'), '需有行動版我的分享鈕');
   assert.ok($('#mLogoutLink'), '需有行動版登出連結');
@@ -178,15 +182,17 @@ test('4. 行動版 DOM 結構與分頁控制 (JSDOM 驗證)', { skip: !JSDOM && 
   assert.equal($('nav.mtab [data-tab="issues"]').getAttribute('aria-selected'), 'false', '原 issues aria-selected 應為 false');
 
   // g. 點擊更多 sheet 內的次要分頁（例如 dfm）
-  const btnDfm = $('#moreSheet [data-mtab="dfm"]');
+  const btnDfm = $('#moreSheet [data-mtab="improve"][data-mtab-sub="dfm"]');
   btnDfm.click();
   // 當前分頁不在前四項時，mtabMore 應標記為 selected
   const mtabMore = $('#mtabMore');
   assert.equal(mtabMore.getAttribute('aria-selected'), 'true', '在次級分頁時更多按鈕需顯示 active/selected');
   assert.ok($('#cWipe'), '需存在 #cWipe 畫布');
-  assert.equal($('#cardMorph')?.parentElement?.id, 'p-adv', '#cardMorph 的直接父層必須是 #p-adv');
-  assert.equal($$('#p-adv .card .card').length, 0, '#p-adv 內不可有 .card 巢狀包覆 .card');
-  for (const id of ['aiSettingsCard', 'inAiKey', 'btnAiKeyToggle', 'inAiDailyLim', 'inAiTokenLim', 'inAiUsdLim', 'btnAiSaveCfg', 'btnAiClearKey', 'aiDailyBar', 'aiMonthlyBar', 'btnAICopy', 'btnAIMd']) {
+  const morphWrap = $('#cardMorph')?.parentElement;
+  assert.equal(morphWrap?.dataset?.subview, 'adv', '#cardMorph 的直接父層必須是深入分析子視圖');
+  assert.equal($('#cardMorph')?.closest('#p-deep')?.id, 'p-deep', '#cardMorph 須在 #p-deep 內');
+  assert.equal($$('#p-deep [data-subview="adv"] .card .card').length, 0, '深入分析子視圖內不可有 .card 巢狀包覆 .card');
+  for (const id of ['aiSettingsCard', 'inAiKey', 'btnAiKeyToggle', 'inAiDailyLim', 'inAiTokenLim', 'inAiUsdLim', 'btnAiSaveCfg', 'btnAiClearKey', 'aiDailyBar', 'aiMonthlyBar', 'btnAICopy']) {
     assert.ok($(`#${id}`), `AI 分析頁需存在 #${id}`);
   }
 });
@@ -249,20 +255,23 @@ test('7. 版面回歸：同權重 CSS 的先後順序、flex 壓縮與行內高�
   assert.match(htmlSource, /\.iss-head \.pill\{[^}]*white-space:normal/, '問題卡片的規則標籤需可換行');
 
   // c. 觸控 44px 規則須排在基準高度之後（同權重時後者勝出）
-  assert.ok(at('@media (pointer:coarse){.seg button,#startupDbBanner button,#recPickerQ,#recPickerReload{min-height:44px') >
+  assert.ok(at('@media (pointer:coarse){.seg button,#recPickerQ,#recPickerReload{min-height:44px') >
     at('.seg button{border:none;border-radius:0;background:var(--surface);min-height:32px'), '觸控 .seg 規則需在基準規則之後');
+  assert.match(htmlSource, /\.pmap-details summary\{[^}]*min-height:44px/, '問題地圖 details 摘要需有 44px 觸控高度');
   assert.match(htmlSource, /\.how summary, details\.fm>summary\{min-height:44px/, '交叉驗證失效模式摘要需有 44px 觸控高度');
   assert.match(htmlSource, /@media \(pointer:coarse\)\{\r?\n\s*button,select,input\[type=number\],input\[type=text\],input\[type=date\],textarea\{min-height:44px/, '日期欄位需在觸控 44px 規則內');
 
   // d. 行內 min-height 會蓋過觸控規則，改由 CSS 管理
-  for (const id of ['btnBannerLoadDb', 'btnBannerGoImport', 'btnBannerDismiss', 'recPickerQ', 'recPickerReload']) {
+  assert.match(htmlSource, /id="btnOpenExportModal"/, '頂欄應有匯出中心入口 #btnOpenExportModal');
+  assert.match(htmlSource, /id="exportCenterModal"/, '應存在匯出中心 #exportCenterModal');
+  for (const id of ['recPickerQ', 'recPickerReload']) {
     const tag = htmlSource.match(new RegExp(`<[^>]*id="${id}"[^>]*>`))[0];
     assert.doesNotMatch(tag, /min-height/, `#${id} 不可有行內 min-height`);
   }
 
   // e. 可橫向捲動的列不可壓縮項目（觸控 min-width:44px 取代了 flex 預設的 min-width:auto，文字會互相重疊）
   assert.match(htmlSource, /\n\.tab\{[^}]*flex-shrink:0/, '頁籤不可被壓縮');
-  assert.match(htmlSource, /\n\.toc button\{[^}]*flex-shrink:0/, '本頁目錄按鈕不可被壓縮');
+  assert.match(htmlSource, /\n\.tab\{[^}]*flex-shrink:0/, '頁籤按鈕不可被壓縮');
   assert.match(htmlSource, /#p-issues>#issFilter>\*\{flex-shrink:0\}/, '手機問題篩選 chip 不可被壓縮');
 
   // g. 手機頁首顯示版本與建置時間，另列一行並保留完整時間字串
@@ -282,8 +291,8 @@ test('7. 版面回歸：同權重 CSS 的先後順序、flex 壓縮與行內高�
   assert.match(landscapeCss, /\.sticky\{top:calc\(var\(--navbar-h\) \+ var\(--safe-t\)\)!important/, '短版橫向黏性內容需跟隨頁首高度');
 
   // f. 欄位容器是直向 flex，flex-basis 會變成高度：版本欄位不可用 flex 基準寬
-  const rev = htmlSource.match(/<input[^>]*id="placeRev"[^>]*>/)[0];
-  assert.doesNotMatch(rev, /flex:/, '#placeRev 不可設定 flex（會變成 90px 高）');
+  const rev = htmlSource.match(/<input[^>]*id="upPlaceRev"[^>]*>/)[0];
+  assert.doesNotMatch(rev, /flex:/, '#upPlaceRev 不可設定 flex（會變成 90px 高）');
 
   // g. 登入後主頁的版本資訊在手機標題列換到第二行，並保留 sticky 內容與對話框的頂部偏移
   const mobileSectionStart = at('@media (max-width:600px), (pointer:coarse) and (max-height:500px){');
