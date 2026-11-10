@@ -1,4 +1,4 @@
-// 資料庫介面測試（本機模式：claude.ai／本機檔案時存在瀏覽器 IndexedDB）
+﻿// 資料庫介面測試（本機模式：claude.ai／本機檔案時存在瀏覽器 IndexedDB）
 // 必填檢查 → 存入後建立回合（回合帶批號／料號／指紋）→ 資料庫頁列出、驗證、下載原始檔 → 從資料庫開啟 → 重複檔 → 刪除與稽核紀錄
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -321,5 +321,88 @@ test("歷史紀錄開啟失敗不污染下一次匯入；原座標缺失時可�
   assert.ok(await until(() => !$("#mapBox").hidden && $("#inLot").value === "LP"));
   assert.match($("#toast").textContent, /當時的座標檔無法取回或缺少已驗證設定/);
   assert.match($("#mapPrev").textContent, /尚未選取受控座標檔/);
+  assert.deepEqual(errs, []);
+});
+
+test("歷史舊資料回合在選取相符座標檔後即時套用檢視座標；不符則防護提醒並維持示意網格", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { dom, errs } = page([]);
+  await tick(50);
+  const w = dom.window, d = w.document, $ = (s) => d.querySelector(s);
+  const hook = w.SPI_TEST_HOOK;
+
+  // 1. 建立未受控歷史量測紀錄（301-000100124，TOP 面，無 placeId）
+  const head = ["Component ID", "Height(%)1", "Volume(%)1", "Area(%)1", "PAD ID", "Result1", "Height(%)2", "Volume(%)2", "Area(%)2", "Result2"].join(",");
+  const WIDE = head + "\nC1_1,100,101,99,1,PASS,102,103,98,PASS\nC1_1,100,101,99,2,PASS,102,103,98,PASS\n";
+  const part = "301-000100124";
+  const legacyRec = await seedHistorical(w, {
+    kind: "spi",
+    part,
+    lot: "B09-LOT",
+    side: "TOP",
+    vendor: "lirong",
+    name: "301-000100124 TOP 量測紀錄.csv",
+    stencil: 90,
+    lifecycle: "legacy",
+    validation_source: "legacy"
+  }, WIDE);
+
+  // 2. 建立同料號受控座標檔 (包含 C1 在 TOP 面)
+  const placeText = "RefDes,X,Y,PartType,Layer\nC1,12.5,34.8,C0402,TOP\n";
+  const placeRec = await seedHistorical(w, {
+    id: "place301000100124top",
+    kind: "place",
+    part,
+    rev: "V1",
+    side: "TOP",
+    unit: "mm",
+    name: "301-000100124_V1.csv",
+    lifecycle: "active",
+    validation_source: "server_verified"
+  }, placeText);
+
+  // 3. 建立不符料號的座標檔 (BOT 面或不同料號)
+  const otherPlace = await seedHistorical(w, {
+    id: "otherplace0000000001",
+    kind: "place",
+    part: "999-DIFFERENT",
+    rev: "V1",
+    side: "BOT",
+    unit: "mm",
+    name: "other.csv",
+    lifecycle: "active",
+    validation_source: "server_verified"
+  }, "RefDes,X,Y,PartType,Layer\nR1,1,2,R0402,BOT\n");
+
+  // 4. 開啟歷史紀錄並套用至分析回合
+  await hook.openRecord(legacyRec, { autoApply: false });
+  $("#btnApply").click();
+  assert.ok(await until(() => hook.curRun() && hook.curRun().name.includes(part)), "應已建立並載入分析回合");
+  const cur = hook.curRun();
+  assert.equal(cur.rows[0].gridPos, true, "剛開啟無座標歷史紀錄時應為虛擬網格");
+  assert.match($("#statePlace").textContent, /未套用/, "尚未選取座標檔時應顯示未套用");
+
+  // 5. 選取不相符料號的座標檔 -> 應提示不符，且不套用至目前回合
+  await hook.usePlaceRec(otherPlace);
+  hook.syncPlaceToCurrentRun({ notify: true });
+  assert.match($("#statePlace").textContent, /已選取/, "不符座標檔應僅顯示已選取，不顯示已套用");
+  assert.equal(cur.rows[0].gridPos, true, "不符料號不得清除 gridPos");
+
+  // 6. 選取相符料號與面別的座標檔 -> 應自動套用檢視座標
+  await hook.usePlaceRec(placeRec);
+  hook.syncPlaceToCurrentRun({ notify: true });
+  assert.match($("#statePlace").textContent, /座標檔：已套用（檢視）/, "相符座標檔應顯示已套用（檢視）");
+  assert.equal($("#statePlace").dataset.state, "ok", "膠囊狀態應亮綠燈 ok");
+  assert.equal(cur.rows[0].gridPos, undefined, "套用座標後應清除 gridPos");
+  assert.equal(cur.rows[0].componentX, 12.5, "應填入對應的元件 X 座標");
+  assert.equal(cur.rows[0].componentY, 34.8, "應填入對應的元件 Y 座標");
+  assert.match(hook.pos3DNote(), /元件中心示意/, "3D 註記應為元件中心示意");
+  assert.doesNotMatch(hook.pos3DNote(), /無實際座標，為排列示意網格/, "3D 註記不應再出現排列示意網格");
+
+  // 7. 清除座標檔 -> 應還原為示意網格
+  $("#placeClear").click();
+  assert.equal(cur.rows[0].gridPos, true, "清除座標檔後應還原為 gridPos 虛擬網格");
+  assert.match($("#statePlace").textContent, /座標檔：未套用/, "清除後應顯示未套用");
+  assert.match(hook.pos3DNote(), /無實際座標，為排列示意網格/, "清除後 3D 應重新顯示排列示意網格");
+
   assert.deepEqual(errs, []);
 });
