@@ -164,7 +164,7 @@ test("D-65 3D 模擬快照：提供 capture3DImage，在 sim3d 工具列加入�
   assert.ok(H.capture3DImage, "公開 capture3DImage hook");
   const btnDl3d = d.querySelector("#btnDl3d");
   assert.ok(btnDl3d, "sim3d 工具列內存在 #btnDl3d 下載按鈕");
-  assert.match(btnDl3d.textContent, /下載 3D 圖/);
+  assert.match(btnDl3d.textContent, /匯出 3D 圖/);
 
   // 測試呼叫 capture3DImage
   const res = await H.capture3DImage();
