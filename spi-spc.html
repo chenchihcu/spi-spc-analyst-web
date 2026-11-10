@@ -44,8 +44,8 @@
   --c-bar:rgba(242,244,240,.88);
   --c-hairline:rgba(24,32,27,.10);
   --tbl-sticky-shadow:2px 0 5px rgba(24,32,27,.08);
-  --fs-brand:32px;--fs-brand-narrow:28px;--fs-kpi:30px;--fs-title:18px;--fs-heading:15px;--fs-body:14px;--fs-ui:13px;--fs-caption:12px;--fs-icon:18px;--fs-chart:10px;
-  --fs-input:16px;--fs-body-mobile:16px;--fs-nav-title:17px;--fs-rail:15px;--fs-label-mobile:13px;--fs-tab-label:12px;--fs-issue-title-mobile:16px;
+  --fs-brand:32px;--fs-brand-narrow:28px;--fs-kpi:30px;--fs-title:18px;--fs-heading:16px;--fs-body:14px;--fs-ui:13px;--fs-caption:12px;--fs-icon:18px;--fs-chart:12px;
+  --fs-input:16px;--fs-body-mobile:16px;--fs-nav-title:16px;--fs-rail:16px;--fs-label-mobile:13px;--fs-tab-label:12px;--fs-issue-title-mobile:16px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0F1311;--surface:#171C19;--surface2:#212923;--ink:#E4E9E4;--muted:#98A39B;--line:#2D3731;
@@ -177,6 +177,7 @@ tr.rec-new>td{background:var(--accent-soft)}
 .proof-refs li{padding:2px 0}
 @media (max-width:600px){.proof-tbl thead{display:none}.proof-tbl,.proof-tbl tbody,.proof-tbl tr,.proof-tbl td{display:block;width:100%}.proof-tbl tr{border-bottom:1px solid var(--line);padding:6px 0}.proof-tbl td{border:none;padding:2px 0}.proof-tbl td[data-label]::before{content:attr(data-label) "：";color:var(--muted);font-size:var(--fs-caption)}}
 .seg-btn.active{font-weight:700;box-shadow:inset 0 0 0 1px var(--muted)}
+.imp-step-title{font-size:var(--fs-ui);font-weight:700;color:var(--ink);margin:10px 0 6px}
 .vendor{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding:10px 12px;margin-bottom:10px;border-radius:8px;background:var(--surface2)}
 #zoneMap{max-height:420px;width:auto;max-width:100%;margin:0 auto;display:block}
 /* 長表格：預設 10 列，可展開；表頭固定 */
@@ -392,7 +393,7 @@ td.num,th.num{text-align:right}
 .drop{border:1.5px dashed var(--line);border-radius:var(--r);padding:18px;text-align:center;color:var(--muted)}
 .drop.over{border-color:var(--accent);background:var(--accent-soft)}
 .drop label[for="fileIn"]{display:inline-flex;align-items:center;min-width:var(--tap-min);min-height:var(--tap-min)}
-textarea{width:100%;min-height:140px;font-family:var(--f-mono);font-size:var(--fs-caption)}
+textarea{width:100%;min-height:140px;font-family:var(--f-mono);font-size:var(--fs-body)}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .err{color:var(--ng);font-size:var(--fs-ui)}
 input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
@@ -523,7 +524,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   }
   .sheet-handle{width:36px;height:5px;border-radius:999px;background:var(--line);margin:0 auto 4px;align-self:center}
   .sheet-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:8px;border-bottom:0.5px solid var(--c-hairline)}
-  .sheet-head h3{font-size:var(--fs-nav-title);font-weight:700;margin:0}
+  .sheet-head h3{font-size:var(--fs-heading);font-weight:700;margin:0}
   .sheet-close{all:unset;cursor:pointer;font-size:var(--fs-icon);min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted)}
   .sheet-sec-title{font-size:var(--fs-ui)!important;font-weight:700;color:var(--muted);letter-spacing:0.04em;padding:10px 4px 4px}
   .sheet-list{display:flex;flex-direction:column;background:var(--surface2);border-radius:var(--r-card);overflow:hidden}
@@ -880,7 +881,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 }
 .rec-card-actions .primary {
   flex: 1 1 auto;
-  font-size:var(--fs-ui);
+  font-size:var(--fs-body);
   font-weight:700;
 }
 .load-state{display:inline-flex;align-items:center;gap:6px;min-height:36px;max-width:min(36vw,260px);font-size:var(--fs-caption);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -929,7 +930,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
     <span class="tag" hidden>錫膏印刷檢測 · 統計製程管制</span>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.15.4</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.15.5</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <div class="db-capsule-group" role="group" aria-label="雲端記錄庫與套用狀態">
@@ -1744,7 +1745,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
         <label for="mailBody" class="lbl" style="font-weight:700">郵件內文／摘要：</label>
         <button type="button" class="linkbtn" id="btnMailCopySummary">複製摘要</button>
       </div>
-      <textarea id="mailBody" rows="7" style="width:100%;box-sizing:border-box;font-family:inherit;font-size:var(--fs-ui);line-height:1.5;padding:8px"></textarea>
+      <textarea id="mailBody" rows="7" style="width:100%;box-sizing:border-box;font-family:inherit;font-size:var(--fs-body);line-height:1.5;padding:8px"></textarea>
       <div class="row" style="justify-content:space-between;margin-top:4px">
         <span class="note" id="mailBodyLen">字數：0 字</span>
         <span class="note" id="mailUrlLen">mailto 網址長度：0 / 1800 字元</span>
@@ -1876,7 +1877,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     <div class="sheet-head" style="padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:var(--surface)">
       <div style="display:flex;align-items:center;gap:10px">
         <svg class="ui-ico ui-ico--folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
-        <h3 style="margin:0;font-size:var(--fs-input)">量測記錄與座標檔資料庫</h3>
+        <h3 style="margin:0;font-size:var(--fs-heading)">量測記錄與座標檔資料庫</h3>
         <span class="note" id="recPickerMode" style="font-size:var(--fs-caption)"></span>
       </div>
       <button type="button" class="sheet-close" id="recPickerClose" aria-label="關閉選單">✕</button>
@@ -1897,7 +1898,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
           <button type="button" class="seg-btn" id="btnPickPlace" style="padding:5px 14px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-size:var(--fs-ui)">座標檔庫 (<span id="countPickPlace">0</span>)</button>
         </div>
         <div class="rec-picker-search" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;flex:1 1 240px;max-width:420px">
-          <input type="text" id="recPickerQ" aria-label="搜尋資料庫" aria-describedby="recPickerSearchHelp" placeholder="搜尋批號、料號、工單或檔名…" style="flex:1 1 160px;min-width:0;width:100%;font-size:var(--fs-ui)">
+          <input type="text" id="recPickerQ" aria-label="搜尋資料庫" aria-describedby="recPickerSearchHelp" placeholder="搜尋批號、料號、工單或檔名…" style="flex:1 1 160px;min-width:0;width:100%;font-size:var(--fs-body)">
           <button type="button" id="recPickerQClear">清除搜尋</button>
           <button type="button" id="recPickerReload" title="重新整理" style="padding:4px 12px">↻</button>
         </div>
@@ -1907,7 +1908,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
       <!-- SMT 產線快捷過濾列 -->
       <div id="recFilterBar" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:6px 10px;background:var(--surface2);border-radius:8px">
         <span class="note" style="font-size:var(--fs-caption);font-weight:700">篩選：</span>
-        <select id="pickPartFilter" aria-label="依產品料號篩選" style="font-size:var(--fs-caption);padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--surface)">
+        <select id="pickPartFilter" aria-label="依產品料號篩選" style="font-size:var(--fs-body);padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--surface)">
           <option value="">全部料號</option>
         </select>
         <div class="seg" id="pickSideSeg" style="display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden">
@@ -1978,8 +1979,8 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     <div class="sheet-foot" style="padding:10px 18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:var(--surface2);flex:0 0 auto">
       <span class="note" style="font-size:var(--fs-caption);min-width:0">原始檔不可修改；「驗證」檢查指紋與座標對應</span>
       <div style="display:flex;gap:8px;flex:none">
-        <button type="button" id="btnRecPickerGoImport" style="font-size:var(--fs-ui)">＋ 匯入新檔</button>
-        <button type="button" id="btnRecPickerCloseBottom" class="primary" style="font-size:var(--fs-ui)">完成</button>
+        <button type="button" id="btnRecPickerGoImport" style="font-size:var(--fs-body)">＋ 匯入新檔</button>
+        <button type="button" id="btnRecPickerCloseBottom" class="primary" style="font-size:var(--fs-body)">完成</button>
       </div>
     </div>
   </div>
@@ -1992,7 +1993,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     <div class="sheet-head" style="padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:var(--surface)">
       <div style="display:flex;align-items:center;gap:10px">
         <svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:20px;height:20px;color:var(--accent)"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        <h3 style="margin:0;font-size:var(--fs-input)">資料與報告匯出中心</h3>
+        <h3 style="margin:0;font-size:var(--fs-heading)">資料與報告匯出中心</h3>
       </div>
       <button type="button" class="sheet-close" id="exportCenterClose" aria-label="關閉匯出中心">✕</button>
     </div>
@@ -2205,7 +2206,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 
     <div class="sheet-foot" style="padding:10px 18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:var(--surface2);flex:0 0 auto">
       <span class="note" style="font-size:var(--fs-caption)">所有匯出檔案名稱自動附帶料號與 UTC+8 時間戳</span>
-      <button type="button" class="primary" id="btnExportCenterCloseBottom" style="font-size:var(--fs-ui)">完成</button>
+      <button type="button" class="primary" id="btnExportCenterCloseBottom" style="font-size:var(--fs-body)">完成</button>
     </div>
   </div>
 </div>
@@ -6086,11 +6087,18 @@ $("#moreAppVer").textContent=APP.ver;
 $("#moreAppBuilt").textContent=APP.built;
 const charts={};
 function mk(id,cfg){if(charts[id])charts[id].destroy();if(!window.Chart)return;const c=document.getElementById(id);if(!c||!c.offsetParent)return;charts[id]=new Chart(c,cfg)}
+function chartCaptionFontPx(){
+  try{
+    const raw=getComputedStyle(document.documentElement).getPropertyValue("--fs-caption").trim();
+    const n=parseFloat(raw);
+    return Number.isFinite(n)?n:12;
+  }catch(e){return 12}
+}
 function baseOpts(extra={}){const ink=css("--muted"),grid=css("--grid"),coarse=typeof window!=="undefined"&&window.matchMedia&&window.matchMedia("(pointer:coarse)").matches;return Object.assign({responsive:true,maintainAspectRatio:false,animation:false,
   ...(coarse?{elements:{point:{hitRadius:24,hoverRadius:8}}}:{}),
   plugins:{legend:{display:false},tooltip:{titleFont:{family:"IBM Plex Mono"},bodyFont:{family:"IBM Plex Mono"}}},
-  scales:{x:{ticks:{color:ink,font:{family:"IBM Plex Mono",size:10},maxRotation:0,autoSkipPadding:6},grid:{color:grid}},y:{ticks:{color:ink,font:{family:"IBM Plex Mono",size:10}},grid:{color:grid}}}},extra)}
-const vlines={id:"vlines",afterDatasetsDraw(ch,_,o){if(!o||!o.lines)return;const{ctx,chartArea:a,scales:{x}}=ch;ctx.save();for(const l of o.lines){if(!isFinite(l.v))continue;const px=x.getPixelForValue(l.v);if(px<a.left-1||px>a.right+1)continue;ctx.strokeStyle=l.c;ctx.setLineDash(l.dash||[5,4]);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(px,a.top);ctx.lineTo(px,a.bottom);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=l.c;ctx.font="11px IBM Plex Mono";ctx.fillText(l.t,Math.min(px+4,a.right-40),a.top+12)}ctx.restore()}};
+  scales:{x:{ticks:{color:ink,font:{family:"IBM Plex Mono",size:chartCaptionFontPx()},maxRotation:0,autoSkipPadding:6},grid:{color:grid}},y:{ticks:{color:ink,font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{color:grid}}}},extra)}
+const vlines={id:"vlines",afterDatasetsDraw(ch,_,o){if(!o||!o.lines)return;const{ctx,chartArea:a,scales:{x}}=ch;ctx.save();for(const l of o.lines){if(!isFinite(l.v))continue;const px=x.getPixelForValue(l.v);if(px<a.left-1||px>a.right+1)continue;ctx.strokeStyle=l.c;ctx.setLineDash(l.dash||[5,4]);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(px,a.top);ctx.lineTo(px,a.bottom);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=l.c;ctx.font=chartCaptionFontPx()+"px IBM Plex Mono";ctx.fillText(l.t,Math.min(px+4,a.right-40),a.top+12)}ctx.restore()}};
 if(window.Chart)Chart.register(vlines);
 
 /* ---------- 控制項 ---------- */
@@ -6416,7 +6424,7 @@ function renderIssues(){const F=S.F||[],c={ng:0,warn:0,info:0};F.forEach(x=>c[x.
   const isBoardCard = x => Boolean(isBoardInf && ((x.cat && (x.cat.includes("X̄") || x.cat.includes("板"))) || (x.boards && x.boards !== "全部" && x.boards !== "—")));
   const card=x=>`<details class="iss-card" id="iss-${x.id}" data-id="${x.id}"${ISS_OPEN.has(x.id)?" open":""}>
     <summary><span class="iss-sum-l"><span class="no">#${x.id}</span><span class="pill ${x.lv}">${LVL[x.lv]}</span></span>
-      <span class="iss-sum-t"><b>${esc(x.title)}</b><span>${isBoardCard(x)?'<span class="pill warn" style="font-size:var(--fs-chart);padding:1px 4px;margin-right:4px">推定子群組，僅供參考</span>':""}${esc(x.cat)}｜${esc(keyFact(x))}${x.corrob.length?`｜佐證 ${x.corrob.length}`:""}</span></span>
+      <span class="iss-sum-t"><b>${esc(x.title)}</b><span>${isBoardCard(x)?'<span class="pill warn" style="font-size:var(--fs-caption);padding:1px 4px;margin-right:4px">推定子群組，僅供參考</span>':""}${esc(x.cat)}｜${esc(keyFact(x))}${x.corrob.length?`｜佐證 ${x.corrob.length}`:""}</span></span>
       ${spark(x)}<span class="iss-chev" aria-hidden="true">▾</span></summary>
     <div class="iss-detail">
     <div class="iss-head"><span class="cat">${esc(x.cat)}</span><span class="pill na">${esc(x.rule_id||"")} · ${esc(x.rule_name||"")}</span>${isBoardCard(x)?'<span class="pill warn">推定子群組，僅供參考</span>':""}${x.corrob.length?`<span class="pill na">佐證 ${x.corrob.length}</span>`:""}${x.same_phenomenon&&x.same_phenomenon.length?`<span class="pill na">同一現象 ${x.same_phenomenon.length}</span>`:""}<span class="pill na">信心 ${esc(x.conf)}</span></div>
@@ -6827,7 +6835,7 @@ function renderCap(){
   $("#histSub").textContent=`n = ${n.toLocaleString()} · 組距 ${f(bw,2)} ${u}`+(mixN?` · ${A.groups.length} 個元件群組混合：常態曲線與規格線僅供參考，請選單一群組判讀`:"");
   const ng=css("--ng");
   mk("cHist",{type:"bar",data:{datasets:[{type:"bar",data:bins,backgroundColor:css("--series2")+"AA",borderColor:css("--series2"),borderWidth:0,barPercentage:1,categoryPercentage:1,grouped:false},{type:"line",data:curve,borderColor:css("--accent"),borderWidth:2,pointRadius:0}]},
-    options:baseOpts({scales:{x:{type:"linear",min:lo-(hi-lo)*.05,max:hi+(hi-lo)*.05,ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:10}},grid:{color:css("--grid")}},y:{ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:10}},grid:{color:css("--grid")}}},
+    options:baseOpts({scales:{x:{type:"linear",min:lo-(hi-lo)*.05,max:hi+(hi-lo)*.05,ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{color:css("--grid")}},y:{ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{color:css("--grid")}}},
       plugins:{legend:{display:false},vlines:{lines:A.hasSpec?[{v:A.sp.lsl,c:ng,t:"LSL"},{v:A.sp.usl,c:ng,t:"USL"},{v:A.sp.tgt,c:css("--muted"),t:"T",dash:[2,3]}]:[]},tooltip:{callbacks:{title:i=>f(i[0].raw.x,2)+" "+u,label:i=>i.datasetIndex===0?i.raw.y+" 點":"常態 "+f(i.raw.y,1)}}}})});
   const step=Math.max(1,Math.floor(n/500)),qq=[];for(let i=0;i<n;i+=step)qq.push({x:invPhi((i+.5)/n),y:all[i]});
   const zr=[-3.5,3.5];
@@ -6835,7 +6843,7 @@ function renderCap(){
   const swTxt = A.sw && A.sw.valid ? ` · SW W ${f(A.sw.w,4)}，p ${A.sw.p<.001?"< 0.001":"= "+f(A.sw.p,3)}` : (A.sw && A.sw.reason ? ` · SW: ${esc(A.sw.reason)}` : "");
   $("#qqSub").textContent=mixN?"元件群組混合，常態性不具意義；請選單一群組":`AD ${adSampledTxt}p ${A.ad.p<.001?"< 0.001":"= "+f(A.ad.p,3)} · ${adVerdict(A.ad)}${swTxt}`;
   mk("cQQ",{type:"scatter",data:{datasets:[{data:qq,pointRadius:2,backgroundColor:css("--series2")},{type:"line",data:zr.map(z=>({x:z,y:A.gMean+z*A.overallSd})),borderColor:css("--accent"),borderWidth:1.6,pointRadius:0}]},
-    options:baseOpts({scales:{x:{type:"linear",min:-3.6,max:3.6,title:{display:true,text:"理論常態分位數 z",color:css("--muted"),font:{size:11}},ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:10}},grid:{color:css("--grid")}},y:{title:{display:true,text:METRICS[A.m].short+" ("+u+")",color:css("--muted"),font:{size:11}},ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:10}},grid:{color:css("--grid")}}}})});
+    options:baseOpts({scales:{x:{type:"linear",min:-3.6,max:3.6,title:{display:true,text:"理論常態分位數 z",color:css("--muted"),font:{size:chartCaptionFontPx()}},ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{color:css("--grid")}},y:{title:{display:true,text:METRICS[A.m].short+" ("+u+")",color:css("--muted"),font:{size:chartCaptionFontPx()}},ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{color:css("--grid")}}}})});
   const boxGroup = (document.getElementById("selBoxGroup") && document.getElementById("selBoxGroup").value) || S.boxGroup || "board";
   let B = A.byBoard, labels = B.map(b => b.board);
   if (boxGroup === "group") {
@@ -6923,15 +6931,15 @@ function drawPareto(id, dim){
     },
     options: baseOpts({
       scales: {
-        x: { ticks: { color: css("--muted"), font: { size: 11 } }, grid: { display: false } },
+        x: { ticks: { color: css("--muted"), font: { size: chartCaptionFontPx() } }, grid: { display: false } },
         y: {
-          beginAtZero: true, title: { display: true, text: "不良處數", color: css("--muted"), font: { size: 11 } },
-          ticks: { precision: 0, color: css("--muted"), font: { family: "IBM Plex Mono", size: 10 }, callback: v => Number.isInteger(v) ? v : null },
+          beginAtZero: true, title: { display: true, text: "不良處數", color: css("--muted"), font: { size: chartCaptionFontPx() } },
+          ticks: { precision: 0, color: css("--muted"), font: { family: "IBM Plex Mono", size: chartCaptionFontPx() }, callback: v => Number.isInteger(v) ? v : null },
           grid: { color: css("--grid") }
         },
         y2: {
-          position: "right", min: 0, max: 100, title: { display: true, text: "累積 %", color: css("--muted"), font: { size: 11 } },
-          ticks: { color: css("--muted"), callback: v => v + "%", font: { family: "IBM Plex Mono", size: 10 } }, grid: { display: false }
+          position: "right", min: 0, max: 100, title: { display: true, text: "累積 %", color: css("--muted"), font: { size: chartCaptionFontPx() } },
+          ticks: { color: css("--muted"), callback: v => v + "%", font: { family: "IBM Plex Mono", size: chartCaptionFontPx() } }, grid: { display: false }
         }
       },
       plugins: {
@@ -6957,7 +6965,7 @@ function renderCross(){
   const scBase=!A.msa?"":A.msa.derived?"機台體積由面積×高度計算，相關性不具佐證意義":`體積 vs 高度×面積 組內 r = ${f(A.rHA,3)}`;
   $("#scSub").textContent=[scBase,S.scatterDisclosure?S.scatterDisclosure.text:""].filter(Boolean).join(" · ");
   mk("cScatter",{type:"scatter",data:{datasets:[{data:ok,pointRadius:1.8,backgroundColor:css("--series2")+"99"},{data:bad,pointRadius:3.5,pointStyle:"triangle",backgroundColor:css("--ng")}]},
-    options:baseOpts({scales:{x:{type:"linear",title:{display:true,text:"面積 (%)",color:css("--muted"),font:{size:11}},ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:10}},grid:{color:css("--grid")}},y:{title:{display:true,text:`高度 (${METRICS.height.unit})`,color:css("--muted"),font:{size:11}},ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:10}},grid:{color:css("--grid")}}},
+    options:baseOpts({scales:{x:{type:"linear",title:{display:true,text:"面積 (%)",color:css("--muted"),font:{size:chartCaptionFontPx()}},ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{color:css("--grid")}},y:{title:{display:true,text:`高度 (${METRICS.height.unit})`,color:css("--muted"),font:{size:chartCaptionFontPx()}},ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{color:css("--grid")}}},
       plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`${i.raw.r.board} ${i.raw.r.pad}  面積 ${i.raw.x}%  高度 ${i.raw.y} ${METRICS.height.unit}`}}}})});
   drawHeat();
   const G=A.groups;
@@ -7009,7 +7017,7 @@ function renderAdv(){
     return;
   }
   const A=S.A;V=advAnalyze(S,A);const ink=css("--muted"),grid=css("--grid"),ng=css("--ng"),ok=css("--ok"),warn=css("--warn");
-  const ax=(t)=>({ticks:{color:ink,font:{family:"IBM Plex Mono",size:10}},grid:{color:grid},title:{display:!!t,text:t,color:ink,font:{size:11}}});
+  const ax=(t)=>({ticks:{color:ink,font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{color:grid},title:{display:!!t,text:t,color:ink,font:{size:chartCaptionFontPx()}}});
   // 面積比 × 轉移效率
   const groups=V.arGroups.map(g=>g.g),vs=S.specs.volume;
   const srcs=[...new Set(V.arPads.map(p=>p.ap.src))];
@@ -7028,7 +7036,7 @@ function renderAdv(){
   const pc=V.padCpk.slice(0,15);$("#pcSub").textContent=`${METRICS[A.m].short} · ${V.padCpk.length} 個焊墊位置中 ${V.padCpk.filter(p=>p.cpk<1.33).length} 個 < 1.33`;
   $("#cPadCpk").parentElement.style.height=Math.max(260,pc.length*24+60)+"px";
   mk("cPadCpk",{type:"bar",data:{labels:pc.map(p=>p.pad),datasets:[{data:pc.map(p=>p.cpk),backgroundColor:pc.map(p=>p.cpk<1?ng:p.cpk<1.33?warn:ok)}]},
-    options:baseOpts({indexAxis:"y",scales:{x:{...ax("Cpk")},y:{ticks:{color:ink,font:{family:"IBM Plex Mono",size:10},autoSkip:false},grid:{display:false}}},plugins:{legend:{display:false},vlines:{lines:[{v:1,c:ng,t:"1.00"},{v:1.33,c:warn,t:"1.33"}]},tooltip:{callbacks:{label:i=>{const p=pc[i.dataIndex];return`Cpk ${f(p.cpk)} · 平均 ${f(p.mean,1)} · σ ${f(p.sd,2)} · ${p.group}`}}}},
+    options:baseOpts({indexAxis:"y",scales:{x:{...ax("Cpk")},y:{ticks:{color:ink,font:{family:"IBM Plex Mono",size:chartCaptionFontPx()},autoSkip:false},grid:{display:false}}},plugins:{legend:{display:false},vlines:{lines:[{v:1,c:ng,t:"1.00"},{v:1.33,c:warn,t:"1.33"}]},tooltip:{callbacks:{label:i=>{const p=pc[i.dataIndex];return`Cpk ${f(p.cpk)} · 平均 ${f(p.mean,1)} · σ ${f(p.sd,2)} · ${p.group}`}}}},
       onClick:(e,els)=>{if(els[0])goPad(pc[els[0].index].pad)},onHover:(e,els,ch)=>{ch.canvas.style.cursor=els.length?"pointer":"default"}})});
   // 相關矩陣
   const C=V.corr;$("#corrSub").textContent=`皮爾森 r · n = ${C.n.toLocaleString()}`;
@@ -7044,14 +7052,14 @@ function renderAdv(){
   const sk=V.stroke;
   if(sk){$("#strokeSub").textContent=V.strokeFromField?"依資料的刮刀方向欄位分組":"資料沒有方向欄位，依板序奇偶推定行程方向";mk("cStroke",{type:"bar",data:{labels:V.strokeLabel,datasets:[{data:[[sk.ma-1.96*sd(V.odd)/Math.sqrt(V.odd.length),sk.ma+1.96*sd(V.odd)/Math.sqrt(V.odd.length)],[sk.mb-1.96*sd(V.even)/Math.sqrt(V.even.length),sk.mb+1.96*sd(V.even)/Math.sqrt(V.even.length)]],backgroundColor:[css("--series2")+"66",css("--accent")+"66"],borderColor:[css("--series2"),css("--accent")],borderWidth:1.2,barPercentage:.45},
       {type:"line",data:[sk.ma,sk.mb],showLine:false,pointStyle:"line",pointRadius:22,pointBorderWidth:2.5,pointBorderColor:css("--ink")}]},
-      options:baseOpts({indexAxis:"y",scales:{x:{...ax(METRICS[A.m].short+"（"+METRICS[A.m].unit+"）· 平均與 95% 信賴區間"),...(()=>{const e=[sk.ma,sk.mb].map((m,i)=>1.96*sd(i?V.even:V.odd)/Math.sqrt((i?V.even:V.odd).length)),lo=Math.min(sk.ma-e[0],sk.mb-e[1]),hi=Math.max(sk.ma+e[0],sk.mb+e[1]),pd=Math.max((hi-lo)*.6,.5);return{min:+(lo-pd).toFixed(1),max:+(hi+pd).toFixed(1)}})()},y:{ticks:{color:ink,font:{size:11}},grid:{display:false}}},plugins:{legend:{display:false},vlines:{},tooltip:{enabled:false}}})});
+      options:baseOpts({indexAxis:"y",scales:{x:{...ax(METRICS[A.m].short+"（"+METRICS[A.m].unit+"）· 平均與 95% 信賴區間"),...(()=>{const e=[sk.ma,sk.mb].map((m,i)=>1.96*sd(i?V.even:V.odd)/Math.sqrt((i?V.even:V.odd).length)),lo=Math.min(sk.ma-e[0],sk.mb-e[1]),hi=Math.max(sk.ma+e[0],sk.mb+e[1]),pd=Math.max((hi-lo)*.6,.5);return{min:+(lo-pd).toFixed(1),max:+(hi+pd).toFixed(1)}})()},y:{ticks:{color:ink,font:{size:chartCaptionFontPx()}},grid:{display:false}}},plugins:{legend:{display:false},vlines:{},tooltip:{enabled:false}}})});
     $("#strokeTxt").innerHTML=`<span class="pill ${sk.p<.05?"warn":"ok"}">${sk.p<.05?"有顯著差異":"無顯著差異"}</span> 差值 <b class="mono">${f(sk.ma-sk.mb,2)}</b> ${METRICS[A.m].unit}，t = ${f(sk.t,2)}，df = ${f(sk.df,1)}，p = <b class="mono">${sk.p<.001?"< 0.001":f(sk.p,3)}</b>`}
   else{$("#strokeSub").textContent=V.strokeWhy?"刮刀方向欄位不完整":"資料不足";mk("cStroke",{type:"bar",data:{labels:[],datasets:[]},options:baseOpts()});
     $("#strokeTxt").innerHTML=`<span class="pill na">無法比較</span> ${V.strokeWhy?esc(V.strokeWhy)+"；資料有方向欄位時不以板序奇偶推定，請補齊每片板的刮刀方向":"兩個方向各需至少 2 片板"}`}
   // 擦拭
   const W=V.wipe;$("#inWipe").value=W.N;$("#wipeSub").textContent=`每 ${W.N} 片擦拭 · `+(W.p<.05?`推定擦拭後第 1 片為 ${W.first}（已掃描 ${W.N} 種起點，p 值已校正）`:`未找到明顯週期（已掃描 ${W.N} 種起點）；下圖以最接近的起點 ${W.first||"—"} 分組`);
   mk("cWipe",{type:"bar",data:{labels:W.rows.map(w=>"第 "+w.k+" 片"),datasets:[{data:W.rows.map(w=>w.mean),backgroundColor:css("--series2")+"AA",yAxisID:"y",order:2},{type:"line",data:W.rows.map(w=>w.p*100),borderColor:css("--accent"),pointRadius:3,borderWidth:1.6,yAxisID:"y2",order:1}]},
-    options:baseOpts({scales:{x:{ticks:{color:ink,font:{size:11}},grid:{display:false}},y:{...ax(METRICS[A.m].short+" 平均"),min:Math.min(...W.rows.map(w=>w.mean))-Math.max(1,A.overallSd*.3)},y2:{position:"right",min:0,ticks:{color:ink,callback:v=>v+"%",font:{family:"IBM Plex Mono",size:10}},grid:{display:false},title:{display:true,text:"不良率",color:ink,font:{size:11}}}},
+    options:baseOpts({scales:{x:{ticks:{color:ink,font:{size:chartCaptionFontPx()}},grid:{display:false}},y:{...ax(METRICS[A.m].short+" 平均"),min:Math.min(...W.rows.map(w=>w.mean))-Math.max(1,A.overallSd*.3)},y2:{position:"right",min:0,ticks:{color:ink,callback:v=>v+"%",font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{display:false},title:{display:true,text:"不良率",color:ink,font:{size:chartCaptionFontPx()}}}},
       plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>i.datasetIndex?"不良率 "+f(i.raw,2)+" %":"平均 "+f(i.raw,2)+" "+METRICS[A.m].unit}}}})});
   renderHotellingT2UI();
   renderMorphologyUI();
@@ -7409,7 +7417,7 @@ function drawVec(){const cv=$("#vecCv");if(!cv.offsetParent)return;const ctx=cv.
   for(const r of rs){const[px,py]=X.toPx(r.x,r.y);ctx.fillStyle=css("--line");ctx.fillRect(px-3,py-3,6,6);const bad=Math.hypot(r.offx,r.offy)>Math.min(Math.abs(S.specs.offx.usl),Math.abs(S.specs.offy.usl));arrow(r.x,r.y,r.offx,r.offy,bad?css("--ng"):css("--series2"),1.4)}
   if(a){const[cx,cy]=X.toPx(a.xc,a.yc);ctx.fillStyle=css("--accent");ctx.beginPath();ctx.arc(cx,cy,5,0,7);ctx.fill();arrow(a.xc,a.yc,a.tx,a.ty,css("--accent"),3);
     ctx.fillStyle=css("--ink");ctx.font="18px IBM Plex Mono";ctx.fillText(`${b}  平移 (${f(a.tx,1)}, ${f(a.ty,1)}) µm  旋轉 ${f(a.thDeg,3)}°  伸縮 ${f(a.ex*1000,0)}/${f(a.ey*1000,0)} ppm  殘差 ${f(a.resid,1)} µm`,X.pad,22)}
-  ctx.fillStyle=css("--muted");ctx.font="15px IBM Plex Mono";ctx.fillText(`箭頭 = 偏移 × ${$("#inVec").value}　粗箭頭 = 整板平移　紅色 = 超出偏移規格`,X.pad,cv.height-6)}
+  ctx.fillStyle=css("--muted");ctx.font="16px IBM Plex Mono";ctx.fillText(`箭頭 = 偏移 × ${$("#inVec").value}　粗箭頭 = 整板平移　紅色 = 超出偏移規格`,X.pad,cv.height-6)}
 $("#selAlignBoard").onchange=e=>{S.board=e.target.value;renderAdv()};
 $("#inVec").oninput=e=>{$("#vecOut").textContent=e.target.value+"×";drawVec()};
 function setWipe(v){v=Math.round(+v);if(!(v>=2&&v<=50)){syncControls();return}S.wipe=v;persist();syncControls();recompute()}
@@ -7449,9 +7457,9 @@ function renderCompare(){if(S.runs.length<2){$("#cmpTbl").innerHTML="";$("#cmpLe
   const cA=css("--muted"),cB=css("--accent");
   $("#cmpLeg1").innerHTML=$("#cmpLeg2").innerHTML=`<span><i class="sq" style="background:${cA}"></i>A：${esc(ra.name)}</span><span><i class="sq" style="background:${cB}"></i>B：${esc(rb.name)}</span>`;
   mk("cCmpTE",{type:"bar",data:{labels:gs.map(x=>x.g),datasets:[{data:gs.map(x=>x.a.te),backgroundColor:cA+"99"},{data:gs.map(x=>x.b.te),backgroundColor:cB}]},
-    options:baseOpts({plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`${i.datasetIndex?"B":"A"} ${f(i.raw,1)}%`}}},scales:{x:{ticks:{color:css("--muted"),font:{size:11}},grid:{display:false}},y:{min:Math.min(60,...gs.map(x=>Math.min(x.a.te,x.b.te)))-5,ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:10}},grid:{color:css("--grid")}}}})});
+    options:baseOpts({plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`${i.datasetIndex?"B":"A"} ${f(i.raw,1)}%`}}},scales:{x:{ticks:{color:css("--muted"),font:{size:chartCaptionFontPx()}},grid:{display:false}},y:{min:Math.min(60,...gs.map(x=>Math.min(x.a.te,x.b.te)))-5,ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{color:css("--grid")}}}})});
   mk("cCmpD",{type:"bar",data:{labels:gs.map(x=>x.g),datasets:[{data:gs.map(x=>x.a.rate*1e6),backgroundColor:cA+"99"},{data:gs.map(x=>x.b.rate*1e6),backgroundColor:cB}]},
-    options:baseOpts({plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`${i.datasetIndex?"B":"A"} ${fmtPpm(i.raw)} PPM`}}},scales:{x:{ticks:{color:css("--muted"),font:{size:11}},grid:{display:false}},y:{beginAtZero:true,ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:10}},grid:{color:css("--grid")}}}})});
+    options:baseOpts({plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`${i.datasetIndex?"B":"A"} ${fmtPpm(i.raw)} PPM`}}},scales:{x:{ticks:{color:css("--muted"),font:{size:chartCaptionFontPx()}},grid:{display:false}},y:{beginAtZero:true,ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{color:css("--grid")}}}})});
   // 問題比較：依面向與嚴重度
   const cats=[...new Set([...FA,...FB].map(x=>x.cat))],cnt=(F,c,l)=>F.filter(x=>x.cat===c&&(!l||x.lv===l)).length;
   const keyOf=x=>x.cat+"｜"+x.title.replace(/B\d+|PN\d+-\d+/g,"#").replace(/[\d.]+/g,"n");
@@ -7482,7 +7490,7 @@ function renderDfm(){const D=dfmTable(S);DFM=D;const r=curRun();
   $("#dfmLeg").innerHTML=parts.map((p,i)=>`<span><i class="sq" style="background:${pal[i]}"></i>${p[1]}</span>`).join("");
   $("#cDfm").parentElement.style.height=Math.max(220,D.length*44+70)+"px";
   mk("cDfm",{type:"bar",data:{labels:D.map(x=>x.g),datasets:parts.map((p,i)=>({label:p[1],data:sc.map(t=>t[p[0]]),backgroundColor:pal[i],stack:"s"}))},
-    options:baseOpts({indexAxis:"y",plugins:{legend:{display:false},vlines:{lines:[{v:2,c:css("--warn"),t:"中"},{v:4,c:css("--ng"),t:"高"}]}},scales:{x:{stacked:true,ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:10}},grid:{color:css("--grid")},title:{display:true,text:"風險分數",color:css("--muted"),font:{size:11}}},y:{stacked:true,ticks:{color:css("--muted"),font:{size:11}},grid:{display:false}}}})});
+    options:baseOpts({indexAxis:"y",plugins:{legend:{display:false},vlines:{lines:[{v:2,c:css("--warn"),t:"中"},{v:4,c:css("--ng"),t:"高"}]}},scales:{x:{stacked:true,ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{color:css("--grid")},title:{display:true,text:"風險分數",color:css("--muted"),font:{size:chartCaptionFontPx()}}},y:{stacked:true,ticks:{color:css("--muted"),font:{size:chartCaptionFontPx()}},grid:{display:false}}}})});
   const PF=S.F.filter(x=>x.cat==="焊墊位置");
   $("#dfmPads").innerHTML=PF.length?`<thead><tr><th>群組／項目</th><th>焊墊與數值</th></tr></thead><tbody>${PF.map(x=>`<tr><td>${esc(x.title)}</td><td class="note">${x.facts.map(esc).join("<br>")}</td></tr>`).join("")}</tbody>`:'<tbody><tr><td class="note">沒有長期偏離的個別焊墊位置。</td></tr></tbody>';
   const unc=S.padCoverage&&S.padCoverage.uncovered;
@@ -7524,9 +7532,9 @@ function renderAOI(){const r=curRun(),ms=S.metrics.filter(k=>k!=="offx"&&k!=="of
     {label:"回焊不良率",data:B.map(b=>b.n?b.rate*100:null),backgroundColor:B.map(b=>ac.win&&b.lo>=ac.win[0]&&b.hi<=ac.win[1]?css("--series2"):ng),barPercentage:.3,grouped:false,yAxisID:"y"},
     {type:"line",label:"焊墊數",data:B.map(b=>b.n||null),borderColor:css("--muted"),borderDash:[4,3],pointRadius:2,yAxisID:"y2"}]},
     options:baseOpts({plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>i.datasetIndex===2?`焊墊 ${i.raw}`:i.datasetIndex===1?`不良率 ${f(i.raw,2)}%（${B[i.dataIndex].k}/${B[i.dataIndex].n}）`:`95% CI ${f(i.raw[0],2)}–${f(i.raw[1],2)}%`}}},
-      scales:{x:{ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:10},autoSkip:false,maxRotation:45},grid:{display:false},title:{display:true,text:`SPI ${METRICS[S.aoiM].short}（${u}）· 藍＝建議窗口內`,color:css("--muted"),font:{size:11}}},
-        y:{beginAtZero:true,suggestedMax:Math.min(100,Math.max(...B.filter(b=>b.n>=20).map(b=>b.ci[1]*100),1)),ticks:{color:css("--muted"),callback:v=>v+"%",font:{family:"IBM Plex Mono",size:10}},grid:{color:css("--grid")},title:{display:true,text:"回焊不良率",color:css("--muted"),font:{size:11}}},
-        y2:{position:"right",type:"logarithmic",ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:10}},grid:{display:false},title:{display:true,text:"焊墊數（對數）",color:css("--muted"),font:{size:11}}}}})});
+      scales:{x:{ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:chartCaptionFontPx()},autoSkip:false,maxRotation:45},grid:{display:false},title:{display:true,text:`SPI ${METRICS[S.aoiM].short}（${u}）· 藍＝建議窗口內`,color:css("--muted"),font:{size:chartCaptionFontPx()}}},
+        y:{beginAtZero:true,suggestedMax:Math.min(100,Math.max(...B.filter(b=>b.n>=20).map(b=>b.ci[1]*100),1)),ticks:{color:css("--muted"),callback:v=>v+"%",font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{color:css("--grid")},title:{display:true,text:"回焊不良率",color:css("--muted"),font:{size:chartCaptionFontPx()}}},
+        y2:{position:"right",type:"logarithmic",ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{display:false},title:{display:true,text:"焊墊數（對數）",color:css("--muted"),font:{size:chartCaptionFontPx()}}}}})});
 }
 $("#aoiFile").onchange=e=>{const fl=e.target.files[0];if(!fl)return;fl.text().then(t=>{try{curRun().aoi=parseAOI(t);saveRunsSoon();renderAOI()}catch(er){$("#aoiState").textContent=er.message}})};
 $("#btnAoiSample").onclick=()=>{curRun().aoi=parseAOI(sampleAOI(S));saveRunsSoon();renderAOI()};
@@ -7544,7 +7552,7 @@ function renderDOE(){fillSelect($("#doeResp"),Object.entries(RESP).map(([k,v])=>
   box.innerHTML=D.eff.map(e=>`<div><div class="fact" style="margin-bottom:4px">${FACT[e.k].label} 主效應</div><div class="chartbox short"><canvas id="cDoe-${e.k}" role="img" aria-label="${FACT[e.k].label}主效應圖"></canvas></div></div>`).join("");
   const all=D.eff.flatMap(e=>e.means),lo=Math.min(...all),hi=Math.max(...all),pad=(hi-lo)*.25||1;
   D.eff.forEach(e=>mk("cDoe-"+e.k,{type:"line",data:{labels:e.lv.map(l=>l+" "+FACT[e.k].unit),datasets:[{data:e.means,borderColor:e.p<.05?css("--accent"):css("--muted"),pointRadius:5,borderWidth:2}]},
-    options:baseOpts({plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`${RESP[S.doeResp].label} ${f(i.raw,2)}`}}},scales:{x:{ticks:{color:css("--muted"),font:{size:11}},grid:{display:false}},y:{min:lo-pad,max:hi+pad,ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:10}},grid:{color:css("--grid")}}}})}));
+    options:baseOpts({plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`${RESP[S.doeResp].label} ${f(i.raw,2)}`}}},scales:{x:{ticks:{color:css("--muted"),font:{size:chartCaptionFontPx()}},grid:{display:false}},y:{min:lo-pad,max:hi+pad,ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{color:css("--grid")}}}})}));
 }
 $("#doeResp").onchange=e=>{S.doeResp=e.target.value;renderDOE()};
 $("#btnDoeSample").onclick=()=>{const ex=S.runs.find(r=>r.name.startsWith("DOE"));const id=ex?ex.id:addRun("DOE · 印刷參數 2³ 全因子",sampleData({variant:"DOE"}),["volume","height","area","offx","offy"],snapCfg());switchRun(id);setTab("lab")};
@@ -7629,7 +7637,7 @@ function drawCrossSectionProfile(r){
       ctx.strokeStyle=color;setDash(dash);
       ctx.beginPath();ctx.moveTo(50,py);ctx.lineTo(W-40,py);ctx.stroke();
       setDash([]);
-      ctx.fillStyle=color;ctx.font="10px monospace";ctx.textAlign="left";
+      ctx.fillStyle=color;ctx.font=chartCaptionFontPx()+"px IBM Plex Mono, monospace";ctx.textAlign="left";
       ctx.fillText(`${label} ${f(val,0)}`,8,py+3);
     };
     drawRefH(hs.lsl,css("--cs-limit"),[4,4],"LSL");
@@ -7697,7 +7705,7 @@ function drawCrossSectionProfile(r){
     const peakPy=toPy(peakY_um);
     ctx.fillStyle=css("--cs-paste");
     ctx.beginPath();ctx.arc(toPx(cX),peakPy,3.5,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle="#e5e7eb";ctx.font="bold 11px sans-serif";ctx.textAlign="center";
+    ctx.fillStyle="#e5e7eb";ctx.font="700 "+chartCaptionFontPx()+"px sans-serif";ctx.textAlign="center";
     ctx.fillText(`峰值 ${f(peakY_um,1)} µm`,toPx(cX),Math.max(14,peakPy-6));
 
     if(Math.abs(off)>5){
@@ -7706,7 +7714,7 @@ function drawCrossSectionProfile(r){
       ctx.moveTo(toPx(0),toPy(0));ctx.lineTo(toPx(0),toPy(thk*0.5));
       ctx.moveTo(toPx(cX),toPy(0));ctx.lineTo(toPx(cX),toPy(thk*0.5));
       ctx.stroke();setDash([]);
-      ctx.fillStyle=css("--cs-limit");ctx.font="10px monospace";
+      ctx.fillStyle=css("--cs-limit");ctx.font=chartCaptionFontPx()+"px IBM Plex Mono, monospace";
       ctx.fillText(`Δ${axis}=${f(off,0)}µm`,toPx(cX/2),toPy(thk*0.25));
     }
   }catch(err){}
@@ -7743,7 +7751,7 @@ function renderBoard2D(){
   });
   const G=[...new Set(S.rows.map(r=>r.group))],m=A.m,gm=g=>{const v=S.rows.filter(r=>r.group===g&&r[m]!=null).map(r=>r[m]);return v.length?mean(v):null},bm=g=>{const v=S.rows.filter(r=>r.group===g&&r.board===S.board&&r[m]!=null).map(r=>r[m]);return v.length?mean(v):null};
   mk("cBoardCmp",{type:"bar",data:{labels:G,datasets:[{label:"全體",data:G.map(gm),backgroundColor:css("--muted")+"66"},{label:S.board,data:G.map(bm),backgroundColor:css("--accent")}]},
-    options:baseOpts({plugins:{legend:{display:true,labels:{color:css("--muted"),boxWidth:10,font:{size:11}}}},scales:{x:{ticks:{color:css("--muted"),font:{size:11}},grid:{display:false}},y:{ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:10}},grid:{color:css("--grid")},title:{display:true,text:METRICS[m].short+" ("+METRICS[m].unit+")",color:css("--muted"),font:{size:11}}}}})});
+    options:baseOpts({plugins:{legend:{display:true,labels:{color:css("--muted"),boxWidth:10,font:{size:chartCaptionFontPx()}}}},scales:{x:{ticks:{color:css("--muted"),font:{size:chartCaptionFontPx()}},grid:{display:false}},y:{ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{color:css("--grid")},title:{display:true,text:METRICS[m].short+" ("+METRICS[m].unit+")",color:css("--muted"),font:{size:chartCaptionFontPx()}}}}})});
   const L={status:[[css("--ok"),"規格內"],[css("--warn"),"高度 / 偏移超規"],[css("--ng"),"少錫・多錫・連錫風險"]],height:[[divColor(-1),"高度低於目標"],[divColor(0),"接近目標"],[divColor(1),"高度高於目標"]],volume:[[divColor(-1),"體積低於目標"],[divColor(0),"接近目標"],[divColor(1),"體積高於目標"]]}[S.colorMode];
   let legHtml = L.map(l=>`<span><i class="sq" style="background:${l[0]}"></i>${l[1]}</span>`).join("");
   if(S.colorMode==="height"){
@@ -8109,7 +8117,9 @@ function fit3D(span){const k=Math.max(span,60)/60;return{rad:78*k,min:20*k,max:1
 function size3DNote(e){return e&&e.span>1000?`板面 ${Math.round(e.w)} × ${Math.round(e.d)} mm，超過 1 公尺，座標單位可能有誤（例如 mil 被當成 mm），請檢查座標檔的單位設定`:""}
 /* 本板 3D 位置註記：元件中心示意與未繪出焊墊數；HUD 與匯出快照共用 */
 function pos3DNote(){
-  const P=pos3D(S.rows),bRows=S.rows.filter(r=>r.board===S.board&&(isAllGrp(S.group)||r.group===S.group));
+  const board = S.board || (S.A && S.A.worst ? S.A.worst.board : S.A && S.A.boards ? S.A.boards[0] : null) || (S.rows && S.rows[0] && S.rows[0].board);
+  if(!board || !S.rows) return "";
+  const P=pos3D(S.rows),bRows=S.rows.filter(r=>r.board===board&&(isAllGrp(S.group)||r.group===S.group));
   let nEst=0,nGrid=0,nSkip=0;
   for(const r of bRows){
     const p=P.get(r);
@@ -8299,7 +8309,7 @@ function switchRun(id){const c=curRun();if(c)c.cfg=snapCfg();const n=S.runs.find
   LOAD_ERROR.spi="";
   /* 規格一律由使用者定義：舊版的機台推估、自訂、工單、AOI 建議窗回合一律視為未定義（鎖定到套用料號規格為止）；範例資料用示範規格 */
   if(n.sample)S.specSrc="sample";else if(S.specSrc!=="part"||!S.partSpec||!S.partSpec.id){S.specSrc="none";S.partSpec=null;S.specsG=null}
-  if(!S.metrics.includes(S.metric))S.metric=S.metrics[0];syncControls();recompute();saveRunsSoon();updateLoadStates();
+  if(!S.metrics.includes(S.metric))S.metric=S.metrics[0];syncControls();recompute();saveRunsSoon();syncPlaceToCurrentRun({notify:false});updateLoadStates();
   if(typeof updateStartupDbBanner==="function")updateStartupDbBanner()}
 /* ---------- 回合保存（IndexedDB）：資料留在這台電腦的瀏覽器，不上傳 ---------- */
 const RunDB={
@@ -8510,6 +8520,132 @@ function placeLoad(){try{const s=JSON.parse(localStorage.getItem("spi-place")||"
 function placeSave(){try{if(PLACE)localStorage.setItem("spi-place",JSON.stringify({recId:PLACE.recId,part:PLACE.part,rev:PLACE.rev,name:PLACE.name,tab:PLACE.tab,unit:PLACE.unit,side:PLACE.side}));else localStorage.removeItem("spi-place")}catch(e){}}
 function placeShow(){const st=$("#placeState");$("#placeClear").hidden=!PLACE;if(!PLACE){st.textContent="未套用受控座標檔";return}
   const r=PLACE.res,declared=headerPlaceUnit(PLACE.tab.head),declaredText=declared==="conflict"?"（欄名單位互相衝突）":declared?`（欄名標示 ${declared}）`:"（登錄時選擇）";st.textContent=`料號 ${PLACE.part} 版次 ${PLACE.rev} · ${PLACE.name}：${r.items.length} 個元件（TOP ${r.top}、BOT ${r.bot}），單位 ${r.unit}${declaredText}；無焊墊座標${r.warn?`；⚠️ ${r.warn}`:""}`}
+/* ---------- 舊資料／未綁定回合的受控座標檢視套用 ---------- */
+function runTargetSide(run){
+  const src=runSrc(run);
+  let side=src?.side||"";
+  if(!side||side==="ALL"||side==="BOTH") side=detectSide(run?.name||src?.name||"");
+  return side==="BOT"?"BOT":"TOP";
+}
+function canApplyPlacePreview(run){
+  if(!run||run.sample)return false;
+  const src=runSrc(run);
+  if(src&&src.lifecycle==="active"&&src.placeId)return false;
+  return true;
+}
+function clearPlacePreviewFromRun(run){
+  if(!run||!run.info||!run.info.placePreview)return false;
+  delete run.info.placePreview;
+  const allRows=[run.rows,run._rawRows].filter(Boolean);
+  const seenRows=new Set();
+  const pads=[...new Set(run.rows.map(r=>r.pad))],side=Math.ceil(Math.sqrt(pads.length));
+  const padIdx=new Map(pads.map((p,i)=>[p,i]));
+  for(const rows of allRows){
+    for(const r of rows){
+      if(seenRows.has(r))continue;
+      seenRows.add(r);
+      delete r.componentX;
+      delete r.componentY;
+      const pi=padIdx.get(r.pad);
+      r.x=4+(pi%side)*(52/Math.max(side-1,1));
+      r.y=4+Math.floor(pi/side)*(32/Math.max(side-1,1));
+      r.gridPos=true;
+    }
+  }
+  return true;
+}
+function applyPlacePreviewToRun(run,place){
+  if(!canApplyPlacePreview(run))return{ok:false,reason:"此回合不支援套用檢視座標"};
+  if(!place||!place.res||!place.res.items)return{ok:false,reason:"座標檔未解析或無元件"};
+  const src=runSrc(run);
+  const part=src?.part||safeId($("#inPart")?.value)||"";
+  if(part&&place.part&&place.part!==part){
+    return{ok:false,reason:`料號不符（目前回合 ${part}，座標檔 ${place.part}）`};
+  }
+  const side=runTargetSide(run);
+  const itemsOnSide=place.res.items.filter(it=>it.side===side);
+  if(!itemsOnSide.length){
+    return{ok:false,reason:`座標檔不包含目前回合的 ${side} 面座標`};
+  }
+  const byRef=new Map();
+  for(const it of itemsOnSide){
+    byRef.set(it.ref,it);
+  }
+  const allRows=[run.rows,run._rawRows].filter(Boolean);
+  const seenRows=new Set();
+  let matchedCount=0,unmatchedCount=0;
+  for(const rows of allRows){
+    for(const r of rows){
+      if(seenRows.has(r))continue;
+      seenRows.add(r);
+      const rawComp=r.comp||r.pad;
+      const cleanRef=String(rawComp).replace(/_\d+$/,"").replace(/-[^-]+$/,"").trim();
+      const it=byRef.get(rawComp)||byRef.get(cleanRef);
+      if(it){
+        matchedCount++;
+        r.componentX=it.x;
+        r.componentY=it.y;
+        delete r.x;
+        delete r.y;
+        delete r.gridPos;
+      }else{
+        unmatchedCount++;
+      }
+    }
+  }
+  if(matchedCount===0){
+    return{ok:false,reason:`座標檔 ${place.part} ${place.rev} 在 ${side} 面找不到與目前量測相符的位號`};
+  }
+  run.info=run.info||{};
+  run.info.placePreview={
+    recId:place.recId||null,
+    part:place.part,
+    rev:place.rev,
+    name:place.name,
+    side,
+    matched:matchedCount,
+    unmatched:unmatchedCount
+  };
+  return{ok:true,matched:matchedCount,unmatched:unmatchedCount,side};
+}
+function syncPlaceToCurrentRun(opts={}){
+  const run=curRun();
+  if(!run)return;
+  const isPre=Boolean(run.info&&run.info.placePreview);
+  if(!PLACE){
+    if(isPre){
+      clearPlacePreviewFromRun(run);
+      T.pos=null;
+      if(T.ok&&typeof build3D==="function")build3D();
+      updateLoadStates();
+      saveRunsSoon();
+    }
+    return;
+  }
+  const res=applyPlacePreviewToRun(run,PLACE);
+  if(res.ok){
+    T.pos=null;
+    if(T.ok&&typeof build3D==="function")build3D();
+    updateLoadStates();
+    saveRunsSoon();
+    if(opts.notify){
+      toast(`已套用座標檔 ${PLACE.part} ${PLACE.rev} 檢視（${res.side} 面對應 ${res.matched} 個焊墊）`);
+    }
+  }else{
+    if(isPre){
+      clearPlacePreviewFromRun(run);
+      T.pos=null;
+      if(T.ok&&typeof build3D==="function")build3D();
+      saveRunsSoon();
+    }
+    updateLoadStates();
+    if(opts.notify){
+      toast(`座標檔未套用至目前回合：${res.reason}`);
+    }
+  }
+}
+
+
 function vendorUI(){
   const v=$("#selVendor").value,isWideV=v==="lirong"||v==="zsf";
   $("#sideField").hidden=false;$("#placeRow").hidden=false;$("#vendorNote").hidden=!isWideV;
@@ -8564,7 +8700,7 @@ function reconvert(){if(!IMP||!IMP.raw)return;try{convertImp(false);$("#inRunNam
 $("#selVendor").onchange=()=>{try{localStorage.setItem("spi-vendor",$("#selVendor").value)}catch(e){}vendorUI();reconvert()};
 $("#selSide").onchange=reconvert;
 $("#placeUnit").onchange=()=>{if(PLACE)$("#placeUnit").value=PLACE.unit};
-$("#placeClear").onclick=()=>{PLACE=null;placeSave();placeShow();reconvert();clearImportFieldErrors("btnSelectPlace");renderImportSourceSummary();updateImportWorkflow()};
+$("#placeClear").onclick=()=>{PLACE=null;placeSave();placeShow();reconvert();clearImportFieldErrors("btnSelectPlace");renderImportSourceSummary();updateImportWorkflow();syncPlaceToCurrentRun({notify:false})};
 $("#btnSelectPlace").onclick=()=>{if(typeof openRecPickerModal==="function")openRecPickerModal("place");else{$("#btnOpenRecModal")?.click();$("#btnPickPlace")?.click()}};
 async function saveControlledPlacement(fl,part,rev,side,unit){
   if(RecDB.mode!=="cloud")throw new Error("請先登入並連線到雲端資料庫");
@@ -8588,7 +8724,7 @@ $("#placeIn").onchange=async e=>{const fl=e.target.files[0];e.target.value="";if
   if(!unit){try{const declared=headerPlaceUnit(csvTable(decodeBytes(new Uint8Array(await readBuf(fl)))).head);if(declared==="conflict")throw new Error("座標單位與欄名不一致");if(declared){unit=declared;$("#placeUnit").value=unit;$("#placeState").textContent=`欄名標示單位 ${unit}，已預選；請確認登錄資料`}}catch(er){return fail(er)}}
   busy(true,"正在驗證並存入座標檔…");saveControlledPlacement(fl,part,rev,side,unit).then(({rec,tab,res})=>{
     busy(false);PLACE={recId:rec.id,part:rec.part,rev:rec.rev,name:rec.name,tab,res,unit,side};placeSave();placeShow();LOAD_ERROR.place="";updateLoadStates();reconvert();recPartNote();clearImportValidationError();clearImportFieldErrors("btnSelectPlace");renderImportSourceSummary();updateImportWorkflow();
-    toast(`已存入座標檔 ${part} ${rev}：${res.items.length} 個元件`)}).catch(fail)};
+    syncPlaceToCurrentRun({notify:true});toast(`已存入座標檔 ${part} ${rev}：${res.items.length} 個元件`)}).catch(fail)};
 function applyProfile(v){const head=IMP.tab.head;
   if(v==="auto"){IMP.map=autoMap(head);setOpts(guessOpts(head,IMP.map))}
   else if(v==="phme"){IMP.map=autoMap(head);delete IMP.map.board;setOpts({offUnit:"pct",heightUnit:"um",volBasis:"aperture"})}
@@ -10019,7 +10155,8 @@ function updateLoadStates(){const run=curRun(),src=runSrc(run),unmatched=src?.un
   const spiText=src?.lifecycle==="pending_review"?"待管理者判定":src?.lifecycle==="superseded"?"歷史修正前版本":src?.lifecycle==="legacy"?"舊資料・未受控":"未套用";
   set("#stateSpi",LOAD_ERROR.spi?"error":valid?"ok":"idle",LOAD_ERROR.spi?`量測紀錄：${LOAD_ERROR.spi}`:valid?`量測紀錄：已套用${unmatched.length?`・${unmatched.length} 個位號無座標`:""}`:`量測紀錄：${spiText}`);
   const applied=valid&&src.placeId;
-  set("#statePlace",LOAD_ERROR.place?"error":applied?"ok":"idle",LOAD_ERROR.place?`座標檔：${LOAD_ERROR.place}`:applied?"座標檔：已套用":PLACE?"座標檔：已選取":"座標檔：未套用");
+  const previewApplied=!applied&&Boolean(run&&run.info&&run.info.placePreview&&(!PLACE||!PLACE.recId||PLACE.recId===run.info.placePreview.recId));
+  set("#statePlace",LOAD_ERROR.place?"error":(applied||previewApplied)?"ok":"idle",LOAD_ERROR.place?`座標檔：${LOAD_ERROR.place}`:applied?"座標檔：已套用":previewApplied?"座標檔：已套用（檢視）":PLACE?"座標檔：已選取":"座標檔：未套用");
 }
 $("#stateSpi").onclick=()=>{const refs=runSrc(curRun())?.unmatchedRefs||[];if(refs.length){$("#unmatchedRefsTitle").textContent=`無座標位號（${refs.length}）`;$("#unmatchedRefsList").textContent=refs.join("、");openModal("unmatchedRefsModal","[data-close]")}else if(typeof openRecPickerModal==="function")openRecPickerModal("spi");else $("#btnOpenRecModal")?.click()};
 $("#statePlace").onclick=()=>{if(typeof openRecPickerModal==="function")openRecPickerModal("place");else{$("#btnOpenRecModal")?.click();$("#btnPickPlace")?.click()}};
@@ -10086,7 +10223,7 @@ async function usePlaceRec(rec){const g=await RecDB.get(rec);if(!g.ok)throw new 
   const tab=/\.xlsx$/i.test(rec.name)?(await xlsxTable(g.bytes.buffer.slice(g.bytes.byteOffset,g.bytes.byteOffset+g.bytes.length))).tab:csvTable(decodeBytes(g.bytes));
   const unit=rec.unit||rec.meta?.unit,side=rec.side;
   if(!unit||!side)throw new Error("歷史座標缺少已驗證的單位或面別，不能用於新匯入");
-  PLACE={recId:rec.id,part:rec.part,rev:rec.rev,name:rec.name,tab,unit,side,res:parsePlacement(tab,unit,side)};placeSave();placeShow();$("#placePart").value=rec.part;$("#placeRev").value=rec.rev;$("#placeUnit").value=unit;$("#placeSide").value=side;clearImportValidationError();clearImportFieldErrors("btnSelectPlace");renderImportSourceSummary();updateImportWorkflow()}
+  PLACE={recId:rec.id,part:rec.part,rev:rec.rev,name:rec.name,tab,unit,side,res:parsePlacement(tab,unit,side)};placeSave();placeShow();$("#placePart").value=rec.part;$("#placeRev").value=rec.rev;$("#placeUnit").value=unit;$("#placeSide").value=side;clearImportValidationError();clearImportFieldErrors("btnSelectPlace");renderImportSourceSummary();updateImportWorkflow();LOAD_ERROR.place="";updateLoadStates()}
 async function openRecord(rec, opt = {}){busy(true,"正在從資料庫取回原始檔…");
   try{const g=await RecDB.get(rec);if(!g.ok)throw new Error("原始檔指紋與上傳時不同，已停止開啟");
     /* 只用當時的座標檔重現；沒有連結座標檔（或已刪除）時，這次匯入不套用目前的座標檔，避免位置與分群和當初不同 */
@@ -10135,7 +10272,7 @@ $("#recCard").addEventListener("click",async e=>{const b=e.target.closest("[data
     if(act==="dl"&&rec.kind==="spec"){const g=await RecDB.get(rec),dl=specDownloadInfo(rec),fn=dl.filename;await saveBytes(fn,g.bytes);const warning=dl.warning?`；${dl.warning}`:"";$("#recState").textContent=`已匯出 ${fn}${warning}`;if(!g.ok){$("#recState").innerHTML=`<span class="err">已匯出 ${esc(fn)}（注意：檔案指紋與存檔時不同）${esc(warning)}</span>`;toast("注意：檔案指紋與存檔時不同")}else if(dl.warning)toast(dl.warning);return}
     if(act==="dl"){const g=await RecDB.get(rec);await saveBytes(rec.name,g.bytes);if(!g.ok){$("#recState").innerHTML=`<span class="err">已匯出 ${esc(rec.name)}（注意：檔案指紋與上傳時不同）</span>`;toast("注意：檔案指紋與上傳時不同")}else{$("#recState").textContent="已匯出 "+rec.name}return}
     if(act==="ver"){b.disabled=true;b.textContent="驗證中…";try{const g=await RecDB.get(rec);REC_VER[id]={ok:g.ok}}catch(er){REC_VER[id]={ok:false,msg:er.message}}renderRecords();return}
-    if(act==="use"){await usePlaceRec(rec);renderRecords();toast(`已改用座標檔 ${rec.part} ${rec.rev}`);if(IMP&&IMP.raw)reconvert();return}
+    if(act==="use"){await usePlaceRec(rec);renderRecords();syncPlaceToCurrentRun({notify:true});if(IMP&&IMP.raw)reconvert();return}
     if(act==="archive"){if(!window.confirm(`封存 ${rec.part} ${rec.rev} ${rec.side}？`))return;await RecDB.manage(id,"archive_place");if(PLACE?.recId===id){PLACE=null;placeSave();placeShow()}await renderRecords(true);updateLoadStates();toast("座標檔已封存");return}
     if(act==="del"){if(REC_CONFIRM!==id){REC_CONFIRM=id;renderRecords();setTimeout(()=>{if(REC_CONFIRM===id){REC_CONFIRM=null;renderRecords()}},6000);return}
       REC_CONFIRM=null;await RecDB.del(id);if(PLACE&&PLACE.recId===id){PLACE=null;placeSave();placeShow()}delete REC_VER[id];await renderRecords(true);toast(`已刪除 ${rec.kind==="spi"?"批號 "+rec.lot:"座標檔 "+rec.part+" "+rec.rev}（稽核紀錄保留）`)}}
@@ -10554,12 +10691,12 @@ async function renderRecPicker(force) {
         </div>
         <div class="rec-card-actions" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
           ${!["pending_review","superseded"].includes(r.lifecycle)?`<button class="primary" data-pact="load" data-id="${esc(r.id)}" style="flex:1 1 120px;min-height:44px;font-size:var(--fs-body);font-weight:700">載入分析</button>`:""}
-          <button data-pact="ver" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-ui)">驗證</button>
-          <button data-pact="open" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-ui)">調整</button>
-          ${again && again.length ? `<button data-pact="goto" data-id="${esc(again[0].id)}" style="min-height:44px;font-size:var(--fs-ui)">已重新匯入 →</button>` : !pt && canReimport(r) ? `<button data-pact="reimport" data-id="${esc(r.id)}" style="min-height:44px;font-size:var(--fs-ui)">重新受控匯入</button>` : ""}
+          <button data-pact="ver" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-body)">驗證</button>
+          <button data-pact="open" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-body)">調整</button>
+          ${again && again.length ? `<button data-pact="goto" data-id="${esc(again[0].id)}" style="min-height:44px;font-size:var(--fs-body)">已重新匯入 →</button>` : !pt && canReimport(r) ? `<button data-pact="reimport" data-id="${esc(r.id)}" style="min-height:44px;font-size:var(--fs-body)">重新受控匯入</button>` : ""}
           ${RecDB.isAdmin&&r.lifecycle==="pending_review"?`<button data-pact="new-batch" data-id="${esc(r.id)}">新一批</button><button data-pact="correct" data-id="${esc(r.id)}">修正既有</button>`:""}
           ${editBtn(r)}
-          <button data-pact="dl" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-ui)">匯出</button>
+          <button data-pact="dl" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-body)">匯出</button>
           ${delBtn(r)}
         </div>
       </div>`;
@@ -10632,8 +10769,8 @@ async function renderRecPicker(force) {
           ${isCur ? '<button class="primary" disabled style="flex:1 1 120px;min-height:44px;font-size:var(--fs-body)">目前已選取</button>' : selectable?`<button class="primary" data-pact="use-place" data-id="${esc(r.id)}" style="flex:1 1 120px;min-height:44px;font-size:var(--fs-body)">選取此座標檔</button>`:""}
           ${RecDB.isAdmin&&selectable?`<button data-pact="archive-place" data-id="${esc(r.id)}">封存</button>`:""}
           ${RecDB.isAdmin&&r.validation_source==="legacy"?`<button data-pact="register-legacy-place" data-id="${esc(r.id)}">驗證納管</button>`:""}
-          <button data-pact="ver" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-ui)">驗證</button>
-          <button data-pact="dl" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-ui)">匯出</button>
+          <button data-pact="ver" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-body)">驗證</button>
+          <button data-pact="dl" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-body)">匯出</button>
           ${delBtn(r)}
         </div>
       </div>`;
@@ -10852,6 +10989,7 @@ function setupRecPicker() {
         await renderRecPicker(true);
         if (sv) scrollToPickerRow(sv.id);
         await renderRecords(true);
+        syncPlaceToCurrentRun({notify:true});
       } catch(err) {
         if (state) state.innerHTML = `<span class="err">上傳失敗：${esc(err.message)}</span>`;
       }
@@ -10968,7 +11106,7 @@ function setupRecPicker() {
         LOAD_ERROR.place="";updateLoadStates();
         renderRecPicker();
         renderRecords();
-        toast(`已改用座標檔 ${rec.part} ${rec.rev}`);
+        syncPlaceToCurrentRun({notify:true});
         if (IMP && IMP.raw) reconvert();
         return;
       }
@@ -10976,6 +11114,7 @@ function setupRecPicker() {
         if(!window.confirm(`封存 ${rec.part} ${rec.rev} ${rec.side}？歷史引用仍可讀取，封存後不供新匯入。`))return;
         await RecDB.manage(id,"archive_place");
         if(PLACE?.recId===id){PLACE=null;placeSave();placeShow()}
+        syncPlaceToCurrentRun({notify:false});
         await renderRecPicker(true);
         await renderRecords(true);
         updateLoadStates();toast("座標檔已封存");
@@ -11429,10 +11568,10 @@ function renderReport(){
       <tbody>${F.length?F.map(x=>`<tr>
         <td class="mono">#${x.id}</td><td><span class="pill ${x.lv}">${LVL[x.lv]}</span></td><td>${esc(x.cat)}</td>
         <td style="font-size:var(--fs-caption)"><b>${esc(x.rule_id||"—")}</b><br>${esc(x.rule_name||"—")}</td><td>${esc(x.metric)}</td>
-        <td style="font-size:var(--fs-caption)">${esc(x.boards)}<br>${esc(x.group)}</td><td class="mono" style="font-size:var(--fs-chart)">${esc(x.pads)}</td>
-        <td style="font-size:var(--fs-caption)">觀測：${esc(x.observed)}<br>界限：${esc(x.limit)}</td><td class="mono" style="font-size:var(--fs-chart)">z: ${esc(x.z)}<br>p: ${esc(x.p)}</td>
+        <td style="font-size:var(--fs-caption)">${esc(x.boards)}<br>${esc(x.group)}</td><td class="mono" style="font-size:var(--fs-caption)">${esc(x.pads)}</td>
+        <td style="font-size:var(--fs-caption)">觀測：${esc(x.observed)}<br>界限：${esc(x.limit)}</td><td class="mono" style="font-size:var(--fs-caption)">z: ${esc(x.z)}<br>p: ${esc(x.p)}</td>
         <td style="font-size:var(--fs-caption)"><b>事實：</b>${esc(x.facts.join("；"))}<br><b>推論：</b>${esc(x.cause)}<br><b>建議：</b>${esc(x.action)}</td>
-        <td style="font-size:var(--fs-chart)">佐證：${x.corrob&&x.corrob.length?x.corrob.map(i=>"#"+i).join("、"):"無"}${x.explained_pads&&x.explained_pads.length?`<br>已解釋：${esc(x.explained_pads.join("；"))}`:""}</td>
+        <td style="font-size:var(--fs-caption)">佐證：${x.corrob&&x.corrob.length?x.corrob.map(i=>"#"+i).join("、"):"無"}${x.explained_pads&&x.explained_pads.length?`<br>已解釋：${esc(x.explained_pads.join("；"))}`:""}</td>
       </tr>`).join(""):'<tr><td colspan="11" class="note">無偵測到問題</td></tr>'}</tbody>
     </table></div></div>`;
 
@@ -12285,13 +12424,7 @@ function applyMobileChartFont(){
     }
   }
 }
-function chartCaptionFontPx(){
-  try{
-    const raw=getComputedStyle(document.documentElement).getPropertyValue("--fs-caption").trim();
-    const n=parseFloat(raw);
-    return Number.isFinite(n)?n:12;
-  }catch(e){return 12}
-}
+// chartCaptionFontPx hoisted to baseOpts section
 function applyChartFontDefaults(){
   if(window.Chart&&window.Chart.defaults){
     if(!window.Chart.defaults.font)window.Chart.defaults.font={};
@@ -12718,7 +12851,7 @@ updateStartupDbBanner();
 /* 測試用：只有測試在載入前設定 window.SPI_TEST_HOOK 時才公開內部函式 */
 if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{importSearchMatch,renderImportSourceSummary,updateImportWorkflow,showImportValidationError,clearImportValidationError});
 if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")window.SPI_TEST_HOOK.specDownloadInfo=specDownloadInfo;
-if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,renderLISAUI,renderRelChartUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,calcShapeFactor,getSolderGrainTexture,getRealPasteMat,createSolderPasteGeometry,selectPadForProfile,highlightSelectedPad3D,focusPad3D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus,setupExportCenter,openExportCenterModal,closeExportCenterModal,triggerExportByType,downloadDeliverablesQueue,updateAuxDataStatus,setupAuxData});
+if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{S,RecDB,renderIssues,renderPmap,renderOverview,renderLISAUI,renderRelChartUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,calcShapeFactor,getSolderGrainTexture,getRealPasteMat,createSolderPasteGeometry,selectPadForProfile,highlightSelectedPad3D,focusPad3D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,updateStartupDbBanner,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus,setupExportCenter,openExportCenterModal,closeExportCenterModal,triggerExportByType,downloadDeliverablesQueue,updateAuxDataStatus,setupAuxData,applyPlacePreviewToRun,clearPlacePreviewFromRun,syncPlaceToCurrentRun,pos3DNote,usePlaceRec});
 if($("#geomPadFile"))$("#geomPadFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{const p=parseGeometryPadListCsv(rd.result);if(!p.ok){toast("幾何焊墊清單："+p.error);e.target.value="";return}S.geometryPads=p.pads;persist();updatePadCoverageState();recompute();renderGeomPadStatus();toast(`已匯入 ${p.pads.length} 個幾何焊墊`);e.target.value=""};rd.readAsText(f)});
 if($("#geomPadClear"))$("#geomPadClear").onclick=()=>{S.geometryPads=null;S.padCoverage=null;S.pendingVerify=false;persist();updatePadCoverageState();recompute();renderGeomPadStatus()};
 const initHash=(location.hash||"").slice(1);
