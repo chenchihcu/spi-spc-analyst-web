@@ -14,16 +14,16 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
 | 重複錯誤類別 | 檢查／執行入口 | 證據 |
 |---|---|---|
 | 混淆提交、建置、部署與工具執行結果 | 既有 Git integration；從 Cloudflare production build／deployment 讀回同一 commit 的狀態與 version；CLI／瀏覽器中止單列為驗證受阻 | 2026-10-24 只查登入頁而漏掉 DB 503；2026-11-05 #95／#96 並行建置與不同來源部署不可互相作證 |
-| CI 紅燈或變更未進 main 就停 | 失敗的 required check 修完再 commit、push；該 check 綠後合併 `main`；讀同一 commit 的 Workers Build，不把 Actions dry-run 當成正式站 | 2026-11-11 #117：`test` 失敗後曾停住；Actions 只有 `wrangler deploy --dry-run`；Workers Build `2dc2af00-961c-40c2-9b2c-3fb78e2c4a47`（`cdfface`）當時仍在 running，正式站停在 v10.15.9 |
-| 未登入的 401 寫成資料庫路徑未驗證 | 先 `POST /__login`（body 為 `{user,d}`，`d` 為 PBKDF2，不送明文 `pass`），帶 `spi_auth` cookie 再 `GET /api/records`，200 且含 `records` 陣列 | 2026-11-11：未帶 cookie 的 `/api/records` 回 401，被寫成「無法登入／資料庫路徑未驗證」 |
+| CI 紅燈或變更未進 main 就停 | `classifyWorkersSync`（`tools/deploy-verify.mjs`）；`tests/deploy-verify.test.mjs`。dry-run 且沒有 Build 結果是 `not_deployed`，Build 還在跑是 `in_progress`，`success` 才是 `deployed` | 2026-11-11 #117：`test` 失敗後曾停住；Actions 只有 `wrangler deploy --dry-run`；Workers Build `2dc2af00-961c-40c2-9b2c-3fb78e2c4a47`（`cdfface`）當時仍在 running，正式站停在 v10.15.9 |
+| 未登入的 401 寫成資料庫路徑未驗證 | `classifyRecordsProbe`（`tools/deploy-verify.mjs`）；`tests/deploy-verify.test.mjs`。未送 `POST /__login` 時狀態是 `not_done`，不是 `unverified` 或 `verified` | 2026-11-11：未帶 cookie 的 `/api/records` 回 401，被寫成「無法登入／資料庫路徑未驗證」 |
 - **部署驗證要走過資料庫路徑**：登入頁顯示新版本只代表靜態資產已更新。未帶 cookie 的 `GET /api/records` 回 401 只表示這個請求沒登入，不是「無法登入」，也不能寫成資料庫路徑未驗證。先 `POST /__login`，body 為 `{user,d,next}`，`d` 是登入頁同一套 PBKDF2；伺服器拒絕明文 `pass`。登入回應 `ok` 後，用 `Set-Cookie` 的 `spi_auth` 再 `GET /api/records`，HTTP 200 且 JSON 含 `records` 陣列，才算走過資料庫路徑。登入本身失敗（帳密錯誤、429、503、手邊沒有帳號所以無法計算 `d`）才寫「資料庫路徑未驗證」，並寫明登入請求的狀態碼與缺的憑證名稱。
-  - 檢查：驗收紀錄分開寫登入 `POST /__login` 的狀態，以及帶 cookie 的 `GET /api/records` 狀態與 `records` 是否為陣列。只有未登入的 401 時，這條驗證還沒做。
+  - 檢查：用 `classifyRecordsProbe` 寫驗收。未送登入必須是 `not_done`。`node --test tests/deploy-verify.test.mjs` 通過。
   - 出處：2026-10-24 只看登入頁版本；2026-11-11 未登入呼叫 `/api/records` 得 401，被寫成未驗證。
 - **雲端部署以 Cloudflare 正式環境為準**：重現、除錯與驗收走正式 Worker 的頁面與 API（含 D1／R2）。不用只有靜態檔、沒有 Worker API 的本機預覽代替。本機測試與 `wrangler dev` 可輔助，不能把靜態預覽的結果寫成雲端已驗證。
   - 檢查：驗收紀錄寫明正式站 URL、走過的頁面或 API 與 HTTP 狀態。只開了靜態檔伺服器時寫「雲端路徑未驗證」。
   - 出處：2026-10-29 AI 分析；埠 8770 的靜態預覽沒有 `/api/analyze`，不能代表正式站。
 - **產品變更做到 main，CI 紅燈自己修完再推**：使用者要求完成的產品變更，工作樹有差異就 commit 並 push。PR 的 required check 失敗時讀該 check 的失敗測試，修完再 commit、push，不把紅燈留給下一輪。該 check 通過後合併進 `main`。GitHub Actions 的 `wrangler deploy --dry-run` 只證明設定可部署，不是正式站已更新。合併後讀 Cloudflare Workers Builds 裡這個 commit 的 build，等到 `success` 或 `fail`；狀態是 `running` 就繼續等，不另開手動 `wrangler deploy`。正式站登入頁版本對上這個 commit 的 `package.json` 版本後，再走「部署驗證要走過資料庫路徑」。
-  - 檢查：報告寫明失敗 check、後續 commit、合併 SHA、Workers Build uuid 與 outcome、正式 URL 的版本。停在未合併的 PR，或正式站仍是上一版，這項工作未完成。
+  - 檢查：用 `classifyWorkersSync` 寫 Build 狀態。dry-run 且沒有 Build 結果是 `not_deployed`。報告仍寫失敗 check、後續 commit、合併 SHA、Workers Build uuid 與 outcome、正式 URL 的版本。`node --test tests/deploy-verify.test.mjs` 通過。
   - 停止條件：使用者明確說不要合併或不要上正式站；migration 未核准；衝突會改變已審查行為（沿用下一條）；同一 CI 錯誤修完再推後原樣重現且沒有新證據。
   - 出處：2026-11-11 #117。
 - **合併失敗先自行修復再重試，不等使用者要求**：已核准合併的 PR，`gh pr merge` 失敗時先讀錯誤輸出，依下列分類修正，再重跑因修正而失效的必要關卡；完整測試與 `release-check` 的安排依下方「驗證避免重複」規則。必要關卡通過就仍在原核准範圍內，直接重試合併，不需要再問。
