@@ -44,6 +44,7 @@ const forbidden = [
   "一鍵下載標準交付包",
 ];
 
+// 本檔只擋已知禁用字串。通過之後仍依 AGENTS.md 文案條刪掉不改變判讀的靜態標籤。
 test("spi-spc.html 不含禁用教學段與英文譯名", () => {
   for (const needle of forbidden) {
     assert.equal(

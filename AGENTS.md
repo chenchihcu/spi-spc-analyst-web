@@ -77,9 +77,10 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
 - **固定白底區塊要固定 token**：列印用的白紙（`.report-preview`）裡的行內 `var(--*)` 會跟著深色主題變深；在該範圍重新宣告明亮 token。圖例文字用一般字色，系列色只放在符號上。
   - 檢查：深色模式下報告頁文字對比 ≥ 4.5；`tests/mobile-layout.test.mjs` 測試 8d、8e。
   - 出處：v10.3.3（深色模式報告判定框對比 1.2）。
-- **使用者可見文案只用中文標題、不附英文譯名**：介面、報告預覽、PDF 與匯出標題中，「中文（English）」或「中文 (English)」只保留中文部分。無括號的專名、單位、標準號、檔名保留（例如 Cpk、DFM、SPI、CSV、Johnson、ISO 21747、µm）。不新增「怎麼看」或只重複標題的教學副標；計算結果列、空狀態、錯誤與會改變判讀的警示句保留。
-  - 檢查：`tests/ui-copy.test.mjs` 掃描 `spi-spc.html` 禁止 `Executive Summary`、`Closed-Loop Correction`、`<summary>怎麼看</summary>` 等禁用模式。
+- **使用者可見文案只用中文標題、不附英文譯名**：介面、報告預覽、PDF 與匯出標題中，「中文（English）」或「中文 (English)」只保留中文部分。無括號的專名、單位、標準號、檔名保留（例如 Cpk、DFM、SPI、CSV、Johnson、ISO 21747、µm）。不新增「怎麼看」或只重複標題的教學副標。畫面已能顯示正確結果時，仍刪掉拿掉後不改變判讀的靜態標籤：與所在頁籤同名的前綴、口號、把輸入框已寫的欄位再列一次、只寫對象稱謂的說明。計算結果列、空狀態、錯誤與會改變判讀的警示句保留。
+  - 檢查：`tests/ui-copy.test.mjs` 只擋已知禁用字串，通過仍要逐句看靜態標籤。拿掉後合格、數值、範圍或必做動作的判讀不變，就刪。
   - 契約：`docs/spec-ui-copy-rfc.md`。
+  - 出處：2026-11-11 介面精簡。vibe coding 成品在文案測試通過後仍留此類標籤。
 - **純文字節點嚴禁內嵌 HTML 標籤（Plain Text Integrity Guard）**：指派給 `.textContent` 的所有變數（如 `#ctrlSub.textContent` 管制圖副標、狀態摘要列等），其下游格式化函式與條件警告（`subgroupWarning`、`reason` 等）必須嚴格維持純文字字串，嚴禁包裝 `<span class="...">` 或 `<div ...>` 原始標籤以防 HTML 洩漏至畫面。
   - 檢查：`node --test tests/spi-audit-fixes.test.mjs` 管制圖小樣本副標測試通過。
   - 出處：v10.14.3（2026-11-09，X̄-S 管制圖副標 raw HTML 標籤外露）。
