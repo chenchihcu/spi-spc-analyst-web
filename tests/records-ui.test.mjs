@@ -220,7 +220,7 @@ test("重複檔沿用既有紀錄；從資料庫開啟不重複存；管理者�
   assert.ok(d.querySelector('#tblPickSpi [data-pact=del]'), "管理者可見刪除鈕");
   const spiId = recs.find(r => r.kind === "spi").id;
   $('#tblPickSpi [data-pact=del]').click();
-  assert.ok(await until(() => !$("#recDeleteModal").hidden));
+  assert.ok(await until(() => $("#recDeleteModal").classList.contains("open")), "刪除確認須以 .open 顯示 db-modal");
   $("#recDeleteConfirm").click();
   assert.ok(await until(() => $("#recDeleteModal").hidden));
   assert.equal((await w.eval("SPI_TEST_HOOK.RecDB.list()")).filter(r => r.kind === "spi").length, 0);
