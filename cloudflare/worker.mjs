@@ -375,11 +375,18 @@ async function handleRecordsApi(req, repo, user, env) {
   }
 
   if (req.method === 'DELETE') {
-    if (!admin) return json({ error: '需要管理者權限' }, 403);
     const id = url.searchParams.get('id') || '';
+    const rec = await repo.getRecord(id);
+    const adminOnly = !rec || rec.kind === 'spi' || rec.kind === 'place';
+    if (adminOnly && !admin) return json({ error: '需要管理者權限' }, 403);
     const res = await repo.deleteRecord(id, user);
-    if (res.error) return json(res, res.status || 500);
-    return json({ deleted: id });
+    if (res.error) {
+      const body = { error: res.error };
+      if (res.code) body.code = res.code;
+      if (res.id) body.id = res.id;
+      return json(body, res.status || 500);
+    }
+    return json({ deleted: res.deleted || id });
   }
 
   return json({ error: '原始量測紀錄與座標檔不能直接覆寫；只能修改工單/備註或刪除' }, 405);

@@ -79,7 +79,8 @@ test('座標庫超過 100 份仍可用游標讀取，不以首頁判定不存在
 });
 
 test('measurement fingerprint ignores work-order changes; related different file can be reviewed and corrected once', async () => {
-  const db = database(), repo = new Repo(db, bucket());
+  const db = database(), r2 = bucket(), repo = new Repo(db, r2);
+  await repo.bootstrapAdmin('admin@example.com', true, 1);
   await repo.createRecord(place(1), new Uint8Array([1]));
   const a = await repo.createRecord(spi(10, 'sha-a', 'WO-1'), new Uint8Array([10]));
   assert.equal(a.record.lifecycle, 'active');
@@ -93,11 +94,27 @@ test('measurement fingerprint ignores work-order changes; related different file
   assert.equal((await repo.judgeMeasurement(id(11), 'correct', id(10), 'admin@example.com')).ok, true);
   assert.equal((await repo.getRecord(id(10))).lifecycle, 'superseded');
   assert.equal((await repo.getRecord(id(11))).lifecycle, 'active');
-  assert.equal((await repo.deleteRecord(id(10), 'admin@example.com')).status, 409);
+  assert.equal((await repo.deleteRecord(id(10), 'admin@example.com')).ok, true);
+  assert.equal(r2.objects.has(`records/${id(10)}`), false);
+  assert.equal((await repo.getRecord(id(10))), null);
   const another = { ...spi(12, 'sha-c', 'WO-1'), lifecycle: 'pending_review' };
   await repo.createRecord(another, new Uint8Array([12]));
   assert.equal((await repo.judgeMeasurement(id(12), 'correct', id(10), 'admin@example.com')).status, 409);
   assert.equal((await repo.getRecord(id(12))).lifecycle, 'pending_review');
+});
+
+test('admin delete place removes scope row, raw file, and audit entry; non-admin forbidden', async () => {
+  const db = database(), r2 = bucket(), repo = new Repo(db, r2);
+  await repo.bootstrapAdmin('admin@example.com', true, 1);
+  await repo.createRecord(place(1), new Uint8Array([1]));
+  await repo.createRecord(spi(10, 'sha-a', 'WO-1'), new Uint8Array([10]));
+  assert.equal((await repo.deleteRecord(id(1), 'user@example.com')).status, 403);
+  assert.equal((await repo.deleteRecord(id(1), 'admin@example.com')).ok, true);
+  assert.equal((await repo.getRecord(id(1))), null);
+  assert.equal((await repo.coordinateScope('P', 'V5', 'TOP')), null);
+  assert.equal(r2.objects.has(`records/${id(1)}`), false);
+  const spiRec = await repo.getRecord(id(10));
+  assert.equal(spiRec.place_id, id(1), '引用 place_id 保留');
 });
 
 test('archive retains coordinate scope and raw file for history while excluding new selection', async () => {
