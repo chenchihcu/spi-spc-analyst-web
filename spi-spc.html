@@ -869,10 +869,13 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
   font-weight:700;
 }
 .load-state{display:inline-flex;align-items:center;gap:6px;min-height:36px;max-width:min(36vw,260px);font-size:var(--fs-caption);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+button.load-state{border:none;font:inherit;cursor:default}
 .load-state .light{width:10px;height:10px;border-radius:50%;background:var(--muted);flex:none}
 .load-state[data-state="ok"] .light{background:var(--ok)}
 .load-state[data-state="error"] .light{background:var(--ng)}
 .load-state>span:last-child{overflow:hidden;text-overflow:ellipsis}
+.load-state.is-action{cursor:pointer}
+.load-state.is-action:hover{background:var(--surface)}
 @media(max-width:720px){.load-state{max-width:44vw;min-height:44px}}
 .db-capsule-group{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:var(--surface2);padding:2px;gap:2px;max-width:100%}
 .db-capsule-group>.chip.chipBtn{border:none;background:transparent;border-radius:999px;min-height:32px;padding:3px 10px}
@@ -888,12 +891,11 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
   .rail-time-pop,.rail-time-pop[hidden]{display:grid!important;grid-template-columns:minmax(0,1fr);width:100%;gap:8px}
 }
 .panel-subnav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px}
-.panel-subnav__lbl{font-size:var(--fs-caption);color:var(--muted);font-weight:700;margin-right:4px}
 .panel-subnav button{border:1px solid transparent;background:transparent;border-radius:6px;padding:4px 10px;font-size:var(--fs-ui);cursor:pointer;color:var(--ink)}
 .panel-subnav button[aria-current="page"]{background:var(--surface);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
 .tab.tab--sub{font-size:var(--fs-caption);opacity:.88}
 .ai-compact-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 12px!important}
-@media(pointer:coarse){.panel-subnav button,.db-capsule-group>.chip.chipBtn,#btnRailTimeToggle,#btnGoAiCfg{min-height:44px}}
+@media(pointer:coarse){.panel-subnav button,.db-capsule-group>.chip.chipBtn,.load-state.is-action,#btnRailTimeToggle,#btnGoAiCfg{min-height:44px}}
 
 .menu .duo-toggle-btn{display:block;width:100%;text-align:left;padding:12px 14px;border:none;background:transparent;font:inherit;color:inherit;cursor:pointer}
 .pmap-details summary{list-style:none;cursor:pointer;min-height:44px;display:flex;align-items:center;padding:8px 0}
@@ -918,12 +920,12 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     <svg class="mitcorp-logo" viewBox="0 0 248 45" width="143" height="26" fill="currentColor" fill-rule="evenodd" role="img" aria-label="Mitcorp"><path d="M13.8,-0.0L28.5,-0.1L29.2,0.0L30.6,1.0L31.5,2.9L34.7,29.0L35.0,29.8L36.2,30.2L37.5,29.8L38.3,28.2L46.9,3.5L48.0,1.5L48.8,0.8L50.5,-0.1L66.3,0.0L67.6,1.0L68.4,3.2L68.4,30.8L68.3,32.2L67.7,33.8L66.0,34.8L62.8,35.0L59.2,34.8L57.7,33.8L57.3,31.5L57.3,5.8L56.7,4.5L55.2,4.0L53.0,4.7L52.0,6.5L43.5,31.5L42.2,33.3L41.2,34.1L38.2,34.8L28.8,34.8L26.0,34.0L24.6,32.5L24.0,29.8L20.9,5.8L20.2,4.5L18.5,4.0L17.0,4.5L16.5,5.2L12.3,26.8L11.3,30.0L10.5,31.5L8.4,33.8L6.3,35.0L2.2,35.7L1.2,35.7L0.0,35.0L0.0,30.2L1.2,29.6L4.5,28.9L5.4,28.0L6.2,26.2L10.7,3.0L11.9,1.0L13.8,-0.0ZM73.2,-0.0L83.8,0.0L84.6,1.3L84.5,4.2L83.8,5.4L82.8,5.7L75.5,5.8L73.2,5.5L72.7,4.8L72.5,2.8L72.6,1.0L73.2,-0.0ZM90.0,1.7L95.5,1.6L97.2,2.1L97.8,2.8L98.2,4.0L98.3,8.5L98.6,9.2L99.3,9.7L109.8,9.8L110.9,10.2L111.4,12.0L110.9,13.2L110.2,13.6L99.8,13.7L98.8,14.1L98.2,15.5L98.3,27.0L99.0,29.8L100.5,30.9L104.2,31.1L112.5,30.9L113.1,31.5L113.2,33.0L113.0,33.8L112.2,34.6L110.5,35.0L104.5,35.3L95.8,35.1L92.0,33.9L89.9,32.2L88.9,30.5L88.4,27.5L88.4,5.5L88.6,3.0L89.2,2.1L90.0,1.7ZM130.5,9.2L135.5,9.3L144.3,10.0L145.5,10.4L146.1,11.0L146.2,13.2L145.7,14.0L145.0,14.3L140.3,13.8L133.0,13.6L129.5,13.9L127.0,14.9L125.1,17.0L124.3,20.0L124.3,24.0L125.1,27.8L127.0,29.8L130.0,30.9L137.5,31.1L145.2,30.4L146.0,31.0L146.3,32.0L146.2,33.5L145.5,34.3L142.5,35.0L135.2,35.4L129.5,35.4L124.0,34.9L120.5,33.9L118.2,32.8L116.1,30.8L115.1,29.2L114.0,25.5L113.9,20.0L115.0,15.8L116.1,14.0L118.2,12.0L120.5,10.8L124.2,9.8L130.5,9.2ZM161.8,9.5L168.5,9.3L174.8,9.9L178.2,10.8L180.2,11.8L182.8,14.0L183.9,15.8L184.7,18.8L184.9,24.5L184.7,26.2L183.8,29.2L181.8,32.0L178.8,33.9L175.5,34.9L166.0,35.7L156.8,34.8L153.8,33.8L152.0,32.9L150.4,31.5L149.2,30.0L148.3,28.0L147.9,25.5L148.0,18.2L149.1,15.0L151.0,12.8L154.0,11.0L158.0,9.8L161.8,9.5ZM203.0,9.5L209.8,9.4L210.7,10.5L210.8,11.8L210.5,12.8L209.5,13.6L201.8,13.9L200.2,14.2L199.2,14.8L198.7,16.0L198.7,31.0L198.3,33.5L197.5,34.5L196.2,34.9L190.5,34.8L189.1,33.8L188.8,32.0L188.7,15.2L189.2,12.5L190.0,11.7L191.9,10.8L197.2,9.8L203.0,9.5ZM224.0,9.5L230.5,9.3L237.9,9.8L242.2,10.9L244.2,12.0L246.2,14.0L247.0,15.2L247.8,17.3L247.8,27.8L246.9,30.0L245.9,31.5L244.8,32.6L242.8,33.8L240.0,34.8L232.2,35.5L223.2,35.4L222.6,36.0L222.4,36.8L222.2,43.5L221.3,44.8L213.5,44.8L212.6,43.5L212.4,41.8L212.6,13.0L213.2,11.7L214.6,10.8L218.5,9.9L224.0,9.5ZM75.5,9.9L79.0,9.8L81.5,10.0L82.8,10.8L83.4,12.0L83.5,32.2L83.0,33.8L81.5,34.8L75.5,34.8L74.1,34.0L73.7,33.2L73.6,12.0L74.0,10.8L75.5,9.9ZM163.2,13.0L160.8,14.0L159.4,15.2L158.3,18.8L158.1,22.5L158.3,26.5L159.2,29.2L160.5,30.8L162.8,31.8L166.0,32.1L169.8,31.8L172.0,30.8L173.0,29.8L173.9,28.2L174.4,25.0L174.4,21.8L173.9,16.5L173.0,15.0L171.9,14.0L168.5,12.9L163.2,13.0ZM226.0,13.0L223.5,13.5L222.7,14.0L222.4,14.5L222.5,30.5L224.0,31.6L227.5,31.9L232.5,31.9L235.0,31.0L236.0,30.1L237.0,28.7L237.7,25.5L237.8,20.8L237.0,16.2L235.3,14.0L233.0,13.1L230.2,12.8L226.0,13.0Z"/></svg>
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.15.10</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.15.11</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <div class="db-capsule-group" role="group" aria-label="雲端記錄庫與套用狀態">
-      <button type="button" class="chip chipBtn load-state" id="stateSpi" data-state="idle" title="查看量測紀錄"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
-      <button type="button" class="chip chipBtn load-state" id="statePlace" data-state="idle" title="選取座標檔"><span class="light" aria-hidden="true"></span><span>座標檔：未套用</span></button>
+      <button type="button" class="chip load-state" id="stateSpi" data-state="idle" tabindex="-1" aria-disabled="true" title="量測紀錄狀態。載入請用記錄庫"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
+      <span class="chip load-state" id="statePlace" data-state="idle" role="status" title="座標檔狀態。選取請用記錄庫"><span class="light" aria-hidden="true"></span><span>座標檔：未套用</span></span>
       <button type="button" class="chip chipBtn chip-rec-lib" id="btnOpenRecModal" title="開啟量測紀錄與座標檔資料庫，選取歷史檔案載入分析"><svg class="ui-ico ui-ico--folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>記錄庫 ▾</button>
       <button type="button" class="chip chipBtn chip-export-hub" id="btnOpenExportModal" title="開啟資料與報告匯出中心，支援依角色一覽下載與批次打包"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>匯出 ▾</button>
     </div>
@@ -1141,7 +1143,6 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 
 <section class="panel" id="p-deep" role="tabpanel" hidden>
   <nav class="panel-subnav" aria-label="深入分析子視圖">
-    <span class="panel-subnav__lbl">深入分析：</span>
     <button type="button" data-subnav-deep="cross">交叉驗證</button>
     <button type="button" data-subnav-deep="adv">進階分析</button>
     <button type="button" data-subnav-deep="stats">統計資料</button>
@@ -1231,9 +1232,6 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
   </div></div>
     <div data-subview="stats" hidden><div class="card">
     <h3>統計異常點集中清單 <small id="statsSub"></small></h3>
-        <div class="row" style="margin-bottom:12px">
-      <button id="btnStatsCsv">匯出異常清單 .csv</button>
-    </div>
     <div class="tbl" style="max-height:420px;overflow:auto">
       <table id="statsTbl"></table>
     </div>
@@ -1254,7 +1252,6 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 
 <section class="panel" id="p-improve" role="tabpanel" hidden>
   <nav class="panel-subnav" aria-label="改善子視圖">
-    <span class="panel-subnav__lbl">改善：</span>
     <button type="button" data-subnav-improve="compare">試產比較</button>
     <button type="button" data-subnav-improve="dfm">DFM 建議</button>
     <button type="button" data-subnav-improve="lab">實驗驗證</button>
@@ -1287,10 +1284,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
   <div class="card" id="cardClosedLoop" style="margin-top:16px">
     <h3>印刷機閉環補償建議 <small id="printerCorrSub"></small></h3>
         <div class="kpis" id="printerCorrKpis" style="margin-top:10px"></div>
-    <div style="display:flex;gap:12px;align-items:center;margin-top:12px;flex-wrap:wrap">
-      <button type="button" class="primary" id="btnExportCorrectionJson">匯出印刷機補償參數 (.json)</button>
-      <span id="printerCorrNote" class="note"></span>
-    </div>
+    <p id="printerCorrNote" class="note" style="margin:12px 0 0"></p>
   </div></div>
     <div data-subview="lab" hidden><div class="card">
     <h3>SPI × 回焊後 AOI／X-ray 關聯 </h3>
@@ -1324,7 +1318,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     </div>
     <button type="button" id="btnGoAiCfg">前往 AI 與配額設定</button>
   </div>
-  <div class="card"><h3>AI 品質工程分析 <small id="aiCardSub">嚴格區分事實與推論之品質工程診斷</small></h3>
+  <div class="card"><h3>AI 品質工程分析</h3>
     <div class="notice" id="aiNoticeBox" style="background:var(--surface2);padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:var(--fs-ui);color:var(--ink)">
       <p style="margin:0 0 6px"><b>送出前告知與資料隱私保護：</b></p>
       <details class="how" id="aiNoticeDetails">
@@ -1344,7 +1338,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
       </details>
     </div>
     <div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap"><div class="row"><button class="primary" id="btnAI">產生分析報告</button><button id="btnAIStop" hidden>停止</button><span class="note" id="aiState"></span></div><div class="row" id="aiResultTools" hidden><button type="button" id="btnAICopy">複製診斷結果</button></div></div>
-    <div class="ai-out" id="aiOut" style="margin-top:12px"><p class="note" id="aiOutPlaceholder">按下按鈕後，依設定模型與推理強度會審查系統偵測到的問題清單，並產生：結論摘要、逐項同意或存疑、可能漏抓的問題、原因推論與信心、驗證實驗、試產／DFM 建議。</p></div>
+    <div class="ai-out" id="aiOut" style="margin-top:12px"></div>
   </div>
 </section>
 
@@ -1356,10 +1350,8 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
         <div id="repChapterChkRow" class="row" style="gap:8px 14px;align-items:center;display:inline-flex;flex-wrap:wrap;margin:0"></div>
       </div>
       <div class="row" style="gap:8px;flex-wrap:wrap">
-        <button type="button" class="primary" id="btnHubExport" title="開啟全站資料與報告匯出中心"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>匯出中心 ▾</button>
         <button type="button" class="primary" id="btnRepPdf">匯出 PDF 報告</button>
         <button type="button" id="btnRepPrint">列印整頁報告</button>
-        <button type="button" id="btnExpDef">不良焊墊清單 .csv</button>
         <button type="button" id="btnRepMail" title="以 Email 傳送報告摘要">以 Email 傳送</button>
       </div>
     </div>
@@ -1736,16 +1728,14 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
           <button type="button" class="seg-btn" id="btnPickSpecs" style="padding:5px 14px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-size:var(--fs-ui)">規格與稽核</button>
         </div>
         <div class="rec-picker-search" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;flex:1 1 240px;max-width:420px">
-          <input type="text" id="recPickerQ" aria-label="搜尋資料庫" aria-describedby="recPickerSearchHelp" placeholder="搜尋批號、料號、工單或檔名…" style="flex:1 1 160px;min-width:0;width:100%;font-size:var(--fs-body)">
+          <input type="text" id="recPickerQ" aria-label="搜尋資料庫" placeholder="搜尋批號、料號、工單或檔名…" style="flex:1 1 160px;min-width:0;width:100%;font-size:var(--fs-body)">
           <button type="button" id="recPickerQClear">清除搜尋</button>
           <button type="button" id="recPickerReload" title="重新整理" style="padding:4px 12px">↻</button>
         </div>
       </div>
-      <p class="note" id="recPickerSearchHelp" style="margin:4px 0 0">可搜尋批號、料號、版次、工單／日期、廠商／外包工單、檔名、上傳者與備註。</p>
 
       <!-- SMT 產線快捷過濾列 -->
       <div id="recFilterBar" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:6px 10px;background:var(--surface2);border-radius:8px">
-        <span class="note" style="font-size:var(--fs-caption);font-weight:700">篩選：</span>
         <select id="pickPartFilter" aria-label="依產品料號篩選" style="font-size:var(--fs-body);padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--surface)">
           <option value="">全部料號</option>
         </select>
@@ -1848,8 +1838,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
       <!-- 頂部摘要與快速一鍵打包 -->
       <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border-radius:8px;border:1px solid var(--line)">
         <div>
-          <b style="font-size:var(--fs-ui)">當前回合交付摘要</b>
-          <div class="note" id="exportCenterSummary" style="font-size:var(--fs-caption);margin-top:2px">尚無載入回合數據</div>
+          <div class="note" id="exportCenterSummary" style="font-size:var(--fs-caption)">尚無載入回合數據</div>
         </div>
         <button type="button" class="primary" id="btnDownloadStandardBundle" style="display:inline-flex;align-items:center;gap:6px">
           <svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -1872,7 +1861,6 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
       <div class="export-group-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <b style="font-size:var(--fs-ui);color:var(--ink)">管理與決策層</b>
-          <span class="note" style="font-size:var(--fs-caption)">經理人、主管與客戶審查</span>
         </div>
         <div class="export-items-grid">
           <div class="exp-item-card">
@@ -1925,7 +1913,6 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
       <div class="export-group-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <b style="font-size:var(--fs-ui);color:var(--ink)">製程改善與工程分析</b>
-          <span class="note" style="font-size:var(--fs-caption)">SMT 製程工程師、品保與資料庫分析</span>
         </div>
         <div class="export-items-grid">
           <div class="exp-item-card">
@@ -2011,7 +1998,6 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
       <div class="export-group-card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <b style="font-size:var(--fs-ui);color:var(--ink)">鋼板設計與 Layout</b>
-          <span class="note" style="font-size:var(--fs-caption)">鋼板開孔廠商與硬體工程師</span>
         </div>
         <div class="export-items-grid">
           <div class="exp-item-card">
@@ -6505,7 +6491,6 @@ if($("#selRelChart"))$("#selRelChart").onchange=e=>{S.relChart=normalizeRelChart
 if($("#selXrSize"))$("#selXrSize").onchange=e=>{S.xrSize=+e.target.value;recompute()};
 if($("#selXrMode"))$("#selXrMode").onchange=e=>{S.xrMode=e.target.value;recompute()};
 $("#selPad").onchange=e=>{S.pad=e.target.value;recompute()};
-if($("#btnStatsCsv"))$("#btnStatsCsv").onclick=()=>save("spi-stats-anomalies.csv",statsDataCsv(S));
 if($("#selBoxGroup"))$("#selBoxGroup").onchange=e=>{S.boxGroup=e.target.value;renderCap()};
 if($("#selCapDist"))$("#selCapDist").onchange=e=>{S.capDistMode=e.target.value;S.A=analyze(S);renderCap()};
 if($("#selParetoDim"))$("#selParetoDim").onchange=e=>{S.paretoDim=e.target.value;drawPareto("cOvPareto",e.target.value)};
@@ -7325,11 +7310,11 @@ function renderClosedLoopUI(){
   const kpisEl = $("#printerCorrKpis");
   const subEl = $("#printerCorrSub");
   const noteEl = $("#printerCorrNote");
-  const btnExport = $("#btnExportCorrectionJson");
   if (!kpisEl) return;
 
   if (!pc || !pc.valid) {
     if (subEl) subEl.textContent = "資料不足，無法計算閉環補償";
+    if (noteEl) noteEl.textContent = "";
     kpisEl.innerHTML = `<span class="note">無有效偏移量測數據，需匯入包含 offx / offy 之 SPI 資料。</span>`;
     return;
   }
@@ -7351,21 +7336,21 @@ function renderClosedLoopUI(){
       ? "建議將補償值套用於下一片印刷板；死區門檻：|ΔX|,|ΔY| < 3µm, |Δθ| < 0.005° 靜音。"
       : "目前對位狀態優良，維持現有設定即可。";
   }
-
-  if (btnExport) {
-    btnExport.onclick = () => {
-      const payload = {
-        timestamp: fmtNowUtc8(),
-        version: "RFC-SPI-2026-001",
-        evaluatedBoards: pc.evaluatedBoards,
-        damping: pc.damping,
-        correction: pc.correction,
-        stencilCleaning: pc.stencilCleaning,
-        actionRecommended: pc.actionRecommended
-      };
-      save("printer-correction.json", JSON.stringify(payload, null, 2));
-    };
-  }
+}
+function exportCorrectionJson(){
+  const A = S.A;
+  const pc = (A && A.printerCorr) || calcPrinterCorrection(S.rows);
+  if (!pc || !pc.valid) { toast("資料不足，無法匯出印刷機補償參數"); return; }
+  const payload = {
+    timestamp: fmtNowUtc8(),
+    version: "RFC-SPI-2026-001",
+    evaluatedBoards: pc.evaluatedBoards,
+    damping: pc.damping,
+    correction: pc.correction,
+    stencilCleaning: pc.stencilCleaning,
+    actionRecommended: pc.actionRecommended
+  };
+  save("printer-correction.json", JSON.stringify(payload, null, 2));
 }
 function drawVec(){const cv=$("#vecCv");if(!cv.offsetParent)return;const ctx=cv.getContext("2d"),b=$("#selAlignBoard").value,a=V&&V.align.find(x=>x.board===b),rs=S.rows.filter(r=>r.board===b&&(isAllGrp(S.group)||r.group===S.group)&&r.offx!=null),k=+$("#inVec").value/1000;
   const X=mapXf(cv);ctx.clearRect(0,0,cv.width,cv.height);ctx.fillStyle=css("--surface2");ctx.fillRect(0,0,cv.width,cv.height);
@@ -9373,7 +9358,6 @@ function updateAiStatusLabels(cfgArg){
   if($("#aiEffortLabel"))$("#aiEffortLabel").textContent=effLabel;
   if($("#aiQuickEffort"))$("#aiQuickEffort").textContent=effLabel;
   if($("#aiPriceLabel"))$("#aiPriceLabel").textContent=aiPricingLabel(act,effModel);
-  if($("#aiCardSub"))$("#aiCardSub").textContent="將目前統計結果與交叉驗證送出，嚴格區分事實與推論";
   const noticePath=$("#aiNoticeServicePath");
   if(noticePath)noticePath.innerHTML=`由本站後端以 API Key 安全轉發至 ${esc(meta.label)}。`;
 }
@@ -10088,12 +10072,13 @@ function updateLoadStates(){const run=curRun(),src=runSrc(run),unmatched=src?.un
   const valid=src&&src.lifecycle==="active";
   const spiText=src?.lifecycle==="pending_review"?"待管理者判定":src?.lifecycle==="superseded"?"歷史修正前版本":src?.lifecycle==="legacy"?"舊資料・未受控":"未套用";
   set("#stateSpi",LOAD_ERROR.spi?"error":valid?"ok":"idle",LOAD_ERROR.spi?`量測紀錄：${LOAD_ERROR.spi}`:valid?`量測紀錄：已套用${unmatched.length?`・${unmatched.length} 個位號無座標`:""}`:`量測紀錄：${spiText}`);
+  const spiEl=$("#stateSpi");
+  if(spiEl){const openList=unmatched.length>0&&!LOAD_ERROR.spi;spiEl.classList.toggle("is-action",openList);spiEl.tabIndex=openList?0:-1;spiEl.setAttribute("aria-disabled",openList?"false":"true");spiEl.title=openList?"查看無座標位號":"量測紀錄狀態。載入請用記錄庫"}
   const applied=valid&&src.placeId;
   const previewApplied=!applied&&Boolean(run&&run.info&&run.info.placePreview&&(!PLACE||!PLACE.recId||PLACE.recId===run.info.placePreview.recId));
   set("#statePlace",LOAD_ERROR.place?"error":(applied||previewApplied)?"ok":"idle",LOAD_ERROR.place?`座標檔：${LOAD_ERROR.place}`:applied?"座標檔：已套用":previewApplied?"座標檔：已套用（檢視）":PLACE?"座標檔：已選取":"座標檔：未套用");
 }
-$("#stateSpi").onclick=()=>{const refs=runSrc(curRun())?.unmatchedRefs||[];if(refs.length){$("#unmatchedRefsTitle").textContent=`無座標位號（${refs.length}）`;$("#unmatchedRefsList").textContent=refs.join("、");openModal("unmatchedRefsModal","[data-close]")}else if(typeof openRecPickerModal==="function")openRecPickerModal("spi");else $("#btnOpenRecModal")?.click()};
-$("#statePlace").onclick=()=>{if(typeof openRecPickerModal==="function")openRecPickerModal("place");else{$("#btnOpenRecModal")?.click();$("#btnPickPlace")?.click()}};
+$("#stateSpi").onclick=()=>{const refs=runSrc(curRun())?.unmatchedRefs||[];if(!refs.length)return;$("#unmatchedRefsTitle").textContent=`無座標位號（${refs.length}）`;$("#unmatchedRefsList").textContent=refs.join("、");openModal("unmatchedRefsModal","[data-close]")};
 function srcLine(s){return s?`批號 ${s.lot}｜產品料號 ${s.part}${s.supplierWo?"｜廠商工單 "+s.supplierWo:""}${s.outsourceWo?"｜委外工單 "+s.outsourceWo:""}${s.side?"｜"+s.side+" 面":""}｜原始檔 ${s.name}（SHA-256 ${String(s.sha256).slice(0,12)}…，${s.user}，${fmtTime(s.created)}）${s.placePart?`｜座標檔 ${s.placePart} ${s.placeRev}`:""}`:""}
 /* ---------- 資料庫頁 ---------- */
 let REC_CONFIRM=null,REC_VER={};
@@ -11461,7 +11446,7 @@ async function exportRepPdfLite() {
 function exportIssuesMd(){save("spi-issues.md",issuesMd())}
 function exportIssuesCsv(){save("spi-issues.csv",issuesCsv(S.F))}
 async function exportIssuesXlsx(){save("spi-issues.xlsx",await issuesXlsx(S.F))}
-function exportStatsCsv(){const data=buildStatsData(S);save("spi-stats-anomalies.csv",statsDataCsv(data))}
+function exportStatsCsv(){save("spi-stats-anomalies.csv",statsDataCsv(S))}
 
 async function triggerExportByType(type){
   switch(type){
@@ -11471,7 +11456,7 @@ async function triggerExportByType(type){
     case "rep-md":exportReportMd();break;
     case "iss-xlsx":await exportIssuesXlsx();break;
     case "iss-csv":exportIssuesCsv();break;
-    case "correction-json":if($("#btnExportCorrectionJson"))$("#btnExportCorrectionJson").click();break;
+    case "correction-json":exportCorrectionJson();break;
     case "stats-csv":exportStatsCsv();break;
     case "board-csv":exportBoardStatsCsv();break;
     case "def-csv":exportDefectPadsCsv();break;
@@ -12029,24 +12014,6 @@ function setupRecPicker() {
       open("spi");
     };
   }
-  const btnBanner = $("#btnBannerLoadDb");
-  if (btnBanner) btnBanner.onclick = () => open("spi");
-  const btnBannerImport = $("#btnBannerGoImport");
-  if (btnBannerImport) {
-    btnBannerImport.onclick = () => {
-      setTab("data");
-      setSub("import");
-    };
-  }
-  const btnBannerDismiss = $("#btnBannerDismiss");
-  if (btnBannerDismiss) {
-    btnBannerDismiss.onclick = () => {
-      BANNER_DISMISSED = true;
-      const b = $("#startupDbBanner");
-      if (b) b.hidden = true;
-    };
-  }
-
   const btnClose = $("#recPickerClose");
   if (btnClose) btnClose.onclick = close;
   const btnCloseBtm = $("#btnRecPickerCloseBottom");
@@ -12503,9 +12470,6 @@ function setupExportCenter() {
     };
   }
 
-  const btnHub = $("#btnHubExport");
-  if (btnHub) btnHub.onclick = open;
-
   const closeBtn = $("#exportCenterClose");
   if (closeBtn) closeBtn.onclick = close;
 
@@ -12574,7 +12538,6 @@ function setupExportCenter() {
   }
 }
 
-if($("#btnGoWipeSpec"))$("#btnGoWipeSpec").onclick=()=>{setTab("data");setSub("specs");const el=$("#inWipe2");if(el){el.closest(".card").scrollIntoView({block:"start"});el.focus({preventScroll:true})}};
 setupRecPicker();
 setupExportCenter();
 
