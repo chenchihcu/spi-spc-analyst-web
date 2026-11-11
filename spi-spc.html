@@ -221,25 +221,46 @@ table.show-all tr.more-row{display:table-row}
 .tabgrp:first-child{border-left:none;margin-left:0;padding-left:0}
 .ctxbar{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font-size:var(--fs-ui);padding:8px 12px;margin-top:8px;border-radius:8px;background:var(--accent-soft);color:var(--accent-ink)}
 .ctxbar #ctxText{flex:1 1 260px;min-width:0}
-.pmap{display:grid;gap:8px}
-.pmap-row{display:grid;grid-template-columns:72px 1fr;gap:8px;align-items:center}
-.pmap-cells{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:2px;min-width:0}
-.pmap-cells.pmap-groups{grid-auto-flow:row;grid-template-columns:repeat(auto-fill,minmax(44px,1fr))}
-.pmap-cells button{min-height:30px;padding:0;border-radius:3px;border:1px solid transparent;background:var(--surface2);font-family:var(--f-mono);font-size:var(--fs-chart);color:var(--muted);overflow:hidden}
-.pmap-cells button.ng{background:var(--ng);color:var(--on-strong)}.pmap-cells button.warn{background:var(--warn);color:var(--on-strong)}.pmap-cells button.info{background:var(--series2);color:var(--on-strong)}
-.pmap-cells button[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:1px}
+.pmap{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;min-width:0}
+.part-map-nav{display:flex;flex-wrap:wrap;gap:8px}
+.part-map-list,.part-map-detail{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;min-width:0}
+.part-map-list{max-height:20rem;overflow:auto}
+.pmap button{min-height:44px;min-width:44px;max-width:100%;overflow-wrap:anywhere;text-align:start;padding:6px 10px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);color:var(--ink)}
+.pmap button:disabled{opacity:.55}
+.pmap button:not(:disabled):hover{background:var(--surface2)}
+.part-map-list button{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 8px}
+.part-map-plot{min-width:0;max-width:100%;overflow:auto;background:var(--surface2);border:1px solid var(--line)}
+.part-map-plot svg{display:block;width:640px;height:360px;max-width:none}
+.part-map-plot text{fill:var(--ink);font:var(--fs-caption) var(--f-mono);pointer-events:none}
+.part-map-point{cursor:pointer}
+.part-map-point circle{fill:var(--surface);stroke:var(--muted);stroke-width:2}
+.part-map-point.ng circle{fill:var(--ng);stroke:var(--ng)}
+.part-map-point.warn circle{fill:var(--warn);stroke:var(--warn)}
+.part-map-point.info circle{fill:var(--series2);stroke:var(--series2)}
+.part-map-point.cross circle{stroke:var(--ink);stroke-dasharray:3 2}
+.part-map-point.selected circle,.part-map-point:focus-visible circle{stroke:var(--ink);stroke-width:3}
+.part-map-plot .symbol{fill:var(--on-strong);font-weight:700}
+.pmap button[aria-pressed="true"]{outline:2px solid var(--accent);outline-offset:-2px}
+.pmap :focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+.part-map-all summary{cursor:pointer;min-height:44px;display:flex;align-items:center}
+.part-map-detail{overflow-wrap:anywhere;padding:8px;border:1px solid var(--line)}
+.part-map-detail p{margin:0}
 .pmap-lab{font-size:var(--fs-caption);color:var(--muted)}
 .sevhead{display:flex;align-items:baseline;gap:8px;margin:6px 0 -2px;font-size:var(--fs-heading)}
 .ev{display:block;width:100%;height:76px}
 .ev-cap{font-size:var(--fs-caption);color:var(--muted);margin-bottom:2px}
 .iss-body{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:12px 20px;align-items:start}
-@media (max-width:720px){.iss-body{grid-template-columns:1fr}.pmap-row{grid-template-columns:1fr}.pmap-cells button{min-height:26px;font-size:0}}
+@media (max-width:720px){.iss-body{grid-template-columns:1fr}}
 #toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--surface);padding:10px 16px;border-radius:10px;font-size:var(--fs-ui);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50;max-width:min(560px,calc(100% - 32px));display:inline-flex;align-items:center;gap:10px}
 #toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 #toast .toast-close{all:unset;cursor:pointer;color:var(--surface);opacity:.85;font-size:var(--fs-body);padding:4px 8px;min-width:28px;min-height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px}
 #toast .toast-close:hover,#toast .toast-close:focus-visible{opacity:1;background:rgba(255,255,255,.15)}
 .iss-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
-.iss{display:grid;gap:6px}
+.iss{display:grid;grid-template-columns:minmax(0,1fr);gap:6px}
+.iss-case,.iss-case-body{min-width:0;overflow-wrap:anywhere}
+.iss-case>summary{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;cursor:pointer;min-height:44px}
+.iss-case>summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.iss-detail{overflow-wrap:anywhere}
 .iss .sevhead{margin-top:10px}
 .iss-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;gap:8px;min-width:0}
 .iss-card.flash{outline:2px solid var(--accent);outline-offset:2px}
@@ -296,10 +317,10 @@ button:disabled{opacity:.5;cursor:default}
   #btnMore,.chip.chipBtn,a.chip,.chipbtn{min-height:44px;min-width:44px;padding:6px 14px;display:inline-flex;align-items:center;justify-content:center}
   #bannerRecentRuns{min-height:44px}
   .card .cbtn, .toc button, .how summary, details.fm>summary{min-height:44px;min-width:44px;display:inline-flex;align-items:center;padding:0 12px}
-  .pmap-cells button{min-height:44px;min-width:28px}
+
   /* 板號格：觸控時 44×44 方格自動換行，板數多也不必橫捲找板（群組列維持橫捲，群組可達數百個） */
-  .pmap-cells.pmap-boards{grid-auto-flow:row;grid-template-columns:repeat(auto-fill,minmax(44px,1fr))}
-  .pmap-boards button{min-width:44px}
+
+
   input[type=checkbox],input[type=radio]{width:24px;height:24px;min-width:24px;min-height:24px}
   label.row:has(>input[type=checkbox]),label.row:has(>input[type=radio]){min-height:44px;min-width:44px}
   input[type=range]{min-height:44px}
@@ -596,7 +617,8 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   #p-issues{padding-top:8px;gap:8px}
   #p-issues>.iss-top{order:1;gap:6px}
   #p-issues>.iss-top h2{font-size:var(--fs-issue-title-mobile)!important}
-  #p-issues>.iss-top #issSub,#p-issues>.iss-top #fmLine{display:none}
+  #p-issues>.iss-top #issSub{display:none}
+  #p-issues>#pmapDetails,#p-issues>#fmLine{order:2}
   #p-issues>#issFilter{order:2;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:4px}
   #p-issues>#issFilter>*{flex-shrink:0}
   #p-issues>#issList{order:3}
@@ -614,11 +636,11 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
 }
 
 @media (max-width:720px){
-  .pmap-cells{display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
-  .pmap-cells button{min-width:28px!important;min-height:44px!important;height:44px!important;flex:0 0 auto;font-size:var(--fs-caption)!important}
-  .pmap-cells.pmap-boards{display:grid;grid-auto-flow:row;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:4px;overflow-x:visible}
-  .pmap-cells.pmap-groups{display:flex;flex-wrap:nowrap;overflow-x:auto}
-  .pmap-boards button{min-width:44px!important}
+
+
+
+
+
 }
 
 /* ---------- iPhone Duo 折疊屏適配 (外螢幕 466x678 與展開書本 890x626) ---------- */
@@ -890,6 +912,9 @@ button.load-state{border:none;font:inherit;cursor:default}
   #btnRailTimeToggle{display:none!important}
   .rail-time-pop,.rail-time-pop[hidden]{display:grid!important;grid-template-columns:minmax(0,1fr);width:100%;gap:8px}
 }
+.deep-subviews,.improve-subviews{grid-template-columns:minmax(0,1fr)}
+#cRelChart{max-width:100%}
+.deep-subviews>[data-subview],.improve-subviews>[data-subview]{min-width:0}
 .panel-subnav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px}
 .panel-subnav button{border:1px solid transparent;background:transparent;border-radius:6px;padding:4px 10px;font-size:var(--fs-ui);cursor:pointer;color:var(--ink)}
 .panel-subnav button[aria-current="page"]{background:var(--surface);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
@@ -898,6 +923,7 @@ button.load-state{border:none;font:inherit;cursor:default}
 @media(pointer:coarse){.panel-subnav button,.db-capsule-group>.chip.chipBtn,.load-state.is-action,#btnRailTimeToggle,#btnGoAiCfg{min-height:44px}}
 
 .menu .duo-toggle-btn{display:block;width:100%;text-align:left;padding:12px 14px;border:none;background:transparent;font:inherit;color:inherit;cursor:pointer}
+.pmap-details{min-width:0}
 .pmap-details summary{list-style:none;cursor:pointer;min-height:44px;display:flex;align-items:center;padding:8px 0}
 .pmap-details summary::-webkit-details-marker{display:none}
 @media(pointer:coarse){.pmap-details summary{min-height:44px}}
@@ -920,7 +946,7 @@ button.load-state{border:none;font:inherit;cursor:default}
     <svg class="mitcorp-logo" viewBox="0 0 248 45" width="143" height="26" fill="currentColor" fill-rule="evenodd" role="img" aria-label="Mitcorp"><path d="M13.8,-0.0L28.5,-0.1L29.2,0.0L30.6,1.0L31.5,2.9L34.7,29.0L35.0,29.8L36.2,30.2L37.5,29.8L38.3,28.2L46.9,3.5L48.0,1.5L48.8,0.8L50.5,-0.1L66.3,0.0L67.6,1.0L68.4,3.2L68.4,30.8L68.3,32.2L67.7,33.8L66.0,34.8L62.8,35.0L59.2,34.8L57.7,33.8L57.3,31.5L57.3,5.8L56.7,4.5L55.2,4.0L53.0,4.7L52.0,6.5L43.5,31.5L42.2,33.3L41.2,34.1L38.2,34.8L28.8,34.8L26.0,34.0L24.6,32.5L24.0,29.8L20.9,5.8L20.2,4.5L18.5,4.0L17.0,4.5L16.5,5.2L12.3,26.8L11.3,30.0L10.5,31.5L8.4,33.8L6.3,35.0L2.2,35.7L1.2,35.7L0.0,35.0L0.0,30.2L1.2,29.6L4.5,28.9L5.4,28.0L6.2,26.2L10.7,3.0L11.9,1.0L13.8,-0.0ZM73.2,-0.0L83.8,0.0L84.6,1.3L84.5,4.2L83.8,5.4L82.8,5.7L75.5,5.8L73.2,5.5L72.7,4.8L72.5,2.8L72.6,1.0L73.2,-0.0ZM90.0,1.7L95.5,1.6L97.2,2.1L97.8,2.8L98.2,4.0L98.3,8.5L98.6,9.2L99.3,9.7L109.8,9.8L110.9,10.2L111.4,12.0L110.9,13.2L110.2,13.6L99.8,13.7L98.8,14.1L98.2,15.5L98.3,27.0L99.0,29.8L100.5,30.9L104.2,31.1L112.5,30.9L113.1,31.5L113.2,33.0L113.0,33.8L112.2,34.6L110.5,35.0L104.5,35.3L95.8,35.1L92.0,33.9L89.9,32.2L88.9,30.5L88.4,27.5L88.4,5.5L88.6,3.0L89.2,2.1L90.0,1.7ZM130.5,9.2L135.5,9.3L144.3,10.0L145.5,10.4L146.1,11.0L146.2,13.2L145.7,14.0L145.0,14.3L140.3,13.8L133.0,13.6L129.5,13.9L127.0,14.9L125.1,17.0L124.3,20.0L124.3,24.0L125.1,27.8L127.0,29.8L130.0,30.9L137.5,31.1L145.2,30.4L146.0,31.0L146.3,32.0L146.2,33.5L145.5,34.3L142.5,35.0L135.2,35.4L129.5,35.4L124.0,34.9L120.5,33.9L118.2,32.8L116.1,30.8L115.1,29.2L114.0,25.5L113.9,20.0L115.0,15.8L116.1,14.0L118.2,12.0L120.5,10.8L124.2,9.8L130.5,9.2ZM161.8,9.5L168.5,9.3L174.8,9.9L178.2,10.8L180.2,11.8L182.8,14.0L183.9,15.8L184.7,18.8L184.9,24.5L184.7,26.2L183.8,29.2L181.8,32.0L178.8,33.9L175.5,34.9L166.0,35.7L156.8,34.8L153.8,33.8L152.0,32.9L150.4,31.5L149.2,30.0L148.3,28.0L147.9,25.5L148.0,18.2L149.1,15.0L151.0,12.8L154.0,11.0L158.0,9.8L161.8,9.5ZM203.0,9.5L209.8,9.4L210.7,10.5L210.8,11.8L210.5,12.8L209.5,13.6L201.8,13.9L200.2,14.2L199.2,14.8L198.7,16.0L198.7,31.0L198.3,33.5L197.5,34.5L196.2,34.9L190.5,34.8L189.1,33.8L188.8,32.0L188.7,15.2L189.2,12.5L190.0,11.7L191.9,10.8L197.2,9.8L203.0,9.5ZM224.0,9.5L230.5,9.3L237.9,9.8L242.2,10.9L244.2,12.0L246.2,14.0L247.0,15.2L247.8,17.3L247.8,27.8L246.9,30.0L245.9,31.5L244.8,32.6L242.8,33.8L240.0,34.8L232.2,35.5L223.2,35.4L222.6,36.0L222.4,36.8L222.2,43.5L221.3,44.8L213.5,44.8L212.6,43.5L212.4,41.8L212.6,13.0L213.2,11.7L214.6,10.8L218.5,9.9L224.0,9.5ZM75.5,9.9L79.0,9.8L81.5,10.0L82.8,10.8L83.4,12.0L83.5,32.2L83.0,33.8L81.5,34.8L75.5,34.8L74.1,34.0L73.7,33.2L73.6,12.0L74.0,10.8L75.5,9.9ZM163.2,13.0L160.8,14.0L159.4,15.2L158.3,18.8L158.1,22.5L158.3,26.5L159.2,29.2L160.5,30.8L162.8,31.8L166.0,32.1L169.8,31.8L172.0,30.8L173.0,29.8L173.9,28.2L174.4,25.0L174.4,21.8L173.9,16.5L173.0,15.0L171.9,14.0L168.5,12.9L163.2,13.0ZM226.0,13.0L223.5,13.5L222.7,14.0L222.4,14.5L222.5,30.5L224.0,31.6L227.5,31.9L232.5,31.9L235.0,31.0L236.0,30.1L237.0,28.7L237.7,25.5L237.8,20.8L237.0,16.2L235.3,14.0L233.0,13.1L230.2,12.8L226.0,13.0Z"/></svg>
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.15.11</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.16.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <div class="db-capsule-group" role="group" aria-label="雲端記錄庫與套用狀態">
@@ -1026,11 +1052,11 @@ button.load-state{border:none;font:inherit;cursor:default}
     <div>
       <h2 id="issHead" style="font-size:var(--fs-title)">掃描中…</h2>
       <p class="note" id="issSub" style="margin:4px 0 0;max-width:80ch"></p>
-      <p id="fmLine" style="margin:6px 0 0;max-width:80ch"></p>
     </div>
     </div>
-    <details class="pmap-details" id="pmapDetails"><summary><h3 style="display:inline;margin:0">問題地圖 <small id="pmapSub"></small></h3></summary><div class="card" style="margin-top:8px"><div class="pmap" id="pmap"></div>
+    <details class="pmap-details" id="pmapDetails" open><summary><h3 style="display:inline;margin:0">問題地圖 <small id="pmapSub"></small></h3></summary><div class="card" style="margin-top:8px"><div class="pmap" id="pmap"></div>
     <div class="legend" style="margin:8px 0 0"><span><i class="sq" style="background:var(--ng)"></i>✕ 嚴重</span><span><i class="sq" style="background:var(--warn)"></i>! 警示</span><span><i class="sq" style="background:var(--series2)"></i>ℹ 資訊</span><span><i class="sq" style="background:var(--surface2);outline:1px solid var(--line)"></i>無問題</span></div></div></details>
+  <p id="fmLine"></p>
   <div class="row" id="issFilter" role="group" aria-label="篩選問題"></div>
   <div class="iss" id="issList"></div>
 </section>
@@ -2805,7 +2831,7 @@ function formatSidedPpmBlock(block, fmt = (v) => String(Math.round(v))) {
 /* @windows-parity END */
 /* Number.isFinite：空白座標欄解析為 null，全域 isFinite(null) 會當成 0 */
 const realXY=r=>Boolean(r&&!r.gridPos&&Number.isFinite(r.x)&&Number.isFinite(r.y));
-const S={rows:[],metrics:[],metric:"volume",group:ALL_GRP,chart:"xbars",relChart:"specScatter",pad:null,board:null,specSrc:"sample",partSpec:null,specDraft:null,specsG:null,sqDir:"Y",specs:JSON.parse(JSON.stringify(DEF_SPECS)),stencil:120,heightUnit:"um",htol:{lo:75,hi:125},step:{on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]},selZone:1,wipe:5,aperture:{groups:{}},geometryPads:null,padCoverage:null,pendingVerify:false,runVendor:"generic",ovCapSnap:null,ovCapSnapKey:"",source:"範例資料",tab:"issues",deepSub:"cross",improveSub:"compare",F:[],issLv:"all",issCat:"all",issEnt:null,issGroup:"cases",ctx:null,colorMode:"status",sim3dMode:"real",exag:20,ghost:true,bridgeWarn:true,csAxis:"X",selectedPad:null,A:null,ai:"",aiModel:"",duo:{active:false,posture:"folded",mode:"master-detail",leftTab:"issues",rightTab:"sim3d",thumbSide:"right",pinnedPad:null,dockOpen:false}};
+const S={rows:[],metrics:[],metric:"volume",group:ALL_GRP,chart:"xbars",relChart:"specScatter",pad:null,board:null,specSrc:"sample",partSpec:null,specDraft:null,specsG:null,sqDir:"Y",specs:JSON.parse(JSON.stringify(DEF_SPECS)),stencil:120,heightUnit:"um",htol:{lo:75,hi:125},step:{on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]},selZone:1,wipe:5,aperture:{groups:{}},geometryPads:null,padCoverage:null,pendingVerify:false,runVendor:"generic",ovCapSnap:null,ovCapSnapKey:"",source:"範例資料",tab:"issues",deepSub:"cross",improveSub:"compare",F:[],issLv:"all",issCat:"all",issEnt:null,pmapSelection:null,issGroup:"cases",ctx:null,colorMode:"status",sim3dMode:"real",exag:20,ghost:true,bridgeWarn:true,csAxis:"X",selectedPad:null,A:null,ai:"",aiModel:"",duo:{active:false,posture:"folded",mode:"master-detail",leftTab:"issues",rightTab:"sim3d",thumbSide:"right",pinnedPad:null,dockOpen:false}};
 function metricUnit(k,st=S){return k==="height"&&st&&st.heightUnit==="unknown"?"單位未知":(METRICS[k]&&METRICS[k].unit)||""}
 loadSpiKbRules();
 
@@ -6209,7 +6235,7 @@ function detWorker(){if(detW!==null)return detW;try{const core=document.getEleme
 /* 開機後趁空檔先建立背景執行緒，載入大檔時不必再等它編譯 */
 (window.requestIdleCallback||(f=>setTimeout(f,1500)))(()=>{if(typeof Worker!=="undefined")detWorker()});
 /* 傳給背景執行緒的狀態：略過問題偵測用不到的大型欄位（未篩選的原始資料、GR&R、AI 回覆等），減少複製時間 */
-const DET_SKIP=new Set(["A","F","runs","ctx","issEnt","_rawRows","grr","ai"]);
+const DET_SKIP=new Set(["A","F","runs","ctx","issEnt","pmapSelection","_rawRows","grr","ai"]);
 function detState(){const st={};for(const k in S){if(DET_SKIP.has(k))continue;const v=S[k];if(typeof v!=="function")st[k]=v}return st}
 function detectSync(sig){S.F=perfSpan("detect(同步)",()=>detectIssues(S));S.F.rowsRef=S.rows;F_SIG=sig;ISS_OPEN.clear()} /* 問題編號會隨重新偵測改變，展開狀態一併清除 */
 function busy(on,msg){const b=$("#busy");if(!b)return;if(on){$("#busyMsg").textContent=msg||"計算中…";b.hidden=false}else b.hidden=true}
@@ -6287,15 +6313,38 @@ function goto(g,from){if(!g)return;const GT={cross:"deep/cross",adv:"deep/adv",s
 function showCtx(){const c=S.ctx,bar=$("#ctxBar");bar.hidden=!c||S.tab==="issues";if(c)$("#ctxText").innerHTML=`正在查看問題 <b>#${c.id}</b> 的證據：${esc(c.title)}`}
 $("#ctxBack").onclick=()=>{const id=S.ctx&&S.ctx.id;setTab("issues");if(id)setTimeout(()=>flashIssue(id),60)};
 $("#ctxClose").onclick=()=>{S.ctx=null;showCtx()};
-function flashIssue(id){if(!issueList().some(x=>x.id===id)){S.issLv="all";S.issCat="all";S.issEnt=null;renderIssues()}
-  if(!$("#iss-"+id)){const L=issueList(),ord=["ng","warn","info"].flatMap(lv=>L.filter(x=>x.lv===lv)),i=ord.findIndex(x=>x.id===id);if(i>=0){ISS_PG.n=Math.max(ISS_PG.n,Math.ceil((i+1)/ISS_PAGE)*ISS_PAGE);renderIssues()}}   // 目標卡片尚未分批畫出時先畫到它
-  const el=$("#iss-"+id);if(el){el.open=true;ISS_OPEN.add(id);el.scrollIntoView({behavior:"smooth",block:"center"});el.classList.add("flash");setTimeout(()=>el.classList.remove("flash"),1600)}}
+function flashIssue(id){
+  if (!S.F.some(x=>x.id===id) || !S.rows.length) return;
+  pmapState();
+  if (!issueList().some(x=>x.id===id)) pmapSelect({...S.pmapSelection,mode:"all",pad:null});
+  if (!$("#iss-"+id)) {
+    const list=issueList(), allow=new Set(list.map(x=>x.id));
+    const index=S.issGroup==="cases"
+      ? (S.F.meta?.cases || []).filter(c=>c.card_ids.some(cardId=>allow.has(cardId))).findIndex(c=>c.card_ids.includes(id))
+      : ["ng","warn","info"].flatMap(lv=>list.filter(x=>x.lv===lv)).findIndex(x=>x.id===id);
+    ISS_PG.n=Math.max(ISS_PG.n,(Math.floor(index/ISS_PAGE)+1)*ISS_PAGE);
+    renderIssues();
+  }
+  const el=$("#iss-"+id);
+  if (!el) return;
+  const group=el.closest(".iss-case");
+  if (group) { group.open=true; ISS_OPEN.add("c"+group.dataset.case); }
+  el.open=true;
+  ISS_OPEN.add(id);
+  el.scrollIntoView({behavior:"smooth",block:"center"});
+  el.classList.add("flash");
+  setTimeout(()=>el.classList.remove("flash"),1600);
+}
 /* 問題涵蓋的板：直接指向的板，加上漂移起點之後的所有板 */
 /* 結果依問題物件快取：板數多（數千片）時，問題地圖每格都會查詢，不可每次重掃全部資料 */
 let IB_ROWS=null,IB_B=[],IB_C=new WeakMap();
 function issueBoards(x){if(IB_ROWS!==S.rows){IB_ROWS=S.rows;IB_B=[...new Set(S.rows.map(r=>r.board))];IB_C=new WeakMap()}
   let out=IB_C.get(x);if(out)return out;const B=IB_B;out=new Set();x.ents.forEach(e=>{if(e.startsWith("b:"))out.add(e.slice(2));if(e.startsWith("drift:")){const i=B.indexOf(e.slice(6));if(i>=0)B.slice(i).forEach(b=>out.add(b))}});IB_C.set(x,out);return out}
-function issueList(){return S.F.filter(x=>(S.issLv==="all"||x.lv===S.issLv)&&(S.issCat==="all"||x.cat===S.issCat)&&(!S.issEnt||(S.issEnt.startsWith("b:")?issueBoards(x).has(S.issEnt.slice(2)):x.ents.includes(S.issEnt))))}
+function issueList(){
+  if (!S.rows.length || S.F.pending) return [];
+  if (ISS_PG.all) return S.F;
+  const index=pmapState(), ids=pmapEvidence(index,S.pmapSelection);
+  return S.F.filter(x=>(ids===null || ids.has(x.id))&&(S.issLv==="all"||x.lv===S.issLv)&&(S.issCat==="all"||x.cat===S.issCat)&&(!S.issEnt||(S.issEnt.startsWith("b:")?issueBoards(x).has(S.issEnt.slice(2)):x.ents.includes(S.issEnt))))}
 /* 證據迷你圖（SVG）：序列＝每板一點，長條＝群組／焊墊／分箱；異常處以嚴重度顏色標示 */
 function evSvg(ev,lv){if(!ev||!ev.values||!ev.values.some(isFinite))return"";const W=320,H=76,pl=34,pr=6,pt=6,pb=16,iw=W-pl-pr,ih=H-pt-pb,V=ev.values,n=V.length;
   const fin=V.filter(isFinite).concat((ev.ref||[]).filter(isFinite));let lo=Math.min(...fin),hi=Math.max(...fin);if(ev.type==="bars"&&lo>0&&ev.unit!=="%"&&lo/hi>.5)lo=lo*.9;if(hi===lo){hi+=1;lo-=1}const pad=(hi-lo)*.08;lo-=pad;hi+=pad;
@@ -6318,20 +6367,335 @@ function lvOn(x,ent){const R=x.sig&&x.sig.rows;if(!R||!R.length||!R[0].lv)return
   for(const c of R)if((b!=null&&c.r&&c.r.board===b)||(g!=null&&c.g===g))if(w==null||PM_RANK[c.lv]<PM_RANK[w])w=c.lv;
   return w||x.lv}
 const isAgg=x=>!!(x.sig&&x.sig.rows&&x.sig.rows.length&&x.sig.rows[0].lv);
-function renderPmap(){const B=[...new Set(S.rows.map(r=>r.board))],G=[...new Set(S.rows.map(r=>r.group))],rank=PM_RANK,LVT={ng:"嚴重",warn:"警示",info:"資訊"};
-  const worst=list=>list.reduce((w,o)=>w==null||rank[o.lv]<rank[w]?o.lv:w,null);
-  const tip=(lab,list,unit)=>{if(!list.length)return"無問題";const lv=worst(list),agg=list.filter(o=>isAgg(o.x)).length;
-    return`${list.length} 項相關問題，本${unit}最高：${LVT[lv]}${agg?`（其中 ${agg} 張為跨板彙總卡，依本${unit}命中的焊墊判定等級）`:""}`};
-  const cell=(ent,lab,list)=>{const lv=worst(list);const isPart=S.partialBoards&&S.partialBoards.includes(lab);const sym=lv==="ng"?"✕":lv==="warn"?"!":lv==="info"?"ℹ":"";const symHtml=sym?`<span class="pmap-sym" aria-hidden="true" style="font-size:var(--fs-chart);line-height:1;margin-left:1px;font-weight:700">${sym}</span>`:"";return`<button data-ent="${esc(ent)}" class="${lv||""}" aria-pressed="${S.issEnt===ent}" title="${esc(lab)}${isPart?"（部分焊墊）":""}：${esc(tip(lab,list,"板"))}">${esc(lab.replace(/^[A-Za-z]+0?/,""))}${symHtml}${isPart?'<span class="subpill" style="font-size:var(--fs-chart);color:var(--warn);display:block;line-height:1">部分</span>':""}</button>`};
-  const sys=S.F.filter(x=>!x.ents.some(e=>e.startsWith("b:")||e.startsWith("g:")||e.startsWith("drift:")));
-  /* 一次走過全部問題，分到各板／各群組（問題數上千、群組數百時不必每格重掃全部問題） */
-  const byB=new Map(B.map(b=>[b,[]])),byG=new Map(G.map(g=>["g:"+g,[]]));
-  for(const x of S.F){for(const b of issueBoards(x)){const a=byB.get(b);if(a)a.push({x,lv:lvOn(x,"b:"+b)})}for(const e of x.ents){const a=byG.get(e);if(a&&(!a.length||a[a.length-1].x!==x))a.push({x,lv:lvOn(x,e)})}}
-  $("#pmap").innerHTML=`<div class="pmap-row"><span class="pmap-lab">各板（依印刷順序）</span><div class="pmap-cells pmap-boards">${B.map(b=>cell("b:"+b,b,byB.get(b))).join("")}</div></div>
-  <div class="pmap-row"><span class="pmap-lab">元件群組</span><div class="pmap-cells pmap-groups">${G.map(g=>`<button data-ent="g:${esc(g)}" class="${worst(byG.get("g:"+g))||""}" aria-pressed="${S.issEnt==="g:"+g}" title="${esc(g)}：${esc(tip(g,byG.get("g:"+g),"群組"))}" style="font-size:var(--fs-caption)">${esc(g)}</button>`).join("")}</div></div>
-    ${sys.length?`<p class="note" style="margin:0">另有 ${sys.length} 項不屬特定板或群組的整體性問題（${[...new Set(sys.map(x=>x.cat))].join("、")}）。</p>`:""}
-    ${S.issEnt?`<p style="margin:0"><span class="pill warn">只顯示 ${esc(S.issEnt.slice(S.issEnt.indexOf(":")+1))} 相關的問題</span> <button class="linkbtn" id="pmapClear">顯示全部</button></p>`:""}`;
-  $$("#pmap [data-ent]").forEach(b=>b.onclick=()=>{S.issEnt=S.issEnt===b.dataset.ent?null:b.dataset.ent;renderIssues()});if($("#pmapClear"))$("#pmapClear").onclick=()=>{S.issEnt=null;renderIssues()}}
+let pmapCache = null;
+function partMapKey(row) {
+  return JSON.stringify([row.figure ?? "", row.comp ? "comp" : "pad", row.comp || row.pad]);
+}
+function partMapPut(map, key, create) {
+  if (!map.has(key)) map.set(key, create());
+  return map.get(key);
+}
+function partMapRecord(map, card, lv = card.lv) {
+  if (!map.has(card.id) || PM_RANK[lv] < PM_RANK[map.get(card.id)]) map.set(card.id, lv);
+}
+function partMapLevel(...maps) {
+  let level = null;
+  for (const map of maps) for (const lv of map?.values() || []) {
+    if (Object.hasOwn(PM_RANK,lv) && (level === null || PM_RANK[lv] < PM_RANK[level])) level = lv;
+  }
+  return level;
+}
+function buildPartProblemIndex(rows, findings) {
+  const boards = new Map(), parts = new Map(), byPad = new Map(), byGroup = new Map();
+  const unresolved = new Set();
+  for (const row of rows) {
+    const board = partMapPut(boards, row.board, () => ({parts:new Map(), hits:new Map(), batch:new Map()}));
+    if (!row.comp && !row.pad) continue;
+    const key = partMapKey(row);
+    const part = partMapPut(parts, key, () => ({
+      key, comp:row.comp, figure:row.figure, fallback:row.pad, packages:new Set(),
+      boards:new Map(), pads:new Map(), groups:new Map(), hits:new Set()
+    }));
+    const instance = partMapPut(board.parts, key, () => ({
+      part, center:null, conflict:false, pads:new Map(), groups:new Set(), hits:new Map(), groupHits:new Map()
+    }));
+    part.boards.set(row.board, instance);
+    if (row.pkg) part.packages.add(row.pkg);
+    if (row.group) {
+      instance.groups.add(row.group);
+      partMapPut(byGroup, row.group, () => new Set()).add(part);
+    }
+    if (Number.isFinite(row.componentX) && Number.isFinite(row.componentY)) {
+      const center = [row.componentX, row.componentY];
+      if (instance.center && (instance.center[0] !== center[0] || instance.center[1] !== center[1])) {
+        instance.conflict = true;
+      }
+      instance.center ||= center;
+    }
+    if (!row.pad) continue;
+    const pad = partMapPut(part.pads, row.pad, () => ({
+      name:row.pad, part, boards:new Map(), cross:new Map(), hits:new Map()
+    }));
+    const at = partMapPut(instance.pads, row.pad, () => new Set());
+    at.add(row.group);
+    pad.boards.set(row.board, at);
+    partMapPut(byPad, row.pad, () => new Set()).add(pad);
+  }
+  const order = [...boards.keys()], boardOrder = new Map(order.map((b,i) => [b,i]));
+  const globalBatch = new Map();
+  const batchTypes = new Set(["fig","unit","board","drift","grad","stroke","wipe","align","msa",
+    "nelson","morph","pause","spatial","closedloop"]);
+  function direct(card, board, part, pad, lv) {
+    const instance = part.boards.get(board);
+    part.hits.add(board);
+    partMapRecord(instance.hits, card, lv);
+    partMapRecord(boards.get(board).hits, card, lv);
+    partMapRecord(pad ? partMapPut(pad.hits, board, () => new Map()) : instance.groupHits, card, lv);
+  }
+  function attachPad(card, name, evidence, scope, lv) {
+    const candidates = [...(byPad.get(name) || [])].filter(pad => {
+      if (evidence.key && evidence.key !== pad.part.key) return false;
+      return [...pad.boards].some(([b, groups]) =>
+        (!scope || scope.has(b)) && (!evidence.group || groups.has(evidence.group)));
+    });
+    if (candidates.length !== 1) {
+      if (candidates.length || !scope || [...scope].some(b => boards.has(b))) unresolved.add(card.id);
+      return;
+    }
+    const pad = candidates[0];
+    if (!scope) {
+      partMapRecord(pad.cross, card, lv);
+      return;
+    }
+    for (const b of scope) {
+      const groups = pad.boards.get(b);
+      if (groups && (!evidence.group || groups.has(evidence.group))) direct(card,b,pad.part,pad,lv);
+    }
+  }
+  for (const card of findings) {
+    const sig = card.sig || {}, entities = card.ents || [];
+    const boardTags = entities.filter(e => e.startsWith("b:") || e.startsWith("drift:"));
+    const scope = new Set(boardTags.filter(e => e.startsWith("b:")).map(e => e.slice(2)));
+    if (sig.b != null && sig.t !== "drift") scope.add(sig.b);
+    for (const b of [...(Array.isArray(sig.bs) ? sig.bs : []), ...(Array.isArray(sig.boards) ? sig.boards : [])]) scope.add(b);
+    let driftStart = Infinity;
+    for (const e of boardTags) if (e.startsWith("drift:")) {
+      driftStart = Math.min(driftStart, boardOrder.get(e.slice(6)) ?? Infinity);
+    }
+    for (let i = driftStart; i < order.length; i++) scope.add(order[i]);
+    const limited = boardTags.length > 0 || sig.b != null || Array.isArray(sig.bs) || Array.isArray(sig.boards);
+    const namedPads = new Set([...entities.filter(e => e.startsWith("p:")).map(e => e.slice(2)),
+      ...(Array.isArray(sig.pads) ? sig.pads : [])]);
+    if (sig.t === "iso" || sig.rows?.some(item => item.r && item.lv)) {
+      if (!sig.rows?.length) unresolved.add(card.id);
+      for (const item of sig.rows || []) {
+        const row = item.r;
+        if (!row?.pad || row.board == null || !Object.hasOwn(PM_RANK,item.lv)) {
+          unresolved.add(card.id);
+          continue;
+        }
+        attachPad(card,row.pad,{key:partMapKey(row),group:row.group || item.g},new Set([row.board]),item.lv);
+      }
+    } else if (sig.t === "repeated" || sig.padObjs?.length) {
+      if (!sig.padObjs?.length) unresolved.add(card.id);
+      for (const item of sig.padObjs || []) {
+        if (!item.pad || !item.boards?.length) {
+          unresolved.add(card.id);
+          continue;
+        }
+        // The representative row is not an identity for all boards. M-09 groups by raw pad.
+        attachPad(card,item.pad,{},new Set(item.boards),card.lv);
+      }
+    } else if (namedPads.size) {
+      for (const pad of namedPads) attachPad(card,pad,{group:sig.g},limited ? scope : null,card.lv);
+    } else if (["local","sys","dfm","lowte"].includes(sig.t)) {
+      if (!sig.g || (sig.t === "local" && sig.b == null)) {
+        unresolved.add(card.id);
+        continue;
+      }
+      for (const part of byGroup.get(sig.g) || []) {
+        if (sig.t === "local") {
+          if (part.boards.get(sig.b)?.groups.has(sig.g)) direct(card,sig.b,part,null,card.lv);
+        } else {
+          partMapRecord(partMapPut(part.groups,sig.g,() => new Map()),card);
+        }
+      }
+    } else if (batchTypes.has(sig.t)) {
+      if (!limited) partMapRecord(globalBatch,card);
+      for (const b of scope) if (boards.has(b)) {
+        const at = boards.get(b);
+        partMapRecord(at.batch,card);
+        partMapRecord(at.hits,card);
+      }
+    } else {
+      unresolved.add(card.id);
+    }
+  }
+  let bounds = null, worstBoard = order[0], best = [0,0,0,0], hasBoardHits = false;
+  for (const [b, board] of boards) {
+    const score = [0,0,0,0];
+    for (const lv of board.hits.values()) if (Object.hasOwn(PM_RANK,lv)) score[PM_RANK[lv]]++;
+    for (const instance of board.parts.values()) {
+      if (instance.hits.size) score[3]++;
+      if (!instance.center || instance.conflict) continue;
+      const [x,y] = instance.center;
+      bounds ||= [x,y,x,y];
+      bounds = [Math.min(bounds[0],x),Math.min(bounds[1],y),Math.max(bounds[2],x),Math.max(bounds[3],y)];
+    }
+    hasBoardHits ||= board.hits.size > 0;
+    const different = score.findIndex((v,i) => v !== best[i]);
+    if (different >= 0 && score[different] > best[different]) {
+      best = score;
+      worstBoard = b;
+    }
+  }
+  return {boards,order,parts,unresolved,globalBatch,bounds,worstBoard,hasBoardHits};
+}
+function pmapState() {
+  if (pmapCache?.rows !== S.rows || pmapCache?.findings !== S.F) {
+    const old = S.pmapSelection?.board;
+    const index = buildPartProblemIndex(S.rows, S.F);
+    pmapCache = {rows:S.rows,findings:S.F,index};
+    S.pmapSelection = {board:index.boards.has(old) ? old : index.worstBoard, mode:"overview"};
+  }
+  return pmapCache.index;
+}
+function pmapEvidence(index, selection) {
+  const board = index.boards.get(selection.board);
+  const instance = board?.parts.get(selection.part);
+  if (selection.mode === "all") return null;
+  if (selection.mode === "unresolved") return index.unresolved;
+  if (selection.mode === "batch") return new Set([...index.globalBatch.keys(), ...board.batch.keys()]);
+  if (selection.mode === "group" && instance) {
+    return new Set([...instance.groupHits.keys(), ...[...instance.groups].flatMap(g => [...(instance.part.groups.get(g)?.keys() || [])])]);
+  }
+  if (selection.mode === "pad" && instance?.pads.has(selection.pad)) {
+    const pad = instance.part.pads.get(selection.pad);
+    return new Set([...pad.cross.keys(), ...(pad.hits.get(selection.board)?.keys() || [])]);
+  }
+  return new Set();
+}
+function pmapSelect(selection) {
+  S.pmapSelection = selection;
+  S.issLv = S.issCat = "all";
+  S.issEnt = null;
+  S.issGroup = "cases";
+  renderIssues();
+}
+function renderPmap() {
+  const index = pmapState(), selection = S.pmapSelection;
+  const board = index.boards.get(selection.board);
+  if (!board) return;
+  const root = $("#pmap");
+  const active = document.activeElement;
+  const oldFocus = root.contains(active) ? active.getAttribute("data-map-focus") : null;
+  const oldScroll = root.querySelector(".part-map-plot");
+  const scroll = [oldScroll?.scrollLeft || 0, oldScroll?.scrollTop || 0];
+  const listOpen = root.querySelector(".part-map-all")?.open;
+  const symbols = {ng:"✕",warn:"!",info:"ℹ"};
+  const label = p => (p.comp || `${p.fallback}（無位號）`) + (p.figure ? ` · 子板 ${p.figure}` : "");
+  const items = [...board.parts.values()].map((instance,i) => {
+    const {part} = instance;
+    const cross = [...instance.groups].map(g => part.groups.get(g));
+    for (const name of instance.pads.keys()) cross.push(part.pads.get(name).cross);
+    const level = partMapLevel(instance.hits,...cross);
+    return {instance,part,i,level,crossOnly:!!level && !instance.hits.size,label:label(part)};
+  });
+  const sorted = [...items].sort((a,b) => (PM_RANK[a.level] ?? 3) - (PM_RANK[b.level] ?? 3) ||
+    a.label.localeCompare(b.label,"zh-Hant",{numeric:true}) || a.i-b.i);
+  const points = sorted.filter(({instance}) => instance.center && !instance.conflict);
+  const plain = sorted.filter(({instance}) => !instance.center);
+  const conflicts = sorted.filter(({instance}) => instance.conflict);
+  const stateText = item => (LVL[item.level] || "無問題") + (item.crossOnly ? " · 跨板問題" : "");
+  const list = (entries,source) => `<div class="part-map-list">${entries.map(item =>
+    `<button type="button" data-part="${item.i}" data-map-focus="${source}-${item.i}" aria-pressed="${selection.part===item.part.key}"><b>${esc(item.label)}</b><span>${esc(stateText(item))}</span></button>`).join("")}</div>`;
+  const section = (title,entries,source) => entries.length ? `<h4>${title}</h4>${list(entries,source)}` : "";
+  let chart = "";
+  const drawn = [];
+  if (points.length) {
+    const [minX,minY,maxX,maxY] = index.bounds;
+    const w=640,h=360,dx=maxX-minX,dy=maxY-minY;
+    const scale=Math.min(dx ? (w-120)/dx : Infinity,dy ? (h-60)/dy : Infinity);
+    const placed = points.map(item => {
+      const [x,y] = item.instance.center;
+      return {...item,x:w/2+(dx ? (x-minX-dx/2)*scale : 0),y:h/2-(dy ? (y-minY-dy/2)*scale : 0)};
+    });
+    const priority = [...placed].sort((a,b) => Number(b.part.key===selection.part)-Number(a.part.key===selection.part));
+    const occupied=[];
+    const labels=priority.map(item => {
+      const width=item.label.length*8+8, x=Math.max(4,Math.min(item.x+9,w-width-4)), y=item.y-7;
+      if (width>w-8) return "";
+      if (occupied.some(b => x<b.x+b.width && x+width>b.x && Math.abs(b.y-y)<15)) return "";
+      occupied.push({x,y,width});
+      return `<text x="${x}" y="${y}" aria-hidden="true">${esc(item.label)}</text>`;
+    });
+    for (const item of placed) drawn.push(item);
+    chart = `<div class="part-map-plot" tabindex="0" data-map-focus="plot" aria-label="元件中心座標圖，可捲動"><svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="group" aria-label="元件中心座標圖">${[...placed].reverse().map(item =>
+      `<g class="part-map-point ${item.level||"none"}${item.crossOnly?" cross":""}${item.part.key===selection.part?" selected":""}" data-point="${item.i}" ${item.level?`role="button" tabindex="0" data-map-focus="point-${item.i}" aria-pressed="${selection.part===item.part.key}" aria-label="${esc(`${item.label} · ${stateText(item)}`)}"`:""}><title>${esc(`${item.label} · ${stateText(item)}`)}</title><circle cx="${item.x}" cy="${item.y}" r="8"/><text class="symbol" x="${item.x}" y="${item.y}" dominant-baseline="central" text-anchor="middle" aria-hidden="true">${symbols[item.level]||""}</text></g>`).join("")}${labels.join("")}</svg></div><div class="part-map-candidates" hidden></div>
+      ${section("沒有座標的零件",plain,"missing")}${section("座標待確認的零件",conflicts,"conflict")}
+      <details class="part-map-all"${listOpen?" open":""}><summary data-map-focus="all-parts">零件清單</summary>${list(sorted,"list")}</details>`;
+  } else {
+    const message = index.bounds || conflicts.length ? "這片板沒有可用的元件中心座標，改以零件列出" : "這批沒有座標，改以零件列出";
+    chart = `<p>${message}</p>${list(sorted.filter(item=>!item.instance.conflict),"list")}${section("座標待確認的零件",conflicts,"conflict")}`;
+  }
+  const selected = board.parts.get(selection.part);
+  let detail = "";
+  if (selected) {
+    const part = selected.part;
+    const pkg = part.packages.size > 1 ? "封裝不一致" : [...part.packages][0] || "未提供";
+    const groupCount = pmapEvidence(index,{...selection,mode:"group"}).size;
+    const hitGroups = [...selected.groups].filter(g => part.groups.has(g) || S.F.some(card => selected.groupHits.has(card.id) && card.sig?.g===g));
+    let directPads = 0, namedPads = 0;
+    const pads = [...selected.pads.keys()].map(name => {
+      const pad = part.pads.get(name), at = pad.hits.get(selection.board);
+      if (at?.size) directPads++;
+      if (pad.hits.size || pad.cross.size) namedPads++;
+      if (!at?.size && !pad.cross.size) {
+        return pad.hits.size ? `<p>${esc(name)} · 逐片命中 ${pad.hits.size}／${pad.boards.size} 片</p>` : "";
+      }
+      const level = partMapLevel(at);
+      return `<button type="button" data-pad="${esc(name)}" data-map-focus="pad-${esc(name)}" aria-pressed="${selection.mode==="pad" && selection.pad===name}">${esc(name)}${level?` · 本片${LVL[level]}`:""} · 逐片命中 ${pad.hits.size}／${pad.boards.size} 片${pad.cross.size?` · 跨板問題 ${pad.cross.size} 項`:""}</button>`;
+    }).join("");
+    detail = `<div class="part-map-detail"><h4>${esc(label(part))} · ${esc(pkg)}</h4>
+      <p>${selected.pads.size} 個焊墊，本片 ${directPads} 個有直接命中</p>
+      <p>有量測 ${part.boards.size} 片，其中 ${part.hits.size} 片有逐片問題證據</p>
+      ${pads}${selected.pads.size>namedPads?`<p>其餘 ${selected.pads.size-namedPads} 個焊墊未被問題卡點名</p>`:""}
+      ${groupCount?`<p>群組 ${esc(hitGroups.join("、"))}</p><button type="button" data-mode="group" data-map-focus="group">群組相關問題 ${groupCount} 項</button>`:""}</div>`;
+  }
+  const pos=index.order.indexOf(selection.board);
+  const batchCount=pmapEvidence(index,{...selection,mode:"batch"}).size;
+  const change=(target,disabled,caption)=>`<button type="button" data-map-move="${target}" data-map-focus="${target}" ${disabled?"disabled":""}>${caption}</button>`;
+  root.innerHTML=`<div class="part-map-nav">${change("prev",pos===0,"上一片")}${change("next",pos===index.order.length-1,"下一片")}${change("worst",!index.hasBoardHits || selection.board===index.worstBoard,"最嚴重的一片")}</div>
+    <p role="status">${esc(selection.board)} · 第 ${pos+1}／${index.order.length} 片${index.hasBoardHits&&selection.board===index.worstBoard?" · 最嚴重的一片":""} · ${items.filter(item=>item.level).length} 顆零件有相關問題${S.partialBoards?.includes(selection.board)?" · 部分焊墊":""}${S.boardInferred?" · 推定子群組":""}</p>
+    ${chart}${detail}<div class="part-map-nav"><button type="button" data-mode="batch" data-map-focus="batch" ${batchCount?"":"disabled"}>整批問題 ${batchCount} 項</button>${index.unresolved.size?`<button type="button" data-mode="unresolved" data-map-focus="unresolved">位置待確認 ${index.unresolved.size} 項</button>`:""}<button type="button" id="pmapClear" data-mode="all" data-map-focus="all">顯示全部問題</button></div>`;
+  const focus = key => [...root.querySelectorAll("[data-map-focus]")].find(el=>el.dataset.mapFocus===key);
+  function pick(i) {
+    pmapSelect({board:selection.board,part:items[i].part.key,mode:"overview"});
+  }
+  root.onclick = event => {
+    const button=event.target.closest("button");
+    if (button?.dataset.part != null) pick(Number(button.dataset.part));
+    if (button?.dataset.pad != null) pmapSelect({...selection,pad:button.dataset.pad,mode:"pad"});
+    if (button?.dataset.mode) pmapSelect({...selection,pad:null,mode:button.dataset.mode});
+    if (button?.dataset.mapMove) {
+      const move=button.dataset.mapMove;
+      pmapSelect({board:move==="worst"?index.worstBoard:index.order[pos+(move==="next"?1:-1)],mode:"overview"});
+    }
+  };
+  const svg=root.querySelector("svg"), plot=root.querySelector(".part-map-plot");
+  if (svg) {
+    const candidates=root.querySelector(".part-map-candidates");
+    svg.onclick=event=>{
+      const rect=svg.getBoundingClientRect();
+      const near=drawn.map(item=>({item,distance:Math.hypot(event.clientX-rect.left-item.x,event.clientY-rect.top-item.y)}))
+        .filter(entry=>entry.distance<=22).sort((a,b)=>a.distance-b.distance).map(entry=>entry.item);
+      if (near.length===1) pick(near[0].i);
+      if (near.length>1) {
+        candidates.hidden=false;
+        candidates.innerHTML=list(near,"candidate");
+        candidates.querySelector("button").focus();
+      }
+    };
+    svg.onkeydown=event=>{
+      const point=event.target.closest("[data-point]");
+      if (point && ["Enter"," "].includes(event.key)) {
+        event.preventDefault();
+        pick(Number(point.dataset.point));
+      }
+    };
+    candidates.onkeydown=event=>{
+      if (event.key==="Escape") {
+        candidates.hidden=true;
+        plot.focus();
+      }
+    };
+    [plot.scrollLeft,plot.scrollTop]=scroll;
+  }
+  if (oldFocus) {
+    const target=focus(oldFocus);
+    (target && !target.disabled ? target : focus("plot") || focus("all"))?.focus({preventScroll:true});
+  }
+}
 const ISS_OPEN=new Set(),SCROLL={},ISS_PAGE=150,ISS_PG={F:null,k:"",n:ISS_PAGE,all:false};
 function issToolsState(){const all=$$("#issList details.iss-card"),open=all.filter(d=>d.open).length;const e=$("#issExpand"),c=$("#issCollapse");if(e)e.disabled=all.length>0&&open===all.length;if(c)c.disabled=open===0}
 function renderIssues(){const F=S.F||[],c={ng:0,warn:0,info:0};F.forEach(x=>c[x.lv]++);
@@ -6346,8 +6710,6 @@ function renderIssues(){const F=S.F||[],c={ng:0,warn:0,info:0};F.forEach(x=>c[x.
   if(F.pending){$("#issHead").textContent=`正在偵測問題（${S.rows.length.toLocaleString()} 筆）…`;$("#issSub").textContent="資料量大，於背景計算中，完成後會自動顯示結果。";$("#pmap").innerHTML="";$("#issList").innerHTML='<p class="note">計算中…</p>';return}
   const caseList=(F.meta&&F.meta.cases)||[];
   $("#issHead").textContent=F.length?`${caseList.length} 個問題定義（${F.length} 項統計發現）：嚴重 ${c.ng}、警示 ${c.warn}、資訊 ${c.info}`:"未偵測到統計上顯著的問題";
-  const multi=F.filter(x=>x.corrob.length>=2).length;
-  const Me=F.meta;
   $("#issSub").textContent=F.length?"":"十個面向皆在正常範圍。";
   fmLine();
   renderPmap();
@@ -6356,10 +6718,21 @@ function renderIssues(){const F=S.F||[],c={ng:0,warn:0,info:0};F.forEach(x=>c[x.
     +'<span class="vsep" aria-hidden="true" style="height:24px"></span>'+[["all","全部面向"],...cats.map(k=>[k,`${k} ${F.filter(x=>x.cat===k).length}`])].map(([v,t])=>`<button class="chipbtn" data-cat="${v}" aria-pressed="${S.issCat===v}">${t}</button>`).join("")
     +'<span class="vsep" aria-hidden="true" style="height:24px"></span>'+[["cases","依問題定義"],["rules","依統計規則"]].map(([v,t])=>`<button class="chipbtn" data-group="${v}" aria-pressed="${S.issGroup===v}">${t}</button>`).join("")
     +`<span class="iss-tools"><button class="chipbtn" id="issExpand">全部展開</button><button class="chipbtn" id="issCollapse">全部收合</button></span>`;
-  $("#issExpand").onclick=()=>{issueList().forEach(x=>ISS_OPEN.add(x.id));$$("#issList details.iss-card").forEach(d=>d.open=true);issToolsState()};
-  $("#issCollapse").onclick=()=>{ISS_OPEN.clear();$$("#issList details.iss-card").forEach(d=>d.open=false);issToolsState()};
-  $$("#issFilter [data-lv]").forEach(b=>b.onclick=()=>{S.issLv=b.dataset.lv;renderIssues()});$$("#issFilter [data-cat]").forEach(b=>b.onclick=()=>{S.issCat=b.dataset.cat;renderIssues()});
-  $$("#issFilter [data-group]").forEach(b=>b.onclick=()=>{S.issGroup=b.dataset.group;renderIssues()});
+  $("#issExpand").onclick=()=>{
+    issueList().forEach(x=>ISS_OPEN.add(x.id));
+    $$("#issList details").forEach(d=>{if(d.dataset.case)ISS_OPEN.add("c"+d.dataset.case);d.open=true});
+    issToolsState();
+  };
+  $("#issCollapse").onclick=()=>{ISS_OPEN.clear();$$("#issList details").forEach(d=>d.open=false);issToolsState()};
+  for(const [attr,state] of [["lv","issLv"],["cat","issCat"],["group","issGroup"]]){
+    const selector="#issFilter [data-"+attr+"]";
+    $$(selector).forEach(button=>button.onclick=()=>{
+      const value=button.dataset[attr];
+      S[state]=value;
+      renderIssues();
+      $$(selector).find(next=>next.dataset[attr]===value)?.focus({preventScroll:true});
+    });
+  }
   const L=issueList(),byId=Object.fromEntries(F.map(x=>[x.id,x]));
   /* 卡片預設收合成一行：嚴重度、標題、關鍵數字、迷你趨勢圖；點一下展開事實、推論、佐證與前往按鈕 */
   const keyFact=x=>issueCollapsedSummary(x,METRICS);
@@ -6403,6 +6776,10 @@ function renderIssues(){const F=S.F||[],c={ng:0,warn:0,info:0};F.forEach(x=>c[x.
   $("#issList").innerHTML=L.length?listHtml+(more?`<p class="iss-more"><button class="chipbtn" id="issMore">再顯示 ${Math.min(more,ISS_PAGE)} 項（尚有 ${more} 項未顯示）</button></p>`:""):'<p class="note">此篩選條件下沒有問題。</p>';
   if($("#issMore"))$("#issMore").onclick=()=>{ISS_PG.n+=ISS_PAGE;renderIssues()};
   $$("#issList details.iss-card").forEach(d=>d.addEventListener("toggle",()=>{const id=+d.dataset.id;if(d.open)ISS_OPEN.add(id);else ISS_OPEN.delete(id);issToolsState()}));
+  $$("#issList details.iss-case").forEach(d=>d.addEventListener("toggle",()=>{
+    const key="c"+d.dataset.case;
+    if(d.open)ISS_OPEN.add(key);else ISS_OPEN.delete(key);
+  }));
   issToolsState();
   $$("#issList [data-go]").forEach(b=>b.onclick=()=>{const x=byId[+b.dataset.go];goto(x.go,x)});
   $$("#issList [data-jump]").forEach(b=>b.onclick=()=>flashIssue(+b.dataset.jump));
@@ -10274,7 +10651,11 @@ function beforePrint(){
   document.title=pdfFileName().replace(/\.pdf$/i,"");
   prOpenPrev=new Set(ISS_OPEN);
   (S.F||[]).forEach(x=>ISS_OPEN.add(x.id));
-  if($("#issMore")){ISS_PG.all=true;renderIssues()}
+  if(S.tab==="issues" && S.rows.length && !S.F.pending){
+    ISS_PG.all=true;
+    for (const item of S.F.meta?.cases || []) ISS_OPEN.add("c"+item.id);
+    renderIssues();
+  }
   $$("#issList details.iss-card").forEach(d=>d.open=true);
   const ht=document.documentElement;
   prTheme=ht.getAttribute("data-theme");
