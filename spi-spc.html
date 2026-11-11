@@ -9080,8 +9080,8 @@ function aiPayload(){const A=S.A;return{試產回合:curRun()?curRun().name:"",�
   常態性:{AD:+f(A.ad.A,3),p:+f(A.ad.p,4),SW:A.sw&&A.sw.valid?{W:+f(A.sw.w,4),p:+f(A.sw.p,4)}:null,偏態:+f(A.sk.skew,2),峰度:+f(A.sk.kurt,2)},Nelson:A.nel.rules.filter(r=>r.idx.length&&!r.na).map(r=>({管制圖:chartName(),規則:r.name,點:r.idx.map(i=>A.series[i].lab)})),
   各板:A.byBoard.map(b=>({板:b.board,平均:+f(b.mean,2),σ:+f(b.sd,2),不良:b.defects})),元件群組統計:A.groups.map(g=>({群組:g.g,平均:+f(g.mean,2),σ:+f(g.sd,2)})),
   不良柏拉圖:Object.fromEntries(Object.entries(A.pareto).map(([k,v])=>[DEFECTS[k],v])),交叉驗證:A.xv.rows.map(x=>({面向:x.k,判定:x.st,依據:x.ev})),
-  問題定義:(S.F.meta&&S.F.meta.cases||[]).slice(0,15).map(c=>({案號:c.id,標題:c.title,嚴重度:LVL[c.lv],形狀:c.shape||"—",範圍:c.scope||"—",時間:c.time||"—",建議:c.action,統計發現:c.card_ids.map(i=>"#"+i)})),
-  系統偵測問題清單:S.F.slice(0,15).map(x=>({編號:x.id,嚴重度:LVL[x.lv],面向:x.cat,問題:x.title,問題定義案:x.case_id,事實:x.aiFacts||x.facts.slice(0,3),系統推論:x.cause,信心:x.conf,佐證:x.corrob})),
+  問題定義:(S.F.meta&&S.F.meta.cases||[]).slice(0,8).map(c=>({案號:c.id,標題:String(c.title).slice(0,36),嚴重度:LVL[c.lv],統計發現:c.card_ids.slice(0,8)})),
+  系統偵測問題清單:S.F.slice(0,15).map(x=>({編號:x.id,嚴重度:LVL[x.lv],面向:x.cat,問題:x.title,事實:x.aiFacts||x.facts.slice(0,3),系統推論:x.cause,信心:x.conf,佐證:x.corrob})),
   前15不良焊墊:A.defRows.slice(0,15).map(r=>({板:r.board,焊墊:r.pad,體積:r.volume,高度:r.height,面積:r.area,偏移X:r.offx,偏移Y:r.offy,判定:r.codes.map(c=>DEFECTS[c])})),
   進階:advSummary(A)}}
 function advSummary(A){const W=advAnalyze(S,A);return{EWMA越界:A.ewma.filter(p=>p.v>p.ucl||p.v<p.lcl).map(p=>p.lab),CUSUM訊號:A.cusum.pts.filter(p=>p.cp>A.cusum.h||p.cm>A.cusum.h).map(p=>p.lab),

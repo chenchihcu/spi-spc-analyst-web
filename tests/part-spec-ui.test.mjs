@@ -214,7 +214,7 @@ test("流程：鋼板厚度必填 → 未定義規格時鎖定 → 驗證與草�
   w.SPI_TEST_HOOK.beforePrint(); w.SPI_TEST_HOOK.afterPrint();
   assert.match($("#printHead").textContent, /規格來源：料號規格 NEW-1 v1（SHA-256 [0-9a-f]{12}）/);
   const csv = w.eval("SPI_TEST_HOOK.issuesCsv(S.F)").split("\n");
-  assert.ok(csv[0].endsWith(",spec_source")); assert.match(csv[1], /料號規格 NEW-1 v1/);
+  assert.match(csv[0], /,spec_source,case_id,case_title$/); assert.match(csv[1], /料號規格 NEW-1 v1/);
 
   // 10. 調整本回合厚度只更新回合分析，不回寫資料庫的匯入厚度
   assert.equal($("#inImpStencil").value, "100", "匯入欄保留當時使用的厚度");
