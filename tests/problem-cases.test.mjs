@@ -29,7 +29,7 @@ test('問題定義：同群組 sys 與 pad 併為一案', () => {
   }
 });
 
-test('問題定義：漂移與 Nelson 5/6 同項目併案', () => {
+test('問題定義：同向錫量漂移併成一案，且每張卡只屬於一案', () => {
   const st = baseState(core, {
     rows: core.sampleData(),
     metrics: ['volume', 'height', 'hpct', 'area', 'offx', 'offy'],
@@ -38,10 +38,19 @@ test('問題定義：漂移與 Nelson 5/6 同項目併案', () => {
     chart: 'xbars'
   });
   const F = core.detectIssues(st);
-  const drift = F.find(x => x.sig && x.sig.t === 'drift' && x.sig.k === 'volume');
+  const vol = F.find(x => x.sig && x.sig.t === 'drift' && x.sig.k === 'volume');
+  const hp = F.find(x => x.sig && x.sig.t === 'drift' && x.sig.k === 'hpct');
   const nel5 = F.find(x => x.sig && x.sig.t === 'nelson' && x.sig.k === 'volume' && x.sig.ruleId === 5);
-  assert.ok(drift && nel5, '範例應有體積漂移與 Nelson 規則 5');
-  assert.equal(drift.case_id, nel5.case_id, '同項目漂移與 Nelson 5 應同案');
+  assert.ok(vol && hp && nel5, '範例應有體積、高度漂移與 Nelson 規則 5');
+  assert.equal(vol.case_id, hp.case_id, '同向體積與高度漂移應同案');
+  assert.equal(vol.case_id, nel5.case_id, '同案應含該項目的 Nelson 規則 5');
+  const owner = new Map();
+  for (const c of F.meta.cases) for (const id of c.card_ids) {
+    assert.equal(owner.has(id), false, `卡片 #${id} 不得同時屬於案 ${owner.get(id)} 與案 ${c.id}`);
+    owner.set(id, c.id);
+    assert.equal(F.find(x => x.id === id).case_id, c.id);
+  }
+  assert.equal(owner.size, F.length, '每張卡都應屬於恰好一案');
 });
 
 test('問題定義：卡片 id 與 title 順序不因分組改變', () => {

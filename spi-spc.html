@@ -4643,17 +4643,20 @@ function buildProblemCases(F,st){
     cases.push(c);uniq.forEach(m=>{m.case_id=c.id;m.case_title=c.title;});return c;
   }
   for(const x of F)if(unused(x)&&x.sig&&(x.sig.t==="unit"||x.sig.t==="msa"))adopt([x],x.title,{scope:"全部板",time:x.sig.t==="unit"?"規格設定":"量測"});
-  for(const d of F.filter(unused).filter(x=>x.sig&&x.sig.t==="drift")){
-    const members=[d],s0=d.sig.s0,k=d.sig.k;
-    for(const n of F.filter(unused).filter(x=>x.sig&&x.sig.t==="nelson"&&x.sig.k===k)){const rid=n.sig.ruleId;
+  const PASTE=new Set(["volume","area","hpct"]);
+  const attachNelson=(drift,members)=>{const s0=drift.sig.s0,k=drift.sig.k;
+    for(const n of F){if(!unused(n)||members.includes(n)||!n.sig||n.sig.t!=="nelson"||n.sig.k!==k)continue;const rid=n.sig.ruleId;
       if([2,3,5,6,8].includes(rid)&&boardOverlapAfterS0(n,s0,boards))members.push(n);
-      else if(rid===1&&nelsonAfterS0(n,s0,boards))members.push(n);}
-    for(const d2 of F.filter(unused).filter(x=>x.sig&&x.sig.t==="drift"&&x.id!==d.id)){
-      if(d2.sig.dir!==d.sig.dir)continue;
-      const b1=issueCardBoardSet(d,boards),b2=issueCardBoardSet(d2,boards);let ov=false;for(const b of b1)if(b2.has(b)){ov=true;break;}
-      if(ov||d2.sig.k===k)members.push(d2);}
-    const dir=d.sig.dir>0?"上升":"下降";
-    adopt(members,`${labM(k)}自 ${d.sig.b||boards[s0]||""} 起持續${dir}`,{shape:dir,scope:"全部板",time:"趨勢漂移",msa_volume_hint:k==="volume"});}
+      else if(rid===1&&nelsonAfterS0(n,s0,boards))members.push(n);}};
+  for(const d of F){if(!unused(d)||!d.sig||d.sig.t!=="drift")continue;
+    const members=[d];attachNelson(d,members);
+    if(PASTE.has(d.sig.k))for(const d2 of F){if(!unused(d2)||d2===d||!d2.sig||d2.sig.t!=="drift"||!PASTE.has(d2.sig.k)||d2.sig.dir!==d.sig.dir)continue;
+      const b1=issueCardBoardSet(d,boards),b2=issueCardBoardSet(d2,boards);let ov=false;for(const b of b1)if(b2.has(b)){ov=true;break}
+      if(!ov)continue;members.push(d2);attachNelson(d2,members);}
+    const drifts=members.filter(m=>m.sig.t==="drift"),dir=d.sig.dir>0?"上升":"下降",ks=[...new Set(drifts.map(m=>m.sig.k))];
+    const title=ks.length>1?`${ks.map(labM).join("、")}自 ${d.sig.b||boards[d.sig.s0]||""} 起同向${dir}`:`${labM(d.sig.k)}自 ${d.sig.b||boards[d.sig.s0]||""} 起持續${dir}`;
+    adopt(members,title,{shape:dir,scope:"全部板",time:"趨勢漂移",msa_volume_hint:ks.includes("volume")});
+  }
   for(const s of F.filter(unused).filter(x=>x.sig&&x.sig.t==="sys")){
     const g=s.sig.g,side=s.sig.lowSide?"偏低":"偏高";
     const pads=F.filter(unused).filter(x=>x.sig&&x.sig.t==="pad"&&x.sig.g===g);
@@ -6400,7 +6403,7 @@ function renderIssues(){const F=S.F||[],c={ng:0,warn:0,info:0};F.forEach(x=>c[x.
         <p class="inf" style="margin:8px 0"><span class="lbl">建議動作</span>${esc(c.action)}</p>${hint}${c.members.map(card).join("")}</div></details>`;};
   /* 分批顯示：問題很多（上千項）時一次畫出全部卡片會讓頁面停住數十秒；先畫前 ISS_PAGE 項，其餘按「再顯示」或列印時才畫 */
   const pgK=[S.issLv,S.issCat,S.issEnt,S.issGroup].join("|");if(ISS_PG.F!==F||ISS_PG.k!==pgK){ISS_PG.F=F;ISS_PG.k=pgK;ISS_PG.n=ISS_PAGE}
-  const lim=ISS_PG.all?Infinity:ISS_PAGE;let listHtml="",more=0;
+  const lim=ISS_PG.all?Infinity:ISS_PG.n;let listHtml="",more=0;
   if(S.issGroup==="cases"){
     const allow=new Set(L.map(x=>x.id));
     let rows=(F.meta&&F.meta.cases||[]).map(c=>({...c,members:c.card_ids.map(id=>byId[id]).filter(x=>x&&allow.has(x.id))})).filter(c=>c.members.length&&(S.issLv==="all"||c.lv===S.issLv));
@@ -6411,7 +6414,7 @@ function renderIssues(){const F=S.F||[],c={ng:0,warn:0,info:0};F.forEach(x=>c[x.
     listHtml=["ng","warn","info"].map(lv=>{const q=L.filter(x=>x.lv===lv),show=q.slice(0,Math.max(0,left));left-=show.length;return show.length?`<h3 class="sevhead"><span class="pill ${lv}">${LVL[lv]}</span> ${q.length} 項${show.length<q.length?`（顯示前 ${show.length} 項）`:""}</h3>`+show.map(card).join(""):""}).join("");
     more=Math.max(0,L.length-lim);
   }
-  $("#issList").innerHTML=L.length?listHtml+(more?`<p class="iss-more"><button class="chipbtn" id="issMore">再顯示 ${Math.min(more,S.issGroup==="cases"?10:ISS_PAGE)} 項（尚有 ${more} 項未顯示）</button></p>`:""):'<p class="note">此篩選條件下沒有問題。</p>';
+  $("#issList").innerHTML=L.length?listHtml+(more?`<p class="iss-more"><button class="chipbtn" id="issMore">再顯示 ${Math.min(more,ISS_PAGE)} 項（尚有 ${more} 項未顯示）</button></p>`:""):'<p class="note">此篩選條件下沒有問題。</p>';
   if($("#issMore"))$("#issMore").onclick=()=>{ISS_PG.n+=ISS_PAGE;renderIssues()};
   $$("#issList details.iss-card").forEach(d=>d.addEventListener("toggle",()=>{const id=+d.dataset.id;if(d.open)ISS_OPEN.add(id);else ISS_OPEN.delete(id);issToolsState()}));
   issToolsState();
