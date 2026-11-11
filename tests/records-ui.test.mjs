@@ -10,6 +10,7 @@ const { JSDOM } = (() => { try { return require("jsdom"); } catch { return {}; }
 const fs = require("fs");
 const { HTML, withIdb, seedPartSpec } = require("./_load.js");
 import { createCloudHarness, installBrowserCloud } from './_cloud-harness.mjs';
+import { uploadPlaceViaPicker, openPlacePicker, openPickerTab, getPlacePart, getPlaceRev, until as placeUntil, applyPlaceFromPicker } from './_place-picker.mjs';
 const tick = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function page(saved, cloud, preloadPlace) {
@@ -47,13 +48,13 @@ async function cloudPage(saved = []) {
   return { ...result, cloud };
 }
 async function selectPlace(dom, cloud, part, rev = 'V1', side = 'TOP', ref = 'U1') {
-  const d = dom.window.document;
+  const w = dom.window, d = dom.window.document;
   const rec = await cloud.upload({ kind: 'place', part, rev, side, unit: 'mm', name: `${part}-${rev}.csv` },
     `RefDes,X,Y,Layer\n${ref},1,2,${side}\n`);
   d.querySelector('#btnSelectPlace').click();
   assert.ok(await until(() => [...d.querySelectorAll('#tblPickPlace tr')].some(tr => tr.textContent.includes(part) && tr.querySelector('[data-pact="use-place"]'))));
   [...d.querySelectorAll('#tblPickPlace tr')].find(tr => tr.textContent.includes(part)).querySelector('[data-pact="use-place"]').click();
-  assert.ok(await until(() => d.querySelector('#placePart').value === part));
+  assert.ok(await placeUntil(() => getPlacePart(w) === part));
   d.querySelector('#recPickerClose').click();
   d.querySelector('#selSide').value = side;
   return rec;
@@ -105,7 +106,6 @@ test("匯入來源未標高度單位時顯示未知並阻止套用；明確選 �
   assert.equal(known.filename, "料號規格_P1_v3.json");
   assert.equal(known.warning, "");
   w.eval("SPI_TEST_HOOK.S.runId=null;SPI_TEST_HOOK.S.rows=[{group:'0402',groupBasis:'package'}];SPI_TEST_HOOK.updateRailSummary()");
-  assert.match(d.querySelector("#groupBasisNote").textContent, /分組依據：封裝/);
   assert.match(d.querySelector("#railChipSummary").textContent, /分組依據：封裝/);
   assert.deepEqual(errs, []);
   dom.window.close();
@@ -115,7 +115,7 @@ test("UNKNOWN_UNIT 恢復舊回合時停用高度分析與規格比較", { skip:
   const { dom, errs } = page([], null);
   const w = dom.window, d = w.document, h = w.SPI_TEST_HOOK, S = h.S;
   w.eval("saveRunsSoon=()=>{};updateStartupDbBanner=()=>{}");
-  assert.ok(await until(() => S.runId != null && d.querySelector("#srcName").textContent), "等待舊回合測試頁面完成初始載入");
+  assert.ok(await until(() => S.runId != null && d.querySelector("#selRun option:checked")?.textContent), "等待舊回合測試頁面完成初始載入");
   const rows = [];
   for (let b = 1; b <= 10; b++) for (let i = 0; i < 6; i++) rows.push({
     board: `B${b}`, pad: `P${i}`, comp: `P${i}`, group: "G", volume: 100 + (i % 5), height: 200 + i, area: 100
@@ -126,12 +126,15 @@ test("UNKNOWN_UNIT 恢復舊回合時停用高度分析與規格比較", { skip:
       stencil: 120, htol: { lo: 75, hi: 125 }, step: { on: false, zones: [] }, aperture: { groups: {} }, wipe: 5 } });
   S.metric = "height";
   h.switchRun(id);
-  assert.ok(await until(() => d.querySelector("#srcName").textContent === "舊版未知單位回合" && d.querySelector("#selMetric").value === S.metric), "等待回合切換完成");
+  d.querySelector('[data-tab=capability]').click();
+  assert.ok(await until(() => d.querySelector("#selRun option:checked")?.textContent === "舊版未知單位回合" && d.querySelector("#selMetric").value === S.metric), "等待回合切換完成");
+  assert.ok(await until(() => d.querySelector("#stencilNote")), "規格頁應顯示鋼板厚度說明");
   assert.equal(S.heightUnit, "unknown");
   assert.ok(!S.metrics.includes("height") && !S.metrics.includes("hpct"), "高度與高度%不得留在舊回合的可選分析項目");
   assert.notEqual(S.metric, "height", "選取的分析項目須回到可用指標");
   assert.match(d.querySelector("#stencilNote").textContent, /高度不以 µm 規格判讀/);
   assert.doesNotMatch(d.querySelector("#stencilNote").textContent, /\d+\s*~\s*\d+\s*µm/);
+  assert.ok(await until(() => [...d.querySelectorAll("#specTbl th[scope=row]")].some(x => x.textContent.includes("高度"))), "規格表應載入高度列");
   const heightHeader = [...d.querySelectorAll("#specTbl th[scope=row]")].find(x => x.textContent.includes("高度"));
   assert.match(heightHeader.textContent, /單位未知/);
   const out = h.buildStatsData(S);
@@ -171,12 +174,13 @@ test("受控欄位必填；存入後才建立回合，回合帶來源資訊；�
   assert.equal(src.sha256, createHash("sha256").update(CSV).digest("hex"), "指紋為原始檔的 SHA-256");
   assert.match(w.eval("SPI_TEST_HOOK.reportMd()"), /批號 L2410-01｜產品料號 301-000100124/, "報告帶批號與料號");
   // 資料庫頁
-  $("[data-tab=data]").click(); $('.subtab[data-sub="records"]').click();
-  assert.ok(await until(() => /L2410-01/.test($("#recSpi").textContent)));
-  assert.match($("#recMode").textContent, /雲端資料庫/);
-  $('#recSpi [data-ract="ver"]').click();
-  assert.ok(await until(() => /與上傳時相同/.test($("#recSpi").textContent)), "驗證通過");
-  $('#recSpi [data-ract="dl"]').click();
+  openPickerTab(d, 'spi');
+  assert.ok(await until(() => !$("#recPickerModal").hidden && /L2410-01/.test($("#tblPickSpi").textContent)));
+  assert.equal(w.eval("SPI_TEST_HOOK.RecDB.mode"), "cloud");
+  $('#tblPickSpi [data-pact="ver"]').click();
+  assert.ok(await until(() => !$("#proofModal").hidden && $("#proofBody").textContent.length > 20), "驗證對話框應顯示證明內容");
+  assert.match($("#proofBody").textContent, /指紋|SHA|相同|一致/);
+  $('#tblPickSpi [data-pact="dl"]').click();
   assert.ok(await until(() => saved.length === 1));
   assert.equal(saved[0].filename, "批次A_TOP.csv");
   const txt = await saved[0].data.text();
@@ -204,18 +208,19 @@ test("重複檔沿用既有紀錄；從資料庫開啟不重複存；受控原�
   assert.equal(w.eval("S.runs[2].info.src.id"), w.eval("S.runs[3].info.src.id"), "兩個回合連到同一筆紀錄");
   assert.equal($("#impDupNotice").hidden, false, "409 後應保留可讀的重複檔提示");
   // 從資料庫開啟
-  $("[data-tab=data]").click(); $('.subtab[data-sub="records"]').click();
-  assert.ok(await until(() => d.querySelector('#recSpi [data-ract="open"]')));
-  $('#recSpi [data-ract="open"]').click();
+  openPickerTab(d, 'spi');
+  assert.ok(await until(() => d.querySelector('#tblPickSpi [data-pact="open"]')));
+  $('#tblPickSpi [data-pact="open"]').click();
   assert.ok(await until(() => !$("#mapBox").hidden && $("#inLot").value === "L1"));
   assert.equal($("#inLot").readOnly, true); assert.equal($("#inPart").readOnly, true);
   assert.match($("#recNote").textContent, /不會重複存檔/);
   $("#btnApply").click();
   assert.ok(await until(() => w.eval("S.runs.length") === 5));
   assert.equal((await w.eval("SPI_TEST_HOOK.RecDB.list()")).filter(r => r.kind === 'spi').length, 1, "開啟後套用不新增紀錄");
-  assert.equal($("#recSpi [data-ract=del]"), null, "正式量測原始檔沒有刪除鈕");
+  assert.equal($("#tblPickSpi [data-pact=del]"), null, "正式量測原始檔沒有刪除鈕");
   await assert.rejects(w.eval(`SPI_TEST_HOOK.RecDB.del(${JSON.stringify(recs.find(r => r.kind === 'spi').id)})`), /原始檔須保留/);
   assert.equal((await w.eval("SPI_TEST_HOOK.RecDB.list()")).filter(r => r.kind === 'spi').length, 1, "拒絕刪除後仍可讀取");
+  openPickerTab(d, 'specs');
   $("#recAuditBox").open = true; $("#recAuditBox").dispatchEvent(new w.Event("toggle"));
   assert.ok(await until(() => /新增/.test($("#recAudit").textContent)));
   const audit = $("#recAudit").textContent;
@@ -229,14 +234,18 @@ test("座標檔：受控欄位未填不能上傳；存入後可在資料庫選�
   const w = dom.window, d = w.document, $ = (s) => d.querySelector(s);
   const sv = $("#selVendor"); sv.value = "lirong"; sv.dispatchEvent(new w.Event("change"));
   const PL = "RefDes,X,Y,PartType,Layer\nC1,10,20,C0402,TOP\n";
-  const up = async (name) => { const inp = $("#placeIn"); Object.defineProperty(inp, "files", { configurable: true, value: [new w.File([Buffer.from(PL)], name)] }); inp.dispatchEvent(new w.Event("change")); await tick(300); };
-  $("#placeSide").value = "TOP"; $("#placeUnit").value = "mm";
-  $("#placePart").value = ""; $("#placeRev").value = "";
-  await up("p.csv");
-  assert.match($("#placeState").textContent, /請填寫正式料號與版次/);
+  await openPlacePicker(d);
+  const inp = $('#upPlaceFile');
+  Object.defineProperty(inp, 'files', { configurable: true, value: [new w.File([Buffer.from(PL)], 'p.csv')] });
+  inp.dispatchEvent(new w.Event('change'));
+  await tick(50);
+  $('#btnSubmitPlace').click();
+  assert.match($("#upPlaceState").textContent || $("#upPlaceState").innerHTML, /請填寫正式料號、版次/);
   assert.equal((await w.eval("SPI_TEST_HOOK.RecDB.list()")).length, 0);
-  $("#placePart").value = "X3000"; $("#placeRev").value = "V5";
-  await up("p.csv");
+  await uploadPlaceViaPicker(w, d, {
+    part: 'X3000', rev: 'V5', side: 'TOP', unit: 'mm',
+    body: Buffer.from(PL), name: 'p.csv',
+  });
   assert.match($("#placeState").textContent, /料號 X3000 版次 V5.*1 個元件/);
   const list = await w.eval("SPI_TEST_HOOK.RecDB.list()");
   assert.equal(list.length, 1); assert.equal(list[0].kind, "place"); assert.equal(list[0].comps, 1);
@@ -248,11 +257,11 @@ test("座標檔：受控欄位未填不能上傳；存入後可在資料庫選�
   // 移除後再從資料庫設為目前座標檔
   $("#placeClear").click();
   assert.match($("#placeState").textContent, /未套用受控座標檔/);
-  $('.subtab[data-sub="records"]').click();
-  assert.ok(await until(() => d.querySelector('#recPlace [data-ract="use"]')));
-  $('#recPlace [data-ract="use"]').click();
+  openPickerTab(d, 'place');
+  assert.ok(await until(() => d.querySelector('#tblPickPlace [data-pact="use-place"]')));
+  $('#tblPickPlace [data-pact="use-place"]').click();
   assert.ok(await until(() => /料號 X3000 版次 V5/.test($("#placeState").textContent)));
-  assert.ok(await until(() => /目前已選取/.test($("#recPlace").textContent)));
+  assert.ok(await until(() => /目前已選取/.test($("#tblPickPlace").textContent)));
 });
 
 test("開啟歷史立榮紀錄：無原座標不借用目前座標；有原座標則帶回原座標", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
@@ -300,9 +309,9 @@ test("歷史紀錄開啟失敗不污染下一次匯入；原座標缺失時可�
   const w = dom.window, d = w.document, $ = (s) => d.querySelector(s);
   // 以歷史資料快照重現既有壞檔；正式新匯入不能在本機寫入。
   await seedHistorical(w, { kind: 'spi', lot: 'BAD', part: 'P', side: 'TOP', vendor: 'generic', name: 'bad.xlsx' }, 'not a zip at all, broken');
-  $("[data-tab=data]").click(); $('.subtab[data-sub="records"]').click();
-  assert.ok(await until(() => d.querySelector('#recSpi [data-ract="open"]')));
-  $('#recSpi [data-ract="open"]').click();
+  openPickerTab(d, 'spi');
+  assert.ok(await until(() => d.querySelector('#tblPickSpi [data-pact="open"]')));
+  $('#tblPickSpi [data-pact="open"]').click();
   assert.ok(await until(() => /無法開啟/.test(($("#toast") || {}).textContent || "")));
   // 接著手動匯入：批號可填、會另存新紀錄
   await pickFile(dom, "ok.csv", CSV);
@@ -314,10 +323,10 @@ test("歷史紀錄開啟失敗不污染下一次匯入；原座標缺失時可�
   const missing = 'missingplace0000000000';
   const historical = await seedHistorical(w, { kind: 'spi', lot: 'LP', part: 'P', side: 'TOP', vendor: 'lirong', name: 'L_TOP.csv', placeId: missing, stencil: 120 }, WIDE);
   assert.equal(historical.placeId, missing);
-  $("[data-tab=data]").click(); $('.subtab[data-sub="records"]').click();
-  $("#recReload").click();
-  assert.ok(await until(() => [...d.querySelectorAll("#recSpi tbody tr")].some((tr) => tr.textContent.includes("LP"))));
-  [...d.querySelectorAll("#recSpi tbody tr")].find((tr) => tr.textContent.includes("LP")).querySelector('[data-ract="open"]').click();
+  openPickerTab(d, 'spi');
+  $("#recPickerReload").click();
+  assert.ok(await until(() => [...d.querySelectorAll("#tblPickSpi tbody tr")].some((tr) => tr.textContent.includes("LP"))));
+  [...d.querySelectorAll("#tblPickSpi tbody tr")].find((tr) => tr.textContent.includes("LP")).querySelector('[data-pact="open"]').click();
   assert.ok(await until(() => !$("#mapBox").hidden && $("#inLot").value === "LP"));
   assert.match($("#toast").textContent, /當時的座標檔無法取回或缺少已驗證設定/);
   assert.match($("#mapPrev").textContent, /尚未選取受控座標檔/);

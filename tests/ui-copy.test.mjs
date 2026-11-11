@@ -44,6 +44,7 @@ const forbidden = [
   "一鍵下載標準交付包",
 ];
 
+// 本檔只擋已知禁用字串。通過之後仍依 AGENTS.md 文案條刪掉不改變判讀的靜態標籤。
 test("spi-spc.html 不含禁用教學段與英文譯名", () => {
   for (const needle of forbidden) {
     assert.equal(
@@ -58,4 +59,33 @@ test("spi-spc.html 保留功能型折疊", () => {
   assert.match(html, /id="aiPayloadDetails"/);
   assert.match(html, /id="recAuditBox"/);
   assert.match(html, /<summary>預覽送出內容<\/summary>/);
+});
+
+test("規格鋼板控制項唯一且位於規格子分頁；關係圖不含已拒絕圖種", () => {
+  const specs = html.slice(html.indexOf('<div data-sub="specs" hidden>'), html.indexOf('<div data-sub="ai-cfg" hidden>'));
+  assert.ok(specs.length > 0, "規格子分頁應在 AI 設定之前結束");
+  for (const id of ["chkStep", "apTbl", "zoneMap"]) {
+    assert.equal((html.match(new RegExp(`id="${id}"`, "g")) || []).length, 1, `#${id} 應只出現一次`);
+    assert.match(specs, new RegExp(`id="${id}"`), `#${id} 應位於規格子分頁`);
+  }
+  assert.equal(html.includes('data-sub="stencil"'), false, "不應再留獨立鋼板子分頁");
+  assert.doesNotMatch(specs, /id="aiSettingsCard"/);
+  assert.doesNotMatch(specs, /id="runTbl"/);
+  const rel = html.match(/<select id="selRelChart">([\s\S]*?)<\/select>/);
+  assert.ok(rel, "應有關係圖下拉");
+  assert.deepEqual([...rel[1].matchAll(/value="([^"]+)"/g)].map((m) => m[1]), ["specScatter", "parallel", "radar"]);
+  const notice = html.match(/<details class="how" id="aiNoticeDetails">([\s\S]*?)<\/details>/);
+  assert.ok(notice && !/\sopen[\s>]/.test(notice[0].slice(0, notice[0].indexOf(">"))), "送出範圍預設收合");
+  assert.match(notice[1], /<summary>查看送出範圍與記錄方式<\/summary>/);
+  const display = html.match(/<details class="how" id="sim3dDisplayOpts">([\s\S]*?)<\/details>/);
+  assert.ok(display && !/\sopen[\s>]/.test(display[0].slice(0, display[0].indexOf(">"))));
+  for (const id of ["inExag", "chkGhost", "chkBridgeWarn"]) assert.match(display[1], new RegExp(`id="${id}"`));
+  for (const id of ["btnPhme", "btnAddB", "btnSample", "btnAoiSample", "btnDoeSample", "btnGrrSample"]) {
+    const at = html.indexOf(`id="${id}"`);
+    assert.ok(at > 0, `#${id} 仍須存在`);
+    const open = html.lastIndexOf("<details", at);
+    const block = html.slice(open, html.indexOf("</details>", at));
+    assert.match(block, /<summary>範例資料<\/summary>/);
+    assert.equal(/\sopen[\s>]/.test(block.slice(0, block.indexOf(">"))), false);
+  }
 });

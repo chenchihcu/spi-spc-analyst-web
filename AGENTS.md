@@ -14,12 +14,18 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
 | 重複錯誤類別 | 檢查／執行入口 | 證據 |
 |---|---|---|
 | 混淆提交、建置、部署與工具執行結果 | 既有 Git integration；從 Cloudflare production build／deployment 讀回同一 commit 的狀態與 version；CLI／瀏覽器中止單列為驗證受阻 | 2026-10-24 只查登入頁而漏掉 DB 503；2026-11-05 #95／#96 並行建置與不同來源部署不可互相作證 |
-- **部署驗證要走過資料庫路徑**：登入頁顯示新版本只代表靜態資產已更新。至少確認一個登入後的資料庫畫面或 API 回 200；無法登入時回報「資料庫路徑未驗證」，不可寫成部署成功。
-  - 檢查：驗收紀錄寫明走過的頁面或 API 與 HTTP 狀態。
-  - 出處：同上事故；當時只看登入頁版本即回報成功。
+| CI 紅燈或變更未進 main 就停 | `classifyWorkersSync`（`tools/deploy-verify.mjs`）；`tests/deploy-verify.test.mjs`。dry-run 且沒有 Build 結果是 `not_deployed`，Build 還在跑是 `in_progress`，`success` 才是 `deployed` | 2026-11-11 #117：`test` 失敗後曾停住；Actions 只有 `wrangler deploy --dry-run`；Workers Build `2dc2af00-961c-40c2-9b2c-3fb78e2c4a47`（`cdfface`）當時仍在 running，正式站停在 v10.15.9 |
+| 未登入的 401 寫成資料庫路徑未驗證 | `classifyRecordsProbe`（`tools/deploy-verify.mjs`）；`tests/deploy-verify.test.mjs`。未送 `POST /__login` 時狀態是 `not_done`，不是 `unverified` 或 `verified` | 2026-11-11：未帶 cookie 的 `/api/records` 回 401，被寫成「無法登入／資料庫路徑未驗證」 |
+- **部署驗證要走過資料庫路徑**：登入頁顯示新版本只代表靜態資產已更新。未帶 cookie 的 `GET /api/records` 回 401 只表示這個請求沒登入，不是「無法登入」，也不能寫成資料庫路徑未驗證。先 `POST /__login`，body 為 `{user,d,next}`，`d` 是登入頁同一套 PBKDF2；伺服器拒絕明文 `pass`。登入回應 `ok` 後，用 `Set-Cookie` 的 `spi_auth` 再 `GET /api/records`，HTTP 200 且 JSON 含 `records` 陣列，才算走過資料庫路徑。登入本身失敗（帳密錯誤、429、503、手邊沒有帳號所以無法計算 `d`）才寫「資料庫路徑未驗證」，並寫明登入請求的狀態碼與缺的憑證名稱。
+  - 檢查：用 `classifyRecordsProbe` 寫驗收。未送登入必須是 `not_done`。`node --test tests/deploy-verify.test.mjs` 通過。
+  - 出處：2026-10-24 只看登入頁版本；2026-11-11 未登入呼叫 `/api/records` 得 401，被寫成未驗證。
 - **雲端部署以 Cloudflare 正式環境為準**：重現、除錯與驗收走正式 Worker 的頁面與 API（含 D1／R2）。不用只有靜態檔、沒有 Worker API 的本機預覽代替。本機測試與 `wrangler dev` 可輔助，不能把靜態預覽的結果寫成雲端已驗證。
   - 檢查：驗收紀錄寫明正式站 URL、走過的頁面或 API 與 HTTP 狀態。只開了靜態檔伺服器時寫「雲端路徑未驗證」。
   - 出處：2026-10-29 AI 分析；埠 8770 的靜態預覽沒有 `/api/analyze`，不能代表正式站。
+- **產品變更做到 main，CI 紅燈自己修完再推**：使用者要求完成的產品變更，工作樹有差異就 commit 並 push。PR 的 required check 失敗時讀該 check 的失敗測試，修完再 commit、push，不把紅燈留給下一輪。該 check 通過後合併進 `main`。GitHub Actions 的 `wrangler deploy --dry-run` 只證明設定可部署，不是正式站已更新。合併後讀 Cloudflare Workers Builds 裡這個 commit 的 build，等到 `success` 或 `fail`；狀態是 `running` 就繼續等，不另開手動 `wrangler deploy`。正式站登入頁版本對上這個 commit 的 `package.json` 版本後，再走「部署驗證要走過資料庫路徑」。
+  - 檢查：用 `classifyWorkersSync` 寫 Build 狀態。dry-run 且沒有 Build 結果是 `not_deployed`。報告仍寫失敗 check、後續 commit、合併 SHA、Workers Build uuid 與 outcome、正式 URL 的版本。`node --test tests/deploy-verify.test.mjs` 通過。
+  - 停止條件：使用者明確說不要合併或不要上正式站；migration 未核准；衝突會改變已審查行為（沿用下一條）；同一 CI 錯誤修完再推後原樣重現且沒有新證據。
+  - 出處：2026-11-11 #117。
 - **合併失敗先自行修復再重試，不等使用者要求**：已核准合併的 PR，`gh pr merge` 失敗時先讀錯誤輸出，依下列分類修正，再重跑因修正而失效的必要關卡；完整測試與 `release-check` 的安排依下方「驗證避免重複」規則。必要關卡通過就仍在原核准範圍內，直接重試合併，不需要再問。
   - 與 main 衝突（`gh pr view --json mergeStateStatus` 為 `DIRTY`）：在工作分支 `git merge origin/main`。版本檔（`package.json`、`package-lock.json`、`lib/version.mjs`、`spi-spc.html` 的 `#appVer`、`CHANGELOG.md`；`#appBuilt` 固定為預設值，由 build 注入）先採 main 的內容，再把本 PR 的版本改成 main 版本的下一號，保留本 PR 的 CHANGELOG 條目；依「驗證避免重複」完成受影響關卡後 push，再合併。
   - `--match-head-commit` 一律用 `gh pr view --json headRefOid` 的完整 40 碼 SHA（短 SHA 會被 GraphQL 拒絕）。
@@ -71,9 +77,10 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
 - **固定白底區塊要固定 token**：列印用的白紙（`.report-preview`）裡的行內 `var(--*)` 會跟著深色主題變深；在該範圍重新宣告明亮 token。圖例文字用一般字色，系列色只放在符號上。
   - 檢查：深色模式下報告頁文字對比 ≥ 4.5；`tests/mobile-layout.test.mjs` 測試 8d、8e。
   - 出處：v10.3.3（深色模式報告判定框對比 1.2）。
-- **使用者可見文案只用中文標題、不附英文譯名**：介面、報告預覽、PDF 與匯出標題中，「中文（English）」或「中文 (English)」只保留中文部分。無括號的專名、單位、標準號、檔名保留（例如 Cpk、DFM、SPI、CSV、Johnson、ISO 21747、µm）。不新增「怎麼看」或只重複標題的教學副標；計算結果列、空狀態、錯誤與會改變判讀的警示句保留。
-  - 檢查：`tests/ui-copy.test.mjs` 掃描 `spi-spc.html` 禁止 `Executive Summary`、`Closed-Loop Correction`、`<summary>怎麼看</summary>` 等禁用模式。
+- **使用者可見文案只用中文標題、不附英文譯名**：介面、報告預覽、PDF 與匯出標題中，「中文（English）」或「中文 (English)」只保留中文部分。無括號的專名、單位、標準號、檔名保留（例如 Cpk、DFM、SPI、CSV、Johnson、ISO 21747、µm）。不新增「怎麼看」或只重複標題的教學副標。畫面已能顯示正確結果時，仍刪掉拿掉後不改變判讀的靜態標籤：與所在頁籤同名的前綴、口號、把輸入框已寫的欄位再列一次、只寫對象稱謂的說明。計算結果列、空狀態、錯誤與會改變判讀的警示句保留。
+  - 檢查：`tests/ui-copy.test.mjs` 只擋已知禁用字串，通過仍要逐句看靜態標籤。拿掉後合格、數值、範圍或必做動作的判讀不變，就刪。
   - 契約：`docs/spec-ui-copy-rfc.md`。
+  - 出處：2026-11-11 介面精簡。vibe coding 成品在文案測試通過後仍留此類標籤。
 - **純文字節點嚴禁內嵌 HTML 標籤（Plain Text Integrity Guard）**：指派給 `.textContent` 的所有變數（如 `#ctrlSub.textContent` 管制圖副標、狀態摘要列等），其下游格式化函式與條件警告（`subgroupWarning`、`reason` 等）必須嚴格維持純文字字串，嚴禁包裝 `<span class="...">` 或 `<div ...>` 原始標籤以防 HTML 洩漏至畫面。
   - 檢查：`node --test tests/spi-audit-fixes.test.mjs` 管制圖小樣本副標測試通過。
   - 出處：v10.14.3（2026-11-09，X̄-S 管制圖副標 raw HTML 標籤外露）。

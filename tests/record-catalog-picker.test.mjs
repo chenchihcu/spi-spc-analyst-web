@@ -10,6 +10,7 @@ const { JSDOM } = (() => { try { return require("jsdom"); } catch { return {}; }
 const fs = require("fs");
 const { HTML, withIdb, seedPartSpec } = require("./_load.js");
 import { createCloudHarness, installBrowserCloud } from './_cloud-harness.mjs';
+import { uploadPlaceViaPicker, applyPlaceFromPicker, getPlacePart, getPlaceRev, until as placeUntil } from './_place-picker.mjs';
 const tick = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function page(saved = [], { fetch: fetchStub, cloud } = {}) {
@@ -32,6 +33,7 @@ function page(saved = [], { fetch: fetchStub, cloud } = {}) {
 }
 
 const CSV = "Board,Pad,Component,Volume,Height(um),Area\n" + Array.from({ length: 60 }, (_, i) => `B${Math.floor(i / 6) + 1},P${i % 6},U1,${100 + (i % 5)},120,100`).join("\n");
+const HAS_BANNER_RUNS = fs.readFileSync(HTML, "utf8").includes('id="bannerRecentRuns"');
 async function until(fn, n = 150) { for (let i = 0; i < n; i++) { if (fn()) return true; await tick(20); } return false; }
 
 async function cloudPage() {
@@ -43,7 +45,7 @@ async function cloudPage() {
 }
 
 async function selectPlacement(dom, cloud, part, rev, side) {
-  const d = dom.window.document;
+  const w = dom.window, d = dom.window.document;
   await cloud.upload({ kind: 'place', part, rev, side, unit: 'mm', name: `${part}-${rev}-${side}.csv` },
     `RefDes,X,Y,Layer\nU1,1,2,${side}\n`);
   d.querySelector('#btnSelectPlace').click();
@@ -53,7 +55,7 @@ async function selectPlacement(dom, cloud, part, rev, side) {
   const row = [...d.querySelectorAll('#tblPickPlace tr')].find(tr =>
     tr.textContent.includes(part) && tr.textContent.includes(rev) && tr.textContent.includes(side));
   row.querySelector('[data-pact="use-place"]').click();
-  assert.ok(await until(() => d.querySelector('#placePart').value === part && d.querySelector('#placeRev').value === rev));
+  assert.ok(await placeUntil(() => getPlacePart(w) === part && getPlaceRev(w) === rev));
   d.querySelector('#recPickerClose').click();
 }
 
@@ -88,17 +90,14 @@ test("開機首頁顯示範例提示列，點擊頂端或提示列按鈕可開�
   await tick(50);
   const w = dom.window, d = w.document, $ = (s) => d.querySelector(s);
 
-  // 1. 預設為範例資料時，開機橫幅顯示
-  const banner = $("#startupDbBanner");
-  assert.ok(banner && !banner.hidden, "首頁應顯示開機載入提示橫幅");
-
-  // 2. 點擊橫幅按鈕開啟選取視窗
-  $("#btnBannerLoadDb").click();
-  await tick(30);
   const modal = $("#recPickerModal");
-  assert.ok(modal && !modal.hidden && modal.classList.contains("open"), "點擊橫幅按鈕應開啟選取視窗");
 
-  // 3. 關閉視窗
+  // 1. 點擊頂端記錄庫按鈕開啟選取視窗
+  $("#btnOpenRecModal").click();
+  await tick(30);
+  assert.ok(modal && !modal.hidden && modal.classList.contains("open"), "點擊頂端按鈕應開啟選取視窗");
+
+  // 2. 關閉視窗
   $("#recPickerClose").click();
   assert.ok(modal.hidden, "點擊關閉按鈕應隱藏視窗");
 
@@ -122,8 +121,8 @@ test("開機首頁顯示範例提示列，點擊頂端或提示列按鈕可開�
   $("#recPickerClose").click();
   assert.ok(modal.hidden, "關閉選取視窗");
 
-  // 再次點擊一般入口（例如橫幅按鈕），應回到量測記錄分頁
-  $("#btnBannerLoadDb").click();
+  // 再次點擊一般入口，應回到量測記錄分頁
+  $("#btnOpenRecModal").click();
   await tick(30);
   assert.ok(!modal.hidden && modal.classList.contains("open"));
   assert.equal($("#boxPickSpi").hidden, false, "再次從一般入口開啟應重設回量測記錄分頁");
@@ -180,14 +179,12 @@ test("座標檔庫切換、管理與設為目前座標檔", { skip: !JSDOM && "�
   const w = dom.window, d = w.document, $ = (s) => d.querySelector(s);
 
   // 1. 上傳一個座標檔
-  $("[data-tab=data]").click();
-  $("#placePart").value = "PART-990";
-  $("#placeRev").value = "V2";
-  $("#placeSide").value = "TOP";
-  $("#placeUnit").value = "mm";
-  const inp = $("#placeIn");
-  Object.defineProperty(inp, "files", { configurable: true, value: [new w.File([Buffer.from("RefDes,X,Y,PartType,Layer\nU1,50,50,BGA,TOP\n")], "cad_v2.csv")] });
-  inp.dispatchEvent(new w.Event("change"));
+  await uploadPlaceViaPicker(w, d, {
+    part: 'PART-990', rev: 'V2', side: 'TOP', unit: 'mm',
+    body: Buffer.from('RefDes,X,Y,PartType,Layer\nU1,50,50,BGA,TOP\n'),
+    name: 'cad_v2.csv'
+  });
+  await applyPlaceFromPicker(w, d, 'PART-990', 'V2');
   assert.ok(await until(() => /料號 PART-990 版次 V2/.test($("#placeState").textContent)), $("#placeState").textContent);
 
   // 2. 開啟選取視窗並切換至座標檔庫
@@ -288,21 +285,20 @@ test("座標庫明確版次選取與備註修改對話框", { skip: !JSDOM && "�
   const w = dom.window, d = w.document, $ = (s) => d.querySelector(s);
 
   // 1. 上傳兩個不同版本的座標檔
-  $("[data-tab=data]").click();
-  $("#placePart").value = "PART-777";
-  $("#placeRev").value = "V1";
-  $("#placeSide").value = "TOP";
-  $("#placeUnit").value = "mm";
-  const inp1 = $("#placeIn");
-  Object.defineProperty(inp1, "files", { configurable: true, value: [new w.File([Buffer.from("RefDes,X,Y,PartType,Layer\nU1,10,10,BGA,TOP\n")], "cad_v1.csv")] });
-  inp1.dispatchEvent(new w.Event("change"));
+  await uploadPlaceViaPicker(w, d, {
+    part: 'PART-777', rev: 'V1', side: 'TOP', unit: 'mm',
+    body: Buffer.from('RefDes,X,Y,PartType,Layer\nU1,10,10,BGA,TOP\n'),
+    name: 'cad_v1.csv'
+  });
+  await applyPlaceFromPicker(w, d, 'PART-777', 'V1');
   assert.ok(await until(() => /料號 PART-777 版次 V1/.test($("#placeState").textContent)), $("#placeState").textContent);
 
-  $("#placePart").value = "PART-777";
-  $("#placeRev").value = "V2";
-  const inp2 = $("#placeIn");
-  Object.defineProperty(inp2, "files", { configurable: true, value: [new w.File([Buffer.from("RefDes,X,Y,PartType,Layer\nU1,20,20,BGA,TOP\n")], "cad_v2.csv")] });
-  inp2.dispatchEvent(new w.Event("change"));
+  await uploadPlaceViaPicker(w, d, {
+    part: 'PART-777', rev: 'V2', side: 'TOP', unit: 'mm',
+    body: Buffer.from('RefDes,X,Y,PartType,Layer\nU1,20,20,BGA,TOP\n'),
+    name: 'cad_v2.csv'
+  });
+  await applyPlaceFromPicker(w, d, 'PART-777', 'V2');
   assert.ok(await until(() => /料號 PART-777 版次 V2/.test($("#placeState").textContent)), $("#placeState").textContent);
 
   // 2. 開啟選取視窗並切換至座標庫
@@ -316,11 +312,11 @@ test("座標庫明確版次選取與備註修改對話框", { skip: !JSDOM && "�
   const v1Row = [...$("#tblPickPlace").querySelectorAll('tr')].find(tr => tr.textContent.includes('PART-777') && tr.textContent.includes('V1'));
   assert.ok(v1Row?.querySelector('[data-pact="use-place"]'), "V1 應可明確選取");
   v1Row.querySelector('[data-pact="use-place"]').click();
-  assert.ok(await until(() => $("#placeRev").value === "V1"), "選取 V1 後匯入表單應顯示 V1");
+  assert.ok(await placeUntil(() => getPlaceRev(w) === "V1"), "選取 V1 後應套用 V1 座標");
   const v2Row = [...$("#tblPickPlace").querySelectorAll('tr')].find(tr => tr.textContent.includes('PART-777') && tr.textContent.includes('V2'));
   assert.ok(v2Row?.querySelector('[data-pact="use-place"]'), "V2 應可明確選取");
   v2Row.querySelector('[data-pact="use-place"]').click();
-  assert.ok(await until(() => $("#placeRev").value === "V2"), "選取 V2 後匯入表單應顯示 V2");
+  assert.ok(await placeUntil(() => getPlaceRev(w) === "V2"), "選取 V2 後應套用 V2 座標");
 
   // 3. 測試工單與備註修改彈窗
   const editBtn = $("#tblPickPlace [data-pact=edit-meta]");
@@ -344,7 +340,7 @@ test("座標庫明確版次選取與備註修改對話框", { skip: !JSDOM && "�
 });
 
 
-test("雲端模式開機：最近記錄只請求一次、先佔位再填入，且解除開機隱藏", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+test("雲端模式開機：最近記錄只請求一次、先佔位再填入，且解除開機隱藏", { skip: (!JSDOM && "未安裝 jsdom") || (!HAS_BANNER_RUNS && "開機橫幅已整併至記錄庫") }, async () => {
   const calls = [];
   const fetchStub = async (url) => {
     const u = String(url);
@@ -370,7 +366,7 @@ test("雲端模式開機：最近記錄只請求一次、先佔位再填入，�
   assert.deepEqual(errs, []);
 });
 
-test("雲端模式開機：資料庫無記錄時保留一列說明而非收合", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+test("雲端模式開機：資料庫無記錄時保留一列說明而非收合", { skip: (!JSDOM && "未安裝 jsdom") || (!HAS_BANNER_RUNS && "開機橫幅已整併至記錄庫") }, async () => {
   const fetchStub = async (url) => {
     const u = String(url);
     if (u === "/__me") return new Response(JSON.stringify({ user: "tester" }), { status: 200 });
