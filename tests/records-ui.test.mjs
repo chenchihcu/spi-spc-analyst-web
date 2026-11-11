@@ -191,7 +191,7 @@ test("受控欄位必填；存入後才建立回合，回合帶來源資訊；�
   assert.deepEqual(errs, []);
 });
 
-test("重複檔沿用既有紀錄；從資料庫開啟不重複存；受控原始檔不可刪且稽核保留", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+test("重複檔沿用既有紀錄；從資料庫開啟不重複存；管理者可刪量測且稽核保留", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const { dom, errs, cloud } = await cloudPage();
   await tick(50);
   const w = dom.window, d = w.document, $ = (s) => d.querySelector(s);
@@ -217,14 +217,19 @@ test("重複檔沿用既有紀錄；從資料庫開啟不重複存；受控原�
   $("#btnApply").click();
   assert.ok(await until(() => w.eval("S.runs.length") === 5));
   assert.equal((await w.eval("SPI_TEST_HOOK.RecDB.list()")).filter(r => r.kind === 'spi').length, 1, "開啟後套用不新增紀錄");
-  assert.equal($("#tblPickSpi [data-pact=del]"), null, "正式量測原始檔沒有刪除鈕");
-  await assert.rejects(w.eval(`SPI_TEST_HOOK.RecDB.del(${JSON.stringify(recs.find(r => r.kind === 'spi').id)})`), /原始檔須保留/);
-  assert.equal((await w.eval("SPI_TEST_HOOK.RecDB.list()")).filter(r => r.kind === 'spi').length, 1, "拒絕刪除後仍可讀取");
+  assert.ok(d.querySelector('#tblPickSpi [data-pact=del]'), "管理者可見刪除鈕");
+  const spiId = recs.find(r => r.kind === "spi").id;
+  $('#tblPickSpi [data-pact=del]').click();
+  assert.ok(await until(() => !$("#recDeleteModal").hidden));
+  $("#recDeleteConfirm").click();
+  assert.ok(await until(() => $("#recDeleteModal").hidden));
+  assert.equal((await w.eval("SPI_TEST_HOOK.RecDB.list()")).filter(r => r.kind === "spi").length, 0);
+  assert.match($("#stateSpi").textContent, /雲端檔已刪除/);
   openPickerTab(d, 'specs');
   $("#recAuditBox").open = true; $("#recAuditBox").dispatchEvent(new w.Event("toggle"));
   assert.ok(await until(() => /新增/.test($("#recAudit").textContent)));
   const audit = $("#recAudit").textContent;
-  assert.match(audit, /L1/); assert.doesNotMatch(audit, /刪除/);
+  assert.match(audit, /L1/); assert.match(audit, /刪除/);
   assert.deepEqual(errs, []);
 });
 

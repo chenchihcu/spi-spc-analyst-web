@@ -93,7 +93,8 @@ test('measurement fingerprint ignores work-order changes; related different file
   assert.equal((await repo.judgeMeasurement(id(11), 'correct', id(10), 'admin@example.com')).ok, true);
   assert.equal((await repo.getRecord(id(10))).lifecycle, 'superseded');
   assert.equal((await repo.getRecord(id(11))).lifecycle, 'active');
-  assert.equal((await repo.deleteRecord(id(10), 'admin@example.com')).status, 409);
+  assert.equal((await repo.deleteRecord(id(10), 'admin@example.com')).ok, true);
+  assert.equal(await repo.getRecord(id(10)), null);
   const another = { ...spi(12, 'sha-c', 'WO-1'), lifecycle: 'pending_review' };
   await repo.createRecord(another, new Uint8Array([12]));
   assert.equal((await repo.judgeMeasurement(id(12), 'correct', id(10), 'admin@example.com')).status, 409);
@@ -285,4 +286,19 @@ test('重新受控匯入：原檔指紋必須等於舊紀錄，舊紀錄保留�
   assert.deepEqual([after.validation_source, after.lifecycle, after.place_id || ''], ['legacy', 'legacy', '']);
   assert.deepEqual((await (await linkCheck(legacy.id)).json()).reimportedAs.map(r => r.id), [rec.id]);
   assert.equal((await (await linkCheck(rec.id)).json()).refs.matched, 1);
+});
+
+test('管理者硬刪 place 釋放占用、spi 的 place_id 不變', async () => {
+  const db = database(), r2 = bucket(), repo = new Repo(db, r2);
+  await repo.bootstrapAdmin('admin@example.com', true, 1);
+  await repo.createRecord(place(1), new Uint8Array([1]));
+  await repo.createRecord(spi(10, 'sha-a', 'WO-1'), new Uint8Array([10]));
+  assert.equal((await repo.coordinateScope('P', 'V5', 'TOP')).id, id(1));
+  assert.equal((await repo.deleteRecord(id(1), 'admin@example.com')).ok, true);
+  assert.equal(await repo.coordinateScope('P', 'V5', 'TOP'), null);
+  const spiRow = await repo.getRecord(id(10));
+  assert.equal(spiRow.place_id || spiRow.placeId, id(1));
+  assert.equal((await repo.deleteRecord(id(10), 'admin@example.com')).ok, true);
+  assert.equal(await repo.getRecord(id(10)), null);
+  assert.equal(r2.objects.has(`records/${id(10)}`), false);
 });
