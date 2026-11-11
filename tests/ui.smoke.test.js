@@ -41,10 +41,16 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   assert.equal(d.characterSet, "UTF-8", "文件字元編碼需為 UTF-8 (D-01)");
   const vp = d.querySelector('meta[name="viewport"]');
   assert.ok(vp && vp.content.includes("width=device-width") && vp.content.includes("viewport-fit=cover"), "需含正確的 viewport meta (D-01)");
-  assert.ok(d.querySelectorAll(".iss-card").length > 0, "首頁應列出問題");
+  assert.equal(d.querySelectorAll(".iss-card").length, 0, "首頁先呈現零件位置");
+  assert.match($("#pmap").textContent, /這批沒有座標/);
+  assert.equal($("#pmap svg"), null);
+  assert.ok($("#pmap [data-part]"));
+  $("#pmap [data-part]").click();
+  assert.ok($(".part-map-detail"));
+  assert.equal(d.querySelectorAll(".iss-card").length, 0, "點零件只開短卡");
+  $("#pmapClear").click();
 
   // 以「抓出問題」為目的的介面要素：問題地圖、證據迷你圖、嚴重度分段、來源提示
-  assert.ok(d.querySelectorAll("#pmap [data-ent]").length >= 25, "問題地圖應有每片板的格子");
   assert.ok(d.querySelectorAll(".iss-card svg.ev").length === d.querySelectorAll(".iss-card").length, "每個問題卡片都應有證據迷你圖");
   assert.ok(d.querySelectorAll("#issList .iss-case").length >= 1, "預設應依問題定義分組");
   const rulesBtn = d.querySelector('#issFilter [data-group="rules"]');
@@ -84,17 +90,19 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   change($("#selRun"), "2"); tab("issues");
   assert.equal(d.querySelectorAll("#issList details.iss-card[open]").length, 0, "換回合後全部收合");
   change($("#selRun"), "1"); tab("issues");
-  d.querySelector('#pmap [data-ent="b:B13"]').click();
   const hook = w.SPI_TEST_HOOK;
-  const relatedIssues = hook.issueList();
-  const boardOrder = [...new Set(hook.S.rows.map(r => r.board))];
-  const concernsBoard = issue => issue.ents.some(ent => ent === "b:B13"
-    || (ent.startsWith("drift:") && boardOrder.indexOf("B13") >= boardOrder.indexOf(ent.slice(6))));
-  assert.ok(relatedIssues.length >= 1, "選板後仍應有與 B13 相關的問題");
-  assert.ok(relatedIssues.every(concernsBoard), "選板後問題清單的每張卡都應涵蓋 B13");
-  const filteredIds = new Set(relatedIssues.map(issue => `iss-${issue.id}`));
-  assert.ok([...d.querySelectorAll("#issList .iss-card")].every(card => filteredIds.has(card.id)), "畫面不得顯示未通過 B13 關聯篩選的問題卡");
-  d.querySelector("#pmapClear").click();
+  assert.equal(hook.S.pmapSelection.mode, "overview");
+  const before = hook.issuesCsv(hook.S.F);
+  const batch = $("#pmap [data-mode=batch]");
+  assert.ok(!batch.disabled);
+  batch.click();
+  const related = hook.issueList();
+  assert.ok(related.length > 0);
+  const filteredIds = new Set(related.map(card => "iss-" + card.id));
+  assert.ok([...d.querySelectorAll("#issList .iss-card")].every(card => filteredIds.has(card.id)));
+  assert.equal(hook.issuesCsv(hook.S.F), before);
+  $("#pmapClear").click();
+  assert.equal(hook.issueList().length, hook.S.F.length);
   d.querySelector("#issList [data-go]").click();
   assert.equal($("#ctxBar").hidden, false, "前往證據頁時應顯示來源提示");
   $("#ctxBack").click();

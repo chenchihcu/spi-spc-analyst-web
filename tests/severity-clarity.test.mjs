@@ -29,28 +29,31 @@ function page(cloud) {
   return { dom, errs };
 }
 
-test("問題地圖：跨板彙總卡只依該板命中的子項上色，點格篩選仍列出彙總卡", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+test("問題地圖以同板個別焊墊的等級上色，篩選仍顯示原卡", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const { dom, errs } = page();
-  await tick(100);
   const w = dom.window, d = w.document;
-  for (let i = 0; i < 100 && !w.eval(`(S.F||[]).some(x=>x.cat==="孤立極端焊墊"&&x.lv==="ng")`); i++) await tick(20);
-  // 範例資料的嚴重孤立極端焊墊卡：把其中一片板的子項改成警示，其餘子項仍為嚴重，地圖只留這張卡
-  const pick = JSON.parse(w.eval(`(()=>{const x=S.F.find(x=>x.cat==="孤立極端焊墊"&&x.lv==="ng"&&new Set(x.sig.rows.map(c=>c.r.board)).size>=3);
-    const bs=[...new Set(x.sig.rows.map(c=>c.r.board))],wb=bs[1];x.sig.rows.forEach(c=>{if(c.r.board===wb)c.lv="warn"});x.corrob=[];x.same_phenomenon=[];S.F=[x];
-    return JSON.stringify({id:x.id,ng:bs[0],wb,none:[...new Set(S.rows.map(r=>r.board))].find(b=>!bs.includes(b))})})()`));
-  w.eval(`${H}.setTab("issues")`);
-  await tick(60);
-  const cell = (b) => d.querySelector(`#pmap [data-ent="b:${b}"]`);
-  assert.equal(cell(pick.ng).className, "ng", "有嚴重子項的板為嚴重");
-  assert.equal(cell(pick.wb).className, "warn", "只命中警示子項的板不被彙總卡染成嚴重");
-  assert.equal(cell(pick.none).className, "", "彙總卡沒碰到的板無色");
-  assert.match(cell(pick.wb).title, /1 項相關問題，本板最高：警示（其中 1 張為跨板彙總卡，依本板命中的焊墊判定等級）/);
-  assert.match(cell(pick.ng).title, /本板最高：嚴重/);
-  cell(pick.wb).click();
-  await tick(30);
-  assert.equal(w.eval("S.issEnt"), "b:" + pick.wb);
-  assert.deepEqual(JSON.parse(w.eval(`JSON.stringify(${H}.issueList().map(x=>x.id))`)), [pick.id], "點警示板仍篩出該彙總卡");
-  assert.deepEqual(errs, []);
+  const h = w.SPI_TEST_HOOK;
+  for (let i = 0; i < 100 && !h.S.F.length; i++) await tick(20);
+  const f = h.S.F.find(x => x.sig.t === "iso");
+  assert.ok(f);
+  const a={board:"B01",comp:"U1",pad:"U1-A",group:"g",componentX:0,componentY:0};
+  const b={...a,comp:"U2",pad:"U2-A",componentX:4};
+  const c={...a,comp:"U3",pad:"U3-A",componentX:0};
+  h.S.rows=[a,b,c];
+  h.S.F=[{...f,lv:"ng",corrob:[],same_phenomenon:[],sig:{t:"iso",rows:[{r:a,lv:"ng"},{r:b,lv:"warn"}]}}];
+  h.S.F.meta={cases:[{id:1,card_ids:[f.id],lv:"ng",title:"原案"}]};
+  h.renderIssues();
+  const point = i => d.querySelector("[data-point=\x27"+i+"\x27]");
+  assert.ok(point(0).classList.contains("ng"));
+  assert.ok(point(1).classList.contains("warn"));
+  assert.ok(point(2).classList.contains("none"));
+  assert.equal(point(2).querySelector("circle").getAttribute("cx"),point(0).querySelector("circle").getAttribute("cx"));
+  assert.equal(point(2).compareDocumentPosition(point(0)) & w.Node.DOCUMENT_POSITION_FOLLOWING,w.Node.DOCUMENT_POSITION_FOLLOWING,"重疊時嚴重點繪於灰點上層");
+  point(1).dispatchEvent(new w.KeyboardEvent("keydown",{key:"Enter",bubbles:true}));
+  d.querySelector("[data-pad]").click();
+  assert.deepEqual(Array.from(h.issueList(),x=>x.id),[f.id]);
+  assert.ok(d.querySelector("#iss-"+f.id));
+  assert.deepEqual(errs,[]);
 });
 
 test("孤立極端焊墊卡：嚴重子項排在警示子項前面（即使警示子項 |z| 較大）", () => {

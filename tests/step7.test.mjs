@@ -215,11 +215,11 @@ test('步驟 7 (D-07 & 第 7 節): 11 組視口矩陣 data-layout 判定與 CSS 
     /\.mtab\s*\{[^}]*padding:\s*0\s+var\(--safe-r\)\s+var\(--safe-b\)\s+var\(--safe-l\)/i,
     '.mtab 需有橫向安全區 padding: 0 var(--safe-r) var(--safe-b) var(--safe-l)'
   );
-  // 首屏問題偵測頁 #issList (order:3) 排在 .card (#issSum, order:4) 之前，使首張問題卡標題在 430x932 與 932x430 首屏可見
+  // 行動版先呈現問題地圖，再呈現選取後的證據清單。
   assert.match(
     htmlSource,
-    /#p-issues\s*>\s*#issList\s*\{[^}]*order:\s*3[\s\S]*?#p-issues\s*>\s*\.card\s*\{[^}]*order:\s*4/i,
-    '手機版 #p-issues > #issList 應排在 .card 摘要卡之前，使首張問題卡標題首屏可見'
+    /#p-issues>#pmapDetails,#p-issues>#fmLine\{order:2\}[\s\S]*?#p-issues>#issList\{order:3\}/,
+    '手機版問題地圖應排在證據清單之前'
   );
   // 無彈窗：.sheet-backdrop 隱藏，.modal-sheet 為全頁檢視
   assert.match(

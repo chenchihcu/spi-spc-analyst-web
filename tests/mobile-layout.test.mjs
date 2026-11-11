@@ -110,10 +110,6 @@ test('3. 主頁 Head Meta 與 CSS Tokens (spi-spc.html)', () => {
   assert.doesNotMatch(htmlSource, /html\s*\{[^}]*overflow-x:\s*hidden/i, '不可在 html 使用 overflow-x:hidden');
 });
 
-test('問題地圖的手機網格依列自動排版，避免多板格形成隱式欄而撐寬頁面', () => {
-  assert.match(htmlSource, /\.pmap-cells\.pmap-boards\{[^}]*grid-auto-flow:\s*row/i);
-});
-
 test('4. 行動版 DOM 結構與分頁控制 (JSDOM 驗證)', { skip: !JSDOM && '未安裝 jsdom' }, async () => {
   const dom = new JSDOM(htmlSource.replace(/<script src=[^>]+><\/script>/g, ''), {
     runScripts: 'dangerously',
@@ -206,12 +202,8 @@ test('5. 觸控修正與無障礙樣式規範 (CSS 規則檢驗)', () => {
   // b. .subtab segmented 樣式 (44px)
   assert.match(htmlSource, /\.subtab\{[^}]*min-height:\s*44px/i, '.subtab 需有 min-height: 44px');
 
-  // c. 問題地圖：群組格高 44（橫捲）；板號格在觸控與 ≤720px 時為 44×44 並自動換行（v10.4.2 由 28×44 放大，IOS-04）
-  assert.match(htmlSource, /\.pmap-cells\s+button\{[^}]*min-height:\s*44px/i, '問題地圖格子高度需 ≥ 44px');
-  assert.match(htmlSource, /class="pmap-cells pmap-boards"/, '板號列需有 pmap-boards');
-  const boardRules = htmlSource.match(/\.pmap-boards button\{[^}]*\}/g) || [];
-  assert.ok(boardRules.length >= 2 && boardRules.every((r) => /min-width:\s*44px/.test(r)), '板號格在觸控與 ≤720px 需 min-width 44px');
-  assert.match(htmlSource, /\.pmap-cells\.pmap-boards\{[^}]*grid-template-columns:repeat\(auto-fill,minmax\(44px,1fr\)\)/, '板號格需自動換行');
+  // c. 地圖操作與列式入口都保留 44px 觸控熱區。
+  assert.match(htmlSource, /\.pmap button\{[^}]*min-height:44px;min-width:44px/);
 
   // d. 表格與浮動元件避讓
   assert.match(htmlSource, /#toTop,#toast\{[^}]*bottom:\s*calc\(var\(--tabbar-h\)\s*\+\s*var\(--safe-b\)\s*\+\s*12px\)/i, '#toTop 與 #toast 需避讓底欄');
@@ -395,17 +387,13 @@ test('9. 版面回歸：code review（v10.3.3）找到的問題', () => {
   }
 });
 
-test('10. 問題地圖列限制在容器內', () => {
-  const groupRule = htmlSource.match(/\.pmap-cells\.pmap-groups\{[^}]*\}/)?.[0];
-  assert.ok(groupRule, '元件群組需有獨立格線規則');
-  assert.match(groupRule, /grid-auto-flow:\s*row/, '桌機與平板元件群組需逐列填入格線');
-  assert.match(groupRule, /grid-template-columns:\s*repeat\(auto-fill,minmax\(44px,1fr\)\)/, '元件群組欄數需依容器寬度換行');
-  assert.match(htmlSource, /class="pmap-cells pmap-groups"/, '元件群組需套用獨立格線樣式');
-
-  const mobileRules = htmlSource.match(/@media \(max-width:720px\)\{\r?\n([\s\S]*?)\r?\n\}/)?.[1];
-  assert.ok(mobileRules, '需有可定位的窄螢幕問題地圖規則');
-  assert.match(mobileRules, /\.pmap-cells\.pmap-boards\{[^}]*grid-auto-flow:\s*row/, '窄螢幕各板格需逐列換行，避免撐開頁面');
-  assert.match(mobileRules, /\.pmap-cells\.pmap-groups\{[^}]*display:flex;[^}]*overflow-x:auto/, '窄螢幕元件群組需保留容器內橫向捲動');
+test("10. 零件位置圖只在地圖容器內捲動", () => {
+  assert.match(htmlSource, /\.pmap\{[^}]*grid-template-columns:minmax\(0,1fr\)/);
+  assert.match(htmlSource, /\.part-map-plot\{[^}]*min-width:0;max-width:100%;overflow:auto/);
+  assert.match(htmlSource, /\.part-map-plot svg\{[^}]*width:640px;height:360px/);
+  assert.match(htmlSource, /\.part-map-nav\{[^}]*flex-wrap:wrap/);
+  assert.match(htmlSource, /\.iss\{[^}]*grid-template-columns:minmax\(0,1fr\)/);
+  assert.match(htmlSource, /\.deep-subviews,\.improve-subviews\{grid-template-columns:minmax\(0,1fr\)/);
 });
 
 test("已解析匯入預覽的 grid 欄不得由內容撐寬", () => {
