@@ -217,16 +217,19 @@ test("重複檔沿用既有紀錄；從資料庫開啟不重複存；管理者�
   $("#btnApply").click();
   assert.ok(await until(() => w.eval("S.runs.length") === 5));
   assert.equal((await w.eval("SPI_TEST_HOOK.RecDB.list()")).filter(r => r.kind === 'spi').length, 1, "開啟後套用不新增紀錄");
-  assert.ok($("#tblPickSpi [data-pact=del]"), "管理者應見刪除鈕");
-  const spiId = recs.find(r => r.kind === 'spi').id;
-  await w.eval(`SPI_TEST_HOOK.RecDB.del(${JSON.stringify(spiId)})`);
-  await w.eval("SPI_TEST_HOOK.RecDB.list()");
+  assert.ok(d.querySelector('#tblPickSpi [data-pact=del]'), "管理者可見刪除鈕");
+  const spiId = recs.find(r => r.kind === "spi").id;
+  $('#tblPickSpi [data-pact=del]').click();
+  assert.ok(await until(() => !$("#recDeleteModal").hidden));
+  $("#recDeleteConfirm").click();
+  assert.ok(await until(() => $("#recDeleteModal").hidden));
   assert.equal((await w.eval("SPI_TEST_HOOK.RecDB.list()")).filter(r => r.kind === "spi").length, 0);
+  assert.match($("#stateSpi").textContent, /雲端檔已刪除/);
   openPickerTab(d, 'specs');
   $("#recAuditBox").open = true; $("#recAuditBox").dispatchEvent(new w.Event("toggle"));
-  assert.ok(await until(() => /刪除/.test($("#recAudit").textContent)));
+  assert.ok(await until(() => /新增/.test($("#recAudit").textContent)));
   const audit = $("#recAudit").textContent;
-  assert.match(audit, /L1/);
+  assert.match(audit, /L1/); assert.match(audit, /刪除/);
   assert.deepEqual(errs, []);
 });
 

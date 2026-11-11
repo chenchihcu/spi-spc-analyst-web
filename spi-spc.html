@@ -1823,7 +1823,7 @@ button.load-state{border:none;font:inherit;cursor:default}
       </div>
     </div>
     <div class="sheet-foot" style="padding:10px 18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:var(--surface2);flex:0 0 auto">
-      <span class="note" style="font-size:var(--fs-caption);min-width:0">原始檔不可修改；管理者可刪除，刪除後稽核保留；「驗證」檢查指紋與座標對應</span>
+      <span class="note" style="font-size:var(--fs-caption);min-width:0">原始檔不可修改；「驗證」檢查指紋與座標對應。管理者可刪除量測與座標檔，刪除會寫入稽核紀錄。</span>
       <div style="display:flex;gap:8px;flex:none">
         <button type="button" id="btnRecPickerGoImport" style="font-size:var(--fs-body)">＋ 匯入新檔</button>
         <button type="button" id="btnRecPickerCloseBottom" class="primary" style="font-size:var(--fs-body)">完成</button>
@@ -2144,6 +2144,23 @@ button.load-state{border:none;font:inherit;cursor:default}
     <div class="sheet-foot sheet-foot--db sheet-foot--db-end">
       <button type="button" class="primary" id="recEditSave">儲存更新</button>
       <button type="button" id="recEditCancel">取消</button>
+    </div>
+  </div>
+</div>
+<!-- 記錄庫：刪除量測／座標確認 -->
+<div class="db-modal" id="recDeleteModal" role="dialog" aria-modal="true" aria-label="刪除紀錄確認" hidden>
+  <div class="db-modal-panel db-modal-panel--sm">
+    <div class="sheet-head sheet-head--db">
+      <h3 class="modal-h3" id="recDeleteTitle">刪除紀錄</h3>
+      <button type="button" class="sheet-close" id="recDeleteClose" aria-label="關閉">✕</button>
+    </div>
+    <div class="modal-body-stack">
+      <div id="recDeleteBody" class="note" style="white-space:pre-wrap;max-width:40rem"></div>
+      <div id="recDeleteState" class="note" style="min-height:16px"></div>
+    </div>
+    <div class="sheet-foot sheet-foot--db sheet-foot--db-end">
+      <button type="button" class="primary" id="recDeleteConfirm">刪除</button>
+      <button type="button" id="recDeleteCancel">取消</button>
     </div>
   </div>
 </div>
@@ -11738,11 +11755,9 @@ async function downloadDeliverablesQueue(types) {
 }
 
 let PICKER_TAB = "spi";
-let PICKER_CONFIRM = null;
-let PICKER_CONFIRM_FORCE = null;
 let PICKER_SIDE_FILTER = "";
 let PICKER_QUALITY_FILTER = "all";
-let EDITING_REC_ID = null;
+let EDITING_REC_ID = null, DELETING_REC_ID = null;
 let UP_PLACE_FILE_OBJ = null, UP_PLACE_SOURCE_ID = null;
 
 /* ---------- 量測記錄與座標檔的對應證明（RFC-SPI-PROOF-20261028） ---------- */
@@ -11917,6 +11932,78 @@ async function showPlaceProof(rec) {
       : '<p class="note" style="margin:0">尚無量測引用</p>');
   renderRecPicker(); renderRecords();
 }
+function buildRecDeleteText(rec) {
+  const lines = [`檔名：${rec.name || "—"}`];
+  if (rec.kind === "spi") {
+    lines.push(`料號 ${rec.part} · 版次 ${rec.rev || "—"} · 批號 ${rec.lot || "—"} · 面別 ${rec.side || "—"}`);
+  } else {
+    lines.push(`料號 ${rec.part} · 版次 ${rec.rev || "—"} · 面別 ${rec.side === "BOTH" ? "TOP＋BOT" : rec.side || "—"}`);
+    if (Array.isArray(RecDB.cache)) {
+      const n = RecDB.cache.filter(x => x.kind === "spi" && (x.placeId || x.place_id) === rec.id).length;
+      lines.push(`目前有 ${n} 筆量測引用此座標檔（清單已載入範圍內）`);
+    } else {
+      lines.push("無法計算引用筆數");
+    }
+  }
+  const cur = curRun(), src = runSrc(cur);
+  if (rec.kind === "spi" && src && src.id === rec.id) lines.push("此檔為目前分析所用的量測紀錄。");
+  if (rec.kind === "place" && (PLACE?.recId === rec.id || cur?.info?.placePreview?.recId === rec.id)) {
+    lines.push("此檔為目前已選取或檢視中的座標檔。");
+  }
+  lines.push("刪除後雲端原檔無法復原。稽核紀錄會保留。");
+  return lines.join("\n");
+}
+function applyAfterRecordDeleted(rec) {
+  for (const run of S.runs || []) {
+    const src = runSrc(run);
+    if (src && src.id === rec.id && rec.kind === "spi") {
+      src.lifecycle = "unavailable";
+      if (run.id === S.runId) LOAD_ERROR.spi = "雲端檔已刪除";
+    }
+    if (run.info?.placePreview?.recId === rec.id) delete run.info.placePreview;
+  }
+  if (rec.kind === "place") {
+    if (PLACE?.recId === rec.id) {
+      PLACE = null;
+      placeSave();
+      placeShow();
+      LOAD_ERROR.place = "雲端檔已刪除";
+    } else if (curRun()?.info?.placePreview?.recId === rec.id) {
+      LOAD_ERROR.place = "雲端檔已刪除";
+    }
+  }
+  delete REC_VER[rec.id];
+  saveRunsSoon();
+  updateLoadStates();
+  renderRuns();
+  syncPlaceToCurrentRun({ notify: false });
+}
+function openRecDeleteModal(rec) {
+  const m = $("#recDeleteModal");
+  if (!m) return;
+  DELETING_REC_ID = rec.id;
+  if ($("#recDeleteTitle")) {
+    $("#recDeleteTitle").textContent = rec.kind === "spi" ? "刪除量測紀錄" : "刪除座標檔";
+  }
+  if ($("#recDeleteBody")) $("#recDeleteBody").textContent = buildRecDeleteText(rec);
+  if ($("#recDeleteState")) $("#recDeleteState").textContent = "";
+  const confirm = $("#recDeleteConfirm"), cancel = $("#recDeleteCancel"), closeBtn = $("#recDeleteClose");
+  if (confirm) { confirm.disabled = false; confirm.textContent = "刪除"; }
+  if (cancel) cancel.disabled = false;
+  if (closeBtn) closeBtn.disabled = false;
+  m.hidden = false;
+  if (confirm) confirm.focus();
+}
+function closeRecDeleteModal() {
+  const m = $("#recDeleteModal");
+  if (m) m.hidden = true;
+  DELETING_REC_ID = null;
+  if ($("#recDeleteState")) $("#recDeleteState").textContent = "";
+  const confirm = $("#recDeleteConfirm"), cancel = $("#recDeleteCancel"), closeBtn = $("#recDeleteClose");
+  if (confirm) { confirm.disabled = false; confirm.textContent = "刪除"; }
+  if (cancel) cancel.disabled = false;
+  if (closeBtn) closeBtn.disabled = false;
+}
 function resetPickerFilters() {
   PICKER_SIDE_FILTER = ""; PICKER_QUALITY_FILTER = "all";
   for (const [sel, attr, val] of [["#pickSideSeg", "side", ""], ["#pickQualitySeg", "qfilter", "all"]])
@@ -12006,21 +12093,8 @@ async function renderRecPicker(force) {
 
   const fp = r => { const v = REC_VER[r.id];
     return `<span class="mono" title="SHA-256 ${esc(r.sha256)}">${esc(String(r.sha256).slice(0, 10))}…</span>${v ? `<br><span class="${v.ok ? "rec-ok" : "rec-bad"}">原檔 ${v.ok ? "✓ 相同" : "✗ 異常"}</span>${v.verdict ? `・<span class="${v.verdict === "ok" ? "rec-ok" : v.verdict === "none" ? "note" : "rec-bad"}">對應 ${PROOF_MARK[v.verdict]}</span>` : ""}` : ""}`; };
-  const spiRefsForPlace = placeId => (list || []).filter(x => x.kind === "spi" && x.placeId === placeId);
-  const delBtn = r => {
-    if (!RecDB.isAdmin || (r.kind !== "spi" && r.kind !== "place")) return "";
-    const refs = r.kind === "place" ? spiRefsForPlace(r.id) : [];
-    const confirming = PICKER_CONFIRM === r.id;
-    if (!confirming) {
-      return `<button type="button" class="btn-sm" data-pact="del" data-id="${esc(r.id)}" title="永久刪除原檔">刪除</button>`;
-    }
-    if (r.kind === "place" && refs.length && PICKER_CONFIRM_FORCE !== r.id) {
-      const lines = refs.slice(0, 10).map(x => `${esc(x.lot || "未提供批號")}・${esc(x.workOrder || x.measuredDate || "—")}・${esc(x.name || "")}`);
-      const more = refs.length > 10 ? `<br><span class="note">另 ${refs.length - 10} 筆</span>` : "";
-      return `<div class="del-confirm" style="margin-top:6px;text-align:left;max-width:20rem;margin-left:auto"><span class="rec-bad" style="font-size:var(--fs-caption)">仍有 ${refs.length} 筆量測引用此座標</span><div class="note" style="font-size:var(--fs-caption);margin:4px 0">${lines.join("<br>")}${more}</div><div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-top:6px"><button type="button" class="btn-sm primary" data-pact="del-confirm" data-id="${esc(r.id)}" style="min-height:44px">仍要刪除</button><button type="button" class="btn-sm" data-pact="del-cancel" data-id="${esc(r.id)}" style="min-height:44px">取消</button></div></div>`;
-    }
-    return `<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end"><button type="button" class="btn-sm primary" data-pact="del" data-id="${esc(r.id)}" style="min-height:44px">確認刪除</button><button type="button" class="btn-sm" data-pact="del-cancel" data-id="${esc(r.id)}" style="min-height:44px">取消</button></div>`;
-  };
+  const delBtn = r => (RecDB.mode === "cloud" && RecDB.isAdmin && (r.kind === "spi" || r.kind === "place"))
+    ? `<button type="button" data-pact="del" data-id="${esc(r.id)}" class="btn-sm">刪除</button>` : "";
   const editBtn = r => RecDB.isAdmin&&(r.kind==="spi"||r.kind==="place") ? `<button data-pact="edit-meta" data-id="${esc(r.id)}" title="${r.kind==="place"?"修改座標備註":"修改量測中繼資料"}" class="btn-sm">✏️ ${r.kind==="place"?"備註":"資料"}</button>` : "";
 
   const S1 = (list || []).filter(r => r.kind === "spi" && hit(r));
@@ -12262,8 +12336,6 @@ function setupRecPicker() {
     modal.classList.remove("open");
     modal.hidden = true;
     if (!document.querySelector(".open[role=dialog],.db-modal.open")) document.body.style.overflow = "";
-    PICKER_CONFIRM = null;
-    PICKER_CONFIRM_FORCE = null;
     if (pickerReturnFocus && pickerReturnFocus.isConnected) pickerReturnFocus.focus();
     pickerReturnFocus = null;
   }
@@ -12473,6 +12545,40 @@ function setupRecPicker() {
   }
   if ($("#recEditClose")) $("#recEditClose").onclick = closeEditModal;
   if ($("#recEditCancel")) $("#recEditCancel").onclick = closeEditModal;
+  const recDeleteModal = $("#recDeleteModal");
+  if (recDeleteModal) {
+    if ($("#recDeleteClose")) $("#recDeleteClose").onclick = closeRecDeleteModal;
+    if ($("#recDeleteCancel")) $("#recDeleteCancel").onclick = closeRecDeleteModal;
+    if ($("#recDeleteConfirm")) {
+      $("#recDeleteConfirm").onclick = async () => {
+        const id = DELETING_REC_ID;
+        if (!id) return;
+        const rec = (RecDB.cache || []).find(x => x.id === id) || await recFind(id);
+        const state = $("#recDeleteState");
+        const confirm = $("#recDeleteConfirm"), cancel = $("#recDeleteCancel"), closeBtn = $("#recDeleteClose");
+        if (confirm) { confirm.disabled = true; confirm.textContent = "刪除中…"; }
+        if (cancel) cancel.disabled = true;
+        if (closeBtn) closeBtn.disabled = true;
+        if (state) state.textContent = "刪除中…";
+        try {
+          await RecDB.del(id);
+          closeRecDeleteModal();
+          applyAfterRecordDeleted(rec || { id, kind: "spi" });
+          await renderRecPicker(true);
+          await renderRecords(true);
+          if (PICKER_TAB === "specs" && $("#recAuditBox")?.open) await renderAudit();
+          toast(rec?.kind === "spi" ? `已刪除批號 ${rec.lot || rec.part}` : `已刪除座標檔 ${rec.part} ${rec.rev}`);
+        } catch (e) {
+          if (state) state.innerHTML = `<span class="err">${esc(e.message || String(e))}</span>`;
+          if (confirm) { confirm.disabled = false; confirm.textContent = "刪除"; }
+          if (cancel) cancel.disabled = false;
+          if (closeBtn) closeBtn.disabled = false;
+          if (e.status === 404) await renderRecPicker(true);
+        }
+      };
+    }
+  }
+
   if ($("#recEditSave")) {
     $("#recEditSave").onclick = async () => {
       if (!EDITING_REC_ID) return;
@@ -12535,8 +12641,6 @@ function setupRecPicker() {
     if (!b) return;
     const id = b.dataset.id, act = b.dataset.pact, rec = await recFind(id);
     if (!rec) { toast("找不到這筆紀錄，請重新整理"); return; }
-    if (act !== "del" && act !== "del-confirm" && act !== "del-cancel") { PICKER_CONFIRM = null; PICKER_CONFIRM_FORCE = null; }
-
     try {
       if (act === "load") {
         close();
@@ -12654,54 +12758,9 @@ function setupRecPicker() {
         renderRecords();
         return;
       }
-      if (act === "del-cancel") {
-        PICKER_CONFIRM = null;
-        PICKER_CONFIRM_FORCE = null;
-        renderRecPicker();
+      if (act === "del") {
+        openRecDeleteModal(rec);
         return;
-      }
-      if (act === "del-confirm" || act === "del") {
-        if (act === "del" && PICKER_CONFIRM !== id) {
-          PICKER_CONFIRM = id;
-          PICKER_CONFIRM_FORCE = null;
-          renderRecPicker();
-          setTimeout(() => { if (PICKER_CONFIRM === id) { PICKER_CONFIRM = null; PICKER_CONFIRM_FORCE = null; renderRecPicker(); } }, 6000);
-          return;
-        }
-        const refs = rec.kind === "place" ? (RecDB.cache || []).filter(x => x.kind === "spi" && x.placeId === id) : [];
-        if (act === "del" && rec.kind === "place" && refs.length) return;
-        PICKER_CONFIRM = null;
-        PICKER_CONFIRM_FORCE = null;
-        const delBtnEl = b;
-        const prevText = delBtnEl.textContent;
-        delBtnEl.disabled = true;
-        if (delBtnEl.textContent) delBtnEl.textContent = "正在刪除…";
-        try {
-          await RecDB.del(id);
-        } catch (er) {
-          delBtnEl.disabled = false;
-          if (delBtnEl.textContent) delBtnEl.textContent = prevText;
-          if (er.code === "r2_pending") throw new Error(er.message + "；請再按刪除重試清理原檔");
-          throw er;
-        }
-        const run = typeof curRun === "function" ? curRun() : null;
-        const src = run && typeof runSrc === "function" ? runSrc(run) : null;
-        const placeTouched = (PLACE && PLACE.recId === id) || (src && src.placeId === id) || (run && run.info && run.info.placePreview && run.info.placePreview.recId === id);
-        if (PLACE && PLACE.recId === id) { PLACE = null; placeSave(); placeShow(); }
-        if (src && src.id === id) {
-          LOAD_ERROR.spi = "此量測紀錄已從資料庫刪除";
-          if (run && run.info && run.info.src) { run.info.src.lifecycle = "unavailable"; delete run.info.src.id; }
-          saveRunsSoon();
-        }
-        if (placeTouched && typeof syncPlaceToCurrentRun === "function") syncPlaceToCurrentRun({ notify: false });
-        delete REC_VER[id];
-        updateLoadStates();
-        await renderRecPicker(true);
-        await renderRecords(true);
-        const auditBox = $("#recAuditBox");
-        if (auditBox && auditBox.open && typeof renderAudit === "function") await renderAudit();
-        toast(`已刪除 ${rec.kind === "spi" ? "批號 " + rec.lot : "座標檔 " + rec.part + " " + rec.rev}`);
-        if ($("#recPickerNotice")) $("#recPickerNotice").focus();
       }
     } catch(er) {
       toast("操作失敗：" + (er.message || String(er)));

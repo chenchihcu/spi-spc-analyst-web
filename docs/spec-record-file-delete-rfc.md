@@ -7,6 +7,8 @@
 
 本規格不構成發布授權。核准後方得進行實作 PR。
 
+> **實作以 [spec-record-file-manager-rfc.md](spec-record-file-manager-rfc.md) 為準**（下列與該契約衝突時不採用）：不使用 6 秒 `PICKER_CONFIRM` 連點，改為記錄庫內確認對話框；R2 刪除失敗仍回 200，不回 `r2_pending`；刪除目前座標後頂欄顯示「座標檔：雲端檔已刪除」，而非僅「未套用」。
+
 ---
 
 ## 1. 問題陳述與目標
