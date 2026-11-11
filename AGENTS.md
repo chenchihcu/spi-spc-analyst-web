@@ -14,12 +14,17 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
 | 重複錯誤類別 | 檢查／執行入口 | 證據 |
 |---|---|---|
 | 混淆提交、建置、部署與工具執行結果 | 既有 Git integration；從 Cloudflare production build／deployment 讀回同一 commit 的狀態與 version；CLI／瀏覽器中止單列為驗證受阻 | 2026-10-24 只查登入頁而漏掉 DB 503；2026-11-05 #95／#96 並行建置與不同來源部署不可互相作證 |
+| CI 紅燈或變更未進 main 就停 | 失敗的 required check 修完再 commit、push；該 check 綠後合併 `main`；讀同一 commit 的 Workers Build，不把 Actions dry-run 當成正式站 | 2026-11-11 #117：`test` 失敗後曾停住；Actions 只有 `wrangler deploy --dry-run`；Workers Build `2dc2af00-961c-40c2-9b2c-3fb78e2c4a47`（`cdfface`）當時仍在 running，正式站停在 v10.15.9 |
 - **部署驗證要走過資料庫路徑**：登入頁顯示新版本只代表靜態資產已更新。至少確認一個登入後的資料庫畫面或 API 回 200；無法登入時回報「資料庫路徑未驗證」，不可寫成部署成功。
   - 檢查：驗收紀錄寫明走過的頁面或 API 與 HTTP 狀態。
   - 出處：同上事故；當時只看登入頁版本即回報成功。
 - **雲端部署以 Cloudflare 正式環境為準**：重現、除錯與驗收走正式 Worker 的頁面與 API（含 D1／R2）。不用只有靜態檔、沒有 Worker API 的本機預覽代替。本機測試與 `wrangler dev` 可輔助，不能把靜態預覽的結果寫成雲端已驗證。
   - 檢查：驗收紀錄寫明正式站 URL、走過的頁面或 API 與 HTTP 狀態。只開了靜態檔伺服器時寫「雲端路徑未驗證」。
   - 出處：2026-10-29 AI 分析；埠 8770 的靜態預覽沒有 `/api/analyze`，不能代表正式站。
+- **產品變更做到 main，CI 紅燈自己修完再推**：使用者要求完成的產品變更，工作樹有差異就 commit 並 push。PR 的 required check 失敗時讀該 check 的失敗測試，修完再 commit、push，不把紅燈留給下一輪。該 check 通過後合併進 `main`。GitHub Actions 的 `wrangler deploy --dry-run` 只證明設定可部署，不是正式站已更新。合併後讀 Cloudflare Workers Builds 裡這個 commit 的 build，等到 `success` 或 `fail`；狀態是 `running` 就繼續等，不另開手動 `wrangler deploy`。正式站登入頁版本對上這個 commit 的 `package.json` 版本後，再走「部署驗證要走過資料庫路徑」。
+  - 檢查：報告寫明失敗 check、後續 commit、合併 SHA、Workers Build uuid 與 outcome、正式 URL 的版本。停在未合併的 PR，或正式站仍是上一版，這項工作未完成。
+  - 停止條件：使用者明確說不要合併或不要上正式站；migration 未核准；衝突會改變已審查行為（沿用下一條）；同一 CI 錯誤修完再推後原樣重現且沒有新證據。
+  - 出處：2026-11-11 #117。
 - **合併失敗先自行修復再重試，不等使用者要求**：已核准合併的 PR，`gh pr merge` 失敗時先讀錯誤輸出，依下列分類修正，再重跑因修正而失效的必要關卡；完整測試與 `release-check` 的安排依下方「驗證避免重複」規則。必要關卡通過就仍在原核准範圍內，直接重試合併，不需要再問。
   - 與 main 衝突（`gh pr view --json mergeStateStatus` 為 `DIRTY`）：在工作分支 `git merge origin/main`。版本檔（`package.json`、`package-lock.json`、`lib/version.mjs`、`spi-spc.html` 的 `#appVer`、`CHANGELOG.md`；`#appBuilt` 固定為預設值，由 build 注入）先採 main 的內容，再把本 PR 的版本改成 main 版本的下一號，保留本 PR 的 CHANGELOG 條目；依「驗證避免重複」完成受影響關卡後 push，再合併。
   - `--match-head-commit` 一律用 `gh pr view --json headRefOid` 的完整 40 碼 SHA（短 SHA 會被 GraphQL 拒絕）。
