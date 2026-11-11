@@ -2,6 +2,12 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.15.10 — 2026-11-11（問題定義整併）
+
+- **問題定義**：`buildProblemCases` 在統計卡之上收成一案；預設問題頁依案顯示，可切「依統計規則」。
+- **匯出**：問題清單 CSV／XLSX 末欄追加 `case_id`、`case_title`；Markdown 與 AI 輸入先列問題定義。
+- **規格**：`docs/spec-problem-cases-rfc.md`。
+
 ## v10.15.9 — 2026-11-11（報告章節勾選單一來源）
 
 - **章節 SSOT**：`REPORT_CHAPTERS` 產生分析報告頁 `#chkRep1`–`#chkRep10`；PDF 預預覽、匯出與轉寄共用同一組勾選。
