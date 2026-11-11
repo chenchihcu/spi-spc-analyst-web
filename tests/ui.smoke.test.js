@@ -64,13 +64,13 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   assert.equal(d.querySelectorAll("#issList details.iss-card:not([open])").length, 0, "全部展開");
   $("#issCollapse").click();
   assert.equal(d.querySelectorAll("#issList details.iss-card[open]").length, 0, "全部收合");
-  // 頂端不再重複規格輸入；資料與規格頁分為 4 個子分頁（匯入、規格與鋼板、回合管理、AI 設定）
+  // 頂端不再重複規格輸入；資料與規格頁分為 3 個子分頁（匯入、設定、回合管理）
   assert.equal(d.querySelector("#inLsl"), null, "規格輸入只保留在資料與規格頁");
-  assert.equal(d.querySelectorAll("#p-data .subtab").length, 4);
+  assert.equal(d.querySelectorAll("#p-data .subtab").length, 3);
   // 子分頁鍵盤：只有選取中的在 Tab 順序，左右鍵切換
-  assert.deepEqual([...d.querySelectorAll("#p-data .subtab")].map((b) => b.tabIndex), [0, -1, -1, -1]);
+  assert.deepEqual([...d.querySelectorAll("#p-data .subtab")].map((b) => b.tabIndex), [0, -1, -1]);
   d.querySelector("#p-data .subtabs").dispatchEvent(new w.KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
-  assert.equal(d.querySelector('#p-data .subtab[data-sub="specs"]').getAttribute("aria-selected"), "true", "右鍵切到規格與鋼板");
+  assert.equal(d.querySelector('#p-data .subtab[data-sub="settings"]').getAttribute("aria-selected"), "true", "右鍵切到設定");
   d.querySelector("#p-data .subtabs").dispatchEvent(new w.KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
   assert.equal(d.querySelector('#p-data .subtab[data-sub="runs"]').getAttribute("aria-selected"), "true", "再按右鍵切到回合管理");
   d.querySelector("#p-data .subtabs").dispatchEvent(new w.KeyboardEvent("keydown", { key: "Home", bubbles: true }));
@@ -82,9 +82,13 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   assert.ok(d.querySelector("#btnRepPdf"), "分析報告頁保留 PDF 匯出");
   assert.ok(d.querySelector('#p-ai #aiCompactBar #btnGoAiCfg'), "AI 分析頁頂部應有單行精簡狀態列與設定轉跳鈕");
   tab("data");
-  d.querySelector('.subtab[data-sub="ai-cfg"]').click();
-  assert.equal(d.querySelector('#p-data [data-sub="ai-cfg"]').hidden, false, "AI 設定子分頁應可見");
-  assert.ok(d.querySelector("#aiSettingsCard"), "AI 詳細設定卡應收折於資料與規格頁的 AI 設定子分頁");
+  d.querySelector("#btnGoAiCfg").click();
+  assert.equal(d.querySelector('#p-data [data-sub="settings"]').hidden, false, "設定子分頁應可見");
+  assert.equal(d.querySelector('#p-data .subtab[data-sub="settings"]').getAttribute("aria-selected"), "true");
+  assert.ok(d.querySelector("#aiSettingsCard"), "AI 詳細設定卡應位於設定 Hub");
+  assert.ok(d.querySelector("#btnThemeSettings"), "主題切換應位於設定介面段");
+  w.SPI_TEST_HOOK.setSub("specs", "spec");
+  assert.equal(w.SPI_TEST_HOOK.S.sub, "settings", "舊別名 specs 應對應設定子分頁");
   // 換回合後，先前展開的問題不會自動展開
   d.querySelector("#iss-1 > summary").click();
   assert.equal(d.querySelector("#iss-1").open, true);

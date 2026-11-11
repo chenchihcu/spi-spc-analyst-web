@@ -61,16 +61,17 @@ test("spi-spc.html 保留功能型折疊", () => {
   assert.match(html, /<summary>預覽送出內容<\/summary>/);
 });
 
-test("規格鋼板控制項唯一且位於規格子分頁；關係圖不含已拒絕圖種", () => {
-  const specs = html.slice(html.indexOf('<div data-sub="specs" hidden>'), html.indexOf('<div data-sub="ai-cfg" hidden>'));
-  assert.ok(specs.length > 0, "規格子分頁應在 AI 設定之前結束");
-  for (const id of ["chkStep", "apTbl", "zoneMap"]) {
+test("規格鋼板控制項唯一且位於設定 Hub；關係圖不含已拒絕圖種", () => {
+  const settings = html.slice(html.indexOf('<div data-sub="settings"'), html.indexOf('<div class="grid2" data-sub="runs"'));
+  assert.ok(settings.length > 0, "設定 Hub 應在回合管理之前結束");
+  for (const id of ["chkStep", "apTbl", "zoneMap", "aiSettingsCard", "btnThemeSettings"]) {
     assert.equal((html.match(new RegExp(`id="${id}"`, "g")) || []).length, 1, `#${id} 應只出現一次`);
-    assert.match(specs, new RegExp(`id="${id}"`), `#${id} 應位於規格子分頁`);
+    assert.match(settings, new RegExp(`id="${id}"`), `#${id} 應位於設定 Hub`);
   }
   assert.equal(html.includes('data-sub="stencil"'), false, "不應再留獨立鋼板子分頁");
-  assert.doesNotMatch(specs, /id="aiSettingsCard"/);
-  assert.doesNotMatch(specs, /id="runTbl"/);
+  assert.equal(html.includes('data-sub="specs"'), false, "不應再留獨立規格子分頁");
+  assert.equal(html.includes('data-sub="ai-cfg"'), false, "不應再留獨立 AI 子分頁");
+  assert.doesNotMatch(settings, /id="runTbl"/);
   const rel = html.match(/<select id="selRelChart">([\s\S]*?)<\/select>/);
   assert.ok(rel, "應有關係圖下拉");
   assert.deepEqual([...rel[1].matchAll(/value="([^"]+)"/g)].map((m) => m[1]), ["specScatter", "parallel", "radar"]);
