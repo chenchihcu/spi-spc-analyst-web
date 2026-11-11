@@ -15,9 +15,10 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
 |---|---|---|
 | 混淆提交、建置、部署與工具執行結果 | 既有 Git integration；從 Cloudflare production build／deployment 讀回同一 commit 的狀態與 version；CLI／瀏覽器中止單列為驗證受阻 | 2026-10-24 只查登入頁而漏掉 DB 503；2026-11-05 #95／#96 並行建置與不同來源部署不可互相作證 |
 | CI 紅燈或變更未進 main 就停 | 失敗的 required check 修完再 commit、push；該 check 綠後合併 `main`；讀同一 commit 的 Workers Build，不把 Actions dry-run 當成正式站 | 2026-11-11 #117：`test` 失敗後曾停住；Actions 只有 `wrangler deploy --dry-run`；Workers Build `2dc2af00-961c-40c2-9b2c-3fb78e2c4a47`（`cdfface`）當時仍在 running，正式站停在 v10.15.9 |
-- **部署驗證要走過資料庫路徑**：登入頁顯示新版本只代表靜態資產已更新。至少確認一個登入後的資料庫畫面或 API 回 200；無法登入時回報「資料庫路徑未驗證」，不可寫成部署成功。
-  - 檢查：驗收紀錄寫明走過的頁面或 API 與 HTTP 狀態。
-  - 出處：同上事故；當時只看登入頁版本即回報成功。
+| 未登入的 401 寫成資料庫路徑未驗證 | 先 `POST /__login`（body 為 `{user,d}`，`d` 為 PBKDF2，不送明文 `pass`），帶 `spi_auth` cookie 再 `GET /api/records`，200 且含 `records` 陣列 | 2026-11-11：未帶 cookie 的 `/api/records` 回 401，被寫成「無法登入／資料庫路徑未驗證」 |
+- **部署驗證要走過資料庫路徑**：登入頁顯示新版本只代表靜態資產已更新。未帶 cookie 的 `GET /api/records` 回 401 只表示這個請求沒登入，不是「無法登入」，也不能寫成資料庫路徑未驗證。先 `POST /__login`，body 為 `{user,d,next}`，`d` 是登入頁同一套 PBKDF2；伺服器拒絕明文 `pass`。登入回應 `ok` 後，用 `Set-Cookie` 的 `spi_auth` 再 `GET /api/records`，HTTP 200 且 JSON 含 `records` 陣列，才算走過資料庫路徑。登入本身失敗（帳密錯誤、429、503、手邊沒有帳號所以無法計算 `d`）才寫「資料庫路徑未驗證」，並寫明登入請求的狀態碼與缺的憑證名稱。
+  - 檢查：驗收紀錄分開寫登入 `POST /__login` 的狀態，以及帶 cookie 的 `GET /api/records` 狀態與 `records` 是否為陣列。只有未登入的 401 時，這條驗證還沒做。
+  - 出處：2026-10-24 只看登入頁版本；2026-11-11 未登入呼叫 `/api/records` 得 401，被寫成未驗證。
 - **雲端部署以 Cloudflare 正式環境為準**：重現、除錯與驗收走正式 Worker 的頁面與 API（含 D1／R2）。不用只有靜態檔、沒有 Worker API 的本機預覽代替。本機測試與 `wrangler dev` 可輔助，不能把靜態預覽的結果寫成雲端已驗證。
   - 檢查：驗收紀錄寫明正式站 URL、走過的頁面或 API 與 HTTP 狀態。只開了靜態檔伺服器時寫「雲端路徑未驗證」。
   - 出處：2026-10-29 AI 分析；埠 8770 的靜態預覽沒有 `/api/analyze`，不能代表正式站。
