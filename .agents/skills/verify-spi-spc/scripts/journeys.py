@@ -66,14 +66,6 @@ def refresh(page, button, note):
 
 def database(page, evidence, note):
     open_tab(page, "data", note)
-    page.locator('button[data-sub="records"]').click()
-    expect(page.locator("#recCard")).to_be_visible()
-    expect(page.locator("#recSpi")).to_contain_text("尚無量測紀錄")
-    refresh(page, "#recReload", note)
-    expect(page.locator("#recSpi")).to_contain_text("尚無量測紀錄")
-    expect(page.locator("#recSpiSub")).to_have_text("0 筆")
-    expect(page.locator("#recMode")).to_contain_text("verify@example.invalid")
-    page.screenshot(path=evidence / "database-panel.png")
     page.locator("#btnOpenRecModal").click()
     expect(page.locator("#recPickerModal")).to_be_visible()
     expect(page.locator("#recPickerNotice")).to_contain_text("量測紀錄 0 筆")
@@ -82,6 +74,19 @@ def database(page, evidence, note):
     expect(page.locator("#recPickerAuthNotice")).to_be_hidden()
     page.screenshot(path=evidence / "database-picker.png")
     page.locator("#recPickerClose").click()
+    expect(page.locator("#recPickerModal")).to_be_hidden()
+
+    spi = page.locator("#stateSpi")
+    expect(spi).to_have_attribute("aria-disabled", "true")
+    spi.click(force=True)
+    expect(page.locator("#recPickerModal")).to_be_hidden()
+    expect(page.locator("#unmatchedRefsModal")).to_be_hidden()
+    place = page.locator("#statePlace")
+    expect(place).to_have_attribute("role", "status")
+    place.click()
+    expect(page.locator("#recPickerModal")).to_be_hidden()
+    note("status capsules", spi="aria-disabled", place="status")
+    page.screenshot(path=evidence / "database-status.png")
 
     def picker_entry(selector, *, placement=False):
         page.locator(selector).click()
@@ -99,12 +104,9 @@ def database(page, evidence, note):
         page.screenshot(path=evidence / ("picker-" + selector[1:] + ".png"))
         page.locator("#recPickerClose").click()
 
-    picker_entry("#stateSpi")
-    picker_entry("#statePlace", placement=True)
     page.locator('button[data-sub="import"]').click()
     picker_entry("#btnSelectPlace", placement=True)
     open_tab(page, "issues", note)
-    picker_entry("#btnBannerLoadDb")
     size = page.viewport_size
     try:
         page.set_viewport_size({"width": 390, "height": 844})
