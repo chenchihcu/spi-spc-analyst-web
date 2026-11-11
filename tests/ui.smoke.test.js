@@ -74,9 +74,10 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   d.querySelector("#p-data .subtabs").dispatchEvent(new w.KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
   assert.equal(d.querySelector('#p-data .subtab[data-sub="runs"]').getAttribute("aria-selected"), "true", "再按右鍵切到回合管理");
   d.querySelector("#p-data .subtabs").dispatchEvent(new w.KeyboardEvent("keydown", { key: "Home", bubbles: true }));
-  // 驗證新整合的 UI/UX 入口與轉跳（記錄庫膠囊群組、全域時段篩選、子視圖切換器、AI 精簡狀態列、分析報告匯出整合）
+  // 驗證新整合的 UI/UX 入口與轉跳（記錄庫膠囊群組、子視圖切換器、AI 精簡狀態列、分析報告匯出整合）
   assert.ok(d.querySelector("header.top .db-capsule-group #btnOpenRecModal"), "頂欄應有整合的記錄庫膠囊群組");
-  assert.ok(d.querySelector(".rail #railTimeWrap #inTimeStart"), "時段篩選應整合於全域分析設定列 .rail");
+  assert.equal(d.querySelector(".rail #railTimeWrap"), null, "分析設定列不應含時段篩選");
+  assert.equal(d.querySelector(".rail #inTimeStart"), null, "分析設定列不應含時段輸入");
   assert.ok(d.querySelector("#btnOpenExportModal"), "匯出應以匯出中心為單一入口");
   assert.ok(d.querySelector("#btnRepPdf"), "分析報告頁保留 PDF 匯出");
   assert.ok(d.querySelector('#p-ai #aiCompactBar #btnGoAiCfg'), "AI 分析頁頂部應有單行精簡狀態列與設定轉跳鈕");
