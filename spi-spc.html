@@ -905,13 +905,6 @@ button.load-state{border:none;font:inherit;cursor:default}
 .db-capsule-group>.chip-rec-lib{background:var(--surface);border:1px solid var(--line);font-weight:700}
 .db-capsule-group>.chip-export-hub{background:var(--surface);border:1px solid var(--line);font-weight:700}
 @media(max-width:600px),(pointer:coarse) and (max-height:500px){.db-capsule-group{display:none!important}}
-.rail-time-wrap{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;position:relative}
-.rail-time-pop{display:inline-flex;align-items:flex-end;gap:6px;flex-wrap:wrap;padding:6px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px}
-@media(max-width:600px),(pointer:coarse) and (max-height:500px){
-  .rail-time-wrap{display:grid;grid-template-columns:minmax(0,1fr);width:100%}
-  #btnRailTimeToggle{display:none!important}
-  .rail-time-pop,.rail-time-pop[hidden]{display:grid!important;grid-template-columns:minmax(0,1fr);width:100%;gap:8px}
-}
 .deep-subviews,.improve-subviews{grid-template-columns:minmax(0,1fr)}
 #cRelChart{max-width:100%}
 .deep-subviews>[data-subview],.improve-subviews>[data-subview]{min-width:0}
@@ -920,7 +913,7 @@ button.load-state{border:none;font:inherit;cursor:default}
 .panel-subnav button[aria-current="page"]{background:var(--surface);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
 .tab.tab--sub{font-size:var(--fs-caption);opacity:.88}
 .ai-compact-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 12px!important}
-@media(pointer:coarse){.panel-subnav button,.db-capsule-group>.chip.chipBtn,.load-state.is-action,#btnRailTimeToggle,#btnGoAiCfg{min-height:44px}}
+@media(pointer:coarse){.panel-subnav button,.db-capsule-group>.chip.chipBtn,.load-state.is-action,#btnGoAiCfg{min-height:44px}}
 
 .menu .duo-toggle-btn{display:block;width:100%;text-align:left;padding:12px 14px;border:none;background:transparent;font:inherit;color:inherit;cursor:pointer}
 .pmap-details{min-width:0}
@@ -946,7 +939,7 @@ button.load-state{border:none;font:inherit;cursor:default}
     <svg class="mitcorp-logo" viewBox="0 0 248 45" width="143" height="26" fill="currentColor" fill-rule="evenodd" role="img" aria-label="Mitcorp"><path d="M13.8,-0.0L28.5,-0.1L29.2,0.0L30.6,1.0L31.5,2.9L34.7,29.0L35.0,29.8L36.2,30.2L37.5,29.8L38.3,28.2L46.9,3.5L48.0,1.5L48.8,0.8L50.5,-0.1L66.3,0.0L67.6,1.0L68.4,3.2L68.4,30.8L68.3,32.2L67.7,33.8L66.0,34.8L62.8,35.0L59.2,34.8L57.7,33.8L57.3,31.5L57.3,5.8L56.7,4.5L55.2,4.0L53.0,4.7L52.0,6.5L43.5,31.5L42.2,33.3L41.2,34.1L38.2,34.8L28.8,34.8L26.0,34.0L24.6,32.5L24.0,29.8L20.9,5.8L20.2,4.5L18.5,4.0L17.0,4.5L16.5,5.2L12.3,26.8L11.3,30.0L10.5,31.5L8.4,33.8L6.3,35.0L2.2,35.7L1.2,35.7L0.0,35.0L0.0,30.2L1.2,29.6L4.5,28.9L5.4,28.0L6.2,26.2L10.7,3.0L11.9,1.0L13.8,-0.0ZM73.2,-0.0L83.8,0.0L84.6,1.3L84.5,4.2L83.8,5.4L82.8,5.7L75.5,5.8L73.2,5.5L72.7,4.8L72.5,2.8L72.6,1.0L73.2,-0.0ZM90.0,1.7L95.5,1.6L97.2,2.1L97.8,2.8L98.2,4.0L98.3,8.5L98.6,9.2L99.3,9.7L109.8,9.8L110.9,10.2L111.4,12.0L110.9,13.2L110.2,13.6L99.8,13.7L98.8,14.1L98.2,15.5L98.3,27.0L99.0,29.8L100.5,30.9L104.2,31.1L112.5,30.9L113.1,31.5L113.2,33.0L113.0,33.8L112.2,34.6L110.5,35.0L104.5,35.3L95.8,35.1L92.0,33.9L89.9,32.2L88.9,30.5L88.4,27.5L88.4,5.5L88.6,3.0L89.2,2.1L90.0,1.7ZM130.5,9.2L135.5,9.3L144.3,10.0L145.5,10.4L146.1,11.0L146.2,13.2L145.7,14.0L145.0,14.3L140.3,13.8L133.0,13.6L129.5,13.9L127.0,14.9L125.1,17.0L124.3,20.0L124.3,24.0L125.1,27.8L127.0,29.8L130.0,30.9L137.5,31.1L145.2,30.4L146.0,31.0L146.3,32.0L146.2,33.5L145.5,34.3L142.5,35.0L135.2,35.4L129.5,35.4L124.0,34.9L120.5,33.9L118.2,32.8L116.1,30.8L115.1,29.2L114.0,25.5L113.9,20.0L115.0,15.8L116.1,14.0L118.2,12.0L120.5,10.8L124.2,9.8L130.5,9.2ZM161.8,9.5L168.5,9.3L174.8,9.9L178.2,10.8L180.2,11.8L182.8,14.0L183.9,15.8L184.7,18.8L184.9,24.5L184.7,26.2L183.8,29.2L181.8,32.0L178.8,33.9L175.5,34.9L166.0,35.7L156.8,34.8L153.8,33.8L152.0,32.9L150.4,31.5L149.2,30.0L148.3,28.0L147.9,25.5L148.0,18.2L149.1,15.0L151.0,12.8L154.0,11.0L158.0,9.8L161.8,9.5ZM203.0,9.5L209.8,9.4L210.7,10.5L210.8,11.8L210.5,12.8L209.5,13.6L201.8,13.9L200.2,14.2L199.2,14.8L198.7,16.0L198.7,31.0L198.3,33.5L197.5,34.5L196.2,34.9L190.5,34.8L189.1,33.8L188.8,32.0L188.7,15.2L189.2,12.5L190.0,11.7L191.9,10.8L197.2,9.8L203.0,9.5ZM224.0,9.5L230.5,9.3L237.9,9.8L242.2,10.9L244.2,12.0L246.2,14.0L247.0,15.2L247.8,17.3L247.8,27.8L246.9,30.0L245.9,31.5L244.8,32.6L242.8,33.8L240.0,34.8L232.2,35.5L223.2,35.4L222.6,36.0L222.4,36.8L222.2,43.5L221.3,44.8L213.5,44.8L212.6,43.5L212.4,41.8L212.6,13.0L213.2,11.7L214.6,10.8L218.5,9.9L224.0,9.5ZM75.5,9.9L79.0,9.8L81.5,10.0L82.8,10.8L83.4,12.0L83.5,32.2L83.0,33.8L81.5,34.8L75.5,34.8L74.1,34.0L73.7,33.2L73.6,12.0L74.0,10.8L75.5,9.9ZM163.2,13.0L160.8,14.0L159.4,15.2L158.3,18.8L158.1,22.5L158.3,26.5L159.2,29.2L160.5,30.8L162.8,31.8L166.0,32.1L169.8,31.8L172.0,30.8L173.0,29.8L173.9,28.2L174.4,25.0L174.4,21.8L173.9,16.5L173.0,15.0L171.9,14.0L168.5,12.9L163.2,13.0ZM226.0,13.0L223.5,13.5L222.7,14.0L222.4,14.5L222.5,30.5L224.0,31.6L227.5,31.9L232.5,31.9L235.0,31.0L236.0,30.1L237.0,28.7L237.7,25.5L237.8,20.8L237.0,16.2L235.3,14.0L233.0,13.1L230.2,12.8L226.0,13.0Z"/></svg>
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.16.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.17.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <div class="db-capsule-group" role="group" aria-label="雲端記錄庫與套用狀態">
@@ -1012,15 +1005,6 @@ button.load-state{border:none;font:inherit;cursor:default}
             <option value="pad">同一焊墊連續 n 片板</option>
           </select></div>
         <div class="field" id="padField" data-scope="a" hidden><label for="selPad">焊墊</label><select id="selPad"></select></div>
-        <div class="rail-time-wrap" id="railTimeWrap">
-          <button type="button" class="specbtn" id="btnRailTimeToggle" aria-expanded="false" aria-controls="railTimePopover" title="依時間欄位篩選特定時段（UTC+8 閉區間）"><span class="lbl">時段篩選</span> <b id="railTimeSummary">全部時間</b> <span aria-hidden="true">▾</span></button>
-          <div class="rail-time-pop" id="railTimePopover" role="group" aria-label="時間區間篩選" hidden>
-            <div class="field"><label for="inTimeStart">起始時間</label><input type="text" id="inTimeStart" placeholder="例：08:00:00 或 2026-03-01 08:00:00" style="min-width:0;width:min(100%,170px)"></div>
-            <div class="field"><label for="inTimeEnd">結束時間</label><input type="text" id="inTimeEnd" placeholder="例：17:00:00 或 2026-03-01 17:00:00" style="min-width:0;width:min(100%,170px)"></div>
-            <div class="row" style="gap:6px"><button type="button" id="btnTimeFilter">套用篩選</button><button type="button" id="btnTimeFilterClear">清除篩選</button></div>
-            <span class="note" id="timeFilterState" style="margin:0"></span>
-          </div>
-        </div>
         <p class="note" id="railNote" hidden style="margin:0;align-self:center;max-width:42ch"></p>
         <button class="specbtn" id="railSpecBtn" title="鋼板厚度與規格在「資料與規格 → 規格設定」修改"><span class="lbl">鋼板／規格</span> <b id="railSum"></b> <span aria-hidden="true">✎</span></button>
       </div>
@@ -2676,7 +2660,7 @@ function relChartCollinearityReject(dims, conditionNumber, threshold = 1e12) {
   return `選定特徵共線（條件數 ${conditionNumber.toExponential(1)}），Hotelling 會拒絕計算，無法繪製可判讀的${dims.length > 2 ? " Radar" : "相關"}圖`;
 }
 
-/** FR-9：幾何焊墊清單覆蓋率（分母＝幾何相異焊墊，時間篩選不縮分母） */
+/** FR-9：幾何焊墊清單覆蓋率（分母始終為幾何相異焊墊） */
 function normPadKeyForCoverage(pad) {
   return String(pad || "").trim().toUpperCase();
 }
@@ -3244,91 +3228,6 @@ function stateToPartSpec(part,draft,stencil,note){const specs={};for(const k of 
   return{schema:PART_SPEC_SCHEMA,part,stencilRef:stencil,specs,groups:JSON.parse(JSON.stringify(draft.groups||{})),note:note||""}}
 /* 可以分析：範例資料（示範規格），或已套用使用者存檔的料號規格版本 */
 const specReady=st=>!!st&&(st.specSrc==="sample"||(st.specSrc==="part"&&!!(st.partSpec&&st.partSpec.id)));
-
-function applyTimeFilter(startStr, endStr){
-  let raw = S._rawRows || (typeof curRun==="function"&&curRun()&&curRun()._rawRows);
-  if(!raw){
-    raw = S.rows;
-    S._rawRows = raw;
-    if(typeof curRun==="function"&&curRun()) curRun()._rawRows = raw;
-  }
-  if(!startStr && !endStr){
-    S.rows = raw;
-    if(typeof curRun==="function"&&curRun()) curRun().rows = raw;
-    S.timeFilter = null;
-    S.partialBoards = null;
-    if(typeof $ === "function" && $("#timeFilterState")) $("#timeFilterState").textContent = "已清除時間篩選（顯示全部資料）";
-    if(typeof syncControls==="function") syncControls();
-    if(typeof recompute==="function") recompute();
-    return;
-  }
-
-  const fullBoardPads = new Map();
-  for(const r of raw){
-    fullBoardPads.set(r.board, (fullBoardPads.get(r.board) || 0) + 1);
-  }
-
-  const parseT = (s, isEnd) => {
-    if(!s || !String(s).trim()) return null;
-    const trimmed = String(s).trim();
-    if(/^\d+$/.test(trimmed)) return +trimmed;
-    const mTime = trimmed.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
-    if(mTime){
-      const firstRowWithTs = raw.find(r => r.ts != null);
-      let datePrefix = "1970-01-01";
-      if(firstRowWithTs && firstRowWithTs.ts){
-        datePrefix = formatUtc8Date(firstRowWithTs.ts, "YYYY-MM-DD");
-      }
-      const hh = mTime[1].padStart(2, "0");
-      const mm = mTime[2];
-      const ss = mTime[3] ? mTime[3] : (isEnd ? "59" : "00");
-      return Date.parse(`${datePrefix}T${hh}:${mm}:${ss}`);
-    }
-    const iso = trimmed.replace(" ", "T");
-    const parsed = Date.parse(iso);
-    return isFinite(parsed) ? parsed : null;
-  };
-
-  const startTs = parseT(startStr, false);
-  const endTs = parseT(endStr, true);
-
-  const filtered = raw.filter(r => {
-    if(r.ts == null) return false;
-    if(startTs != null && r.ts < startTs) return false;
-    if(endTs != null && r.ts > endTs) return false;
-    return true;
-  });
-
-  if(!filtered.length){
-    if(typeof toast==="function") toast("所選時間區間內無符合資料");
-    if(typeof $ === "function" && $("#timeFilterState")) $("#timeFilterState").textContent = "篩選後無符合資料";
-    return;
-  }
-
-  const filteredBoardPads = new Map();
-  for(const r of filtered){
-    filteredBoardPads.set(r.board, (filteredBoardPads.get(r.board) || 0) + 1);
-  }
-
-  const partialBoards = [];
-  for(const [b, count] of filteredBoardPads.entries()){
-    const fullCount = fullBoardPads.get(b) || 0;
-    if(count < fullCount){
-      partialBoards.push(b);
-    }
-  }
-
-  S.rows = filtered;
-  if(typeof curRun==="function"&&curRun()) curRun().rows = filtered;
-  S.timeFilter = { start: startStr, end: endStr };
-  S.partialBoards = partialBoards;
-
-  const msg = `已篩選時間 ${startStr || "起"} ～ ${endStr || "迄"}（共 ${filtered.length} 筆，${filteredBoardPads.size} 片板${partialBoards.length ? `，其中 ${partialBoards.length} 片為部分焊墊` : ""}）`;
-  if(typeof toast==="function") toast(msg);
-  if(typeof $ === "function" && $("#timeFilterState")) $("#timeFilterState").textContent = msg;
-  if(typeof syncControls==="function") syncControls();
-  if(typeof recompute==="function") recompute();
-}
 
 /* ============ CSV ============ */
 /* ============ 匯入：欄位對應與機台格式設定 ============ */
@@ -6037,7 +5936,7 @@ function fmMd(F, st){
 |---|---|---|---|
 `+Me.modes.map(m=>`| ${m.name} | ${m.verdict} | ${(m.dims||[]).join("、")||"—"} | ${[m.need||"",...(m.sup||[]).map(e=>"✓ "+e.d+"："+e.txt),...(m.con||[]).map(e=>"✗ "+e.d+"："+e.txt),...(m.rules&&m.rules.length?[`規則來源：${m.rules.join("、")}`]:[])].filter(Boolean).join("<br>").replace(/\|/g,"／")} |`).join("\n")+"\n";
 }
-if(typeof module!=="undefined")module.exports={issuesMd,fmMd,rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,adSample,adSampleHash,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,areaRatio,maxThkForAR,detectIssues,buildProblemCases,overallVerdict,compareRuns,dfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,groupBasisOfRow,groupBasisForRows,groupBasisLabel,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml};
+if(typeof module!=="undefined")module.exports={issuesMd,fmMd,rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,adSample,adSampleHash,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,areaRatio,maxThkForAR,detectIssues,buildProblemCases,overallVerdict,compareRuns,dfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,groupBasisOfRow,groupBasisForRows,groupBasisLabel,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml};
 </script>
 <script>
 
@@ -6182,7 +6081,7 @@ function applyStencil(t,lo,hi){if(isFinite(t)&&t>0){S.stencil=t;stencilRescale()
   S.specs.height=hpctToH(S.specs.hpct,S.stencil);
   if(S.specSrc==="part"&&S.partSpec)S.specsG=buildPartSpecsG(S.specs,S.partSpec.groups,S.stencil);
   persist();syncControls();recompute()}
-/* 高度 % 匯入的回合：µm 高度跟著鋼板厚度換算（同一列物件可能同時在全部資料、時間篩選後資料中，各換算一次） */
+/* 高度 % 匯入的回合：µm 高度跟著鋼板厚度換算（以 Set 去重，同一列物件只換算一次） */
 function stencilRescale(){const run=curRun(),thk=run&&run.info&&run.info.hPctThk;if(!thk||thk===S.stencil)return;
   const rows=new Set([...(run._rawRows||[]),...run.rows,...(S._rawRows||[]),...S.rows]);const n=rescaleHpct(rows,thk,S.stencil,S);run.info.hPctThk=S.stencil;
   if(n)toast(`原始資料為高度 %：已依新鋼板厚度 ${S.stencil} µm 換算 ${n.toLocaleString()} 筆高度（µm），高度 % 不變`)}
@@ -6646,7 +6545,7 @@ function renderPmap() {
   const batchCount=pmapEvidence(index,{...selection,mode:"batch"}).size;
   const change=(target,disabled,caption)=>`<button type="button" data-map-move="${target}" data-map-focus="${target}" ${disabled?"disabled":""}>${caption}</button>`;
   root.innerHTML=`<div class="part-map-nav">${change("prev",pos===0,"上一片")}${change("next",pos===index.order.length-1,"下一片")}${change("worst",!index.hasBoardHits || selection.board===index.worstBoard,"最嚴重的一片")}</div>
-    <p role="status">${esc(selection.board)} · 第 ${pos+1}／${index.order.length} 片${index.hasBoardHits&&selection.board===index.worstBoard?" · 最嚴重的一片":""} · ${items.filter(item=>item.level).length} 顆零件有相關問題${S.partialBoards?.includes(selection.board)?" · 部分焊墊":""}${S.boardInferred?" · 推定子群組":""}</p>
+    <p role="status">${esc(selection.board)} · 第 ${pos+1}／${index.order.length} 片${index.hasBoardHits&&selection.board===index.worstBoard?" · 最嚴重的一片":""} · ${items.filter(item=>item.level).length} 顆零件有相關問題${S.boardInferred?" · 推定子群組":""}</p>
     ${chart}${detail}<div class="part-map-nav"><button type="button" data-mode="batch" data-map-focus="batch" ${batchCount?"":"disabled"}>整批問題 ${batchCount} 項</button>${index.unresolved.size?`<button type="button" data-mode="unresolved" data-map-focus="unresolved">位置待確認 ${index.unresolved.size} 項</button>`:""}<button type="button" id="pmapClear" data-mode="all" data-map-focus="all">顯示全部問題</button></div>`;
   const focus = key => [...root.querySelectorAll("[data-map-focus]")].find(el=>el.dataset.mapFocus===key);
   function pick(i) {
@@ -8623,7 +8522,7 @@ function runHeightUnit(run){return run&&((run.sample)||run.info&&run.info.height
 function runState(run){const heightUnit=runHeightUnit(run);return run.id===S.runId?{...S}:{...S,rows:run.rows,metrics:runMetrics(run.metrics,heightUnit),heightUnit,...clone(run.cfg)}}
 function addRun(name,rows,metrics,cfg,info){name=safeId(name)||"未命名回合";const id=Math.max(0,...S.runs.map(r=>r.id))+1,heightUnit=info&&info.heightUnit||S.heightUnit||"unknown",runInfo={...(info||{}),heightUnit};S.runs.push({id,name,rows,metrics:runMetrics(metrics,heightUnit),cfg:cfg||snapCfg(),info:runInfo,aoi:null,_rawRows:rows});return id}
 function switchRun(id){const c=curRun();if(c)c.cfg=snapCfg();const n=S.runs.find(r=>r.id===id);if(!n)return;
-  S.runId=id;S.rows=n.rows;S._rawRows=n._rawRows||n.rows;S.timeFilter=null;S.partialBoards=null;S.metrics=runMetrics(n.metrics,runHeightUnit(n));S.heightUnit=runHeightUnit(n);S.source=n.name;S.issEnt=null;S.ctx=null;S.specSrc="none";S.partSpec=null;S.specDraft=null;S.specsG=null;S.sqDir="Y";Object.assign(S,clone(n.cfg));S.heightUnit=runHeightUnit(n);delete S.specsCustom;S.group="ALL";S.board=null;S.pad=null;
+  S.runId=id;S.rows=n.rows;S._rawRows=n._rawRows||n.rows;S.metrics=runMetrics(n.metrics,runHeightUnit(n));S.heightUnit=runHeightUnit(n);S.source=n.name;S.issEnt=null;S.ctx=null;S.specSrc="none";S.partSpec=null;S.specDraft=null;S.specsG=null;S.sqDir="Y";Object.assign(S,clone(n.cfg));S.heightUnit=runHeightUnit(n);delete S.specsCustom;S.group="ALL";S.board=null;S.pad=null;
   LOAD_ERROR.spi="";
   /* 規格一律由使用者定義：舊版的機台推估、自訂、工單、AOI 建議窗回合一律視為未定義（鎖定到套用料號規格為止）；範例資料用示範規格 */
   if(n.sample)S.specSrc="sample";else if(S.specSrc!=="part"||!S.partSpec||!S.partSpec.id){S.specSrc="none";S.partSpec=null;S.specsG=null}
@@ -9350,8 +9249,6 @@ ${(dfmData||[]).map(d=>`| ${d.group} | ${d.padDim} | ${d.apDim} | ${d.thk} | ${f
 
 - 匯入總筆數：${S.rows.length} 筆；納入分析筆數：${S.rows.length} 筆
 - 板號推定狀態：${(S.boardInferred || S.rows.some(r=>r.boardInferred)) ? `板號為推定（每 ${S.boardInferred || Math.round(S.rows.length / (A.boards.length||1))} 筆）` : "板號完整，無推定缺失"}
-- 時間區間篩選：${S.timeFilter ? `${S.timeFilter.start || "—"} ～ ${S.timeFilter.end || "—"}（UTC+8）` : "未設定時間篩選（全時段）"}
-- 部分焊墊板數：${S.partialBoards && S.partialBoards.length ? `${S.partialBoards.length} 片板僅含部分焊墊（${S.partialBoards.join("、")}）` : "無部分板（所有板皆含完整焊墊）"}
 - 刮刀方向狀態：${S.sqDir ? `刮刀方向設定為 ${S.sqDir} 向` : "依板序奇偶推定"}
 - 焊墊座標狀態：${PLACE ? `已套用座標檔：${esc(PLACE.part)} ${esc(PLACE.rev)}` : "未套用獨立座標檔（採用資料內建座標或相對位置）"}
 
@@ -9381,22 +9278,6 @@ function exportReportMd(){if(needSpec()){const md=reportMd();save("spi-spc-repor
 function exportBoardStatsCsv(){if(!needSpec())return;const src=runSrc(curRun()),swo=src&&src.supplierWo?src.supplierWo:"",owo=src&&src.outsourceWo?src.outsourceWo:"";save("board-stats.csv",toCSV([["board","supplier_wo","outsource_wo","n","mean","sd","min","q1","median","q3","max","defect_pads","defect_rate","spec_source"],...S.A.byBoard.map(b=>[b.board,swo,owo,b.n,f(b.mean,3),f(b.sd,3),b.min,f(b.q1,2),f(b.med,2),f(b.q3,2),b.max,b.defects,f(b.p,4),specSrcText()])]));}
 function exportDefectPadsCsv(){if(!needSpec())return;save("defect-pads.csv",toCSV([["board","pad","component","group","volume","height","area","offset_x","offset_y","defects","spec_source"],...S.A.defRows.map(r=>[r.board,r.pad,r.comp,r.group,r.volume,r.height,r.area,r.offx,r.offy,r.codes.map(c=>DEFECTS[c]).join(" / "),specSrcText()])]));}
 
-function syncRailTimeUI() {
-  const sum = $("#railTimeSummary");
-  if (sum) {
-    sum.textContent = S.timeFilter ? `${S.timeFilter.start || "起"}~${S.timeFilter.end || "迄"}` : "全部時間";
-  }
-  if (typeof updateRailSummary === "function") updateRailSummary();
-}
-if ($("#btnRailTimeToggle")) {
-  $("#btnRailTimeToggle").onclick = () => {
-    const pop = $("#railTimePopover");
-    if (!pop) return;
-    const open = pop.hidden;
-    pop.hidden = !open;
-    $("#btnRailTimeToggle").setAttribute("aria-expanded", String(open));
-  };
-}
 $$("[data-subnav-deep]").forEach(b=>{b.onclick=()=>setTab("deep/"+b.dataset.subnavDeep)});
 $$("[data-subnav-improve]").forEach(b=>{b.onclick=()=>setTab("improve/"+b.dataset.subnavImprove)});
 if ($("#btnGoAiCfg")) {
@@ -9405,19 +9286,6 @@ if ($("#btnGoAiCfg")) {
     setSub("ai-cfg");
   };
 }
-if($("#btnTimeFilter")) $("#btnTimeFilter").onclick = () => {
-  const start = $("#inTimeStart") ? $("#inTimeStart").value.trim() : "";
-  const end = $("#inTimeEnd") ? $("#inTimeEnd").value.trim() : "";
-  applyTimeFilter(start, end);
-  syncRailTimeUI();
-};
-if($("#btnTimeFilterClear")) $("#btnTimeFilterClear").onclick = () => {
-  if($("#inTimeStart")) $("#inTimeStart").value = "";
-  if($("#inTimeEnd")) $("#inTimeEnd").value = "";
-  applyTimeFilter("", "");
-  syncRailTimeUI();
-};
-
 /* ---------- AI ---------- */
 let aiAbort=null;
 function mdLite(t){const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));let html="",inList=false;
@@ -11675,9 +11543,7 @@ function updateRailSummary(){
   const basis=groupBasisLabel(currentGroupBasis()),basisText=`分組依據：${basis}`;
   const sg=$("#selGroup");if(sg){sg.title=basisText;sg.setAttribute("aria-label",basisText)}
   const inferredText=(S.boardInferred||(S.rows&&S.rows.some(r=>r.boardInferred)))?` · 板號為推定（每 ${S.boardInferred||Math.round(S.rows.length/((S.A&&S.A.boards&&S.A.boards.length)||1))} 筆）`:"";
-  const timeText=S.timeFilter?` · 時段 ${S.timeFilter.start||"起"}~${S.timeFilter.end||"迄"}`:"";
-  const sumEl=$("#railTimeSummary");if(sumEl)sumEl.textContent=S.timeFilter?`${S.timeFilter.start||"起"}~${S.timeFilter.end||"迄"}`:"全部時間";
-  chip.textContent=`${runText} · ${metricText} · ${grpText} · ${basisText}${timeText}${inferredText} ▾`;
+  chip.textContent=`${runText} · ${metricText} · ${grpText} · ${basisText}${inferredText} ▾`;
 }
 function setupModalSheet(sheetId,triggerId,closeId,backdropId){
   const sheet=$(sheetId),trig=$(triggerId),cls=$(closeId),bd=$(backdropId);
@@ -12934,7 +12800,7 @@ function pdfFileName(){
 function specDownloadInfo(rec){const raw=rec&&rec.ver!=null?String(rec.ver).trim():"",hasVersion=!!raw&&!/^(?:undefined|null)$/i.test(raw),version=hasVersion?safeFn(raw):"",filename="料號規格_"+safeFn(rec&&rec.part)+"_"+(hasVersion?"v"+version:"版本未知")+".json";
   return{filename,warning:hasVersion?"":"這筆規格紀錄沒有版本號；匯出檔名已標示「版本未知」"}}
 if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")window.SPI_TEST_HOOK.specDownloadInfo=specDownloadInfo;
-if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{getPlace:()=>PLACE,S,RecDB,renderIssues,renderPmap,renderOverview,renderLISAUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,calcShapeFactor,getSolderGrainTexture,getRealPasteMat,createSolderPasteGeometry,selectPadForProfile,highlightSelectedPad3D,focusPad3D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,getReportChapters,renderMailChapterSummary,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,applyTimeFilter,setupRecPicker,renderRecPicker,openRecord,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus,setupExportCenter,openExportCenterModal,closeExportCenterModal,triggerExportByType,downloadDeliverablesQueue,applyPlacePreviewToRun,clearPlacePreviewFromRun,syncPlaceToCurrentRun,pos3DNote,usePlaceRec});
+if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{getPlace:()=>PLACE,S,RecDB,renderIssues,renderPmap,renderOverview,renderLISAUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,calcShapeFactor,getSolderGrainTexture,getRealPasteMat,createSolderPasteGeometry,selectPadForProfile,highlightSelectedPad3D,focusPad3D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,getReportChapters,renderMailChapterSummary,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,setupRecPicker,renderRecPicker,openRecord,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus,setupExportCenter,openExportCenterModal,closeExportCenterModal,triggerExportByType,downloadDeliverablesQueue,applyPlacePreviewToRun,clearPlacePreviewFromRun,syncPlaceToCurrentRun,pos3DNote,usePlaceRec});
 if($("#geomPadFile"))$("#geomPadFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{const p=parseGeometryPadListCsv(rd.result);if(!p.ok){toast("幾何焊墊清單："+p.error);e.target.value="";return}S.geometryPads=p.pads;persist();updatePadCoverageState();recompute();renderGeomPadStatus();toast(`已匯入 ${p.pads.length} 個幾何焊墊`);e.target.value=""};rd.readAsText(f)});
 if($("#geomPadClear"))$("#geomPadClear").onclick=()=>{S.geometryPads=null;S.padCoverage=null;S.pendingVerify=false;persist();updatePadCoverageState();recompute();renderGeomPadStatus()};
 const initHash=(location.hash||"").slice(1);

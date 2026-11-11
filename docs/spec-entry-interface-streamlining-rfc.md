@@ -127,7 +127,7 @@ flowchart TD
 | **4. 鋼板與幾何設定** | `stencil` (鋼板與開孔) | - 鋼板整體厚度 (Stencil Foil Thickness: 100/120/130/150µm)<br>- 各元件開孔面積比 (Area Ratio) 與寬深比 (Aspect Ratio)<br>- 階梯鋼板 (Step Stencil) 與微開孔配置 | `#p-data [data-sub="stencil"]`（既有） |
 | **5. 資料庫與角色設定** | `records` (資料庫) | - 雲端量測紀錄 (SPI CSV) 清單與 SHA-256 指紋驗證<br>- 受控座標檔 (CAD Placement) 管理與備註修訂<br>- 管理者角色指派與權限變更 (`adminUsersSection`)<br>- 資料庫稽核紀錄 (Audit Log) 查閱 | `#p-data [data-sub="records"]`（既有） |
 | **6. AI 與智能診斷設定** | `ai-cfg` (AI 設定) | - AI 提供商配置 (Google Gemini / OpenAI / Anthropic)<br>- AES-256-GCM API 金鑰保存與驗證<br>- 動態模型型錄與推理思維預算配置<br>- 每日 Token 用量配額硬阻斷設定 | `#p-data [data-sub="ai-cfg"]`（既有） |
-| **7. 系統顯示與偏好設定** | 整合至 `records` 或各卡片標頭 | - 介面主題快速切換（明亮/深色）<br>- 時段篩選閉區間預設模式<br>- 圖表字型與高對比顯示偏好 | 強化設定可見度，不再僅能從頂欄「更多 ▾」進入 |
+| **7. 系統顯示與偏好設定** | 整合至 `records` 或各卡片標頭 | - 介面主題快速切換（明亮/深色）<br>- ~~時段篩選閉區間預設模式~~（不採用，見 [`spec-remove-time-filter-rfc.md`](spec-remove-time-filter-rfc.md)）<br>- 圖表字型與高對比顯示偏好 | 強化設定可見度，不再僅能從頂欄「更多 ▾」進入 |
 
 ---
 
