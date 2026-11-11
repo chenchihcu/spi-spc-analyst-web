@@ -158,6 +158,10 @@ sequenceDiagram
 
 - `PLACE.recId === id` → 清空 `PLACE`，`placeSave()`，`placeShow()`。
 - `runSrc(curRun())?.id === id` → 設定 `LOAD_ERROR.spi` 或清除來源標記，更新 `#stateSpi`／`#statePlace`。
+- **刪除目前套用之座標檔**時，僅清 `PLACE` 不足：`updateLoadStates()` 仍可能因 `run.info.src.placeId` 或 `run.info.placePreview` 將頂欄顯示為「座標檔：已套用」，`componentX/Y` 等預覽座標也可能殘留列上。實作須依刪除目標分支處理：
+  - 刪除的 id 等於 `PLACE.recId`，或等於 `runSrc(curRun())?.placeId`，或等於 `run.info.placePreview?.recId` → 清空 `PLACE` 後對 `curRun()` 呼叫 `syncPlaceToCurrentRun({ notify: false })`（`PLACE` 為 null 時會走 `clearPlacePreviewFromRun`，清預覽座標並 `build3D()`）。
+  - 若刪除的 id 等於目前回合量測來源 `runSrc(curRun())?.id` → 另依上列清除 `run.info.src` 相關標記或設定 `LOAD_ERROR.spi`，再 `updateLoadStates()`。
+  - 一律 `saveRunsSoon()` 在 `syncPlaceToCurrentRun` 路徑內已涵蓋；禁止只 `placeShow()` 而未同步回合預覽狀態。
 - `delete REC_VER[id]`。
 
 ### 3.4 實作 PR 須同步的測試／文件
@@ -171,12 +175,18 @@ sequenceDiagram
 
 ### 3.5 UI 驗收矩陣（實作完成後）
 
-- build 產物；寬度 1440／390；明亮與深色。
-- 記錄庫 → 量測分頁：管理者見刪除；一般使用者不見。
-- 記錄庫 → 座標分頁：同上；有引用座標兩段確認。
-- 刪除目前選取之座標 → 頂欄「座標檔：未套用」。
-- 稽核區出現刪除列；舊列對已刪 id 顯示「目標已不在本站」。
-- R2 失敗模擬（測試 stub）：顯示錯誤且可重試。
+依 `AGENTS.md`「UI 改動的驗證矩陣」：**build 產物**（非 dev server），寬度 **1440／820／390／320** CSS px，各跑**明亮與深色**；`devicePixelRatio > 1` 下記錄庫分頁至少進出兩次。
+
+| 檢查項 | 範圍 |
+|---|---|
+| 橫向溢出 | 開啟 `#recPickerModal`、刪除確認／引用警告對話框：`documentElement.scrollWidth === clientWidth` |
+| 觸控熱區 | 刪除／仍要刪除／取消按鈕與手機卡片動作列 ≥44px（含 `@media (pointer:coarse)`） |
+| 文字對比 | 破壞性確認與錯誤態在兩主題下可讀 |
+| 角色／權限 | 記錄庫 → 量測與座標分頁：管理者見刪除；一般使用者不見 |
+| 刪除流程 | 座標分頁：有引用須兩段確認；無引用一次確認 |
+| 狀態同步 | 刪除目前選取之座標後頂欄「座標檔：未套用」；若回合曾顯示 `placePreview`，刪除後不得仍顯示「已套用（檢視）」 |
+| 稽核 | 刪除列寫入 audit；舊列對已刪 id 顯示「目標已不在本站」 |
+| R2 失敗 | 測試 stub 顯示 `r2_pending` 類訊息且可重試 |
 
 ---
 
@@ -219,6 +229,7 @@ sequenceDiagram
 3. **Given** 管理者 **When** 刪除一筆量測 **Then** 該筆自清單消失；若為目前回合來源則頂欄狀態更新。
 4. **Given** 非管理者 **When** 呼叫 DELETE **Then** 403；UI 無刪除鈕。
 5. **Given** D1 batch 已成功、R2 delete 失敗 **When** API 回應 **Then** 客戶端顯示 `r2_pending` 類訊息；重試 DELETE 可清 R2 且不重複寫 audit（orphan 路徑）。
+6. **Given** 目前回合以 `placePreview` 或 `PLACE` 套用被刪座標 **When** 管理者刪除該座標檔 **Then** 頂欄座標狀態為未套用／錯誤可見；3D 不再顯示已刪預覽佈局（`componentX/Y` 已清）。
 
 ---
 

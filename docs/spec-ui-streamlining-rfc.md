@@ -114,3 +114,16 @@ import | specs (標籤：規格與鋼板) | runs | ai-cfg
    - 將匯出邏輯獨立為具名函式並掛載於 `window.SPI_TEST_HOOK`，`triggerExportByType(type)` 直接呼叫對應匯出函式，不再透過 DOM `.click()` 代理。
 4. **`#recPickerModal` 三頁籤**：
    - `#btnPickSpi` / `#btnPickPlace` / `#btnPickSpecs`；`"specs"` 分頁隱藏 `#pickSideSeg` 與 `#pickQualitySeg`，顯示 `#adminUsersSection`、`#recSpec` 與 `#recAuditBox`，沿用 `#recPickerQ` 與 `#pickPartFilter` 篩選與 `[data-ract]` 操作；`openRecord()` 錯誤同步寫入 `toast` 與 `#recPickerNotice`。
+
+---
+
+## 6. 實作驗收矩陣（UI）
+
+依 `AGENTS.md`：以 **build 產物**在 **1440／820／390／320** CSS px、**明亮／深色**各驗一輪；涵蓋 10 個主分頁、`#p-data` 四子分頁、`#moreMenu`、`#recPickerModal`（含三頁籤）與 `#exportCenterModal`。每頁檢查：
+
+- `documentElement.scrollWidth === clientWidth`（`.rail` 單列目標在 ≥1280px 寬度須達成）
+- 觸控熱區 ≥44px（`tests/mobile-layout.test.mjs` 對照）
+- `devicePixelRatio > 1` 下同一頁至少進出兩次（3D、LISA 等 canvas 尺寸不累積放大）
+- 深色主題下報告預覽文字對比符合既有守則
+
+無法於 CI 模擬者（例如 `pointer:coarse` 於 ≥768px）標 `NOT TESTED` 並列於驗收紀錄。
