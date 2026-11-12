@@ -280,9 +280,10 @@ function resolveModelAndEffort(req, env, provCfg) {
   return { model, reasoningEffort };
 }
 
-export const UPSTREAM_RETRY_MAX_ATTEMPTS = 3;
-export const UPSTREAM_RETRY_MAX_DELAY_MS = 4000;
-const UPSTREAM_RETRY_BACKOFF_MS = [1000, 2000, 4000];
+// 上游暫時過載（Gemini 503 high demand、429 rate limit）常持續十幾秒；最多 4 次、間隔 2→4→8 秒（總等待約 14 秒）。
+export const UPSTREAM_RETRY_MAX_ATTEMPTS = 4;
+export const UPSTREAM_RETRY_MAX_DELAY_MS = 8000;
+const UPSTREAM_RETRY_BACKOFF_MS = [2000, 4000, 8000];
 
 function errorPayloadFromJson(value) {
   if (!value || typeof value !== 'object') return null;
