@@ -95,6 +95,7 @@ npm run release-check:scans # 僅發布掃描，不執行測試，不代表完�
   - 系統已完成由 Netlify 至 Cloudflare 之架構遷移。Netlify 平台資源之徹底下線與 Blobs 清理步驟詳見 [`docs/netlify-teardown.md`](file:///c:/Users/user/Documents/spi-spc%20analyst/docs/netlify-teardown.md)。
 - **AI 分析**：
   - 在 claude.ai 內使用頁內 Claude；正式站點由後端 `/api/analyze` 透過 Cloudflare AI Gateway 呼叫 Claude（可用環境變數 `AI_MODEL` 指定模型）。只傳送統計摘要與問題清單，不傳送原始逐焊墊 SPI 資料。
+  - AI 設定可選 OpenAI、Antigravity 或 NVIDIA（build.nvidia.com 免費帳號的 `nvapi-` 金鑰）；NVIDIA 的模型選單以「更新模型清單」取得帳號當下可用的模型。金鑰由使用者在介面填入，或由管理員設 Worker secret（`OPENAI_API_KEY`、`ANTIGRAVITY_API_KEY`、`NVIDIA_API_KEY`）。
 - **全站登入防護**：
   - Cloudflare Worker 對全站頁面與 `/api/*` 要求帳號與加鹽 PBKDF2/PEPPER-HMAC 密碼驗證。同帳號或 IP 15 分鐘內失敗達門檻自動鎖定。
 
