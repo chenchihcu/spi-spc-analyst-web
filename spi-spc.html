@@ -2542,6 +2542,7 @@ const NELSON=[
  {id:8,name:"連續 8 點皆在 1σ 外（兩側）",hint:"混合分布：多台印刷機或多鋼板交替"}];
 /* allow：此圖適用的規則編號（計數型、S／MR 圖只用 1–4；EWMA／CUSUM 點彼此不獨立，只用規則 1） */
 const XBAR_FA="X̄ 圖界限採板平均移動全距（三向法），已含正常板間變異；穩定製程模擬（10–25 板、每板 30–100 焊墊、含各板焊墊數不等、有無板間變異）下規則 1 每點誤報約 0.21–0.28%（名目 0.27%），規則 1–6、8 合併每點約 1.8–5.2%，低於真 σ 已知時的 3.0–6.5%。";
+const XBAR_FA_AI="三向法界限；規則 1 模擬誤報約名目 0.27%";
 /* 三向管制圖（Wheeler）：X̄ 圖每板平均的 σ 取自板平均依序移動全距（σ̂板平均 = MR̄/1.128），已含正常的板間變異。
    各板焊墊數 nᵢ 不同時，每個移動全距依相鄰兩板的 hⱼ = (1/nⱼ + 1/nⱼ₋₁)/2 標準化：
    求 σ̂板間² ≥ 0 使 平均 |dⱼ| / √(σ̂板間² + σ̂組內²·hⱼ) = 1.128，σᵢ = √(σ̂板間² + σ̂組內²/nᵢ)；
@@ -5359,7 +5360,7 @@ function detectIssues(st,onStage){
           limit:limTxt,
           z:topList(r.idx.map(i=>`${boards[i]} z=${f(z[i],2)}`),10),
           p:r.id===1?"每點約 0.27%（10–25 板穩定製程模擬）":"不適用（連串型規則，見預期誤報）",
-          aiFacts:[`${boards[zMaxIdx]} 平均 ${f(bm[zMaxIdx],2)} ${u(k)}；z=${f(z[zMaxIdx],2)}；n=${counts[zMaxIdx]}；CL=${f(mu,2)}；LCL=${f(pts[zMaxIdx].lcl,2)}；UCL=${f(pts[zMaxIdx].ucl,2)}`,faFact],
+          aiFacts:[`${boards[zMaxIdx]} 平均 ${f(bm[zMaxIdx],2)} ${u(k)}；z=${f(z[zMaxIdx],2)}；n=${counts[zMaxIdx]}；CL=${f(mu,2)}；LCL=${f(pts[zMaxIdx].lcl,2)}；UCL=${f(pts[zMaxIdx].ucl,2)}`,XBAR_FA_AI],
           facts:[
             `${lab(k)} X̄ 圖（每板平均、群組＝全部）：Nelson 規則 ${r.id}（${r.name}）於 ${bStr} 觸發；最大偏離板 ${boards[zMaxIdx]} 平均 ${f(bm[zMaxIdx],2)} ${u(k)}（z = ${f(z[zMaxIdx],2)}），${limTxt}`,
             ...(faFact?[faFact]:[])
@@ -10193,7 +10194,7 @@ function capInfo(A){const c=A.cap;if(!c)return null;const ci=x=>`${f(x.ci[0])}�
   return{Cp:+f(c.cp),Cpk:+f(c.cpk),Cpk95信賴區間:ci(c),信賴區間有效板數:c.nb,Pp:+f(c.pp),Ppk:+f(c.ppk),...( !isFinite(c.cpk)&&c.reason?{Cpk無法估計原因:c.reason}:{}),預估PPM:+fmtPpm(c.ppmExp).replace(/,/g,""),...(c.mixed?{全部群組預估PPM:+fmtPpm(c.ppmExpAll).replace(/,/g,""),全部群組超規PPM:+fmtPpm(c.ppmObsAll).replace(/,/g,"")}:{}),不良PPM_全部判定項目:defPpm,[`超規PPM_${mShort}`]:+fmtPpm(c.ppmObs).replace(/,/g,""),
     製程穩定:A.stable,製程穩定狀態:stabilityText(A),能力計算方式:(c.mixed?`逐元件群組（組內 σ），以${isFinite(c.cpk)?"最差群組":"Ppk 最差可估群組"} ${c.worst} 代表`:"組內 σ"),規格窗:fmtSpecSpan({lsl:c.lsl!=null?c.lsl:A.sp.lsl,usl:c.usl!=null?c.usl:A.sp.usl},1),
     逐群組:c.mixed?c.groups.slice(0,15).map(g=>({群組:g.g,n:g.n,規格:fmtSpecSpan(g,0),Cpk:+f(g.cpk),Cpk95信賴區間:ci(g),Ppk:+f(g.ppk)})):undefined}}
-function ctrlInfo(A){const N=A.nelX||A.nel;return{依據:"X̄ 圖（每板平均，界限依板平均移動全距 σ̂ = MR̄/1.128，三向法，8 條 Nelson 規則）",σ板平均:+f(A.xs.sigmaBM,3),σ板間:+f(A.xs.sigmaB,3),製程穩定:A.stable,製程穩定狀態:stabilityText(A),...(A.stable===null?{穩定性原因:A.xs.reason}:{}),觸發規則:N.rules.filter(r=>r.idx.length).map(r=>({規則:r.name,板:r.idx.map(i=>A.xs.pts[i].lab).join(" ")})),Pprime_sigmaZ:+f(A.pc.sigZ,2)}}
+function ctrlInfo(A){const N=A.nelX||A.nel;return{依據:"X̄ 圖（每板平均，三向法 MR̄/1.128，8 條 Nelson 規則）",σ̂板平均:+f(A.xs.sigmaBM,3),σ̂板間:+f(A.xs.sigmaB,3),製程穩定:A.stable,製程穩定狀態:stabilityText(A),...(A.stable===null?{穩定性原因:A.xs.reason}:{}),觸發規則:N.rules.filter(r=>r.idx.length).map(r=>({規則:r.name,板:r.idx.map(i=>A.xs.pts[i].lab).join(" ")})),Pprime_sigmaZ:+f(A.pc.sigZ,2)}}
 function fmInfo(){const Me=S.F&&S.F.meta;if(!Me||!Me.modes)return[];return Me.modes.map(m=>({模式:m.name,判讀:m.verdict,支持面向:m.dims.join("、"),必要面向:m.key||"",支持證據:m.sup.map(e=>e.d+"："+e.txt),矛盾證據:m.con.map(e=>e.d+"："+e.txt),資料不足:m.need||""}))}
 function mcInfo(){const Me=S.F&&S.F.meta;return Me&&Me.tests?{單板異常檢定次數:Me.tests,每次誤報率:+Me.alpha.toExponential(2),預期誤報數:+f(Me.expFA,2),門檻:"依板數校準（i.i.d. 穩定製程模擬）",涵蓋範圍:"僅單板異常；其他偵測各有誤報率"}:null}
 /* 與伺服器端 lib/analyze-core.mjs 的 SYSTEM_PROMPT 相同的證據規則（測試會核對兩邊一致） */

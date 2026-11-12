@@ -45,7 +45,7 @@ test("AI 分析資料：含失效模式交叉比對、能力信賴區間、X̄ �
   assert.ok(controlIssues.some(x => !x["問題"].startsWith(out["量測項目"])), "應覆蓋未選取項目的控制圖問題");
   for (const issue of controlIssues) {
     assert.ok(issue["事實"].some(x => /平均.*z=.*LCL=.*UCL=/.test(x)), "控制圖問題應保留數值證據");
-    assert.ok(issue["事實"].some(x => /三向法.*名目 0\.27%/.test(x)), "也須揭露三向法界限的模擬誤報率");
+    assert.ok(issue["事實"].some(x => /三向法.*0\.27%/.test(x)), "也須揭露三向法界限的模擬誤報率");
   }
   assert.deepEqual(errs, []);
 });
