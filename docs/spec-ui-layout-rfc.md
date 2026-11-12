@@ -85,11 +85,12 @@ flowchart TD
 | 改善與驗證 | `lab` | `#p-lab` | 實驗驗證 |
 | 改善與驗證 | `ai` | `#p-ai` | AI 分析 |
 | 改善與驗證 | `report` | `#p-report` | 分析報告 |
-| 設定 | `data` | `#p-data` | 資料與規格（含子頁） |
+| 資料 | `data` | `#p-data` | 資料與規格（匯入、回合） |
+| 設定 | `settings` | `#p-settings` | 設定（介面、規格、鋼板、AI；流程外，排在分析報告之後） |
 
-**「資料與規格」子頁**（`#p-data` 內 `data-sub`）：`import`（匯入與規格）、`runs`（回合管理）、`stencil`（鋼板與開孔）、`records`（資料庫）。
+**「資料與規格」子頁**（`#p-data` 內 `data-sub`）：`import`（匯入資料）、`runs`（回合管理）。
 
-**手機底欄（≤5 項）**：問題、總覽、管制圖、能力、**更多**（`#moreSheet` 含其餘分頁與記錄庫／主題／帳號工具）。
+**手機底欄（≤5 項）**：問題、總覽、管制圖、能力、**更多**（`#moreSheet` 含其餘分頁、記錄庫、設定與帳號工具）。
 
 **輔助 panel**（非主 tab 列項目，由流程進入）：`#p-gate`、`#p-share`、`#p-shares`、`#p-mail` 等 — 改版面時須一併納入驗收矩陣，不可視為「次要而略過」。
 
@@ -134,7 +135,7 @@ Institution Web 規則偏好「同一語意單 DOM + CSS 斷點」；本產品�
 | 觸控／安全區 | `--tap-min:44px`；`--safe-*` | 對齊 IOS-04 工程目標 |
 | 圓角 | `--r` / `--r-card` / `--r-sheet` | 10 / 16 / 20 px |
 
-深色：`@media (prefers-color-scheme: dark)` 與 `[data-theme="dark"]` 覆寫；使用者可經「更多／sheet」切換（`#btnTheme` / `#mBtnTheme`）。**明亮仍為產品基準**（Institution §3）。
+深色：`@media (prefers-color-scheme: dark)` 與 `[data-theme="dark"]` 覆寫；使用者在「設定 → 介面」以 `#btnThemeSettings` 切換。**明亮仍為產品基準**（Institution §3）。
 
 Viewport：`<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">` — 符合 IOS-01／IOS-02 基礎。
 
@@ -214,7 +215,7 @@ Institution §9：版本單一來源 `package.json`；build 注入 `#appVer`／`
 |------|------|
 | 寬度 | 1440、820、390、320 CSS px |
 | 主題 | 明亮 + 深色（含 `.report-preview` 列印對比） |
-| 路由／分頁 | 14 主分頁 + 4 資料子頁 + 「更多」sheet + 設定／帳號選單 + 主要 dialog |
+| 路由／分頁 | 主頁籤（含獨立「設定」）+ 資料子頁（匯入、回合）+ 「更多」sheet + 帳號選單 + 主要 dialog |
 | 溢出 | 320px 下 `document.documentElement.scrollWidth === clientWidth`（表格／圖表允許**區域** scroll） |
 | 觸控 | 可點目標 ≥ 44px（含 label 包住 checkbox） |
 | dpr | devicePixelRatio > 1 下同一頁進出 ≥ 2 次（canvas 寬度不累乘） |

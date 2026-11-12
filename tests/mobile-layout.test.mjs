@@ -153,12 +153,13 @@ test('4. 行動版 DOM 結構與分頁控制 (JSDOM 驗證)', { skip: !JSDOM && 
   const subTabs = $$('#moreSheet [data-mtab]').map((b) => b.dataset.mtab);
   assert.deepEqual(
     subTabs,
-    ['sim3d', 'deep', 'deep', 'deep', 'improve', 'improve', 'improve', 'ai', 'report', 'data'],
-    '需涵蓋其餘 10 個分頁（深入／改善複合路由）'
+    ['sim3d', 'deep', 'deep', 'deep', 'improve', 'improve', 'improve', 'ai', 'report', 'data', 'settings'],
+    '需涵蓋其餘分頁（深入／改善複合路由，以及獨立的設定）'
   );
 
-  // d. 更多 Sheet 內涵蓋操作與帳號（主題改由設定 Hub；桌機頂欄「更多」不再重複主題鈕）
-  assert.ok($('#mBtnTheme'), '需有行動版介面與主題設定入口');
+  // d. 更多 Sheet 內涵蓋操作與帳號（主題在設定頁；桌機頂欄「更多」不再重複主題鈕）
+  assert.ok($('#moreSheet [data-mtab="settings"]'), '需有行動版設定入口');
+  assert.equal($('#mBtnTheme'), null, '更多選單不重複「介面與主題設定」');
   assert.equal($('#btnTheme'), null, '桌機 #moreMenu 不應再留 #btnTheme');
   assert.ok($('#btnThemeSettings'), '設定 Hub 需有 #btnThemeSettings');
   assert.ok($('#mBtnOpenExportModal'), '需有行動版匯出中心入口');

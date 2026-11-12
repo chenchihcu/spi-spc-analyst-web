@@ -98,7 +98,7 @@ test("流程：鋼板厚度必填 → 未定義規格時鎖定 → 驗證與草�
   await $("#btnApply").onclick();
   assert.ok(await until(() => w.eval("S.runs.length") === 3));
   assert.equal(w.eval("S.specSrc"), "none"); assert.equal(w.eval("S.A"), null, "未定義規格不計算");
-  assert.equal(w.eval("S.tab"), "data", "導向資料與規格");
+  assert.equal(w.eval("S.tab"), "settings", "未定義規格時打開設定");
   assert.equal(w.eval("S.stencil"), 100);
   assert.equal($("#inStencil2").value, "100", "套用匯入後，厚度帶入本回合設定欄");
   assert.equal($("label[for=inStencil2]").textContent, "本回合鋼板厚度 µm");
@@ -108,7 +108,7 @@ test("流程：鋼板厚度必填 → 未定義規格時鎖定 → 驗證與草�
   assert.equal($("#p-gate").hidden, false, "分析頁顯示鎖定畫面"); assert.equal($("#p-issues").hidden, true);
   assert.match($("#gateMsg").textContent, /NEW-1.*儲存為新版本/);
   $("#btnGateSpec").click();
-  assert.equal(w.eval("S.tab"), "data");
+  assert.equal(w.eval("S.tab"), "settings", "閘門前往設定");
 
   // 3. 欄位驗證：LSL ≥ USL 不寫入，並以紅框＋行內說明提示
   change(w, $("#sp-volume-lsl"), 140);
