@@ -152,8 +152,8 @@ test('[D-10] no_coords: 空間分布與問題地圖顯示不適用，無空間�
   const spatialIssues = issues.filter(iss => iss.cat === '空間分布');
   assert.equal(spatialIssues.length, 0, '無座標時不得出現空間相關的問題卡');
   const d = dom.window.document;
-  d.querySelector('[data-tab="deep"]').click();
-  d.querySelector('[data-subnav-deep="cross"]')?.click();
+  d.querySelector('[data-tab="issues"]').click();
+  d.querySelector('[data-subnav-issues="cross"]')?.click();
   await tick(40);
   const heatSub = d.querySelector('#heatSub');
   if (heatSub) {

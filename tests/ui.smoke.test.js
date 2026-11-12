@@ -64,43 +64,38 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   assert.equal(d.querySelectorAll("#issList details.iss-card:not([open])").length, 0, "全部展開");
   $("#issCollapse").click();
   assert.equal(d.querySelectorAll("#issList details.iss-card[open]").length, 0, "全部收合");
-  // 頂端不再重複規格輸入；資料與規格頁分為匯入、回合管理。設定是獨立主頁籤。
-  assert.equal(d.querySelector("#inLsl"), null, "規格輸入只保留在設定頁");
-  assert.equal(d.querySelectorAll("#p-data .subtab").length, 2);
-  assert.equal(d.querySelector('.tab[data-tab="settings"]').textContent, "設定");
-  // 子分頁鍵盤：只有選取中的在 Tab 順序，左右鍵在匯入與回合之間切換
-  assert.deepEqual([...d.querySelectorAll("#p-data .subtab")].map((b) => b.tabIndex), [0, -1]);
+  // 頂端不再重複規格輸入；資料與規格頁分為 3 個子分頁（匯入、規格、回合管理）
+  assert.equal(d.querySelector("#inLsl"), null, "規格輸入只保留在資料與規格頁");
+  assert.equal(d.querySelectorAll("#p-data .subtab").length, 3);
+  // 子分頁鍵盤：只有選取中的在 Tab 順序，左右鍵切換
+  assert.deepEqual([...d.querySelectorAll("#p-data .subtab")].map((b) => b.tabIndex), [0, -1, -1]);
   d.querySelector("#p-data .subtabs").dispatchEvent(new w.KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
-  assert.equal(d.querySelector('#p-data .subtab[data-sub="runs"]').getAttribute("aria-selected"), "true", "右鍵切到回合管理");
+  assert.equal(d.querySelector('#p-data .subtab[data-sub="settings"]').textContent.trim(), "規格");
+  assert.equal(d.querySelector('#p-data .subtab[data-sub="settings"]').getAttribute("aria-selected"), "true", "右鍵切到規格");
+  d.querySelector("#p-data .subtabs").dispatchEvent(new w.KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+  assert.equal(d.querySelector('#p-data .subtab[data-sub="runs"]').getAttribute("aria-selected"), "true", "再按右鍵切到回合管理");
   d.querySelector("#p-data .subtabs").dispatchEvent(new w.KeyboardEvent("keydown", { key: "Home", bubbles: true }));
-  assert.equal(d.querySelector('#p-data .subtab[data-sub="import"]').getAttribute("aria-selected"), "true", "Home 回到匯入資料");
   // 驗證新整合的 UI/UX 入口與轉跳（記錄庫膠囊群組、子視圖切換器、AI 精簡狀態列、分析報告匯出整合）
   assert.ok(d.querySelector("header.top .db-capsule-group #btnOpenRecModal"), "頂欄應有整合的記錄庫膠囊群組");
   assert.equal(d.querySelector(".rail #railTimeWrap"), null, "分析設定列不應含時段篩選");
   assert.equal(d.querySelector(".rail #inTimeStart"), null, "分析設定列不應含時段輸入");
   assert.ok(d.querySelector("#btnOpenExportModal"), "匯出應以匯出中心為單一入口");
   assert.ok(d.querySelector("#btnRepPdf"), "分析報告頁保留 PDF 匯出");
-  assert.ok(d.querySelector('#p-ai #aiCompactBar #btnGoAiCfg'), "AI 分析頁頂部應有單行精簡狀態列與設定轉跳鈕");
-  tab("data");
+  assert.ok(d.querySelector('#p-ai #aiCompactBar #btnGoAiCfg'), "AI 診斷頁頂部應有精簡狀態列與設定轉跳鈕");
+  tab("ai");
   d.querySelector("#btnGoAiCfg").click();
-  assert.equal(d.querySelector("#p-settings").hidden, false, "設定頁應可見");
-  assert.equal(d.querySelector("#p-data").hidden, true, "資料頁應隱藏");
-  assert.equal(d.querySelector('.tab[data-tab="settings"]').getAttribute("aria-selected"), "true");
-  assert.equal(w.SPI_TEST_HOOK.S.settingsPane, "ai");
-  assert.equal(d.querySelector('#p-settings [data-settings-anchor="ai"]').getAttribute("aria-current"), "true");
-  assert.equal(d.querySelector("#aiSettingsCard").hidden, false, "AI 設定卡保持可見");
-  assert.ok(d.querySelector("#p-settings #aiSettingsCard"), "AI 詳細設定卡應位於設定頁");
-  assert.ok(d.querySelector("#p-settings #btnThemeSettings"), "主題切換應位於設定介面段");
-  d.querySelector("#inAiKey").value = "sk-draft-unsaved";
-  d.querySelector("#inAiDailyLim").value = "7";
-  d.querySelector('[data-settings-anchor="spec"]').click();
-  assert.equal(d.querySelector("#inAiKey").value, "sk-draft-unsaved", "同頁切到規格時保留未儲存的 AI 金鑰");
-  assert.equal(d.querySelector("#inAiDailyLim").value, "7", "同頁切區段時保留未儲存的配額");
-  d.querySelector('[data-settings-anchor="ai"]').click();
-  assert.equal(d.querySelector("#inAiKey").value, "sk-draft-unsaved", "再點 AI 區段也不重載已存設定");
+  assert.equal(d.querySelector("#appSettingsModal").hidden, false, "AI 設定轉跳應開啟介面與 AI 設定對話框");
+  assert.ok(d.querySelector("#appSettingsModal #aiSettingsCard"), "AI 詳細設定卡應在設定對話框");
+  assert.ok(d.querySelector("#appSettingsModal #btnThemeSettings"), "主題切換應在設定對話框");
+  d.querySelector("#appSettingsClose").click();
   w.SPI_TEST_HOOK.setSub("specs", "spec");
-  assert.equal(w.SPI_TEST_HOOK.S.tab, "settings", "舊別名 specs 應打開設定頁");
-  assert.equal(w.SPI_TEST_HOOK.S.settingsPane, "spec");
+  assert.equal(w.SPI_TEST_HOOK.S.sub, "settings", "舊別名 specs 應對應規格子分頁");
+  w.SPI_TEST_HOOK.setTab("deep/cross");
+  assert.equal($("[data-tab=issues]").getAttribute("aria-selected"), "true", "#deep/cross 應開問題偵測");
+  assert.equal(w.SPI_TEST_HOOK.S.issuesSub, "cross", "#deep/cross 應開交叉驗證");
+  w.SPI_TEST_HOOK.setTab("deep/adv");
+  assert.equal($("[data-tab=deep]").getAttribute("aria-selected"), "true", "#deep/adv 應開製程跡象");
+  assert.equal(d.querySelector(".rail #selChart"), null, "分析設定列不應含管制圖種類");
   // 換回合後，先前展開的問題不會自動展開
   d.querySelector("#iss-1 > summary").click();
   assert.equal(d.querySelector("#iss-1").open, true);
@@ -120,10 +115,14 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   assert.equal(hook.issuesCsv(hook.S.F), before);
   $("#pmapClear").click();
   assert.equal(hook.issueList().length, hook.S.F.length);
-  d.querySelector("#issList [data-go]").click();
-  assert.equal($("#ctxBar").hidden, false, "前往證據頁時應顯示來源提示");
+  const crossGo = [...d.querySelectorAll("#issList [data-go]")].find((b) => hook.S.F.some((x) => x.id === +b.dataset.go && x.go && x.go.tab === "cross"));
+  assert.ok(crossGo, "範例資料應有導向交叉驗證的問題卡");
+  crossGo.click();
+  assert.equal(hook.S.issuesSub, "cross", "交叉驗證證據應在交叉驗證子頁");
+  assert.equal($("#ctxBar").hidden, false, "前往交叉驗證證據時應顯示來源提示");
   $("#ctxBack").click();
   assert.equal($("[data-tab=issues]").getAttribute("aria-selected"), "true", "返回鍵應回到問題清單");
+  assert.equal(hook.S.issuesSub, "list", "返回鍵應回到問題清單子頁");
   assert.equal($("#selMetric").closest(".field").hidden, true, "問題偵測頁不顯示不相干的量測項目選單");
 
   for (const t of ["issues", "overview", "control", "capability", "sim3d", "deep", "improve", "ai", "data", "report"]) tab(t);

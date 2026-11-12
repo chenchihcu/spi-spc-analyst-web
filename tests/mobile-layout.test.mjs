@@ -149,17 +149,17 @@ test('4. 行動版 DOM 結構與分頁控制 (JSDOM 驗證)', { skip: !JSDOM && 
   assert.ok($('#moreSheetClose'), '需有 #moreSheetClose 關閉鈕');
   assert.ok(moreSheet.querySelector('.sheet-handle'), '需有拖曳把手 .sheet-handle');
 
-  // c. 更多 Sheet 內涵蓋全部次要分頁（共 4+9=13 個分頁）
+  // c. 更多 Sheet 內涵蓋次要分頁路由（製程跡象單頁；改善三子頁）
   const subTabs = $$('#moreSheet [data-mtab]').map((b) => b.dataset.mtab);
   assert.deepEqual(
     subTabs,
-    ['sim3d', 'deep', 'deep', 'deep', 'improve', 'improve', 'improve', 'ai', 'report', 'data', 'settings'],
-    '需涵蓋其餘分頁（深入／改善複合路由，以及獨立的設定）'
+    ['sim3d', 'deep', 'improve', 'improve', 'improve', 'ai', 'report', 'data'],
+    '需涵蓋其餘分析、診斷與資料分頁路由'
   );
 
-  // d. 更多 Sheet 內涵蓋操作與帳號（主題在設定頁；桌機頂欄「更多」不再重複主題鈕）
-  assert.ok($('#moreSheet [data-mtab="settings"]'), '需有行動版設定入口');
-  assert.equal($('#mBtnTheme'), null, '更多選單不重複「介面與主題設定」');
+  // d. 更多 Sheet 內涵蓋操作與帳號（介面／AI 服務改由 sheet；桌機頂欄「更多」不再重複主題鈕）
+  assert.ok($('#mBtnUiSettings'), '需有行動版介面設定入口');
+  assert.ok($('#mBtnAiSettings'), '需有行動版 AI 服務設定入口');
   assert.equal($('#btnTheme'), null, '桌機 #moreMenu 不應再留 #btnTheme');
   assert.ok($('#btnThemeSettings'), '設定 Hub 需有 #btnThemeSettings');
   assert.ok($('#mBtnOpenExportModal'), '需有行動版匯出中心入口');
@@ -186,12 +186,10 @@ test('4. 行動版 DOM 結構與分頁控制 (JSDOM 驗證)', { skip: !JSDOM && 
   const mtabMore = $('#mtabMore');
   assert.equal(mtabMore.getAttribute('aria-selected'), 'true', '在次級分頁時更多按鈕需顯示 active/selected');
   assert.ok($('#cWipe'), '需存在 #cWipe 畫布');
-  const morphWrap = $('#cardMorph')?.parentElement;
-  assert.equal(morphWrap?.dataset?.subview, 'adv', '#cardMorph 的直接父層必須是深入分析子視圖');
   assert.equal($('#cardMorph')?.closest('#p-deep')?.id, 'p-deep', '#cardMorph 須在 #p-deep 內');
-  assert.equal($$('#p-deep [data-subview="adv"] .card .card').length, 0, '深入分析子視圖內不可有 .card 巢狀包覆 .card');
+  assert.equal($$('#p-deep .card .card').length, 0, '製程跡象區不可有 .card 巢狀包覆 .card');
   for (const id of ['aiSettingsCard', 'inAiKey', 'btnAiKeyToggle', 'inAiDailyLim', 'inAiTokenLim', 'inAiUsdLim', 'btnAiSaveCfg', 'btnAiClearKey', 'aiDailyBar', 'aiMonthlyBar', 'btnAICopy']) {
-    assert.ok($(`#${id}`), `AI 分析頁需存在 #${id}`);
+    assert.ok($(`#${id}`), `AI 服務設定需存在 #${id}`);
   }
 });
 
@@ -395,7 +393,7 @@ test("10. 零件位置圖只在地圖容器內捲動", () => {
   assert.match(htmlSource, /\.part-map-plot svg\{[^}]*width:640px;height:360px/);
   assert.match(htmlSource, /\.part-map-nav\{[^}]*flex-wrap:wrap/);
   assert.match(htmlSource, /\.iss\{[^}]*grid-template-columns:minmax\(0,1fr\)/);
-  assert.match(htmlSource, /\.deep-subviews,\.improve-subviews\{grid-template-columns:minmax\(0,1fr\)/);
+  assert.match(htmlSource, /\.deep-subviews,\.improve-subviews,\.issues-subviews,\.control-subviews\{grid-template-columns:minmax\(0,1fr\)/);
 });
 
 test("已解析匯入預覽的 grid 欄不得由內容撐寬", () => {

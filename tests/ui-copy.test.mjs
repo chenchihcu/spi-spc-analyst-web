@@ -62,12 +62,18 @@ test("spi-spc.html 保留功能型折疊", () => {
 });
 
 test("規格鋼板控制項唯一且位於設定 Hub；關係圖不含已拒絕圖種", () => {
-  const settings = html.slice(html.indexOf('id="p-settings"'), html.indexOf('id="p-share"'));
-  assert.ok(settings.length > 0, "設定頁應在分享頁之前");
-  for (const id of ["chkStep", "apTbl", "zoneMap", "aiSettingsCard", "btnThemeSettings"]) {
+  const settings = html.slice(html.indexOf('<div data-sub="settings"'), html.indexOf('<div class="grid2" data-sub="runs"'));
+  assert.ok(settings.length > 0, "設定 Hub 應在回合管理之前結束");
+  for (const id of ["chkStep", "apTbl", "zoneMap"]) {
     assert.equal((html.match(new RegExp(`id="${id}"`, "g")) || []).length, 1, `#${id} 應只出現一次`);
-    assert.match(settings, new RegExp(`id="${id}"`), `#${id} 應位於設定 Hub`);
+    assert.match(settings, new RegExp(`id="${id}"`), `#${id} 應位於規格子頁`);
   }
+  const appSettings = html.slice(html.indexOf('id="appSettingsModal"'), html.indexOf("<!-- 量測記錄"));
+  for (const id of ["aiSettingsCard", "btnThemeSettings", "settingsUiSection"]) {
+    assert.equal((html.match(new RegExp(`id="${id}"`, "g")) || []).length, 1, `#${id} 應只出現一次`);
+    assert.match(appSettings, new RegExp(`id="${id}"`), `#${id} 應位於介面與 AI 設定對話框`);
+  }
+  assert.doesNotMatch(html.slice(0, html.indexOf('id="appSettingsModal"')), /id="aiSettingsCard"/, "資料頁不應再內嵌 AI 設定卡");
   assert.equal(html.includes('data-sub="stencil"'), false, "不應再留獨立鋼板子分頁");
   assert.equal(html.includes('data-sub="specs"'), false, "不應再留獨立規格子分頁");
   assert.equal(html.includes('data-sub="ai-cfg"'), false, "不應再留獨立 AI 子分頁");
