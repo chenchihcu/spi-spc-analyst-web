@@ -45,6 +45,13 @@ const CASES = [
   ["群組名稱含特殊字元", spec("P1", { groups: { "A&B": { volume: W(80, 100, 120) } } })],
   ["群組名稱前後空白", spec("P1", { groups: { " U2": { volume: W(80, 100, 120) } } })],
   ["群組名稱超過 64 字", spec("P1", { groups: { ["G".repeat(65)]: { volume: W(80, 100, 120) } } })],
+  ["單邊 LSL（標準值與 USL 空）", spec("P1", { specs: { ...spec().specs, volume: W(75, null, null) } })],
+  ["單邊 LSL 含標準值", spec("P1", { specs: { ...spec().specs, volume: W(75, 100, null) } })],
+  ["單邊 USL（標準值與 LSL 空）", spec("P1", { specs: { ...spec().specs, area: W(null, null, 130) } })],
+  ["單邊 USL 含標準值", spec("P1", { specs: { ...spec().specs, area: W(null, 100, 130) } })],
+  ["雙邊皆空拒收", spec("P1", { specs: { ...spec().specs, volume: W(null, 100, null) } })],
+  ["單邊 LSL 標準值低於 LSL 拒收", spec("P1", { specs: { ...spec().specs, volume: W(80, 70, null) } })],
+  ["單邊 USL 標準值高於 USL 拒收", spec("P1", { specs: { ...spec().specs, area: W(null, 140, 130) } })],
 ];
 
 test("規格檔驗證：頁面 partSpecCheck／partSpecCanon 與伺服器 lib 結果完全相同", () => {
@@ -60,6 +67,47 @@ test("規格檔驗證：頁面 partSpecCheck／partSpecCanon 與伺服器 lib �
   assert.equal(partSpecCheck(CASES[11][1]).spec.part, "P1");
   assert.equal(partSpecCheck(CASES[12][1]).spec.stencilRef, null);
   for (const i of [13, 14, 15]) assert.match(partSpecCheck(CASES[i][1]).error, /群組名稱/, CASES[i][0] + "：不改寫群組名稱，直接拒收");
+  assert.equal(partSpecCheck(CASES[16][1]).spec.specs.volume.usl, null);
+  assert.equal(partSpecCheck(CASES[17][1]).spec.specs.volume.tgt, 100);
+  assert.equal(partSpecCheck(CASES[18][1]).spec.specs.area.lsl, null);
+  assert.equal(partSpecCheck(CASES[19][1]).spec.specs.area.tgt, 100);
+  assert.match(partSpecCheck(CASES[20][1]).error, /至少須設定 LSL 或 USL 之一/);
+  assert.match(partSpecCheck(CASES[21][1]).error, /的目標不可小於 LSL/);
+  assert.match(partSpecCheck(CASES[22][1]).error, /的目標不可大於 USL/);
+});
+
+test("單邊規格分析：classify 與 analyze 在只有 LSL 或只有 USL 時正確計算單邊 Cpk／Ppk 且不誤判缺界", () => {
+  const specs = {
+    volume: { lsl: 70, tgt: null, usl: null },
+    height: { lsl: null, tgt: 120, usl: 160 },
+    hpct: { lsl: null, tgt: 100, usl: 133.33 },
+    area: { lsl: null, tgt: null, usl: 130 },
+    offx: { lsl: -75, tgt: 0, usl: 75 },
+    offy: { lsl: -75, tgt: 0, usl: 75 },
+  };
+  const st = { stencil: 120, htol: { lo: null, hi: 133.33 }, step: { on: false, zones: [] }, specsG: {}, heightUnit: "um" };
+  assert.deepEqual([...core.classify({ volume: 220, height: 40, area: 30, offx: 0, offy: 0 }, specs, st)], [], "單邊上/下限缺口側不誤報");
+  assert.deepEqual([...core.classify({ volume: 65, height: 165, area: 140, offx: 0, offy: 0 }, specs, st)], ["INS", "BRG", "HIH"], "單邊超標正確分類");
+  const rows = Array.from({ length: 12 }, (_, i) => ({
+    board: `B${String(Math.floor(i / 4) + 1).padStart(2, "0")}`,
+    pad: `U1-${(i % 4) + 1}`,
+    group: "0402",
+    volume: 95 + (i % 4) * 3,
+    height: 115 + (i % 3) * 4,
+    area: 100 + (i % 4) * 2,
+    offx: (i % 3) - 1,
+    offy: 0,
+    w: 0.7,
+    d: 0.7,
+  }));
+  const A = core.analyze({ ...core.S, rows, specs, stencil: 120, htol: { lo: null, hi: 133.33 }, step: { on: false, zones: [] }, specsG: {}, heightUnit: "um", group: "ALL", metric: "volume" });
+  assert.ok(Number.isNaN(A.cap.cp), "只有 LSL 時體積 Cp 為 NaN");
+  assert.ok(Number.isFinite(A.cap.cpk) && A.cap.cpk > 0, "只有 LSL 時體積 Cpk 為有限正值");
+  assert.ok(Number.isNaN(A.cap.pp), "只有 LSL 時體積 Pp 為 NaN");
+  assert.ok(Number.isFinite(A.cap.ppk) && A.cap.ppk > 0, "只有 LSL 時體積 Ppk 為有限正值");
+  const AH = core.analyze({ ...core.S, rows, specs, stencil: 120, htol: { lo: null, hi: 133.33 }, step: { on: false, zones: [] }, specsG: {}, heightUnit: "um", group: "ALL", metric: "height" });
+  assert.ok(Number.isNaN(AH.cap.cp), "只有 USL 時高度 Cp 為 NaN");
+  assert.ok(Number.isFinite(AH.cap.cpk) && AH.cap.cpk > 0, "只有 USL 時高度 Cpk 為有限正值");
 });
 
 test("標準化：鍵順序不同的同一份規格產生相同位元組與指紋；本體檢查擋下非標準化、料號不符與壞 JSON", () => {
