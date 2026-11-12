@@ -160,6 +160,15 @@ test("立榮格式：面別未選且檔名無 TOP／BOT 時，依座標檔推定
   assert.match(prev, /找不到 1 個位號：G9/);
   assert.doesNotMatch(prev, /屬於另一面/);
   assert.equal(d.querySelector('#selSide').value, 'TOP', '推定結果預填到面別下拉');
+  const hint = d.querySelector('#selSideAuto');
+  assert.equal(hint.hidden, false, '面別旁顯示推定提醒');
+  assert.match(hint.textContent, /系統推定為 TOP 面：受控座標檔 TOP 面對得上 2\/3 個元件/);
+  assert.ok(d.querySelector('#selSide').classList.contains('inferred'));
+  d.querySelector('#inImpStencil').value = '100'; d.querySelector('#inImpStencil').dispatchEvent(new w.Event('change'));
+  assert.equal(hint.hidden, false, '改鋼板厚度重新轉換不算確認，提醒保留');
+  const side = d.querySelector('#selSide'); side.value = 'TOP'; side.dispatchEvent(new w.Event('change'));
+  assert.equal(hint.hidden, true, '使用者自己選面別後提醒消失');
+  assert.ok(!side.classList.contains('inferred'));
 });
 
 test("立榮格式：面別未選時依檔名 BOT 判定", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
@@ -172,6 +181,7 @@ test("立榮格式：面別未選時依檔名 BOT 判定", { skip: !JSDOM && "�
   await pick(dom, "#fileIn", "DEMO_BOT.csv", Buffer.from(WIDE));
   assert.match(d.querySelector("#mapPrev").textContent, /BOT 面（依檔名判定）/);
   assert.equal(d.querySelector('#selSide').value, 'BOT');
+  assert.match(d.querySelector('#selSideAuto').textContent, /系統推定為 BOT 面：檔名含 BOT/);
 });
 
 test("通用格式下讀到立榮橫排檔會自動切換；選立榮卻上傳一般檔會清楚說明", { skip: !JSDOM && "未安裝 jsdom" }, async () => {

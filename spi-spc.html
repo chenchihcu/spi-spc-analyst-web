@@ -376,6 +376,10 @@ th{font-size:var(--fs-caption);color:var(--muted);font-weight:700;letter-spacing
 td.num,th.num{text-align:right}
 .xv td:first-child{white-space:nowrap;font-weight:700}
 .note{font-size:var(--fs-caption);color:var(--muted)}
+/* 面別由系統推定時提醒確認：琥珀框＋說明，使用者改選後消失 */
+#selSide.inferred{outline:2px solid var(--warn);outline-offset:1px}
+.side-auto{display:block;margin-top:4px;padding:4px 8px;border-radius:6px;background:var(--warn-soft);color:var(--ink);font-size:var(--fs-caption)}
+.side-auto b{color:var(--warn)}
 .empty-state{text-align:center;padding:36px 20px;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-radius:var(--r);background:var(--surface2)}
 .empty-state h3,.empty-state .title{font-size:var(--fs-heading);font-weight:700;color:var(--ink);margin:0}
 .empty-state p,.empty-state .desc{font-size:var(--fs-body);color:var(--muted);margin:0;max-width:460px;line-height:1.5}
@@ -1444,7 +1448,7 @@ button.load-state{border:none;font:inherit;cursor:default}
       <div class="vendor" id="vendorBox">
         <div class="row">
           <div class="field"><label for="selVendor">加工廠 SPI 格式</label><select id="selVendor"><option value="generic">通用格式（每列一筆量測）</option><option value="lirong">立榮電子（每列一焊墊、各板橫排）</option><option value="zsf">振順豐（絕對值橫排）</option></select></div>
-          <div class="field" id="sideField"><label for="selSide">量測面別（必選）</label><select id="selSide" aria-describedby="selSideError"><option value="">請選擇</option><option value="TOP">TOP 面</option><option value="BOT">BOT 面</option></select><span class="note" id="selSideError" aria-live="polite"></span></div>
+          <div class="field" id="sideField"><label for="selSide">量測面別（必選）</label><select id="selSide" aria-describedby="selSideError selSideAuto"><option value="">請選擇</option><option value="TOP">TOP 面</option><option value="BOT">BOT 面</option></select><span class="note" id="selSideError" aria-live="polite"></span><span class="side-auto" id="selSideAuto" role="status" hidden></span></div>
         </div>
         <div class="row" id="placeRow" hidden>
           <span class="lbl" style="align-self:center">受控座標檔（必選）</span>
@@ -9045,7 +9049,11 @@ placeLoad();vendorUI();
 /* 量測面別：使用者選的優先；未選時依檔名（TOP／BOT），再不行由 unpivotWide 依座標檔推定 */
 function impSideOpt(){const v=$("#selSide").value;if(v==="TOP"||v==="BOT")return{side:v,sideSrc:"select"};const f=detectSide(IMP.name);return f?{side:f,sideSrc:"file"}:{side:""}}
 /* 推定出的面別寫回下拉（只在未選時），使用者仍可改選 */
-function fillImpSide(info){const el=$("#selSide");if(el&&!el.value&&(info.side==="TOP"||info.side==="BOT")){el.value=info.side;el.removeAttribute("aria-invalid")}}
+function fillImpSide(info){const el=$("#selSide");if(el&&!el.value&&(info.side==="TOP"||info.side==="BOT")){el.value=info.side;el.removeAttribute("aria-invalid");IMP.sideAuto={side:info.side,src:info.sideSrc,hits:info.sideHits}}showSideAuto()}
+/* 推定面別的提醒：留到使用者自己選面別或換檔為止 */
+function showSideAuto(){const el=$("#selSide"),box=$("#selSideAuto");if(!el||!box)return;const a=IMP&&IMP.sideAuto&&el.value===IMP.sideAuto.side?IMP.sideAuto:null;
+  el.classList.toggle("inferred",!!a);box.hidden=!a;
+  box.innerHTML=a?`<b>系統推定為 ${a.side} 面</b>：${a.src==="place"?`受控座標檔 ${a.side} 面對得上 ${a.hits.n}/${a.hits.total} 個元件`:"檔名含 "+a.side}。請確認是否正確，錯了請改選。`:""}
 function convertImp(keepMap){
   const v=$("#selVendor").value;IMP.conv=null;
   const wide=isWide(IMP.raw.head),hasMm=wide&&IMP.raw.head.some(h=>/\(mm\)/i.test(h));
@@ -9105,7 +9113,7 @@ $("#inImpStencil").onchange=()=>{$("#inImpStencil").removeAttribute("aria-invali
 /* 加工廠格式、面別、座標檔變更時，若已讀取檔案就重新轉換 */
 function reconvert(){if(!IMP||!IMP.raw)return;try{convertImp(false);$("#inRunName").value=impName();$("#parseErr").textContent="";renderMap();renderImportSourceSummary();updateImportWorkflow()}catch(e){$("#parseErr").textContent=e.message;$("#mapBox").hidden=true;IMP=null;showImportValidationError(e.message);updateImportWorkflow()}}
 $("#selVendor").onchange=()=>{try{localStorage.setItem("spi-vendor",$("#selVendor").value)}catch(e){}vendorUI();reconvert()};
-$("#selSide").onchange=()=>{syncIdentityHints();reconvert()};
+$("#selSide").onchange=()=>{if(IMP)IMP.sideAuto=null;showSideAuto();syncIdentityHints();reconvert()};
 $("#placeClear").onclick=()=>{PLACE=null;placeSave();placeShow();reconvert();clearImportFieldErrors("btnSelectPlace");renderImportSourceSummary();updateImportWorkflow();syncIdentityHints();syncPlaceToCurrentRun({notify:false})};
 $("#btnSelectPlace").onclick=()=>{if(typeof openRecPickerModal==="function")openRecPickerModal("place");else{$("#btnOpenRecModal")?.click();$("#btnPickPlace")?.click()}};
 /* 3D 示意網格警示：一鍵開啟座標檔庫，選取後由 use-place 動作套用至目前回合 */
