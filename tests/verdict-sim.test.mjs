@@ -28,7 +28,7 @@ function generateIidStableData({ nb = 25, shift = 0, seed = 1 } = {}) {
 
 const CMP_FIELDS = ['board', 'pad', 'comp', 'group', 'x', 'y', 'w', 'd', 'stroke', 'height', 'area', 'volume', 'offx', 'offy'];
 
-test('6.1 stable-25.csv 驗證：seed 1 CSV 往返一致；含同板效應的舊資料依新 X̄ 界限發出警示', () => {
+test('6.1 stable-25.csv 驗證：seed 1 CSV 往返一致；同板共變屬正常板間變異，三向法 X̄ 界限不因此警示', () => {
   const csvPath = path.join(import.meta.dirname, 'fixtures', 'stable-25.csv');
   assert.ok(fs.existsSync(csvPath), 'stable-25.csv 應存在');
   const txt = fs.readFileSync(csvPath, 'utf8');
@@ -52,9 +52,11 @@ test('6.1 stable-25.csv 驗證：seed 1 CSV 往返一致；含同板效應的舊
   const iss = core.detectIssues(st);
   const vd = iss.meta.verdict;
 
-  assert.equal(vd.level, 'warn', '同板共變造成的板平均變異應反映為警示');
-  assert.equal(vd.label, '警示', '整體判定標籤應為警示');
-  assert.ok(iss.some(x => x.cat === '管制圖規則' && (x.level === '警示' || x.lv === 'warn')), '警示應由新 X̄ 界限觸發的 Nelson 規則說明');
+  // v10.22.0 起 X̄ 界限採板平均移動全距（三向法）：generateStableData 的同板隨機效應是穩定的板間變異，
+  // 舊的組內標準誤界限把它判為警示；三向法不再因此警示（Nelson 卡最多為資訊等級）
+  assert.equal(vd.level, 'ok', '同板共變不應單獨造成警示');
+  assert.equal(vd.label, '正常', '整體判定標籤應為正常');
+  assert.ok(!iss.some(x => x.cat === '管制圖規則' && (x.lv === 'warn' || x.lv === 'ng')), '三向法 X̄ 界限不應把正常板間變異列為警示或嚴重');
 });
 
 test('6.1 verdict-sim-expected.json 期望檔與附錄 C 稽核參考判定比對（一致率 ≥85%）', () => {
@@ -93,12 +95,12 @@ test('6.1 verdict-sim-expected.json 期望檔與附錄 C 稽核參考判定比�
   }
 });
 
-test('M-18 回歸：25 板 seed 3 不出現多變量離群卡（X̄ 規則另列同板效應警示）', () => {
+test('M-18 回歸：25 板 seed 3 不出現多變量離群卡，同板效應也不觸發 X̄ 警示', () => {
   const rows = generateStableData({ nb: 25, shift: 0, stroke: true, seed: 3 });
   const st = baseState(core, { rows, metrics: ['volume', 'hpct', 'area', 'offx', 'offy'], metric: 'volume', group: 'ALL', chart: 'xbars' });
   const iss = core.detectIssues(st);
   assert.equal(iss.filter(x => x.cat === '多變量離群').length, 0);
-  assert.ok(iss.some(x => x.cat === '管制圖規則' && (x.level === '警示' || x.lv === 'warn')));
+  assert.ok(!iss.some(x => x.cat === '管制圖規則' && (x.lv === 'warn' || x.lv === 'ng')), '三向法 X̄ 界限不應把同板效應列為警示');
 });
 
 test('空間群聚回歸：穩定製程不出現空間群聚卡（Moran 標準誤校正前 25 板 seed 23/72/76/182、50 板 seed 141 的 Z 為 2.66–4.08 誤報）', () => {
@@ -107,7 +109,7 @@ test('空間群聚回歸：穩定製程不出現空間群聚卡（Moran 標準�
     const st = baseState(core, { rows, metrics: ['volume', 'hpct', 'area', 'offx', 'offy'], metric: 'volume', group: 'ALL', chart: 'xbars' });
     const iss = core.detectIssues(st);
     assert.equal(iss.filter(x => x.cat === '空間群聚').length, 0, `${nb} 板 seed ${seed} 不應出現空間群聚卡`);
-    assert.ok(iss.some(x => x.cat === '管制圖規則'), `${nb} 板 seed ${seed} 的新 X̄ 界限卡應獨立於空間群聚判讀`);
+    assert.ok(!iss.some(x => x.cat === '管制圖規則' && (x.lv === 'warn' || x.lv === 'ng')), `${nb} 板 seed ${seed} 的 X̄ 三向界限不應把同板效應列為警示`);
   }
 });
 
@@ -186,5 +188,36 @@ test('[slow] LISA 局部標示：全虛無資料在實際群組大小 30／60／
     // 同一資料集內各焊墊相關，標準誤放寬 3 倍
     const lim = alpha + 9 * Math.sqrt(alpha * (1 - alpha) / tot);
     assert.ok(sig / tot <= lim, `${n} 焊墊：每焊墊標示率 ${(sig / tot * 100).toFixed(2)}%（上限 ${(lim * 100).toFixed(2)}%）`);
+  }
+});
+
+test('[slow] X̄ 三向界限：穩定製程 10／15／25 板、每板 30–100 焊墊、有無板間變異，每點誤報接近名目', () => {
+  // 每板平均 σ = 板平均 MR̄/1.128（三向法）。i.i.d. 列級常態，板間隨機效應 σB ∈ {0, 1, 3}×(σW/√n)；另含各板 n 不等的情形。
+  // 規則 1 每點名目 0.27%；規則 1–6、8 合併旗標率與「真 σ 已知」時的同一模擬比較。
+  // 舊的 σ̂組內/√nᵢ 界限在 σB = 3·SE 時規則 1 每點約 32%（此處不重跑，見 CHANGELOG v10.22.0）。
+  const T = isSlow ? 300 : 4, nominal = 0.0027;
+  let a = 20261112;
+  const rnd = () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const nrm = () => { let u = 0; while (!u) u = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rnd()); };
+  const sizes = [[30], [60], [100], [30, 45, 60, 80, 100]];
+  for (const m of [10, 15, 25]) {
+    let r1 = 0, flag = 0, flagKnown = 0, tot = 0;
+    for (const ns of sizes) for (const bf of [0, 1, 3]) for (let t = 0; t < T; t++) {
+      const rows = [], trueSe = [], effects = [];
+      for (let b = 0; b < m; b++) {
+        const n = ns[b % ns.length], sb = bf / Math.sqrt(60), e = sb * nrm();
+        effects.push(e); trueSe.push(Math.sqrt(sb * sb + 1 / n));
+        for (let i = 0; i < n; i++) rows.push({ board: `B${String(b + 1).padStart(2, '0')}`, pad: `P${i}`, comp: `P${i}`, group: 'G', volume: 100 + e + nrm(), height: 120, area: 100 });
+      }
+      const A = core.analyze(baseState(core, { rows, metrics: ['volume'], metric: 'volume', group: 'ALL', chart: 'xbars' }));
+      assert.equal(A.xs.rejected, false);
+      r1 += A.nelX.rules.find((r) => r.id === 1).idx.length; flag += A.nelX.flag.size; tot += m;
+      flagKnown += core.nelson(A.xs.pts.map((p, i) => (p.v - 100) / trueSe[i])).flag.size;
+    }
+    if (!isSlow) continue;
+    const rate = r1 / tot, se = Math.sqrt(nominal * (1 - nominal) / tot);
+    assert.ok(rate <= 1.5 * nominal + 3 * se && rate >= 0.5 * nominal - 3 * se, `${m} 板：規則 1 每點誤報 ${(rate * 100).toFixed(3)}%（名目 0.27%）`);
+    assert.ok(flag <= 1.5 * flagKnown, `${m} 板：規則 1–6、8 合併每點旗標 ${(flag / tot * 100).toFixed(2)}%，真 σ 已知時 ${(flagKnown / tot * 100).toFixed(2)}%`);
+    console.log(`# 三向界限 ${m} 板：規則 1 每點 ${(rate * 100).toFixed(3)}%；合併 ${(flag / tot * 100).toFixed(2)}%（真 σ 已知 ${(flagKnown / tot * 100).toFixed(2)}%）`);
   }
 });

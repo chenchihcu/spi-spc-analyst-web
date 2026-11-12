@@ -58,7 +58,7 @@ test('R-ISSUE (8.0): issuesCsv 匯出格式包含 group_basis 與規格來源欄
   assert.equal(parsed.data.length, issues.length, 'CSV 行數應為 issues 數 + 1');
 });
 
-test('D-47: Nelson 規則卡獨立於畫面選擇、嚴重度依 8.0、新界限不套用舊誤報率', () => {
+test('D-47: Nelson 規則卡獨立於畫面選擇、嚴重度依 8.0、界限採三向法並揭露模擬誤報率', () => {
   const samp = core.sampleData();
   const st = baseState(core, {
     rows: samp,
@@ -78,15 +78,16 @@ test('D-47: Nelson 規則卡獨立於畫面選擇、嚴重度依 8.0、新界限
 
   assert.equal(nel5.level, '資訊', '規則 5 嚴重度應為資訊');
   assert.equal(nel6.level, '資訊', '規則 6 嚴重度應為資訊');
-  assert.equal(nel5.boards, 'B01; B02; B03; B04; B05; B06; B07; B08; B09; B10; B11; B12; B15; B16; B17; B18; B19; B20; B21; B22; B23; B24; B25', '規則 5 板號應依每板 σ̂組內/√nᵢ 界限計算');
-  assert.equal(nel6.boards, 'B01; B02; B03; B04; B05; B06; B07; B08; B09; B10; B11; B18; B19; B20; B21; B22; B23; B24; B25', '規則 6 板號應依每板 σ̂組內/√nᵢ 界限計算');
+  // 三向法界限已含正常板間變異：規則 5/6 只留下 B20 起的實際下降，不再涵蓋幾乎全部板
+  assert.equal(nel5.boards, 'B22–B25', '規則 5 板號應依三向法界限計算');
+  assert.equal(nel6.boards, 'B21–B25', '規則 6 板號應依三向法界限計算');
 
   assert.ok(nel5._sameTitles.some(t => t.includes('體積自 B20 起持續下降')), '規則 5 same_phenomenon 應含持續下降趨勢');
   assert.ok(nel6._sameTitles.some(t => t.includes('體積自 B20 起持續下降')), '規則 6 same_phenomenon 應含持續下降趨勢');
 
   for (const c of nelsonCards) {
-    assert.ok(c.facts.some(t => t.includes('舊板平均移動全距模擬表不適用')), `卡片 #${c.no} 不可套用舊界限的誤報率`);
-    assert.equal(c.p, '不適用（整批 Nelson 規則誤報率尚未校準）');
+    assert.ok(c.facts.some(t => t.includes('三向法') && t.includes('名目 0.27%')), `卡片 #${c.no} 應揭露三向法界限的模擬誤報率`);
+    assert.equal(c.p, c.rule_id === 'Nelson 規則 1' ? '每點約 0.27%（10–25 板穩定製程模擬）' : '不適用（連串型規則，見預期誤報）');
   }
 });
 

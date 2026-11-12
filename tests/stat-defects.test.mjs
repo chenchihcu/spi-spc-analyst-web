@@ -130,72 +130,40 @@ test("L3 沒有組內自由度時，σ̂組內與 Cpk 不由整體 σ 代替", (
   assert.equal(issues.meta.verdict.worstCap, null, "問題偵測也不可用整體 σ 補造組內 Cpk");
 });
 
-test("L3 固定 seed X̄ 模擬：每板 n_i 正規化，依 Phase I t(df) 參考核對誤報", () => {
-  let seed = 20261104 >>> 0;
-  const ref = normal(() => ((seed = (Math.imul(1664525, seed) + 1013904223) >>> 0) / 4294967296)), reps = 10000;
-  const simulate = (counts) => {
-    const byN = new Map(), totalBoards = counts.length;
-    for (let trial = 0; trial < reps; trial++) {
-      const means = new Float64Array(totalBoards); let grandSum = 0, N = 0, ssw = 0, df = 0;
-      for (let b = 0; b < totalBoards; b++) {
-        const n = counts[b], values = new Float64Array(n); let sum = 0;
-        for (let i = 0; i < n; i++) { const x = ref(); values[i] = x; sum += x; }
-        const m = sum / n; means[b] = m; grandSum += sum; N += n;
-        if (n > 1) { for (const x of values) ssw += (x - m) ** 2; df += n - 1; }
-      }
-      const grand = grandSum / N, sigmaW = Math.sqrt(ssw / df);
-      for (let b = 0; b < totalBoards; b++) {
-        const n = counts[b], z = (means[b] - grand) / (sigmaW / Math.sqrt(n));
-        const bucket = byN.get(n) || { total: 0, hit: 0 }; bucket.total++;
-        if (Math.abs(z) > 3) bucket.hit++;
-        byN.set(n, bucket);
-      }
-    }
-    return Object.fromEntries([...byN].map(([n, x]) => [n, { ...x, rate: x.hit / x.total }]));
-  };
-  const fixedN = simulate(Array(25).fill(5));
-  const alternating = simulate(Array.from({ length: 25 }, (_, i) => i % 2 ? 25 : 1));
-  // Phase I reference: P(|t_df| > 3 / sqrt(1 - n_i/N)); n=5 => df=100,
-  // n=1/25 alternating => N=313, df=288. The Monte Carlo tolerance is six binomial standard errors
-  // from that n-specific reference, not a shared fixed error-rate interval.
-  const checkReference = (result, n, N, df) => {
-    const p = c.tP(3 / Math.sqrt(1 - n / N), df), expected = result.total * p, se = Math.sqrt(result.total * p * (1 - p));
-    assert.ok(Math.abs(result.hit - expected) <= 6 * se, `n=${n}: ${result.hit}/${result.total} differs from t(${df}) reference ${p} (${expected.toFixed(1)} expected, ${se.toFixed(1)} SE)`);
-  };
-  assert.equal(fixedN[5].total, 250000);
-  assert.equal(alternating[1].total, 130000);
-  assert.equal(alternating[25].total, 120000);
-  checkReference(fixedN[5], 5, 125, 100);
-  checkReference(alternating[1], 1, 313, 288);
-  checkReference(alternating[25], 25, 313, 288);
-  const smallDf = simulate(Array(5).fill(2));
-  checkReference(smallDf[2], 2, 10, 5);
-  assert.ok(c.tP(3 / Math.sqrt(1 - 2 / 10), 5) > 0.01, "df=5 的有限樣本參考不能誤稱固定為常態 0.27%");
+// 三向法 X̄ 界限的獨立實作：每個移動全距 dⱼ 以 hⱼ = (1/nⱼ + 1/nⱼ₋₁)/2 標準化，
+// 求 σB² ≥ 0 使 mean(dⱼ/√(σB² + σW²hⱼ)) = 1.128；σB² = 0 時 σᵢ² = k·σW²/nᵢ，k 由同式在 σB² = 0 求出
+function threeWayRef(means, ns, sw) {
+  const d = [], h = [], w2 = sw * sw;
+  for (let i = 1; i < means.length; i++) { d.push(Math.abs(means[i] - means[i - 1])); h.push((1 / ns[i] + 1 / ns[i - 1]) / 2); }
+  const g = (b) => d.reduce((t, v, j) => t + v / Math.sqrt(b + w2 * h[j]), 0) / d.length;
+  if (g(0) <= 1.128) { const k = (g(0) / 1.128) ** 2; return ns.map((n) => Math.sqrt(k * w2 / n)); }
+  let lo = 0, hi = w2; while (g(hi) > 1.128) hi *= 2;
+  for (let i = 0; i < 200; i++) { const mid = (lo + hi) / 2; if (g(mid) > 1.128) lo = mid; else hi = mid; }
+  return ns.map((n) => Math.sqrt(lo + w2 / n));
+}
 
+test("L3 X̄ 三向界限：每板 n_i 不等時 σᵢ 依 n_i 調整，z、UCL 與界限同分母", () => {
   const rows = [];
   for (let b = 0; b < 25; b++) for (let i = 0; i < (b % 2 ? 25 : 1); i++) rows.push({ board: `B${b + 1}`, pad: `P${i}`, comp: `P${i}`, group: "G", volume: 100 + (b % 2 ? 2 : 0) + (i - 12) * 0.1, height: 120, area: 100 });
   const A = c.analyze(st(rows));
   assert.equal(rows.length, 313);
   assert.equal(A.sigmaW > 0, true);
+  const ref = threeWayRef(A.byBoard.map((b) => b.mean), A.byBoard.map((b) => b.n), A.sigmaW);
   for (let i = 0; i < A.byBoard.length; i++) {
-    const n = A.byBoard[i].n, p = A.xs.pts[i], expectedSd = A.sigmaW / Math.sqrt(n);
-    assert.ok(Math.abs(p.sd - expectedSd) < 1e-12, `B${i + 1} 的 z 分母應為 σ̂組內/√n_i`);
-    assert.ok(Math.abs(p.ucl - (A.gMean + 3 * expectedSd)) < 1e-12, `B${i + 1} 的 UCL 應依 n_i 調整`);
-    assert.ok(Math.abs(p.z - (p.v - A.gMean) / expectedSd) < 1e-12, `B${i + 1} 的 z 應與界限同分母`);
+    const p = A.xs.pts[i];
+    assert.ok(Math.abs(p.sd - ref[i]) < 1e-9 * ref[i], `B${i + 1} 的 z 分母應為三向法 σᵢ`);
+    assert.ok(Math.abs(p.ucl - (A.gMean + 3 * p.sd)) < 1e-12, `B${i + 1} 的 UCL 應依 σᵢ`);
+    assert.ok(Math.abs(p.z - (p.v - A.gMean) / p.sd) < 1e-12, `B${i + 1} 的 z 應與界限同分母`);
   }
+  assert.ok(A.xs.sigmaBM > A.sigmaW / Math.sqrt(25), "板間交替 ±1 時 σ̂板平均應大於組內標準誤");
 });
 
-test("L3 小自由度邊界：analyze 的 5 板×2 點符合 Phase I t(5) 參考", () => {
-  const nrm = normal(mulberry32(20261104)), trials = 2000;
-  let hits = 0;
-  for (let trial = 0; trial < trials; trial++) {
-    const rows = Array.from({ length: 10 }, (_, i) => ({ board: `B${Math.floor(i / 2)}`, pad: `P${i % 2}`, group: "G", volume: 100 + nrm() }));
-    const A = c.analyze(st(rows));
-    assert.equal(A.xs.rejected, false);
-    hits += A.xs.pts.filter(p => Math.abs(p.z) > 3).length;
-  }
-  const p = c.tP(3 / Math.sqrt(1 - 2 / 10), 5), total = trials * 5;
-  assert.ok(Math.abs(hits - total * p) <= 6 * Math.sqrt(total * p * (1 - p)), `${hits}/${total} 應依 t(5) 參考 ${p} 判讀，不套用常態 0.27%`);
+test("L3 X̄ 三向界限：板間無差異、各板 n 相同時 σ 即板平均 MR̄/1.128", () => {
+  const nrm = normal(mulberry32(20261112)), rows = [];
+  for (let b = 0; b < 12; b++) for (let i = 0; i < 40; i++) rows.push({ board: `B${b + 1}`, pad: `P${i}`, comp: `P${i}`, group: "G", volume: 100 + nrm(), height: 120, area: 100 });
+  const A = c.analyze(st(rows)), m = A.byBoard.map((b) => b.mean);
+  let mr = 0; for (let i = 1; i < m.length; i++) mr += Math.abs(m[i] - m[i - 1]);
+  for (const p of A.xs.pts) assert.ok(Math.abs(p.sd - mr / 11 / 1.128) < 1e-12, "等 n 時不另設 σ̂組內/√n 下限");
 });
 
 test("L3 零組內變異的總覽、能力頁、報告與 AI payload 明確呈現未知及保留 Ppk", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
@@ -525,9 +493,10 @@ test("D-XBAR: 25 板樣本數不等時，X̄ 圖與 Nelson 卡使用同一加權
   const chartRules = Array.from(A.nelX.rules.filter(r => r.idx.length && r.id !== 7), r => r.id).sort((a, b) => a - b);
   assert.ok(Math.abs(A.xs.cl - c.mean(rows.map(r => r.volume))) < 1e-10, "X̄ 中心線應為依各板量測數加權的總平均");
   assert.deepEqual(chartRules, cardRules, `X̄ 圖觸發 ${chartRules.join(",")}，卡片觸發 ${cardRules.join(",")}`);
+  const sdRef = threeWayRef(A.byBoard.map((b) => b.mean), A.byBoard.map((b) => b.n), A.sigmaW);
   for (let i = 0; i < A.xs.pts.length; i++) {
     const p = A.xs.pts[i], n = A.byBoard[i].n;
-    assert.ok(Math.abs(p.sd - A.sigmaW / Math.sqrt(n)) < 1e-12, `${p.lab} 的 X̄ 標準誤應依 n=${n} 縮放`);
+    assert.ok(Math.abs(p.sd - sdRef[i]) < 1e-9 * sdRef[i], `${p.lab} 的 X̄ σᵢ 應依三向法與 n=${n} 調整`);
     assert.ok(Math.abs(p.ucl - (A.xs.cl + 3 * p.sd)) < 1e-12, `${p.lab} UCL 應使用該板標準誤`);
     assert.ok(Math.abs(p.lcl - (A.xs.cl - 3 * p.sd)) < 1e-12, `${p.lab} LCL 應使用該板標準誤`);
   }
