@@ -74,6 +74,19 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   assert.equal(d.querySelector('#p-data .subtab[data-sub="settings"]').getAttribute("aria-selected"), "true", "右鍵切到規格");
   d.querySelector("#p-data .subtabs").dispatchEvent(new w.KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
   assert.equal(d.querySelector('#p-data .subtab[data-sub="runs"]').getAttribute("aria-selected"), "true", "再按右鍵切到回合管理");
+  const wrap = d.querySelector(".wrap");
+  for (const id of ["p-overview", "p-control", "p-capability", "p-sim3d", "p-deep", "p-improve", "p-ai", "p-report", "p-gate", "p-data", "p-share", "p-shares", "p-mail"]) {
+    assert.equal(d.getElementById(id).parentElement, wrap, `#${id} 應在 .wrap 內`);
+  }
+  assert.equal(d.querySelector("nav.mtab").parentElement, d.body, "底部導覽留在 .wrap 外");
+  assert.equal(d.querySelector("#exportCenterModal").parentElement, d.body, "匯出對話框留在 .wrap 外");
+  const runsPane = d.querySelector('#p-data div[data-sub="runs"]');
+  assert.equal(runsPane.parentElement, d.getElementById("p-data"), "回合管理與規格並列");
+  assert.equal(runsPane.parentElement, d.querySelector('#p-data div[data-sub="settings"]').parentElement);
+  assert.equal(d.querySelector("#pmap").parentElement.id, "pmapDetails", "問題地圖不再套一層卡");
+  assert.equal(d.querySelector('#p-control [data-control-sub="multi"] .grid2'), null, "多變量區不留空 grid");
+  tab("data");
+  assert.ok(d.querySelector("#runTbl").offsetParent, "資料頁的回合表應可見");
   d.querySelector("#p-data .subtabs").dispatchEvent(new w.KeyboardEvent("keydown", { key: "Home", bubbles: true }));
   // 驗證新整合的 UI/UX 入口與轉跳（記錄庫膠囊群組、子視圖切換器、AI 精簡狀態列、分析報告匯出整合）
   assert.ok(d.querySelector("header.top .db-capsule-group #btnOpenRecModal"), "頂欄應有整合的記錄庫膠囊群組");
