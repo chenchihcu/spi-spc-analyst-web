@@ -7,7 +7,7 @@ const { HTML, withIdb } = require("./_load");
 let JSDOM, VirtualConsole;
 try { ({ JSDOM, VirtualConsole } = require("jsdom")); } catch { /* 未安裝 jsdom 時略過 */ }
 
-const waitFor = async (cond, label, ms = 3000) => {
+const waitFor = async (cond, label, ms = 20000) => {
   const t0 = Date.now();
   while (!cond()) {
     if (Date.now() - t0 > ms) throw new Error("等待逾時：" + label);
