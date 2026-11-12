@@ -247,7 +247,7 @@ test('G-1 & G-3: 稽核頁單列狀態映射與分享 6 碼 ID 回傳', async ()
   assert.equal(result[0].ok, true);
 
   // 2. target_type === 'record' 但已不在本站 -> 中性提示文字，不當成異常
-  assert.equal(result[1].status, '目標已不在本站（見較新的刪除或遷移排除紀錄）');
+  assert.equal(result[1].status, '目標已不在本站');
   assert.equal(result[1].ok, true);
 
   // 3. delete -> 刪除

@@ -318,3 +318,43 @@ test('管理者硬刪 place 釋放占用、spi 的 place_id 不變', async () =>
   assert.equal(await repo.getRecord(id(10)), null);
   assert.equal(r2.objects.has(`records/${id(10)}`), false);
 });
+
+test('稽核紀錄刪除：只限管理者，留下不可刪的 audit_delete 列，並行只成功一次', async () => {
+  const { db, env, cookie } = apiHarness();
+  const repo = new Repo(db, bucket());
+  await repo.bootstrapAdmin('admin@example.com', true, 1);
+  await repo.createRecord(place(1), new Uint8Array([1]));
+  await repo.createRecord(place(2, 'BOT'), new Uint8Array([2]));
+  const target = (await repo.listAuditLog()).find(e => e.action === 'create' && e.id === id(1));
+  const del = async (seq, user) => handleRequest(new Request(`https://spi.test/api/records?audit_seq=${seq}`, {
+    method: 'DELETE', headers: { cookie: await cookie(user), origin: 'https://spi.test' } }), env);
+  assert.equal((await del(target.seq, 'user@example.com')).status, 403, '一般使用者不可刪');
+  assert.equal((await del('abc', 'admin@example.com')).status, 400);
+  assert.equal((await del(99999, 'admin@example.com')).status, 404);
+  const ok = await del(target.seq, 'admin@example.com');
+  assert.equal(ok.status, 200);
+  assert.equal((await ok.json()).deleted_seq, target.seq);
+  const after = await repo.listAuditLog();
+  assert.equal(after.some(e => e.seq === target.seq), false, '原列已刪');
+  const tomb = after.find(e => e.action === 'audit_delete');
+  assert.equal(tomb.by, 'admin@example.com');
+  assert.equal(tomb.deleted.seq, target.seq);
+  assert.equal(tomb.deleted.action, 'create');
+  assert.equal(tomb.deleted.part, 'P');
+  assert.equal((await del(tomb.seq, 'admin@example.com')).status, 409, '墓碑不可刪');
+  assert.equal((await repo.getRecord(id(1))).id, id(1), '刪稽核不影響紀錄本身');
+  // 並行刪同一列：一個成功、一個 404，只多一筆墓碑
+  const scope = (await repo.listAuditLog()).find(e => e.action !== 'audit_delete');
+  const res = await Promise.all([repo.deleteAuditEntry(scope.seq, 'admin@example.com'), repo.deleteAuditEntry(scope.seq, 'admin@example.com')]);
+  assert.deepEqual(res.map(r => r.ok ? 200 : r.status).sort(), [200, 404]);
+  assert.equal((await repo.listAuditLog()).filter(e => e.action === 'audit_delete').length, 2);
+});
+
+test('稽核紀錄刪除：資料庫寫入失敗時回 503 且原列仍在', async () => {
+  const db = database(), repo = new Repo(db, bucket());
+  await repo.createRecord(place(1), new Uint8Array([1]));
+  const seq = (await repo.listAuditLog())[0].seq;
+  const failing = new Repo({ ...db, prepare: db.prepare, batch() { throw new Error('d1 down'); } }, bucket());
+  assert.equal((await failing.deleteAuditEntry(seq, 'admin@example.com')).status, 503);
+  assert.equal((await repo.listAuditLog()).some(e => e.seq === seq), true);
+});
