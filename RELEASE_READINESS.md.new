@@ -1,30 +1,50 @@
 # Release Readiness Report
 
 **Project:** SPI·SPC 分析台
-**Version:** v10.21.2（main `4968d8f`）
+**Version:** v10.22.1（`package.json`、`#appVer`、CHANGELOG 一致）
+**Commit:** main `72a8f80`（在分支 `claude/elegant-johnson-2r0ydo` 合併後驗證，產品程式碼與 main 相同）
 **Date:** 2026-11-12
-**Overall Status:** NEEDS REVIEW（本機關卡無失敗；2 項警告經判讀非缺陷）
+**Overall Status:** NEEDS REVIEW（本機關卡全部通過、無阻擋項；正式站資料庫路徑未驗證）
 
 ## Summary
 
-本機全部自動關卡通過：518 項測試 0 失敗、穩定製程模擬 7／7、Cloudflare build 與 Worker dry-run 皆 exit 0。`release-check` 依規則回報 `NEEDS REVIEW`，原因是 2 項警告，判讀後都不是缺陷。正式站、UI 矩陣與 iPhone 真機未在本次驗證。
+本機的功能與輸出正確性都通過了：530 項測試、黃金值比對、完整判定模擬，以及 5 萬筆效能門檻，失敗數都是 0。build 與 Worker dry-run 也通過。正式站登入頁已顯示 v10.22.1；因為手邊沒有帳號，登入後的資料庫路徑沒有驗證。
 
-## Checks（本次實際執行）
+## 本機關卡（verified：本次實際執行）
 
-| 類別 | 狀態 | 結果 | 下一步 |
-|---|---|---|---|
-| SPA 啟動 | ✅ | FACT：`node --test tests/ui.smoke.test.js` 2／2 通過 | — |
-| 版本 | ✅ | FACT：主頁 v10.21.2，與 CHANGELOG 最新條目一致 | — |
-| 更新紀錄 | ✅ | FACT：最新條目 v10.21.2，有日期 | — |
-| 除錯殘留 | ⚠️ | FACT：`spi-spc.html` 有 4 處 console 輸出（8227、8566、11982、11996）。INFERENCE：4 處都是 `console.warn`／`console.error`，在錯誤處理分支內，且畫面上另有可見的降級提示，屬刻意的診斷輸出，不是遺留的 debug | 保留 |
-| 文件 | ✅ | FACT：README 有快速開始／使用／設定 | — |
-| 相依 | ✅ | FACT：package.json 與 vendor 函式庫皆鎖定版本。INFERENCE：three.js r128 版本較舊但穩定 | — |
-| 測試 | ⚠️ | FACT：`npm run release-check`（內含完整 `npm test`）64 個檔案，518 項通過、0 失敗、4 項略過。FACT：其中 2 項需要 `C:/Users/user/Documents/x3000 spidata` 下的本機樣本檔（`tests/controlled-import.test.mjs`:93、122），本容器沒有這些檔案 | 在有樣本檔的 Windows 電腦上執行，確認這 2 項 |
-| 機密 | ✅ | FACT：掃描 197 個檔案，沒有硬編碼的金鑰或密碼雜湊 | — |
-| 無障礙 | ✅ | FACT：101 個靜態控制項都有標籤 | — |
-| 判定模擬 | ✅ | FACT：`npm run test:slow` 7／7 通過 | — |
-| Cloudflare build | ✅ | FACT：`npm run build:cloudflare` exit 0；`npx wrangler deploy --dry-run` exit 0 | — |
-| Streamlit | N/A | 本專案不是 Streamlit／Python | — |
+| 關卡 | 指令 | 結果 |
+|---|---|---|
+| SPA 啟動 | `node --test tests/ui.smoke.test.js` | FACT：2／2 通過 |
+| 完整測試＋發布掃描 | `npm run release-check`（內含 `npm test`） | FACT：exit 0，`Overall: NEEDS REVIEW`；530 項通過、4 項略過、0 項失敗（65 個測試檔） |
+| 輸出逐位元正確 | `tests/golden.test.mjs`（release-check 內） | FACT：通過 |
+| 判定模擬（誤報率） | `npm run test:slow`（`RUN_SLOW=1`） | FACT：7／7 通過。這個版本有新增單邊規格，屬於統計變更，所以這一關是必要的 |
+| 5 萬筆效能 | `node tools/bench-large.mjs` | FACT：`analyze` 首次最慢 475 ms，`detectIssues` 最慢 1,900 ms，都低於 3 秒的硬門檻。INFERENCE：`detectIssues` 三種形狀都高於 1 秒的本機優化目標，不阻擋發布 |
+| Cloudflare build | `npm run build:cloudflare` | FACT：exit 0；HTML 1,101,398 bytes |
+| Worker dry-run | `npx wrangler deploy --dry-run` | FACT：exit 0 |
+| D1 migration | `git diff 4968d8f..72a8f80` | FACT：這次沒有新增 `cloudflare/migrations/*` |
+
+## release-check 分類
+
+| 類別 | 狀態 | 發現 |
+|---|---|---|
+| 版本、更新紀錄、文件、相依、機密、無障礙 | ✅ | FACT：全部 PASS |
+| 除錯殘留 | ⚠️ | FACT：4 處 console 輸出。INFERENCE：都是 3D 繪製失敗或匯出錯誤時才輸出的 `console.warn`／`console.error` 診斷訊息，不是除錯殘留 |
+| 測試 | ⚠️ | FACT：4 項略過，原因如下 |
+
+略過的 4 項：
+
+- `controlled-import.test.mjs` 有 2 項需要 Windows 本機的樣本檔 `C:/Users/user/Documents/x3000 spidata`。
+- 2 項「雲端模式開機」測試在程式碼中刻意停用，註記為「開機橫幅已整併至記錄庫」。
+
+## 正式站（`https://spi-spc-analyst.chihfu-chen-tw.workers.dev`）
+
+| 項目 | 結果 |
+|---|---|
+| `GET /` | FACT：303，轉向 `/__login?next=%2F` |
+| `GET /__login` | FACT：200，頁面顯示 **v10.22.1**，與 main 的 `package.json` 一致 |
+| `GET /api/records`（未帶 cookie） | FACT：401 `{"error":"請先登入"}`。這只代表該請求沒有登入 |
+| 資料庫路徑（`POST /__login` → `GET /api/records`） | `not_done`：沒有送出登入請求，因為手邊沒有帳號，無法計算 `d`。資料庫路徑未驗證 |
+| Cloudflare Workers Build（`72a8f80`） | 未讀回（沒有 Cloudflare 存取權）。INFERENCE：登入頁版本相符，表示靜態資產已部署 |
 
 ## Blockers
 
@@ -32,15 +52,10 @@
 
 ## Warnings
 
-- [除錯殘留] INFERENCE：4 處 console 輸出都是錯誤診斷 → 不需修改。
-- [測試] FACT：4 項略過，其中 2 項缺本機樣本檔 → 在有樣本檔的電腦上補跑。
-
-## NOT TESTED
-
-- 正式站 Worker／D1 資料庫路徑：本容器沒有登入憑證，未送出 `POST /__login`（依 `classifyRecordsProbe` 判定為 `not_done`）。
-- UI 驗證矩陣（4 種寬度 × 明亮／深色）。
-- iPhone 真機。
+- [正式站] 資料庫路徑未驗證 → 用帳號登入，確認 `GET /api/records` 回 200，而且 JSON 含 `records` 陣列。
+- [測試] FACT：4 項略過 → 2 項在 Windows 本機執行；另外 2 項刻意停用的測試可以考慮刪除。
+- [UI] 四寬度 × 雙主題矩陣與 iPhone 真機：NOT TESTED。
 
 ## Recommendations — Next Best Step
 
-在有 `x3000 spidata` 樣本檔的 Windows 電腦上執行 `node --test tests/controlled-import.test.mjs`，確認被略過的 2 項。
+登入正式站，打開「記錄庫」，確認雲端紀錄有正常列出，資料庫路徑就驗證完成了。
