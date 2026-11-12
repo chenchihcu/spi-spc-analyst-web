@@ -149,6 +149,9 @@ details[open].iss-card>summary{border-bottom:1px solid var(--line);border-radius
 .subtabs{display:flex;gap:6px;flex-wrap:wrap}
 .subtab{border-radius:999px;padding:6px 16px}
 .subtab[aria-selected="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.settings-anchors{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.settings-anchors button{border-radius:999px;padding:6px 16px}
+.settings-anchors button[aria-current="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
 .recrow input{min-width:160px}
 .rec-act{display:flex;gap:6px;flex-wrap:wrap}.rec-act button{min-height:30px;padding:3px 10px;font-size:var(--fs-caption)}.rec-ok{color:var(--ok)}.rec-bad{color:var(--ng)}
 /* 資料庫對話框：操作鈕、版次與狀態膠囊、座標登錄表單、對應證明（RFC-SPI-PROOF-20261028） */
@@ -180,13 +183,13 @@ table.show-all tr.more-row{display:table-row}
 .tbl-more{margin-top:6px;font-size:var(--fs-caption)}
 .tbl.sticky-head{overflow:visible}
 .tbl.sticky-head thead th{position:sticky;top:var(--stickyH,0px);background:var(--surface);z-index:1}
-@media (pointer:coarse){.subtab{min-height:44px}.menu button,.menu a{padding:12px 14px}}
+@media (pointer:coarse){.subtab,.settings-anchors button{min-height:44px}.menu button,.menu a{padding:12px 14px}}
 .printHead{display:none}
 .print3d,.print3d-err{display:none}
 @media print{
   body > :not(.wrap){display:none!important}
   [style*="position:fixed"],[style*="position: fixed"]{display:none!important}
-  .toc,#toTop,.subtabs,.cbtn,.iss-spark,.iss-chev,.tbl-more,.toprow,.tabs-bar,#toast,#busy,.menuwrap,.iss-tools,.toolbar{display:none!important}
+  .toc,#toTop,.subtabs,.settings-anchors,.cbtn,.iss-spark,.iss-chev,.tbl-more,.toprow,.tabs-bar,#toast,#busy,.menuwrap,.iss-tools,.toolbar{display:none!important}
   .card.collapsed>:not(h3){display:revert!important}
   tr.more-row{display:table-row!important}
   details.iss-card>summary{border-bottom:1px solid #ccc}
@@ -597,6 +600,30 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     font-size:var(--fs-body);
     border-radius:999px;
   }
+  .settings-anchors{
+    display:flex;
+    gap:4px;
+    overflow-x:auto;
+    flex-wrap:nowrap;
+    margin:0 0 12px;
+    padding:4px;
+    background:var(--surface2);
+    border-radius:999px;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+  }
+  .settings-anchors button{
+    flex:1 1 0;
+    min-width:max-content;
+    height:44px;
+    min-height:44px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:0 16px;
+    font-size:var(--fs-body);
+    border-radius:999px;
+  }
 
   .tbl{overflow-x:auto;-webkit-overflow-scrolling:touch}
   .tbl td:first-child,.tbl th:first-child{
@@ -939,7 +966,7 @@ button.load-state{border:none;font:inherit;cursor:default}
     <svg class="mitcorp-logo" viewBox="0 0 248 45" width="143" height="26" fill="currentColor" fill-rule="evenodd" role="img" aria-label="Mitcorp"><path d="M13.8,-0.0L28.5,-0.1L29.2,0.0L30.6,1.0L31.5,2.9L34.7,29.0L35.0,29.8L36.2,30.2L37.5,29.8L38.3,28.2L46.9,3.5L48.0,1.5L48.8,0.8L50.5,-0.1L66.3,0.0L67.6,1.0L68.4,3.2L68.4,30.8L68.3,32.2L67.7,33.8L66.0,34.8L62.8,35.0L59.2,34.8L57.7,33.8L57.3,31.5L57.3,5.8L56.7,4.5L55.2,4.0L53.0,4.7L52.0,6.5L43.5,31.5L42.2,33.3L41.2,34.1L38.2,34.8L28.8,34.8L26.0,34.0L24.6,32.5L24.0,29.8L20.9,5.8L20.2,4.5L18.5,4.0L17.0,4.5L16.5,5.2L12.3,26.8L11.3,30.0L10.5,31.5L8.4,33.8L6.3,35.0L2.2,35.7L1.2,35.7L0.0,35.0L0.0,30.2L1.2,29.6L4.5,28.9L5.4,28.0L6.2,26.2L10.7,3.0L11.9,1.0L13.8,-0.0ZM73.2,-0.0L83.8,0.0L84.6,1.3L84.5,4.2L83.8,5.4L82.8,5.7L75.5,5.8L73.2,5.5L72.7,4.8L72.5,2.8L72.6,1.0L73.2,-0.0ZM90.0,1.7L95.5,1.6L97.2,2.1L97.8,2.8L98.2,4.0L98.3,8.5L98.6,9.2L99.3,9.7L109.8,9.8L110.9,10.2L111.4,12.0L110.9,13.2L110.2,13.6L99.8,13.7L98.8,14.1L98.2,15.5L98.3,27.0L99.0,29.8L100.5,30.9L104.2,31.1L112.5,30.9L113.1,31.5L113.2,33.0L113.0,33.8L112.2,34.6L110.5,35.0L104.5,35.3L95.8,35.1L92.0,33.9L89.9,32.2L88.9,30.5L88.4,27.5L88.4,5.5L88.6,3.0L89.2,2.1L90.0,1.7ZM130.5,9.2L135.5,9.3L144.3,10.0L145.5,10.4L146.1,11.0L146.2,13.2L145.7,14.0L145.0,14.3L140.3,13.8L133.0,13.6L129.5,13.9L127.0,14.9L125.1,17.0L124.3,20.0L124.3,24.0L125.1,27.8L127.0,29.8L130.0,30.9L137.5,31.1L145.2,30.4L146.0,31.0L146.3,32.0L146.2,33.5L145.5,34.3L142.5,35.0L135.2,35.4L129.5,35.4L124.0,34.9L120.5,33.9L118.2,32.8L116.1,30.8L115.1,29.2L114.0,25.5L113.9,20.0L115.0,15.8L116.1,14.0L118.2,12.0L120.5,10.8L124.2,9.8L130.5,9.2ZM161.8,9.5L168.5,9.3L174.8,9.9L178.2,10.8L180.2,11.8L182.8,14.0L183.9,15.8L184.7,18.8L184.9,24.5L184.7,26.2L183.8,29.2L181.8,32.0L178.8,33.9L175.5,34.9L166.0,35.7L156.8,34.8L153.8,33.8L152.0,32.9L150.4,31.5L149.2,30.0L148.3,28.0L147.9,25.5L148.0,18.2L149.1,15.0L151.0,12.8L154.0,11.0L158.0,9.8L161.8,9.5ZM203.0,9.5L209.8,9.4L210.7,10.5L210.8,11.8L210.5,12.8L209.5,13.6L201.8,13.9L200.2,14.2L199.2,14.8L198.7,16.0L198.7,31.0L198.3,33.5L197.5,34.5L196.2,34.9L190.5,34.8L189.1,33.8L188.8,32.0L188.7,15.2L189.2,12.5L190.0,11.7L191.9,10.8L197.2,9.8L203.0,9.5ZM224.0,9.5L230.5,9.3L237.9,9.8L242.2,10.9L244.2,12.0L246.2,14.0L247.0,15.2L247.8,17.3L247.8,27.8L246.9,30.0L245.9,31.5L244.8,32.6L242.8,33.8L240.0,34.8L232.2,35.5L223.2,35.4L222.6,36.0L222.4,36.8L222.2,43.5L221.3,44.8L213.5,44.8L212.6,43.5L212.4,41.8L212.6,13.0L213.2,11.7L214.6,10.8L218.5,9.9L224.0,9.5ZM75.5,9.9L79.0,9.8L81.5,10.0L82.8,10.8L83.4,12.0L83.5,32.2L83.0,33.8L81.5,34.8L75.5,34.8L74.1,34.0L73.7,33.2L73.6,12.0L74.0,10.8L75.5,9.9ZM163.2,13.0L160.8,14.0L159.4,15.2L158.3,18.8L158.1,22.5L158.3,26.5L159.2,29.2L160.5,30.8L162.8,31.8L166.0,32.1L169.8,31.8L172.0,30.8L173.0,29.8L173.9,28.2L174.4,25.0L174.4,21.8L173.9,16.5L173.0,15.0L171.9,14.0L168.5,12.9L163.2,13.0ZM226.0,13.0L223.5,13.5L222.7,14.0L222.4,14.5L222.5,30.5L224.0,31.6L227.5,31.9L232.5,31.9L235.0,31.0L236.0,30.1L237.0,28.7L237.7,25.5L237.8,20.8L237.0,16.2L235.3,14.0L233.0,13.1L230.2,12.8L226.0,13.0Z"/></svg>
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.18.2</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.18.3</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <div class="db-capsule-group" role="group" aria-label="雲端記錄庫與套用狀態">
@@ -1005,7 +1032,7 @@ button.load-state{border:none;font:inherit;cursor:default}
           </select></div>
         <div class="field" id="padField" data-scope="a" hidden><label for="selPad">焊墊</label><select id="selPad"></select></div>
         <p class="note" id="railNote" hidden style="margin:0;align-self:center;max-width:42ch"></p>
-        <button class="specbtn" id="railSpecBtn" title="鋼板厚度與規格在「資料與規格 → 設定」修改"><span class="lbl">鋼板／規格</span> <b id="railSum"></b> <span aria-hidden="true">✎</span></button>
+        <button class="specbtn" id="railSpecBtn" title="鋼板厚度與規格在「設定」修改"><span class="lbl">鋼板／規格</span> <b id="railSum"></b> <span aria-hidden="true">✎</span></button>
       </div>
     </div>
   </div>
@@ -1024,6 +1051,7 @@ button.load-state{border:none;font:inherit;cursor:default}
   <button class="tab" role="tab" data-tab="improve">改善</button>
   <button class="tab" role="tab" data-tab="ai">AI 分析</button>
   <button class="tab" role="tab" data-tab="report">分析報告</button>
+  <button class="tab" role="tab" data-tab="settings">設定</button>
 </nav>
 <button type="button" class="tab-scroll" id="tabScrollR" aria-label="向右捲動頁籤" hidden>›</button>
 </div>
@@ -1387,7 +1415,6 @@ button.load-state{border:none;font:inherit;cursor:default}
 <section class="panel" id="p-data" role="tabpanel" hidden>
   <div class="subtabs" role="tablist" aria-label="資料與規格分頁">
     <button role="tab" class="subtab" data-sub="import" aria-selected="true">匯入資料</button>
-    <button role="tab" class="subtab" data-sub="settings" aria-selected="false">設定</button>
     <button role="tab" class="subtab" data-sub="runs" aria-selected="false">回合管理</button>
   </div>
   <div data-sub="import">
@@ -1452,10 +1479,24 @@ button.load-state{border:none;font:inherit;cursor:default}
       </div>
     </div>
   </div>
-  <div data-sub="settings" hidden style="display:grid;grid-template-columns:minmax(0,1fr);gap:16px;min-width:0">
+  <div class="grid2" data-sub="runs" hidden>
+    <div class="card"><h3>試產回合管理 <small id="runSaveNote"></small></h3>
+      <div id="runLegacy" role="status" hidden></div>
+      <div class="tbl"><table id="runTbl"></table></div>
+      <details class="how demo-tools" style="margin-top:8px"><summary>範例資料</summary><div class="row" style="margin-top:8px"><button id="btnAddB">新增範例：改版 B 回合</button><button id="btnSample">還原範例並清除已保存的回合</button></div></details></div>
+  </div>
+  </section>
+
+<section class="panel" id="p-settings" role="tabpanel" hidden>
+  <nav class="settings-anchors" aria-label="設定區段">
+    <button type="button" data-settings-anchor="ui">介面</button>
+    <button type="button" data-settings-anchor="spec">規格</button>
+    <button type="button" data-settings-anchor="stencil">鋼板</button>
+    <button type="button" data-settings-anchor="ai">AI</button>
+  </nav>
+  <div id="settingsBody" style="display:grid;grid-template-columns:minmax(0,1fr);gap:16px;min-width:0">
     <div class="card" id="settingsUiSection">
       <h3 id="settingsAnchorUi">介面</h3>
-      <p class="note" style="margin:0 0 10px">主題與雙欄檢視偏好；雙欄捷徑仍位於頁首。</p>
       <div class="row" style="flex-wrap:wrap;gap:10px;align-items:center">
         <button type="button" class="chip chipBtn" id="btnThemeSettings" title="切換明亮或深色主題">主題：明亮（深色模式）</button>
         <span class="note" id="duoStateNote" role="status">雙欄模式：關閉</span>
@@ -1509,13 +1550,7 @@ button.load-state{border:none;font:inherit;cursor:default}
     </div>
     <div class="card" id="aiSettingsCard"><h3 id="aiSettingsHead">API 金鑰、模型／推理強度與獨立配額設定 <small id="aiKeyBadge"><span class="pill warn">尚未設定金鑰</span></small></h3><div style="display:grid;grid-template-columns:minmax(0,1fr);gap:12px"><div class="row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:var(--fs-ui);font-weight:700">啟用服務商：</span><div class="seg" id="aiProviderSeg" role="group" aria-label="選擇 AI 服務商" style="display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden"><button type="button" data-ai-prov="openai" aria-pressed="true">OpenAI</button><button type="button" data-ai-prov="antigravity" aria-pressed="false">Antigravity</button></div></div><div id="aiAllProvidersSummary" class="row" style="gap:6px;flex-wrap:wrap;font-size:var(--fs-caption)"></div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:10px"><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKey" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>OpenAI API Key</b></span><span id="aiBadgeOpenai" class="pill warn" style="font-size:var(--fs-caption);padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKey" placeholder="sk-proj-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggle" title="顯示或隱藏 OpenAI API Key">顯示</button></div></div><div class="field" style="margin:0;padding:10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px"><label for="inAiKeyAntigravity" style="display:flex;justify-content:space-between;align-items:center;gap:4px"><span><b>Antigravity API Key</b></span><span id="aiBadgeAntigravity" class="pill warn" style="font-size:var(--fs-caption);padding:1px 6px">未設定</span></label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="password" id="inAiKeyAntigravity" placeholder="AIza... / agy-..." autocomplete="off" spellcheck="false" style="flex:1;min-width:0;font-family:var(--f-mono)"><button type="button" id="btnAiKeyToggleAntigravity" title="顯示或隱藏 Antigravity API Key">顯示</button></div></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap"><div class="field" style="flex:1 1 220px;min-width:0"><label for="selAiModel">模型選擇 (<span id="aiModelProvName">OpenAI</span>)</label><select id="selAiModel" style="width:100%"><option value="gpt-6.1-terra" selected>gpt-6.1-terra（旗艦深度推理 · 推薦）</option><option value="o4-mini">o4-mini（精準數理推理）</option><option value="gpt-5.4">gpt-5.4（通用旗艦）</option><option value="custom">自訂模型名稱…</option></select></div><div class="field" style="flex:0 0 auto"><button type="button" id="btnAiCheckModels" title="用目前服務商的 API Key 查詢實際可用的模型">檢查可用模型</button></div><div class="field" id="aiCustomModelField" hidden style="flex:1 1 180px;min-width:0"><label for="inAiCustomModel">自訂模型名稱</label><input type="text" id="inAiCustomModel" placeholder="例：gpt-6.1-terra" style="width:100%;font-family:var(--f-mono)"></div><div class="field" style="flex:1 1 200px;min-width:0"><label for="selAiEffort">推理強度</label><select id="selAiEffort" style="width:100%"><option value="high" selected>高 — 深度工程根因推理（推薦）</option><option value="medium">中 — 均衡推理深度與速度</option><option value="low">低 — 快速重點摘要</option></select></div><div class="field" style="flex:1 1 220px;min-width:0"><label for="inAiCustomEndpoint">自訂 API 端點 (選填 https://)</label><input type="text" id="inAiCustomEndpoint" placeholder="預設使用官方端點" spellcheck="false" style="width:100%;font-family:var(--f-mono)"></div></div><div class="row" style="align-items:flex-end;gap:10px;flex-wrap:wrap;padding-top:4px;border-top:1px dashed var(--line)"><div style="font-size:var(--fs-ui);font-weight:700;color:var(--accent-ink);min-width:140px" id="aiLimitProvTitle">OpenAI 獨立配額上限：</div><div class="field"><label for="inAiDailyLim">每日次數上限 (次/日)</label><input type="number" id="inAiDailyLim" value="20" min="1" max="500" step="1" style="width:96px"></div><div class="field"><label for="inAiTokenLim">每月 Token 上限</label><input type="number" id="inAiTokenLim" value="500000" min="1000" max="10000000" step="10000" style="width:120px"></div><div class="field"><label for="inAiUsdLim">每月費用上限 USD</label><input type="number" id="inAiUsdLim" value="5.0" min="0.5" max="500" step="0.5" style="width:96px"></div><div class="row" style="gap:6px"><button type="button" class="primary" id="btnAiSaveCfg">儲存設定</button><button type="button" id="btnAiClearKey" title="清除目前所選服務商的金鑰">清除當前金鑰</button></div></div><div class="row" style="gap:8px;flex-wrap:wrap;font-size:var(--fs-caption);color:var(--muted)"><span class="chip" style="white-space:normal;min-width:0">計價基準：<b id="aiPriceLabel">輸入 $1.00 / 1M · 輸出 $5.00 / 1M tokens</b></span><span class="note" id="aiCfgMsg" role="status"></span></div><div class="grid2" style="gap:10px;margin-top:2px"><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-ui);margin-bottom:6px"><b><span id="aiDailyBarProv">OpenAI</span> 今日呼叫次數 (<span id="aiUsageDayLabel">今日</span>)</b><span class="mono" id="aiDailyUsageText">0 / 20 次 (0%)</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiDailyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div><div style="background:var(--surface2);padding:10px 12px;border-radius:8px;border:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-ui);margin-bottom:6px;gap:8px;flex-wrap:wrap"><b><span id="aiMonthlyBarProv">OpenAI</span> 本月累計用量 (<span id="aiUsageMonthLabel">本月</span>)</b><span class="mono" id="aiMonthlyUsageText">0 tokens · 預估 $0.00 / $5.00 USD</span></div><div style="height:8px;background:var(--line);border-radius:999px;overflow:hidden"><div id="aiMonthlyBar" style="height:100%;width:0%;background:var(--ok);transition:width .25s"></div></div></div></div></div></div>
   </div>
-  <div class="grid2" data-sub="runs" hidden>
-    <div class="card"><h3>試產回合管理 <small id="runSaveNote"></small></h3>
-      <div id="runLegacy" role="status" hidden></div>
-      <div class="tbl"><table id="runTbl"></table></div>
-      <details class="how demo-tools" style="margin-top:8px"><summary>範例資料</summary><div class="row" style="margin-top:8px"><button id="btnAddB">新增範例：改版 B 回合</button><button id="btnSample">還原範例並清除已保存的回合</button></div></details></div>
-  </div>
-  </section>
+</section>
 
 <section class="panel" id="p-share" role="tabpanel" hidden>
   <div class="card">
@@ -1699,11 +1734,11 @@ button.load-state{border:none;font:inherit;cursor:default}
         <button type="button" class="sheet-row" id="mBtnOpenRecModal"><span style="display:inline-flex;align-items:center;gap:8px"><svg class="ui-ico ui-ico--folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>記錄庫</span><span class="sheet-arrow">›</span></button>
         <button type="button" class="sheet-row" id="mBtnOpenExportModal"><span style="display:inline-flex;align-items:center;gap:8px"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:18px;height:18px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>匯出中心</span><span class="sheet-arrow">›</span></button>
         <button type="button" class="sheet-row" data-mtab="data"><span>資料與規格</span><span class="sheet-arrow">›</span></button>
+        <button type="button" class="sheet-row" data-mtab="settings"><span>設定</span><span class="sheet-arrow">›</span></button>
       </div>
 
       <div class="sheet-sec-title">操作與帳號</div>
       <div class="sheet-list" id="sheetUserTools">
-        <button type="button" class="sheet-row" id="mBtnTheme"><span>介面與主題設定</span><span class="sheet-arrow">›</span></button>
         <button type="button" class="sheet-row duo-toggle-btn" id="mBtnDuo"><span>雙欄模式</span><span class="sheet-arrow">›</span></button>
         <button type="button" class="sheet-row" id="mBtnShare" hidden><span>分享連結</span><span class="sheet-arrow">›</span></button>
         <button type="button" class="sheet-row" id="mBtnMyShares" hidden><span>我的分享</span><span class="sheet-arrow">›</span></button>
@@ -2841,7 +2876,7 @@ function formatSidedPpmBlock(block, fmt = (v) => String(Math.round(v))) {
 /* @windows-parity END */
 /* Number.isFinite：空白座標欄解析為 null，全域 isFinite(null) 會當成 0 */
 const realXY=r=>Boolean(r&&!r.gridPos&&Number.isFinite(r.x)&&Number.isFinite(r.y));
-const S={rows:[],metrics:[],metric:"volume",group:ALL_GRP,chart:"xbars",relChart:"specScatter",pad:null,board:null,specSrc:"sample",partSpec:null,specDraft:null,specsG:null,sqDir:"Y",specs:JSON.parse(JSON.stringify(DEF_SPECS)),stencil:120,heightUnit:"um",htol:{lo:75,hi:125},step:{on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]},selZone:1,wipe:5,aperture:{groups:{}},geometryPads:null,padCoverage:null,pendingVerify:false,runVendor:"generic",ovCapSnap:null,ovCapSnapKey:"",source:"範例資料",tab:"issues",sub:"import",deepSub:"cross",improveSub:"compare",F:[],issLv:"all",issCat:"all",issEnt:null,pmapSelection:null,issGroup:"cases",ctx:null,colorMode:"status",sim3dMode:"real",exag:20,ghost:true,bridgeWarn:true,csAxis:"X",selectedPad:null,A:null,ai:"",aiModel:"",duo:{active:false,posture:"folded",mode:"master-detail",leftTab:"issues",rightTab:"sim3d",thumbSide:"right",pinnedPad:null,dockOpen:false}};
+const S={rows:[],metrics:[],metric:"volume",group:ALL_GRP,chart:"xbars",relChart:"specScatter",pad:null,board:null,specSrc:"sample",partSpec:null,specDraft:null,specsG:null,sqDir:"Y",specs:JSON.parse(JSON.stringify(DEF_SPECS)),stencil:120,heightUnit:"um",htol:{lo:75,hi:125},step:{on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]},selZone:1,wipe:5,aperture:{groups:{}},geometryPads:null,padCoverage:null,pendingVerify:false,runVendor:"generic",ovCapSnap:null,ovCapSnapKey:"",source:"範例資料",tab:"issues",sub:"import",settingsPane:null,deepSub:"cross",improveSub:"compare",F:[],issLv:"all",issCat:"all",issEnt:null,pmapSelection:null,issGroup:"cases",ctx:null,colorMode:"status",sim3dMode:"real",exag:20,ghost:true,bridgeWarn:true,csAxis:"X",selectedPad:null,A:null,ai:"",aiModel:"",duo:{active:false,posture:"folded",mode:"master-detail",leftTab:"issues",rightTab:"sim3d",thumbSide:"right",pinnedPad:null,dockOpen:false}};
 function metricUnit(k,st=S){return k==="height"&&st&&st.heightUnit==="unknown"?"單位未知":(METRICS[k]&&METRICS[k].unit)||""}
 loadSpiKbRules();
 
@@ -4760,7 +4795,7 @@ function detectIssues(st,onStage){
       limit:`規格 ${f(s.lsl,1)}–${f(s.usl,1)} ${u(k)}（中心距資料平均 >10σ 或 |Cpk|>50 觸發）`,
       z:`${isFinite(zDiff)?f(zDiff,1)+"σ":"σ=0"}${cpkWitness?`；${cpkWitness.g} |Cpk|=${f(Math.abs(cpkWitness.cpk))}`:""}`,p:"不適用（非機率檢定）",
       facts:evidence,
-      cause:"資料量測單位與規格單位可能不一致，或規格寬度／群組規格尺度異常；請確認規格設定與匯入單位。",conf:"高",action:ACT.unit,go:{tab:"data"}});
+      cause:"資料量測單位與規格單位可能不一致，或規格寬度／群組規格尺度異常；請確認規格設定與匯入單位。",conf:"高",action:ACT.unit,go:{tab:"settings"}});
   }
   stage(2,"單板異常");
   // 1. 單板異常（整板 / 板 × 元件群組）：以其他板的穩健中位數與 MAD 比較
@@ -5161,7 +5196,7 @@ function detectIssues(st,onStage){
           `全部板／全部焊墊：理論上 體積 ≈ 高度 × 面積 ÷ 鋼板厚度；扣除元件群組平均後相關 r = ${f(r,3)} < 界限 0.75（未扣除 r = ${f(MC.r,3)}）`,
           `體積 ÷ 預測值 中位數 ${f(MC.med,3)}；偏離最大的 5 個焊墊：${top5Txt}`
         ],
-        cause:"SPI 程式內鋼板厚度（含階梯區）設定與此處不一致，或基準面／翹曲補償問題；先確認再採信其他結論",conf:"中",action:ACT.msa,go:{tab:"data"}})}}
+        cause:"SPI 程式內鋼板厚度（含階梯區）設定與此處不一致，或基準面／翹曲補償問題；先確認再採信其他結論",conf:"中",action:ACT.msa,go:{tab:"settings"}})}}
 
   stage(9,"管制圖規則");
   // 10. D-47 Nelson 規則卡（與畫面選擇無關：重用每個量測項目、群組＝全部的 X̄ 圖分析與板別界限）
@@ -6021,8 +6056,8 @@ function syncControls(){
   $("#selSqDir").value=S.sqDir||"Y";$("#inWipe2").value=S.wipe;if($("#wipeDisplay"))$("#wipeDisplay").textContent=S.wipe;
   renderSpecTbl();
 }
-/* 鋼板與規格只在「資料與規格 → 匯入與規格」修改（只保留一處，避免兩邊不一致）；頂端按鈕直接帶過去 */
-$("#railSpecBtn").onclick=()=>{setTab("data");setSub("specs","spec");const el=$("#inStencil2");if(el)el.focus({preventScroll:true})};
+/* 鋼板與規格只在「設定」修改（只保留一處，避免兩邊不一致）；頂端按鈕直接帶過去 */
+$("#railSpecBtn").onclick=()=>{setTab("settings/spec");const el=$("#inStencil2");if(el)el.focus({preventScroll:true})};
 /* ---------- 階梯鋼板區域 ---------- */
 const ZCOL=["#3D6E8F","#B5652B","#7A5BA6","#2C7A4C","#B5487A","#8A7A2C"];
 function persist(){saveRunsSoon();try{localStorage.setItem("spi-stencil",JSON.stringify({t:S.stencil,lo:S.htol.lo,hi:S.htol.hi,step:S.step,aperture:S.aperture,geometryPads:S.geometryPads}))}catch(e){}}
@@ -6230,7 +6265,7 @@ function onPrecompute(d){const k=preKey;preKey=null;if(!k||d.key!==k.key||S.rows
   if(!d.err){try{anPutKey(S.rows,k.key,anUnpack(d.P,S));perfNote("背景預算 "+k.m,performance.now()-k.t0)}catch(e){}}
   if(preQ.length)setTimeout(nextPrecompute,50)}
 /* ---------- 問題偵測 ---------- */
-const LVL={ng:"嚴重",warn:"警示",info:"資訊"},GOLAB={sim3d:"看該板 3D",control:"看管制圖",adv:"看進階分析",deep:"深入分析",data:"看設定",improve:"改善建議"};
+const LVL={ng:"嚴重",warn:"警示",info:"資訊"},GOLAB={sim3d:"看該板 3D",control:"看管制圖",adv:"看進階分析",deep:"深入分析",data:"看設定",settings:"看設定",improve:"改善建議"};
 /* 前往證據頁時記住來源問題，在目標頁顯示來源提示與返回鍵 */
 function goto(g,from){if(!g)return;const GT={cross:"deep/cross",adv:"deep/adv",stats:"deep/stats",compare:"improve/compare",dfm:"improve/dfm",lab:"improve/lab"};if(g.tab&&GT[g.tab])g.tab=GT[g.tab];if(g.metric&&S.metrics.includes(g.metric))S.metric=g.metric;if(g.group!==undefined)S.group=g.group;if(g.chart)S.chart=g.chart;if(g.pad)S.pad=g.pad;if(g.board)S.board=g.board;
   S.ctx=from?{id:from.id,title:from.title,lv:from.lv}:null;
@@ -6772,19 +6807,20 @@ function renderStats(){
   if($("#sidedPpmNote"))$("#sidedPpmNote").textContent=fmtSide.note||"";
 }
 const nextFrame=f=>window.requestAnimationFrame?requestAnimationFrame(f):setTimeout(f,16);
-/* 分析鎖定：回合尚未套用使用者定義的料號規格（範例資料除外）時，只開放「資料與規格」與「我的分享」 */
-const GATE_OPEN=["data","shares"];
+/* 分析鎖定：回合尚未套用使用者定義的料號規格（範例資料除外）時，只開放「資料與規格」「設定」與「我的分享」 */
+const GATE_OPEN=["data","settings","shares"];
 const gateOn=t=>!specReady(S)&&!GATE_OPEN.includes(t);
-function showPanels(t){const lock=gateOn(t);if(lock){$$(".panel").forEach(p=>p.hidden=p.id!=="p-gate");renderGate();return lock}if(S.duo&&S.duo.active){if(t==="report"||S.duo.leftTab==="report"){$$(".panel").forEach(p=>{const isRep=(p.id==="p-report");p.hidden=!isRep;p.classList.toggle("duo-pane-full",isRep);p.classList.remove("duo-pane-left","duo-pane-right")});return false}const lt=duoPanelId(S.duo.leftTab||t),rt=duoPanelId(S.duo.rightTab||"sim3d"),leftId="p-"+lt,rightId=rt===lt?"p-sim3d":"p-"+rt;$$(".panel").forEach(p=>{const isL=(p.id===leftId),isR=(p.id===rightId);p.hidden=!isL&&!isR;p.classList.toggle("duo-pane-left",isL);p.classList.toggle("duo-pane-right",isR);p.classList.remove("duo-pane-full")});return false}$$(".panel").forEach(p=>{p.hidden=p.id!==("p-"+t);p.classList.remove("duo-pane-left","duo-pane-right","duo-pane-full")});return false}
+function showPanels(t){const lock=gateOn(t);if(lock){$$(".panel").forEach(p=>p.hidden=p.id!=="p-gate");renderGate();return lock}if(S.duo&&S.duo.active){if(t==="settings"||t==="report"||S.duo.leftTab==="report"){const fullId=t==="settings"?"p-settings":"p-report";$$(".panel").forEach(p=>{const on=p.id===fullId;p.hidden=!on;p.classList.toggle("duo-pane-full",on);p.classList.remove("duo-pane-left","duo-pane-right")});return false}const lt=duoPanelId(S.duo.leftTab||t),rt=duoPanelId(S.duo.rightTab||"sim3d"),leftId="p-"+lt,rightId=rt===lt?"p-sim3d":"p-"+rt;$$(".panel").forEach(p=>{const isL=(p.id===leftId),isR=(p.id===rightId);p.hidden=!isL&&!isR;p.classList.toggle("duo-pane-left",isL);p.classList.toggle("duo-pane-right",isR);p.classList.remove("duo-pane-full")});return false}$$(".panel").forEach(p=>{p.hidden=p.id!==("p-"+t);p.classList.remove("duo-pane-left","duo-pane-right","duo-pane-full")});return false}
 function renderGate(){const part=runPart();$("#gateMsg").textContent=part
-  ?`此回合（料號 ${part}）尚未套用你定義的料號規格。好壞判定、製程能力與所有分析都依你定義並存檔的規格計算；請先到「資料與規格 → 規格設定」確認規格並按「儲存為新版本」。`
+  ?`此回合（料號 ${part}）尚未套用你定義的料號規格。好壞判定、製程能力與所有分析都依你定義並存檔的規格計算；請先到「設定」確認規格並按「儲存為新版本」。`
   :"此回合沒有產品料號，無法定義料號規格。請從資料庫重新開啟量測紀錄，或重新匯入並填寫產品料號。"}
-$("#btnGateSpec").onclick=()=>{setTab("data");setSub("specs","spec");gotoSpecCard();const el=$("#btnSpecSave");if(el&&!el.disabled)el.focus({preventScroll:true})};
+$("#btnGateSpec").onclick=()=>{gotoSpecCard();const el=$("#btnSpecSave");if(el&&!el.disabled)el.focus({preventScroll:true})};
 $("#btnGateRuns").onclick=()=>{setTab("data");setSub("runs")};
 function renderTab(){if(RENDER_HOLD)return;if(showPanels(S.tab))return;perfSpan("render:"+S.tab,renderTabInner);nextFrame(enhancePanel)}
 function renderDeepPanel(){if(S.deepSub==="cross")renderCross();else if(S.deepSub==="adv")renderAdv();else renderStats()}
 function renderImprovePanel(){if(S.improveSub==="compare")renderCompare();else if(S.improveSub==="dfm")renderDfm();else renderLab()}
-function renderTabByName(k){const fn=({issues:renderIssues,overview:renderOverview,control:renderControl,capability:renderCap,sim3d:render3D,deep:renderDeepPanel,improve:renderImprovePanel,ai:()=>{},report:renderReport,data:()=>{renderSpecTbl();renderZones();renderAperture();renderRuns();if(S.sub==="settings"){updateSettingsUi();initAiPage()}}})[k];if(fn)fn()} function renderTabInner(){if(S.duo&&S.duo.active){if(S.tab==="report"||S.duo.leftTab==="report"||S.duo.rightTab==="report"){renderTabByName("report");return}renderTabByName(S.duo.leftTab||S.tab);if(S.duo.rightTab&&S.duo.rightTab!==S.duo.leftTab)renderTabByName(S.duo.rightTab)}else renderTabByName(S.tab)}
+function renderSettings(){renderSpecTbl();renderZones();renderAperture();updateSettingsUi();initAiPage()}
+function renderTabByName(k){const fn=({issues:renderIssues,overview:renderOverview,control:renderControl,capability:renderCap,sim3d:render3D,deep:renderDeepPanel,improve:renderImprovePanel,ai:()=>{},report:renderReport,settings:renderSettings,data:()=>{renderSpecTbl();renderZones();renderAperture();renderRuns()}})[k];if(fn)fn()} function renderTabInner(){if(S.duo&&S.duo.active){if(S.tab==="settings"){renderTabByName("settings");return}if(S.tab==="report"||S.duo.leftTab==="report"||S.duo.rightTab==="report"){renderTabByName("report");return}renderTabByName(S.duo.leftTab||S.tab);if(S.duo.rightTab&&S.duo.rightTab!==S.duo.leftTab)renderTabByName(S.duo.rightTab)}else renderTabByName(S.tab)}
 
 $("#selMetric").onchange=e=>{S.metric=e.target.value;syncControls();recompute()};
 $("#selGroup").onchange=e=>{S.group=e.target.value;recompute()};
@@ -6829,7 +6865,8 @@ function syncMobileTabs(t){
     if(inMore)moreBtn.setAttribute("aria-current","page");else moreBtn.removeAttribute("aria-current");
   }
 }
-const ALL_TABS=["issues","overview","control","capability","sim3d","deep","improve","ai","report","mail","data","share","shares"];
+const ALL_TABS=["issues","overview","control","capability","sim3d","deep","improve","ai","report","mail","data","settings","share","shares"];
+const SETTINGS_PANES=["ui","spec","stencil","ai"];
 const LEGACY_ROOTS=new Set(["cross","adv","stats","compare","dfm","lab"]);
 function parseTabTarget(raw){
   const s=String(raw||"").replace(/^#/,"").trim();
@@ -6838,12 +6875,14 @@ function parseTabTarget(raw){
   if(LEGACY_ROOTS.has(root))return{tab:"issues",legacy:true};
   if(root==="deep"){const deepSub=sub&&["cross","adv","stats"].includes(sub)?sub:"cross";return{tab:"deep",deepSub}}
   if(root==="improve"){const improveSub=sub&&["compare","dfm","lab"].includes(sub)?sub:"compare";return{tab:"improve",improveSub}}
+  if(root==="settings"){const settingsPane=sub&&SETTINGS_PANES.includes(sub)?sub:null;return{tab:"settings",settingsPane}}
   if(!ALL_TABS.includes(root))return{tab:"issues"};
   return{tab:root}
 }
-function tabHashFor(tab,deepSub,improveSub){
+function tabHashFor(tab,deepSub,improveSub,settingsPane){
   if(tab==="deep")return"deep/"+(deepSub||"cross");
   if(tab==="improve")return"improve/"+(improveSub||"compare");
+  if(tab==="settings"&&settingsPane)return"settings/"+settingsPane;
   return tab;
 }
 function duoPanelId(tab){if(tab==="deep"||tab==="improve"||LEGACY_ROOTS.has(tab))return tab==="improve"||["compare","dfm","lab"].includes(tab)?"improve":"deep";return tab}
@@ -6857,10 +6896,11 @@ function setTab(t,fromHistory=false){
   if(parsed.legacy)tab="issues";
   if(parsed.deepSub)S.deepSub=parsed.deepSub;
   if(parsed.improveSub)S.improveSub=parsed.improveSub;
+  if(tab==="settings")S.settingsPane=parsed.settingsPane||null;
   if(tab==="deep"&&!parsed.deepSub)S.deepSub=S.deepSub||"cross";
   if(tab==="improve"&&!parsed.improveSub)S.improveSub=S.improveSub||"compare";
   if(S.tab&&S.tab!==tab)SCROLL[S.tab]=scrollY;
-  const changed=S.tab!==tab||(tab==="deep"&&parsed.deepSub)||(tab==="improve"&&parsed.improveSub);
+  const changed=S.tab!==tab||(tab==="deep"&&parsed.deepSub)||(tab==="improve"&&parsed.improveSub)||(tab==="settings"&&!!parsed.settingsPane);
   S.tab=tab;
   $$(".tab").forEach(x=>{const sel=x.dataset.tab===tab;x.setAttribute("aria-selected",sel);x.tabIndex=sel?0:-1});
   applyDeepImproveSubnav();
@@ -6877,7 +6917,8 @@ function setTab(t,fromHistory=false){
   else if(tab==="ai")initAiPage();
   else renderTab();
   if(changed)scrollTo(0,Math.min(SCROLL[tab]||0,document.documentElement.scrollHeight));
-  if(!fromHistory){const h=tabHashFor(tab,S.deepSub,S.improveSub);try{if(location.hash!=="#"+h){history.pushState({tab:h}, "", "#"+h);location.hash="#"+h}}catch(e){}}
+  if(!fromHistory){const h=tabHashFor(tab,S.deepSub,S.improveSub,S.settingsPane);try{if(location.hash!=="#"+h){history.pushState({tab:h}, "", "#"+h);location.hash="#"+h}}catch(e){}}
+  if(tab==="settings"){markSettingsAnchor(S.settingsPane);if(S.settingsPane)nextFrame(()=>scrollSettingsAnchor(S.settingsPane))}
 }
 
 /* ---------- 總覽 ---------- */
@@ -7768,7 +7809,7 @@ function renderAOI(){const r=curRun(),ms=S.metrics.filter(k=>k!=="offx"&&k!=="of
     ${kpi("建議 SPI 規格窗口",ac.win?`${ac.win[0]}–${ac.win[1]}`:"—",ac.win?`不良率 ≤ ${f(ac.thr*100,2)}% 的連續區間`:"樣本不足",ac.win?"ok":"")}</div>
     <p style="margin:10px 0 0"><span class="lbl fact">事實</span> 回焊不良焊墊的 SPI ${METRICS[S.aoiM].short}平均 ${f(ac.ngMean,1)} ${u}，良品 ${f(ac.okMean,1)} ${u}${ac.welch?`（p ${ac.welch.p<.001?"< 0.001":"= "+f(ac.welch.p,3)}）`:""}。</p>
     <p style="margin:4px 0 0"><span class="lbl fact">推論</span> ${ac.welch&&ac.welch.p<.05?`SPI ${METRICS[S.aoiM].short}能區分回焊良窳，可用來訂規格（信心 中）。`:`SPI ${METRICS[S.aoiM].short}與回焊結果關聯不明顯；回焊不良可能來自置件、回焊或其他量測項目（信心 中）。`}${ac.escape>.5?" 過半回焊不良的 SPI 值在現行規格內，代表現行 SPI 規格攔不住這些不良。":""}</p>
-    ${ac.win?`<p class="note" style="margin:8px 0 0">建議窗口只供參考，不會自動套用。要採用時，請到「資料與規格 → 規格設定」修改規格並儲存為新版本。</p>`:""}`;
+    ${ac.win?`<p class="note" style="margin:8px 0 0">建議窗口只供參考，不會自動套用。要採用時，請到「設定」修改規格並儲存為新版本。</p>`:""}`;
   $("#aoiChartBox").hidden=false;const B=ac.bins,ng=css("--ng");
   mk("cAoi",{type:"bar",data:{labels:B.map(b=>`${b.lo}–${b.hi}`),datasets:[
     {label:"95% CI",data:B.map(b=>b.n?[b.ci[0]*100,b.ci[1]*100]:null),backgroundColor:css("--series2")+"33",borderColor:css("--series2")+"88",borderWidth:1,barPercentage:.7,grouped:false,yAxisID:"y"},
@@ -8503,7 +8544,7 @@ function askDiscard(msg){return new Promise(ok=>{const m=$("#specConfirmModal");
   m._onClose=()=>{if(!done){done=true;ok(false)}};$("#specConfirmOk").onclick=()=>{done=true;closeModal("specConfirmModal");ok(true)};openModal("specConfirmModal","[data-close]")})}
 /* 套用一個已存檔的料號規格版本（rec 來自資料庫紀錄，spec 為已驗證的規格檔） */
 const partSpecInfo=(rec,spec,groups)=>({id:rec.id,part:rec.part,ver:rec.ver||0,sha:rec.sha256,isDefault:!!rec.isDefault,user:rec.user||"",created:rec.created||0,note:spec.note||"",stencilRef:spec.stencilRef,groups});
-function gotoSpecCard(){setSub("settings","spec");const el=$("#partSpecBar");if(el&&el.scrollIntoView){el.closest(".card").scrollIntoView({block:"start"});scrollBy(0,-stickyH()-8)}}
+function gotoSpecCard(){setTab("settings/spec")}
 function useSpec(rec,spec){const st=partSpecToState(spec,S.stencil);S.specSrc="part";S.specs=st.specs;S.htol=st.htol;S.specsG=st.specsG;
   S.partSpec=partSpecInfo(rec,spec,st.groups);S.specDraft=null;
   saveRunsSoon();syncControls();recompute()}
@@ -9002,7 +9043,7 @@ function renderImportSourceSummary(){const box=$("#impSourceSummary");if(!box)re
   const identity=source?[source.lot?"批號 "+source.lot:"",source.part?"料號 "+source.part:"",source.rev?"版次 "+source.rev:"",source.side?source.side+" 面":""].filter(Boolean).join("｜")||"歷史資料來源":"料號 "+($("#inPart")?.value||"待填")+"｜版次 "+($("#inRev")?.value||"待填");
   const lifecycle=source?(source.lifecycle==="active"?"有效":source.lifecycle==="pending_review"?"待管理者判定":source.lifecycle==="superseded"?"已被修正":"舊資料・未受控"):"尚未保存";
   const historicalSpec=source?"未保存歷史規格版本 ID／指紋，原始規格來源未知。":"尚未形成歷史規格快照。";
-  box.innerHTML="<b>來源與資料脈絡</b><dl class=\"imp-source-grid\"><dt>紀錄識別</dt><dd>"+esc(identity)+"｜"+esc(lifecycle)+"</dd><dt>原始檔</dt><dd>"+esc(file)+"</dd><dt>檔案指紋</dt><dd>"+esc(fingerprint)+"</dd><dt>座標引用</dt><dd>"+esc(place)+"</dd><dt>歷史規格</dt><dd>"+esc(historicalSpec)+"</dd><dt>本次規格</dt><dd>套用時依現有規則查詢；結果另見「規格設定」，不代表歷史原值。</dd></dl>";box.hidden=false}
+  box.innerHTML="<b>來源與資料脈絡</b><dl class=\"imp-source-grid\"><dt>紀錄識別</dt><dd>"+esc(identity)+"｜"+esc(lifecycle)+"</dd><dt>原始檔</dt><dd>"+esc(file)+"</dd><dt>檔案指紋</dt><dd>"+esc(fingerprint)+"</dd><dt>座標引用</dt><dd>"+esc(place)+"</dd><dt>歷史規格</dt><dd>"+esc(historicalSpec)+"</dd><dt>本次規格</dt><dd>套用時依現有規則查詢；結果另見「設定」，不代表歷史原值。</dd></dl>";box.hidden=false}
 function updateImportWorkflow(){
   const root=$("#impFlowSteps"),summary=$("#impFlowStatus");
   if(!root||!summary)return;
@@ -9104,7 +9145,7 @@ $("#btnApply").onclick=async()=>{if(!IMP||!IMP.res)return;const I0=IMP,demo=!!I0
   holdRender(()=>{if(mode==="replace"){const c=curRun();c.rows=rows;c.metrics=runMetrics(metrics,info.heightUnit);c.name=name;c.info=info;c.aoi=null;c.sample=demo;c.cfg=cfg;S.runId=null;switchRun(c.id)}
     else{const id=addRun(name,rows,metrics,cfg,info);if(demo)S.runs.find(r=>r.id===id).sample=true;switchRun(id)}});
   $("#mapBox").hidden=true;IMP=null;IMPORT_FLOW_COMPLETE=true;IMPORT_FLOW_PHASE="";updateImportWorkflow();
-  if(locked){setTab("data");setSub("specs","spec");gotoSpecCard();toast(`料號 ${partNo} 尚無料號規格：請確認規格表後按「儲存為新版本」，分析才會開始`)}
+  if(locked){gotoSpecCard();toast(`料號 ${partNo} 尚無料號規格：請確認規格表後按「儲存為新版本」，分析才會開始`)}
   else{setTab("issues");if(ps)toast(`已套用料號 ${ps.rec.part} 的預設規格 v${ps.rec.ver}`)}})};
 const applyImportHandler=$("#btnApply").onclick;
 $("#btnApply").onclick=async function(event){clearImportValidationError();clearImportFieldErrors();IMPORT_FLOW_PHASE="apply";updateImportWorkflow();try{return await applyImportHandler.call(this,event)}finally{IMPORT_FLOW_PHASE="";const message=$("#parseErr")?.textContent||$("#recNote")?.querySelector(".err")?.textContent||"";if(message)showImportValidationError(message,document.activeElement);updateImportWorkflow()}};
@@ -9308,12 +9349,11 @@ $$("[data-subnav-deep]").forEach(b=>{b.onclick=()=>setTab("deep/"+b.dataset.subn
 $$("[data-subnav-improve]").forEach(b=>{b.onclick=()=>setTab("improve/"+b.dataset.subnavImprove)});
 if ($("#btnGoAiCfg")) {
   $("#btnGoAiCfg").onclick = () => {
-    setTab("data");
-    setSub("settings","ai");
+    setTab("settings/ai");
     initAiPage();
   };
 }
-if($("#btnGoWipeSpec"))$("#btnGoWipeSpec").onclick=()=>{setTab("data");setSub("settings","spec");const el=$("#inWipe2");if(el)el.focus({preventScroll:true})};
+if($("#btnGoWipeSpec"))$("#btnGoWipeSpec").onclick=()=>{setTab("settings/spec");const el=$("#inWipe2");if(el)el.focus({preventScroll:true})};
 /* ---------- AI ---------- */
 let aiAbort=null;
 function mdLite(t){const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));let html="",inList=false;
@@ -10063,6 +10103,9 @@ $("#moreMenu").addEventListener("click",e=>{if(e.target.closest("button,a"))clos
 new MutationObserver(updateMore).observe($("#moreMenu"),{attributes:true,subtree:true,attributeFilter:["hidden"]});
 /* 資料與規格子分頁 */
 const SETTINGS_LEGACY={specs:"spec",stencil:"stencil","ai-cfg":"ai",records:"import"};
+function markSettingsAnchor(anchor){
+  $$("[data-settings-anchor]").forEach(b=>{if(anchor&&b.dataset.settingsAnchor===anchor)b.setAttribute("aria-current","true");else b.removeAttribute("aria-current")});
+}
 function scrollSettingsAnchor(anchor){
   const id={ui:"settingsAnchorUi",spec:"settingsAnchorSpec",stencil:"settingsAnchorStencil",ai:"aiSettingsCard"}[anchor];
   if(!id)return;
@@ -10074,15 +10117,20 @@ function updateSettingsUi(){
   if(note)note.textContent="雙欄模式："+(S.duo&&S.duo.active?"開啟":"關閉");
 }
 function setSub(k,anchor){
-  let sub=k,scrollA=anchor||null;
-  if(SETTINGS_LEGACY[k]){sub="settings";scrollA=scrollA||SETTINGS_LEGACY[k];if(k==="records")scrollA=null}
+  if(k==="settings"||(SETTINGS_LEGACY[k]&&k!=="records")){
+    const pane=anchor||(k==="settings"?null:SETTINGS_LEGACY[k]);
+    setTab(pane?"settings/"+pane:"settings");
+    return;
+  }
+  const sub=k==="records"||!["import","runs"].includes(k)?"import":k;
   S.sub=sub;
   $$("#p-data .subtab").forEach(b=>{const on=b.dataset.sub===sub;b.setAttribute("aria-selected",String(on));b.tabIndex=on?0:-1});
   $$("#p-data [data-sub]:not(.subtab)").forEach(el=>el.hidden=el.dataset.sub!==sub);
-  if(S.tab==="data")renderTab();
-  if(sub==="settings"&&scrollA)nextFrame(()=>scrollSettingsAnchor(scrollA));
+  if(S.tab!=="data")setTab("data");
+  else renderTab();
 }
 $$("#p-data .subtab").forEach(b=>{b.onclick=()=>setSub(b.dataset.sub);b.tabIndex=b.getAttribute("aria-selected")==="true"?0:-1});
+$$("[data-settings-anchor]").forEach(b=>{b.onclick=()=>setTab("settings/"+b.dataset.settingsAnchor)});
 /* 子分頁鍵盤操作：左右鍵、Home、End（與主頁籤相同） */
 $("#p-data .subtabs").addEventListener("keydown",e=>{const T=$$("#p-data .subtab"),i=T.findIndex(t=>t.getAttribute("aria-selected")==="true");let j=null;
   if(e.key==="ArrowRight")j=(i+1)%T.length;else if(e.key==="ArrowLeft")j=(i-1+T.length)%T.length;else if(e.key==="Home")j=0;else if(e.key==="End")j=T.length-1;if(j==null)return;e.preventDefault();setSub(T[j].dataset.sub);T[j].focus()});
@@ -11688,7 +11736,6 @@ function toggleTheme(){
 }
 try{const svT=localStorage.getItem("spi-theme");applyTheme(svT==="dark"?"dark":"light",false)}catch(e){applyTheme("light",false)}
 if($("#btnThemeSettings"))$("#btnThemeSettings").onclick=toggleTheme;
-if($("#mBtnTheme"))$("#mBtnTheme").onclick=()=>{if(typeof moreSheetCtrl!=="undefined"&&moreSheetCtrl)moreSheetCtrl.close();setTab("data");setSub("settings","ui");const el=$("#btnThemeSettings");if(el)el.focus({preventScroll:true})};
 function setDuoTab(pane, tab){if(!S.duo)return;if(pane==="left"){S.duo.leftTab=tab;S.tab=tab}else if(pane==="right"){S.duo.rightTab=tab;updateDuoThumbDock()}renderTab()}
 function swapDuoPanes(){if(!S.duo||!S.duo.active)return;const t=S.duo.leftTab;S.duo.leftTab=S.duo.rightTab;S.duo.rightTab=t;S.tab=S.duo.leftTab;updateDuoThumbDock();renderTab()}
 function toggleDuoMode(forceState){if(!S.duo)return;const next=(typeof forceState==="boolean")?forceState:!S.duo.active;S.duo.active=next;document.body.classList.toggle("duo-mode",next);const btn=$("#duoToggleBtn");if(btn){btn.setAttribute("aria-pressed",next?"true":"false");btn.classList.toggle("active",next)}const mDuo=$("#mBtnDuo");if(mDuo){mDuo.setAttribute("aria-pressed",next?"true":"false");mDuo.classList.toggle("active",next)}const dock=$("#duoThumbDock");if(dock)dock.hidden=!next;updateDuoThumbDock();updateSettingsUi();showPanels(S.tab);renderTab()}
@@ -12062,7 +12109,7 @@ async function renderRecSpecs(list,hit,fp){const tb=$("#recSpec");if(!tb)return;
   const applied=S.partSpec&&S.partSpec.id;
   tb.innerHTML=L.length?`<thead><tr><th>產品料號</th><th>版本</th><th style="min-width:12em">備註</th><th>建立者</th><th>建立時間</th><th>檔案指紋</th><th></th></tr></thead><tbody>`+L.map(r=>`<tr${applied===r.id?' style="background:var(--accent-soft)"':""}><td>${esc(r.part)}</td><td class="mono" style="white-space:nowrap">v${r.ver}${r.isDefault?' <span class="pill ok">預設</span>':""}</td><td>${esc(r.note||"—")}</td><td>${esc(r.user)}</td><td class="mono" style="white-space:nowrap">${esc(fmtTime(r.created))}</td><td>${fp(r)}</td>
     <td><div class="rec-act">${applied===r.id?'<span class="pill ok">目前套用</span>':(r.part===cur&&S.specSrc!=="sample"?`<button data-ract="suse" data-id="${esc(r.id)}">套用到目前回合</button>`:"")}${r.isDefault?"":`<button data-ract="sdef" data-id="${esc(r.id)}">設為預設</button>`}<button data-ract="dl" data-id="${esc(r.id)}">匯出 JSON</button><button data-ract="ver" data-id="${esc(r.id)}">驗證</button></div></td></tr>`).join("")+"</tbody>"
-    :`<tbody><tr><td class="note">${q?"沒有符合的料號規格":parts.length?"這些料號都還沒有規格版本。在「規格設定」填好規格後按「儲存為新版本」。":"尚無料號。匯入量測紀錄後，可在「規格設定」為該料號儲存規格。"}</td></tr></tbody>`}
+    :`<tbody><tr><td class="note">${q?"沒有符合的料號規格":parts.length?"這些料號都還沒有規格版本。在「設定」填好規格後按「儲存為新版本」。":"尚無料號。匯入量測紀錄後，可在「設定」為該料號儲存規格。"}</td></tr></tbody>`}
 
 async function renderRecPicker(force) {
   const modal = $("#recPickerModal");
