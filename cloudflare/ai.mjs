@@ -285,6 +285,12 @@ export const UPSTREAM_RETRY_MAX_ATTEMPTS = 4;
 export const UPSTREAM_RETRY_MAX_DELAY_MS = 8000;
 const UPSTREAM_RETRY_BACKOFF_MS = [2000, 4000, 8000];
 
+// 上游前面是 Cloudflare（api.openai.com、AI Gateway）時，100 秒內沒送出回應標頭就回 524。
+// 高推理強度＋大份摘要可能在推理階段就超過 100 秒；同強度重試只會再等 100 秒後同樣失敗，
+// 因此只重試一次，並把推理強度降為 low（在結果開頭揭露），模型與服務商不變。
+export const UPSTREAM_TIMEOUT_STATUSES = [524];
+export const TIMEOUT_FALLBACK_EFFORT = 'low';
+
 function errorPayloadFromJson(value) {
   if (!value || typeof value !== 'object') return null;
   if (Array.isArray(value)) {
@@ -384,6 +390,10 @@ export function formatUpstreamFailureMessage(provLabel, status, extracted, didRe
   if (status === 404 && /^Route \S+ not found/i.test(extracted.message)) {
     return `${base}。此端點沒有 Chat Completions 路由，請確認自訂 API 端點網址。`;
   }
+  if (UPSTREAM_TIMEOUT_STATUSES.includes(status)) {
+    const tail = didRetry ? `已自動改用推理強度 ${TIMEOUT_FALLBACK_EFFORT} 重試仍逾時` : '上游超過 100 秒未開始回應';
+    return `${base}。${tail}；請在 AI 設定改選較快的模型，或稍後再試。`;
+  }
   if (didRetry && (status === 429 || status === 503)) {
     return `${base}。已自動重試仍失敗，請稍後再試或改選其他服務商。`;
   }
@@ -407,8 +417,9 @@ function abortableDelay(ms, signal) {
   });
 }
 
-async function fetchUpstreamWithRetry(targetUrl, headers, bodyPayload, signal, provLabel) {
+async function fetchUpstreamWithRetry(targetUrl, headers, bodyPayload, signal, provLabel, onEffortFallback) {
   let didRetry = false;
+  let timeoutFallbackUsed = false;
   for (let attempt = 0; attempt < UPSTREAM_RETRY_MAX_ATTEMPTS; attempt++) {
     const res = await fetch(targetUrl, {
       method: 'POST',
@@ -418,6 +429,24 @@ async function fetchUpstreamWithRetry(targetUrl, headers, bodyPayload, signal, p
     });
     if (res.ok) return { res, didRetry };
     const bodyText = await res.text();
+    if (UPSTREAM_TIMEOUT_STATUSES.includes(res.status)) {
+      const canFallback = !timeoutFallbackUsed
+        && bodyPayload.reasoning_effort
+        && bodyPayload.reasoning_effort !== TIMEOUT_FALLBACK_EFFORT;
+      if (canFallback) {
+        timeoutFallbackUsed = true;
+        didRetry = true;
+        const fromEffort = bodyPayload.reasoning_effort;
+        bodyPayload = { ...bodyPayload, reasoning_effort: TIMEOUT_FALLBACK_EFFORT };
+        onEffortFallback?.(fromEffort, TIMEOUT_FALLBACK_EFFORT);
+        continue;
+      }
+      return {
+        res: null,
+        error: formatUpstreamFailureMessage(provLabel, res.status, extractUpstreamError(bodyText), didRetry && timeoutFallbackUsed),
+        didRetry,
+      };
+    }
     const plan = planUpstreamRetry({
       status: res.status,
       headers: res.headers,
@@ -622,6 +651,7 @@ export async function handleAnalyze(req, env = {}, userArg = '') {
       let outChars = 0;
       let usageReported = null;
       let finishReason = null;
+      let effortNote = '';
       try {
         const upstreamHeaders = {
           'Content-Type': 'application/json',
@@ -645,12 +675,16 @@ export async function handleAnalyze(req, env = {}, userArg = '') {
           upstreamBody,
           upstreamCtrl.signal,
           provCfg.label,
+          (fromEffort, toEffort) => {
+            effortNote = `（${provCfg.label} 以推理強度 ${fromEffort} 超過 100 秒未回應，已自動改用推理強度 ${toEffort} 重試）\n\n`;
+          },
         );
         if (!upstream.res) {
           controller.enqueue(enc.encode(`\n\n［AI 分析失敗：${upstream.error}］`));
           return;
         }
         const res = upstream.res;
+        if (effortNote) controller.enqueue(enc.encode(effortNote));
 
         const reader = res.body.getReader();
         const dec = new TextDecoder();

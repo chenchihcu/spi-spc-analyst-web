@@ -490,3 +490,42 @@ test('上游 404 模型不存在與路由不存在：串流失敗訊息附上修
     assert.equal(calls, 1, '404 不重試');
   }
 });
+
+for (const [name, timeoutTimes, startEffort] of [
+  ['上游 524（100 秒未回應）改用推理強度 low 重試一次後成功', 1, 'high'],
+  ['上游 524 降為 low 後仍逾時：只重試一次並提示改選較快模型', 2, 'high'],
+  ['推理強度已是 low 時 524 不重試', 1, 'low'],
+]) {
+  test(name, async () => {
+    const efforts = [];
+    const realFetch = globalThis.fetch;
+    globalThis.fetch = async (url, init) => {
+      const sent = JSON.parse(init.body);
+      efforts.push(sent.reasoning_effort);
+      if (efforts.length <= timeoutTimes) {
+        return new Response('error code: 524', { status: 524, headers: { 'content-type': 'text/plain' } });
+      }
+      return new Response(sse(sent.model, '分析結果'), { status: 200, headers: { 'content-type': 'text/event-stream' } });
+    };
+    try {
+      const req = new Request('https://spi.example/api/analyze', {
+        method: 'POST',
+        headers: { 'X-AI-Provider': 'openai', 'X-OpenAI-Key': 'user-openai-key', 'X-AI-Reasoning-Effort': startEffort },
+        body: BODY,
+      });
+      const text = await (await handleAnalyze(req, {}, USER)).text();
+      if (startEffort === 'low') {
+        assert.deepEqual(efforts, ['low']);
+        assert.match(text, /［AI 分析失敗：524 error code: 524。上游超過 100 秒未開始回應；請在 AI 設定改選較快的模型/);
+      } else if (timeoutTimes === 1) {
+        assert.deepEqual(efforts, ['high', 'low']);
+        assert.equal(text, '（OpenAI 以推理強度 high 超過 100 秒未回應，已自動改用推理強度 low 重試）\n\n分析結果');
+      } else {
+        assert.deepEqual(efforts, ['high', 'low']);
+        assert.match(text, /［AI 分析失敗：524 error code: 524。已自動改用推理強度 low 重試仍逾時/);
+      }
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+  });
+}
