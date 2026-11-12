@@ -420,3 +420,15 @@ test("歷史舊資料回合在選取相符座標檔後即時套用檢視座標�
 
   assert.deepEqual(errs, []);
 });
+
+test("3D 示意網格警示的「套用座標檔」按鈕開啟座標檔庫", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { dom, errs } = page([]);
+  const d = dom.window.document, $ = (s) => d.querySelector(s);
+  assert.ok(await until(() => dom.window.SPI_TEST_HOOK && typeof $("#btnGridApplyPlace")?.onclick === "function"), "頁面初始化完成並掛上按鈕事件");
+  const btn = $("#grid3dWarn #btnGridApplyPlace");
+  assert.ok(btn, "警示橫幅內應有套用座標檔按鈕");
+  btn.click();
+  assert.ok(await until(() => !$("#recPickerModal").hidden), "應開啟資料庫對話框");
+  assert.equal($("#boxPickPlace").hidden, false, "應直接切到座標檔庫");
+  assert.deepEqual(errs, []);
+});
