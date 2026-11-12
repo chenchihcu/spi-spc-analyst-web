@@ -230,6 +230,16 @@ test("重複檔沿用既有紀錄；從資料庫開啟不重複存；管理者�
   assert.ok(await until(() => /新增/.test($("#recAudit").textContent)));
   const audit = $("#recAudit").textContent;
   assert.match(audit, /L1/); assert.match(audit, /刪除/);
+  // 管理者刪除一筆稽核紀錄：原列消失、出現不可刪的「刪除稽核」列
+  const before = d.querySelectorAll('#recAudit [data-audit-del]').length;
+  assert.ok(before > 0, "管理者可見稽核刪除鈕");
+  d.querySelector('#recAudit [data-audit-del]').click();
+  assert.ok(await until(() => $("#recDeleteModal").classList.contains("open")));
+  assert.equal($("#recDeleteTitle").textContent, "刪除稽核紀錄");
+  assert.match($("#recDeleteBody").textContent, /會留下一筆刪除紀錄/);
+  $("#recDeleteConfirm").click();
+  assert.ok(await until(() => $("#recDeleteModal").hidden && /刪除稽核/.test($("#recAudit").textContent)));
+  assert.equal(d.querySelectorAll('#recAudit [data-audit-del]').length, before - 1, "原列刪除，墓碑列沒有刪除鈕");
   assert.deepEqual(errs, []);
 });
 

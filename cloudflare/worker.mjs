@@ -375,6 +375,13 @@ async function handleRecordsApi(req, repo, user, env) {
   }
 
   if (req.method === 'DELETE') {
+    // 稽核紀錄刪除：只限管理者；刪除本身寫入 audit_delete
+    if (url.searchParams.has('audit_seq')) {
+      if (!admin) return json({ error: '需要管理者權限' }, 403);
+      const res = await repo.deleteAuditEntry(url.searchParams.get('audit_seq'), user);
+      if (res.error) return json({ error: res.error }, res.status || 500);
+      return json({ deleted_seq: res.deleted_seq });
+    }
     const id = url.searchParams.get('id') || '';
     const rec = await repo.getRecord(id);
     const adminOnly = !rec || rec.kind === 'spi' || rec.kind === 'place';
