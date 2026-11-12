@@ -188,7 +188,7 @@ async function handleRecordsApi(req, repo, user, env) {
     const specsFor = url.searchParams.get('specs_for');
     if (specsFor) {
       const specs = await repo.getSpecsForPart(clean(specsFor, 64));
-      return json({ specs, part: specsFor });
+      return json({ specs, part: specsFor, me: user });
     }
 
     const kind = url.searchParams.get('kind') || 'spi';

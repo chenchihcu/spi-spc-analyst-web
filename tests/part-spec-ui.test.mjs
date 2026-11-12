@@ -218,6 +218,50 @@ test("流程：鋼板厚度必填 → 未定義規格時鎖定 → 驗證與草�
   const csv = w.eval("SPI_TEST_HOOK.issuesCsv(S.F)").split("\n");
   assert.match(csv[0], /,spec_source,case_id,case_title$/); assert.match(csv[1], /料號規格 NEW-1 v1/);
 
+  // 9b. 料號規格版本的檔案管理：匯出 JSON、刪除（需確認；取消不刪）；刪除套用中的預設版 → 規格值留在表單、分析鎖定
+  $("#recPickerClose").click();
+  $("[data-tab=data]").click();
+  $("#btnSpecVers").click();
+  assert.ok(await until(() => d.querySelectorAll("#specVerTbl tbody tr").length === 2));
+  assert.equal(d.querySelectorAll("#specVerTbl [data-vdel]").length, 2, "建立者看得到每一版的刪除");
+  assert.equal(d.querySelectorAll("#specVerTbl [data-vdl]").length, 2, "每一版都可匯出");
+  w.URL.createObjectURL = () => "blob:test"; w.URL.revokeObjectURL = () => {};
+  d.querySelector("#specVerTbl [data-vdl]").click();
+  assert.ok(await until(() => /已匯出 料號規格_NEW-1_v2\.json/.test($("#specVerState").textContent)), $("#specVerState").textContent);
+  const specCount = () => cloud.db.prepare("SELECT COUNT(*) AS c FROM records WHERE kind = 'spec' AND part = 'NEW-1'").get().c;
+  d.querySelector("#specVerTbl [data-vdel]").click();
+  assert.ok(await until(() => !$("#specConfirmModal").hidden));
+  assert.match($("#specConfirmTitle").textContent, /刪除料號 NEW-1 規格 v2/);
+  assert.equal($("#specConfirmOk").textContent, "刪除");
+  d.querySelector("#specConfirmModal [data-close]").click();
+  await tick(20);
+  assert.equal(specCount(), 2, "取消不刪除");
+  d.querySelector("#specVerTbl [data-vdel]").click();
+  assert.ok(await until(() => !$("#specConfirmModal").hidden));
+  $("#specConfirmOk").click();
+  assert.ok(await until(() => d.querySelectorAll("#specVerTbl tbody tr").length === 1));
+  assert.equal(specCount(), 1, "v2 已自雲端移除");
+  assert.equal(w.eval("S.partSpec.ver"), 1, "刪除未套用的版本不影響目前分析");
+  const before = J(w, "S.specs.volume");
+  d.querySelector("#specVerTbl [data-vdel]").click();
+  assert.ok(await until(() => !$("#specConfirmModal").hidden));
+  assert.match($("#specConfirmMsg").textContent, /預設版本/); assert.match($("#specConfirmMsg").textContent, /回合正在套用這一版/);
+  $("#specConfirmOk").click();
+  assert.ok(await until(() => /尚無料號規格版本/.test($("#specVerState").textContent)));
+  assert.equal(specCount(), 0);
+  assert.equal(w.eval("S.specSrc"), "none"); assert.equal(w.eval("S.partSpec"), null);
+  assert.equal(w.eval("S.specDraft.dirty"), true, "規格值轉成未儲存的修改");
+  assert.deepEqual(J(w, "S.specDraft.specs.volume"), { lsl: before.lsl, usl: before.usl, tgt: before.tgt }, "表單保留被刪版本的規格值");
+  assert.equal(w.eval("S.runs.some(r => r.cfg && r.cfg.partSpec && r.cfg.partSpec.ver === 1)"), false, "其他回合也不再指向已刪除的版本");
+  assert.match($("#partSpecBar").textContent, /尚未定義規格，分析已鎖定/);
+  const audit = cloud.db.prepare("SELECT COUNT(*) AS c FROM audit_log WHERE action = 'delete'").get().c;
+  assert.equal(audit, 2, "每次刪除寫入稽核紀錄");
+  d.querySelector("#specVerModal [data-close]").click();
+  // 另存為預設，分析解鎖（後續步驟沿用）；版本號依現存最大值 +1（docs/spec-part-spec-rfc.md），全部刪除後重新從 v1 起
+  $("#btnSpecSave").click(); $("#specSaveDefault").checked = true;
+  await $("#specSaveOk").onclick();
+  assert.equal(w.eval("S.specSrc"), "part"); assert.equal(w.eval("S.partSpec.ver"), 1);
+
   // 10. 調整本回合厚度只更新回合分析，不回寫資料庫的匯入厚度
   assert.equal($("#inImpStencil").value, "100", "匯入欄保留當時使用的厚度");
   change(w, $("#inStencil2"), 130);
