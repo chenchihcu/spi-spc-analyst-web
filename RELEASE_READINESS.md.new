@@ -1,0 +1,70 @@
+# Release Readiness Report
+
+**Project:** SPI·SPC 分析台
+**Version:** v10.21.2（`package.json`、`#appVer`、CHANGELOG 一致）
+**Commit:** `4968d8f`（main 最新，分支 `claude/elegant-johnson-2r0ydo` 未改動產品程式碼）
+**Date:** 2026-11-12
+**Overall Status:** NEEDS REVIEW（本機關卡全部通過、無阻擋項；正式站路徑未驗證）
+
+## Summary
+
+本機的功能與輸出正確性都通過了：518 項測試、黃金值比對、完整判定模擬，以及 5 萬筆效能門檻，失敗數都是 0。build 與 Worker dry-run 也通過。但這次在雲端容器執行，正式站的主機被網路代理拒絕，所以登入頁版本與資料庫路徑都沒有驗證。
+
+## 本機關卡（verified：本次實際執行）
+
+| 關卡 | 指令 | 結果 |
+|---|---|---|
+| SPA 啟動 | `node --test tests/ui.smoke.test.js` | FACT：2／2 通過 |
+| 完整測試＋發布掃描 | `npm run release-check`（內含 `npm test`） | FACT：exit 0，`Overall: NEEDS REVIEW`；518 項通過、4 項略過、0 項失敗（64 個測試檔） |
+| 輸出逐位元正確 | `tests/golden.test.mjs`（release-check 內） | FACT：通過（失敗 0） |
+| 判定模擬（誤報率） | `npm run test:slow`（`RUN_SLOW=1`） | FACT：7／7 通過，exit 0 |
+| 5 萬筆效能 | `node tools/bench-large.mjs` | FACT：三種形狀（約 47,600 筆）下，`analyze` 首次最慢 718 ms，`detectIssues` 最慢 1,814 ms，都低於 3 秒的硬門檻。INFERENCE：`detectIssues` 在 410 板 × 116 焊墊時高於 1 秒的本機優化目標，但不阻擋發布 |
+| Cloudflare build | `npm run build:cloudflare` | FACT：exit 0；HTML 1,063,449 bytes，資產為 index.html、vendor/、_headers |
+| Worker dry-run | `npx wrangler deploy --dry-run` | FACT：exit 0；DB、BLOBS、LOGIN_LIMIT、ASSETS 綁定都在 |
+
+另外為了查出略過的是哪 4 項，多跑了一次 `node --test tests/*.test.*`。這次重跑只是為了讀出 SKIP 的名稱，不是另一份測試證據。
+
+## release-check 分類
+
+| 類別 | 狀態 | 發現 |
+|---|---|---|
+| 版本 | ✅ | FACT：v10.21.2；`#appBuilt` 是預設值，build 時才注入 |
+| 更新紀錄 | ✅ | FACT：最新條目 v10.21.2（2026-11-12），與主頁版本一致 |
+| 除錯殘留 | ⚠️ | FACT：主頁有 4 處 console 輸出（`spi-spc.html` 第 8227、8566、11982、11996 行）。INFERENCE：都是 3D 繪製失敗或匯出錯誤時才輸出的 `console.warn`／`console.error` 診斷訊息，不是除錯殘留 |
+| 文件 | ✅ | FACT：README 有快速開始、使用、設定 |
+| 相依 | ✅ | FACT：版本都已鎖定。INFERENCE：three.js r128 較舊，但穩定 |
+| 測試 | ⚠️ | FACT：4 項略過，原因如下 |
+| 機密 | ✅ | FACT：掃描 197 個檔，沒有寫死的金鑰 |
+| 無障礙 | ✅ | FACT：101 個控制項都有標籤 |
+
+略過的 4 項（FACT）：
+
+- `controlled-import.test.mjs` 有 2 項需要使用者 Windows 本機的樣本檔 `C:/Users/user/Documents/x3000 spidata`，所以在雲端容器中略過。INFERENCE：在使用者的本機會執行。
+- 2 項「雲端模式開機」測試的程式碼裡標了略過，原因是「開機橫幅已整併至記錄庫」，屬於刻意停用。
+
+## 正式站（not verified）
+
+- FACT：連 `https://spi-spc-analyst.chihfu-chen-tw.workers.dev` 時，本容器的網路代理回 `CONNECT tunnel failed, response 403`，請求沒有送到 Worker。
+- 登入頁版本：未讀回。
+- 資料庫路徑（`POST /__login` → `GET /api/records`）：`not_done`。手邊也沒有帳號，無法計算 `d`。資料庫路徑未驗證。
+- Cloudflare Workers Build（`4968d8f`）：未讀回。
+- D1 migration：遠端清單未檢查（需要 wrangler 登入）。
+
+## Blockers
+
+無。
+
+## Warnings
+
+- [正式站] FACT：網路代理拒絕連線，正式站版本與資料庫路徑未驗證 → 在本機或有權限的環境讀回登入頁版本，再走 `/__login` → `/api/records`。
+- [除錯殘留] INFERENCE：4 處 console 都是錯誤診斷 → 不需要處理。
+- [測試] FACT：4 項略過 → 2 項在本機執行；2 項刻意停用的開機測試可以考慮刪除。
+
+## Recommendations — Next Best Step
+
+在可以連到正式站的電腦上，確認登入頁顯示 v10.21.2，再登入並確認 `GET /api/records` 回 200，而且 JSON 含 `records` 陣列。
+
+其他：
+
+1. 在 Windows 本機跑 `node --test tests/controlled-import.test.mjs`，讓 2 項樣本檔測試真的執行。
+2. 這次沒有跑 UI 四寬度 × 雙主題矩陣與 iPhone 真機，記為 NOT TESTED。
