@@ -400,3 +400,16 @@ test("已解析匯入預覽的 grid 欄不得由內容撐寬", () => {
   assert.match(htmlSource, /#mapBox\{grid-template-columns:minmax\(0,1fr\)\}/);
   assert.match(htmlSource, /#mapBox>\*\{min-width:0\}/);
 });
+
+test("11. 主頁精簡：狀態移入 rail、問題地圖預設收合、子視圖整合於標題列、面向下拉觸控 44px", () => {
+  assert.doesNotMatch(htmlSource, /max-width:\s*min\(18vw,\s*190px\)/, '不可再用 190px 截斷狀態文字');
+  assert.doesNotMatch(htmlSource, /id="railNote"/, '分析設定列不可留靜態教學 #railNote');
+  assert.match(htmlSource, /<div class="rail-states"[^>]*>[\s\S]*id="stateSpi"[\s\S]*id="statePlace"/, '資料與座標狀態應移至 .rail-states');
+  const pmapTag = htmlSource.match(/<details class="pmap-details" id="pmapDetails"[^>]*>/)?.[0] || '';
+  assert.ok(pmapTag && !/\sopen[\s>]/.test(pmapTag), '#pmapDetails 預設應為收合狀態');
+  const issTopBlock = htmlSource.slice(htmlSource.indexOf('<div class="iss-top">'), htmlSource.indexOf('<div class="issues-subviews"'));
+  assert.match(issTopBlock, /data-subnav-issues="list"/, '子視圖切換鈕應整合在 .iss-top 標題列且位於 issues-subviews 之前');
+  assert.match(htmlSource, /#p-issues>\.iss-top\{order:1;[\s\S]*?#p-issues>\.issues-subviews\{order:2\}/, '手機格線下 .iss-top 必須排在 .issues-subviews 之前');
+  assert.match(htmlSource, /<select id="selIssCat" class="iss-cat-sel"/, '面向篩選應使用 #selIssCat 下拉選單');
+  assert.match(htmlSource, /@media\(pointer:coarse\)\{[^}]*\.panel-subnav--inline button,\.iss-cat-sel[^}]*min-height:44px/, '觸控下子視圖切換與面向下拉需有 44px 熱區');
+});
