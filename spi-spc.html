@@ -9075,8 +9075,8 @@ $("#selVendor").onchange=()=>{try{localStorage.setItem("spi-vendor",$("#selVendo
 $("#selSide").onchange=()=>{syncIdentityHints();reconvert()};
 $("#placeClear").onclick=()=>{PLACE=null;placeSave();placeShow();reconvert();clearImportFieldErrors("btnSelectPlace");renderImportSourceSummary();updateImportWorkflow();syncIdentityHints();syncPlaceToCurrentRun({notify:false})};
 $("#btnSelectPlace").onclick=()=>{if(typeof openRecPickerModal==="function")openRecPickerModal("place");else{$("#btnOpenRecModal")?.click();$("#btnPickPlace")?.click()}};
-$("#btnRegisterPlace").onclick=()=>{RETURN_IMPORT_AFTER_PLACE=true;if(typeof openRecPickerModal==="function")openRecPickerModal("pairs");if($("#upPlacePart"))$("#upPlacePart").value=safeId($("#inPart").value);if($("#upPlaceRev"))$("#upPlaceRev").value=($("#inRev").value||"").trim();const side=$("#selSide").value;if((side==="TOP"||side==="BOT")&&$("#upPlaceSide"))$("#upPlaceSide").value=side;parkPlaceForm();$("#upPlaceSide")?.focus()};
-$("#placeChoices").onclick=async e=>{const b=e.target.closest("[data-pick-place]");if(!b)return;const rec=(RecDB.cache||[]).find(x=>x.id===b.dataset.pickPlace);if(!rec){toast("找不到這份座標檔，請重新整理");return}try{await usePlaceRec(rec)}catch(er){toast(er.message)}};
+$("#btnRegisterPlace").onclick=()=>{if(typeof openRecPickerModal==="function")openRecPickerModal("pairs");RETURN_IMPORT_AFTER_PLACE=true;if($("#upPlacePart"))$("#upPlacePart").value=safeId($("#inPart").value);if($("#upPlaceRev"))$("#upPlaceRev").value=($("#inRev").value||"").trim();const side=$("#selSide").value;if((side==="TOP"||side==="BOT")&&$("#upPlaceSide"))$("#upPlaceSide").value=side;parkPlaceForm();$("#upPlaceSide")?.focus()};
+$("#placeChoices").onclick=async e=>{const b=e.target.closest("[data-pick-place]");if(!b)return;const rec=(RecDB.cache||[]).find(x=>x.id===b.dataset.pickPlace);if(!rec){toast("找不到這份座標檔，請重新整理");return}try{await usePlaceRec(rec);syncPlaceToCurrentRun({notify:true});if(IMP&&IMP.raw)reconvert()}catch(er){toast(er.message)}};
 async function saveControlledPlacement(fl,part,rev,side,unit){
   if(RecDB.mode!=="cloud")throw new Error("請先登入並連線到雲端資料庫");
   if(!RecDB.isAdmin){await RecDB.list();if(!RecDB.isAdmin)throw new Error("只有管理者可以上傳座標檔")}
@@ -9177,8 +9177,8 @@ function updateImportWorkflow(){
           previewReady?"請檢查欄位預覽與警示，再確認中繼資料後套用。":"請依序完成各區段；套用時會再執行正式驗證。";
 }
 $("#impValidationSummary")?.querySelector("[data-import-error-jump]")?.addEventListener("click",()=>{const target=IMPORT_FLOW_ERROR_TARGET;if(target?.focus){target.focus();target.scrollIntoView?.({block:"center"})}});
-$("#impFlowSteps")?.closest(".card")?.addEventListener("input",e=>{if(e.target.matches("input,select,textarea")){clearImportValidationError();clearImportFieldErrors(e.target.id);if($("#recNote")?.querySelector(".err"))$("#recNote").textContent="";renderImportSourceSummary();updateImportWorkflow()}});
-$("#impFlowSteps")?.closest(".card")?.addEventListener("change",e=>{if(e.target.matches("input,select,textarea")){clearImportValidationError();clearImportFieldErrors(e.target.id);if($("#recNote")?.querySelector(".err"))$("#recNote").textContent="";renderImportSourceSummary();updateImportWorkflow()}});
+$("#impFlowSteps")?.closest(".card")?.addEventListener("input",e=>{if(e.target.matches("input,select,textarea")){clearImportValidationError();clearImportFieldErrors(e.target.id);syncIdentityHints();if($("#recNote")?.querySelector(".err"))$("#recNote").textContent="";renderImportSourceSummary();updateImportWorkflow()}});
+$("#impFlowSteps")?.closest(".card")?.addEventListener("change",e=>{if(e.target.matches("input,select,textarea")){clearImportValidationError();clearImportFieldErrors(e.target.id);syncIdentityHints();if($("#recNote")?.querySelector(".err"))$("#recNote").textContent="";renderImportSourceSummary();updateImportWorkflow()}});
 ["optOff","optH","optVol","inSub","optDateFmt","optDupMode","optGrpFallback"].forEach(id=>{const el=$("#"+id);if(el)el.onchange=()=>IMP&&previewImport()});
 $("#selProfile").onchange=e=>{if(!IMP)return;applyProfile(e.target.value);renderMap()};
 $("#btnSaveProfile").onclick=()=>{if(!IMP)return;const name=safeId($("#inProfileName").value)||"自訂設定檔",cols={};Object.entries(IMP.map).forEach(([k,i])=>cols[k]=IMP.tab.head[i]);
@@ -12522,7 +12522,7 @@ async function renderRecPicker(force) {
       : `<button type="button" class="btn-sm" disabled>下載這一對</button><span class="note">座標原檔不在，只能下載量測原檔</span>`;
     const status = st.v === "ok" ? `<span class="rec-ok">身分相符</span>` : st.v === "bad" ? `<span class="rec-bad">${esc(st.text)}</span>` : st.v === "missing" ? `<span class="rec-bad">座標檔不存在</span>` : `<span class="note">尚未搭配</span>`;
     const more = `<button type="button" class="btn-sm" data-pact="ver" data-id="${esc(r.id)}">對應證明</button><button type="button" class="btn-sm" data-pact="dl" data-id="${esc(r.id)}">下載原檔</button><button type="button" class="btn-sm" data-pact="open" data-id="${esc(r.id)}">調整</button>${editBtn(r)}${RecDB.isAdmin && r.lifecycle === "pending_review" ? `<button type="button" class="btn-sm" data-pact="new-batch" data-id="${esc(r.id)}">新一批</button><button type="button" class="btn-sm" data-pact="correct" data-id="${esc(r.id)}">修正既有</button>` : ""}${delBtn(r)}`;
-    return `<div class="pair-row${hl}" data-row-id="${esc(r.id)}"><div class="pair-meta"><b>${esc(r.lot || "未提供批號")}</b> · ${esc(r.side || "—")} · ${status}<br><span class="note">${esc(r.name || "")}</span></div><div class="rec-acts">${primary}${pairBtn}${pairMore(more)}</div></div>`;
+    return `<div class="pair-row${hl}" data-row-id="${esc(r.id)}"><div class="pair-meta"><b>${esc(r.lot || "未提供批號")}</b> ${spiBadge(r)} · ${esc(r.side || "—")} · ${status}<br><span class="note">${esc(r.name || "")}</span></div><div class="rec-acts">${primary}${pairBtn}${pairMore(more)}</div></div>`;
   }
   function placePairRow(p) {
     const selectable = p.lifecycle === "active" && p.validation_source === "server_verified";
@@ -12552,8 +12552,12 @@ async function renderRecPicker(force) {
     const orphanSpi = [];
     for (const r of S1) {
       const st = measurementLink(r, list);
-      if (st.v === "ok" || st.v === "bad") ensure(r.part, r.rev).spi.push(r);
-      else orphanSpi.push(r);
+      if (st.v === "ok" || st.v === "bad") {
+        const g = ensure(r.part, r.rev);
+        g.spi.push(r);
+        // 篩選只命中量測時，從完整清單帶回它引用的座標，不把既有配對顯示成空位
+        if (st.v === "ok" && !g.places.some(p => p.id === st.place.id)) g.places.push(st.place);
+      } else orphanSpi.push(r);
     }
     const orphanPlace = P1.filter(p => !cited(p.id));
     const uploadBtn = (part, rev) => RecDB.isAdmin && RecDB.mode === "cloud"
@@ -12642,6 +12646,7 @@ function setupRecPicker() {
     modal.classList.add("open");
     document.body.style.overflow = "hidden";
     PICKER_HIGHLIGHT = null;
+    RETURN_IMPORT_AFTER_PLACE = false;
     setPickerTab(targetTab, false);
     renderRecPicker(true);
     const qIn = $("#recPickerQ");
@@ -12650,6 +12655,7 @@ function setupRecPicker() {
   openRecPickerModal = open;
 
   function close() {
+    RETURN_IMPORT_AFTER_PLACE = false;
     modal.classList.remove("open");
     modal.hidden = true;
     if (!document.querySelector(".open[role=dialog],.db-modal.open")) document.body.style.overflow = "";
