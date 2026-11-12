@@ -94,10 +94,13 @@ test("AI 分析失敗訊息只在狀態列顯示一次", { skip: !JSDOM && "未�
     w.Element.prototype.scrollIntoView = () => {}; w.matchMedia = () => ({ matches: false, addEventListener() {} }); w.ResizeObserver = class { observe() {} }; w.scrollTo = () => {};
     w.Chart = class { constructor() {} destroy() {} static register() {} };
     if (!w.TextDecoder) w.TextDecoder = TextDecoder;
+    w.SPI_TEST_HOOK = {};
     w.fetch = async () => new Response("\n\n［AI 分析失敗：503 This model is currently experiencing high demand.。已自動重試仍失敗，請稍後再試或改選其他服務商。］", { status: 200 });
   } });
   const d = dom.window.document;
-  await new Promise((r) => setTimeout(r, 50));
+  // 等到主腳本跑完（尾端把內部函式掛上 SPI_TEST_HOOK）再操作
+  for (let i = 0; i < 100 && !dom.window.SPI_TEST_HOOK.importSearchMatch; i++) await new Promise((r) => setTimeout(r, 20));
+  assert.ok(dom.window.SPI_TEST_HOOK.importSearchMatch, "頁面初始化未完成");
   d.querySelector("[data-tab=ai]").click();
   d.querySelector("#btnAI").click();
   for (let i = 0; i < 50 && !/失敗/.test(d.querySelector("#aiState").textContent); i++) await new Promise((r) => setTimeout(r, 20));
