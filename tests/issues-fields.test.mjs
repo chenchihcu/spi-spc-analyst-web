@@ -78,8 +78,8 @@ test('D-47: Nelson 規則卡獨立於畫面選擇、嚴重度依 8.0、新界限
 
   assert.equal(nel5.level, '資訊', '規則 5 嚴重度應為資訊');
   assert.equal(nel6.level, '資訊', '規則 6 嚴重度應為資訊');
-  assert.equal(nel5.boards, 'B01; B02; B03; B04; B05; B06; B07; B08; B09; B10; B11; B12; B15; B16; B17; B18; B19; B20; B21; B22; B23; B24; B25', '規則 5 板號應依每板 σ̂組內/√nᵢ 界限計算');
-  assert.equal(nel6.boards, 'B01; B02; B03; B04; B05; B06; B07; B08; B09; B10; B11; B18; B19; B20; B21; B22; B23; B24; B25', '規則 6 板號應依每板 σ̂組內/√nᵢ 界限計算');
+  assert.equal(nel5.boards, 'B01; B03; B04; B05; B07; B09; B10; B11; B15; B16; B17; B18; B19; B20; B21; B22; B23; B24; B25', '規則 5 板號應依每板 σ̂組內/√nᵢ 界限計算，且只列超出 2σ 的板');
+  assert.equal(nel6.boards, 'B01; B03; B04; B05; B07; B09; B10; B11; B18; B20; B21; B22; B23; B24; B25', '規則 6 板號應依每板 σ̂組內/√nᵢ 界限計算，且只列超出 1σ 的板');
 
   assert.ok(nel5._sameTitles.some(t => t.includes('體積自 B20 起持續下降')), '規則 5 same_phenomenon 應含持續下降趨勢');
   assert.ok(nel6._sameTitles.some(t => t.includes('體積自 B20 起持續下降')), '規則 6 same_phenomenon 應含持續下降趨勢');
