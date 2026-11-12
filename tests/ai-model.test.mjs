@@ -313,6 +313,48 @@ test('Antigravity 429 陣列錯誤本文：解析上游 message 且不盲目重�
   }
 });
 
+test('planUpstreamRetry：503 過載退避 2→4→8 秒，第 4 次放棄', () => {
+  const body = JSON.stringify([{ error: { code: 503, message: 'This model is currently experiencing high demand.', status: 'UNAVAILABLE' } }]);
+  const plan = (i) => planUpstreamRetry({ status: 503, headers: new Headers(), bodyText: body, attemptIndex: i });
+  assert.deepEqual([0, 1, 2].map((i) => plan(i).waitMs), [2000, 4000, 8000]);
+  assert.ok([0, 1, 2].every((i) => plan(i).retry));
+  assert.equal(plan(3).reason, 'exhausted');
+});
+
+for (const [name, failTimes, expectFail] of [
+  ['Gemini 503 high demand 連 3 次後成功', 3, false],
+  ['Gemini 503 high demand 4 次皆失敗才放棄', 4, true],
+]) {
+  test(name, async () => {
+    let calls = 0;
+    const realFetch = globalThis.fetch;
+    globalThis.fetch = async (url, init) => {
+      calls += 1;
+      if (calls <= failTimes) {
+        return new Response(JSON.stringify([{ error: { code: 503, message: 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', status: 'UNAVAILABLE' } }]), {
+          status: 503,
+          headers: { 'Retry-After': '0' },
+        });
+      }
+      const sent = JSON.parse(init.body);
+      return new Response(sse(sent.model, '分析結果'), { status: 200, headers: { 'content-type': 'text/event-stream' } });
+    };
+    try {
+      const req = new Request('https://spi.example/api/analyze', {
+        method: 'POST',
+        headers: { 'X-AI-Provider': 'antigravity', 'X-Antigravity-Key': 'user-agy-key' },
+        body: BODY,
+      });
+      const text = await (await handleAnalyze(req, {}, USER)).text();
+      assert.equal(calls, 4);
+      if (expectFail) assert.match(text, /［AI 分析失敗：503 This model is currently experiencing high demand[^］]*已自動重試仍失敗/);
+      else assert.equal(text, '分析結果');
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+  });
+}
+
 test('短暫 429 配合 Retry-After: 0 自動重試後成功', async () => {
   let calls = 0;
   const realFetch = globalThis.fetch;

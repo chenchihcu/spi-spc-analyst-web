@@ -52,7 +52,7 @@ test('6.1 stable-25.csv 驗證：seed 1 CSV 往返一致；同板共變屬正常
   const iss = core.detectIssues(st);
   const vd = iss.meta.verdict;
 
-  // v10.22.0 起 X̄ 界限採板平均移動全距（三向法）：generateStableData 的同板隨機效應是穩定的板間變異，
+  // v10.22.4 起 X̄ 界限採板平均移動全距（三向法）：generateStableData 的同板隨機效應是穩定的板間變異，
   // 舊的組內標準誤界限把它判為警示；三向法不再因此警示（Nelson 卡最多為資訊等級）
   assert.equal(vd.level, 'ok', '同板共變不應單獨造成警示');
   assert.equal(vd.label, '正常', '整體判定標籤應為正常');
@@ -194,7 +194,7 @@ test('[slow] LISA 局部標示：全虛無資料在實際群組大小 30／60／
 test('[slow] X̄ 三向界限：穩定製程 10／15／25 板、每板 30–100 焊墊、有無板間變異，每點誤報接近名目', () => {
   // 每板平均 σ = 板平均 MR̄/1.128（三向法）。i.i.d. 列級常態，板間隨機效應 σB ∈ {0, 1, 3}×(σW/√n)；另含各板 n 不等的情形。
   // 規則 1 每點名目 0.27%；規則 1–6、8 合併旗標率與「真 σ 已知」時的同一模擬比較。
-  // 舊的 σ̂組內/√nᵢ 界限在 σB = 3·SE 時規則 1 每點約 32%（此處不重跑，見 CHANGELOG v10.22.0）。
+  // 舊的 σ̂組內/√nᵢ 界限在 σB = 3·SE 時規則 1 每點約 32%（此處不重跑，見 CHANGELOG v10.22.4）。
   const T = isSlow ? 300 : 4, nominal = 0.0027;
   let a = 20261112;
   const rnd = () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };

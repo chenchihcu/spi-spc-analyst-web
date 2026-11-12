@@ -78,9 +78,9 @@ test('D-47: Nelson 規則卡獨立於畫面選擇、嚴重度依 8.0、界限採
 
   assert.equal(nel5.level, '資訊', '規則 5 嚴重度應為資訊');
   assert.equal(nel6.level, '資訊', '規則 6 嚴重度應為資訊');
-  // 三向法界限已含正常板間變異：規則 5/6 只留下 B20 起的實際下降，不再涵蓋幾乎全部板
-  assert.equal(nel5.boards, 'B22–B25', '規則 5 板號應依三向法界限計算');
-  assert.equal(nel6.boards, 'B21–B25', '規則 6 板號應依三向法界限計算');
+  // 三向法界限已含正常板間變異：規則 5/6 只留下 B20 起的實際下降、且只列超出 2σ／1σ 的板，不再涵蓋幾乎全部板
+  assert.equal(nel5.boards, 'B22; B24; B25', '規則 5 板號應依三向法界限計算，且只列超出 2σ 的板');
+  assert.equal(nel6.boards, 'B22–B25', '規則 6 板號應依三向法界限計算，且只列超出 1σ 的板');
 
   assert.ok(nel5._sameTitles.some(t => t.includes('體積自 B20 起持續下降')), '規則 5 same_phenomenon 應含持續下降趨勢');
   assert.ok(nel6._sameTitles.some(t => t.includes('體積自 B20 起持續下降')), '規則 6 same_phenomenon 應含持續下降趨勢');

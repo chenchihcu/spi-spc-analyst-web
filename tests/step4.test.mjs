@@ -57,6 +57,17 @@ test('[D-05] Nelson 規則 4：邊界判定', async (t) => {
     assert.equal(getRule8([1.2, -1.2, 1.3, -1.3, 1.4, -1.4, 1.5, -1.5]).idx.length, 8, '中心線兩側各有點時應觸發規則 8');
     assert.equal(getRule8([1.2, -1.2, 1.3, -1.3, 1.4, -1.4, 1.5]).idx.length, 0, '七點不足八點不應觸發規則 8');
   });
+
+  await t.test('規則 5、6 只標超出 2σ／1σ 的點，不標整個視窗（v10.21.3）', () => {
+    const idx = (z, id) => Array.from(core.nelson(z).rules.find(r => r.id === id).idx);
+    assert.deepEqual(idx([0, 2.5, 0.1, 2.4], 5), [1, 3], '規則 5 不應標記界內的 0、2');
+    assert.deepEqual(idx([0, -2.5, 0.1, -2.4], 5), [1, 3], '規則 5 負側同理');
+    assert.deepEqual(idx([1.5, 0.2, 1.4, 1.3, 1.6], 6), [0, 2, 3, 4], '規則 6 不應標記 1σ 內的點');
+    assert.deepEqual(idx([-1.5, 0.2, -1.4, -1.3, -1.6], 6), [0, 2, 3, 4], '規則 6 負側同理');
+    assert.deepEqual(idx([2.5, -2.6, -0.1, 2.4], 5), [], '不同側的 2σ 點不觸發規則 5');
+    const flag = core.nelson([0, 2.5, 0.1, 2.4]).flag;
+    assert.ok(!flag.has(0) && !flag.has(2), '界內點不得列入判異點');
+  });
 });
 
 test('[D-40] 欄位別名擴充與希臘字母處理', () => {
