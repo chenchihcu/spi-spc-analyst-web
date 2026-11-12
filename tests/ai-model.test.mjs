@@ -9,6 +9,7 @@ import {
   MAX_TOKENS,
   OPENAI_CHAT_URL,
   ANTIGRAVITY_CHAT_URL,
+  NVIDIA_CHAT_URL,
   PROVIDERS,
   DEFAULT_LIMITS,
   extractUpstreamError,
@@ -99,7 +100,7 @@ test('AI 預設模型為 gpt-6.1-terra 且推理能力為 high，GET 健康檢�
   assert.equal(DEFAULT_MODEL, 'gpt-6.1-terra');
   assert.equal(DEFAULT_REASONING_EFFORT, 'high');
   assert.deepEqual(ALLOWED_EFFORTS, ['high', 'medium', 'low']);
-  assert.deepEqual(Object.keys(PROVIDERS), ['openai', 'antigravity']);
+  assert.deepEqual(Object.keys(PROVIDERS), ['openai', 'antigravity', 'nvidia']);
   assert.ok(!PROVIDERS.openai.models.includes('o4-mini'));
   assert.ok(!PROVIDERS.openai.models.includes('gpt-6.1-terra-mini'));
 
@@ -111,7 +112,7 @@ test('AI 預設模型為 gpt-6.1-terra 且推理能力為 high，GET 健康檢�
   assert.deepEqual(data.allowedEfforts, ['high', 'medium', 'low']);
   assert.equal(data.hasServerKey, true);
   assert.deepEqual(data.limits, DEFAULT_LIMITS);
-  assert.deepEqual(Object.keys(data.providers), ['openai', 'antigravity']);
+  assert.deepEqual(Object.keys(data.providers), ['openai', 'antigravity', 'nvidia']);
   assert.equal(data.providers.antigravity.defaultModel, 'gemini-3.8-flash');
 });
 
@@ -529,3 +530,89 @@ for (const [name, timeoutTimes, startEffort] of [
     }
   });
 }
+
+test('NVIDIA：使用者金鑰轉發到 NVIDIA 端點，用 max_tokens；推薦模型送 reasoning_effort，其他模型不送', async () => {
+  const r = await postWithCapture({}, { headers: { 'X-AI-Provider': 'nvidia', 'X-Nvidia-Key': 'nvapi-user-key' } });
+  assert.equal(r.res.status, 200);
+  assert.equal(r.res.headers.get('X-AI-Provider'), 'nvidia');
+  assert.equal(r.res.headers.get('X-AI-Model'), 'openai/gpt-oss-120b');
+  assert.equal(r.res.headers.get('X-AI-Reasoning-Effort'), 'high');
+  assert.equal(r.calls[0].url, NVIDIA_CHAT_URL);
+  assert.equal(r.calls[0].headers.Authorization, 'Bearer nvapi-user-key');
+  assert.equal(r.calls[0].body.max_tokens, 8192);
+  assert.equal('max_completion_tokens' in r.calls[0].body, false);
+  assert.equal(r.calls[0].body.reasoning_effort, 'high');
+  assert.match(r.text, /分析結果/);
+
+  // 只帶金鑰標頭、未帶 X-AI-Provider 也判定為 NVIDIA
+  const rKeyOnly = await postWithCapture({}, { headers: { 'X-Nvidia-Key': 'nvapi-user-key' } });
+  assert.equal(rKeyOnly.calls[0].url, NVIDIA_CHAT_URL);
+
+  // 即時清單或自訂的其他模型：不送 reasoning_effort，回應標頭標 none
+  const rOther = await postWithCapture({}, {
+    headers: { 'X-AI-Provider': 'nvidia', 'X-Nvidia-Key': 'nvapi-user-key', 'X-AI-Model': 'meta/llama-next-70b', 'X-AI-Reasoning-Effort': 'low' },
+  });
+  assert.equal(rOther.res.status, 200);
+  assert.equal(rOther.calls[0].body.model, 'meta/llama-next-70b');
+  assert.equal('reasoning_effort' in rOther.calls[0].body, false);
+  assert.equal(rOther.res.headers.get('X-AI-Reasoning-Effort'), 'none');
+});
+
+test('NVIDIA：伺服器 NVIDIA_API_KEY 備援；無金鑰回 400；OpenAI 與 Antigravity 的請求欄位不變', async () => {
+  const rSrv = await postWithCapture({ NVIDIA_API_KEY: 'nv-srv' }, { headers: { 'X-AI-Provider': 'nvidia' } });
+  assert.equal(rSrv.calls[0].headers.Authorization, 'Bearer nv-srv');
+
+  const rNone = await postWithCapture(ENV, { headers: { 'X-AI-Provider': 'nvidia' } });
+  assert.equal(rNone.res.status, 400);
+  assert.match(JSON.parse(rNone.text).error, /NVIDIA API Key/);
+  assert.equal(rNone.calls.length, 0);
+
+  for (const headers of [{}, { 'X-AI-Provider': 'antigravity' }]) {
+    const r = await postWithCapture(ENV, { headers });
+    assert.deepEqual(Object.keys(r.calls[0].body), ['model', 'reasoning_effort', 'max_completion_tokens', 'stream', 'stream_options', 'messages']);
+    assert.equal(r.calls[0].body.max_completion_tokens, MAX_TOKENS);
+  }
+});
+
+test('NVIDIA：免費帳號費用累計為 0，用量與配額鍵和其他服務商分開', async () => {
+  const db = createD1Stub();
+  const env = { DB: db };
+  const r = await postWithCapture(env, {
+    headers: { 'X-AI-Provider': 'nvidia', 'X-Nvidia-Key': 'nvapi-user-key' },
+    usage: { prompt_tokens: 1000000, completion_tokens: 500000, total_tokens: 1500000 },
+  });
+  assert.equal(r.res.status, 200);
+  const data = await (await handleAnalyze(new Request('https://spi.example/api/analyze?provider=nvidia'), env, USER)).json();
+  assert.equal(data.provider, 'nvidia');
+  assert.equal(data.providers.nvidia.usage.dailyRequests, 1);
+  assert.equal(data.providers.nvidia.usage.monthlyTotalTokens, 1500000);
+  assert.equal(data.providers.nvidia.usage.monthlyUsd, 0);
+  assert.deepEqual(data.providers.nvidia.pricing, { inputPerM: 0, outputPerM: 0 });
+  assert.equal(data.providers.openai.usage.dailyRequests, 0);
+  assert.equal(data.providers.antigravity.usage.dailyRequests, 0);
+  assert.deepEqual(lookupModelPricing('nvidia', 'meta/llama-next-70b'), { inputPricePerM: 0, outputPricePerM: 0, pricingSource: 'provider_default', modelId: 'openai/gpt-oss-120b' });
+});
+
+test('NVIDIA：GET ?models=1 查帳號當下的模型清單；429 訊息說明免費帳號上限', async () => {
+  assert.equal(modelsUrlFromChatUrl(NVIDIA_CHAT_URL), 'https://integrate.api.nvidia.com/v1/models');
+  const calls = [];
+  await withFetch(async (url, init) => {
+    calls.push({ url: String(url), auth: init?.headers?.Authorization });
+    return Response.json({ object: 'list', data: [{ id: 'openai/gpt-oss-120b' }, { id: 'meta/llama-next-70b' }] });
+  }, async () => {
+    const res = await handleAnalyze(new Request('https://spi.example/api/analyze?models=1&provider=nvidia', {
+      headers: { 'X-Nvidia-Key': 'nvapi-user-key' },
+    }), {}, USER);
+    assert.deepEqual(await res.json(), { ok: true, provider: 'nvidia', models: ['meta/llama-next-70b', 'openai/gpt-oss-120b'] });
+  });
+  assert.deepEqual(calls, [{ url: 'https://integrate.api.nvidia.com/v1/models', auth: 'Bearer nvapi-user-key' }]);
+
+  await withFetch(async () => new Response(JSON.stringify({ status: 429, title: 'Too Many Requests', detail: 'rate limit' }), {
+    status: 429, headers: { 'retry-after': '60' },
+  }), async () => {
+    const res = await handleAnalyze(new Request('https://spi.example/api/analyze', {
+      method: 'POST', headers: { 'X-AI-Provider': 'nvidia', 'X-Nvidia-Key': 'nvapi-user-key' }, body: BODY,
+    }), {}, USER);
+    assert.match(await res.text(), /AI 分析失敗：.*免費帳號速率或額度已達上限/);
+  });
+});

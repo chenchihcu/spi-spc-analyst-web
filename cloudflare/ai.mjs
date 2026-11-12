@@ -2,8 +2,10 @@ import { validatePayload, buildMessages, SYSTEM_PROMPT, InputError } from '../li
 import {
   OPENAI_CHAT_URL,
   ANTIGRAVITY_CHAT_URL,
+  NVIDIA_CHAT_URL,
   PROVIDERS,
   lookupModelPricing,
+  sendsReasoningEffort,
 } from '../lib/ai-providers.mjs';
 
 // 預設模型為 OpenAI gpt-6.1-terra（可用環境變數 AI_MODEL 或請求標頭 X-AI-Model 覆寫），推理強度預設為 high。
@@ -13,7 +15,7 @@ export const DEFAULT_REASONING_EFFORT = 'high';
 export const ALLOWED_EFFORTS = ['high', 'medium', 'low'];
 export const MAX_TOKENS = 16000;
 
-export { OPENAI_CHAT_URL, ANTIGRAVITY_CHAT_URL, PROVIDERS };
+export { OPENAI_CHAT_URL, ANTIGRAVITY_CHAT_URL, NVIDIA_CHAT_URL, PROVIDERS };
 // Cursor 已移除：api.cursor.com 沒有 /v1/chat/completions 路由（無金鑰 POST 即回 404 Route not found）。
 export const REMOVED_PROVIDERS = {
   cursor: 'Cursor 未提供 AI 對話 API，已從服務商清單移除；請改用 OpenAI 或 Antigravity',
@@ -60,6 +62,7 @@ function normProvider(raw) {
 function getServerEnvKey(env, providerId) {
   if (!env) return '';
   if (providerId === 'antigravity') return String(env.ANTIGRAVITY_API_KEY || env.GEMINI_API_KEY || '').trim();
+  if (providerId === 'nvidia') return String(env.NVIDIA_API_KEY || '').trim();
   return String(env.OPENAI_API_KEY || env.ANTHROPIC_API_KEY || '').trim();
 }
 
@@ -201,6 +204,7 @@ function detectProviderFromHeaders(req) {
   const explicit = (req.headers.get('x-ai-provider') || '').trim().toLowerCase();
   if (PROVIDERS[explicit]) return explicit;
   if ((req.headers.get('x-antigravity-key') || '').trim()) return 'antigravity';
+  if ((req.headers.get('x-nvidia-key') || '').trim()) return 'nvidia';
   return 'openai';
 }
 
@@ -382,10 +386,12 @@ export function formatUpstreamFailureMessage(provLabel, status, extracted, didRe
     ? `${status} ${extracted.message}`
     : `${provLabel} 回應 HTTP ${status}`;
   if (extracted.hasLimitZero || /limit:\s*0/i.test(extracted.message)) {
-    return `${base}。此 API 金鑰對該模型額度為 0，請至 Google AI Studio 確認計費／配額，或改選其他模型／服務商。`;
+    const where = provLabel === 'Antigravity' ? 'Google AI Studio' : `${provLabel} 主控台`;
+    return `${base}。此 API 金鑰對該模型額度為 0，請至 ${where} 確認計費／配額，或改選其他模型／服務商。`;
   }
   if (status === 404 && (extracted.code === 'model_not_found' || /does not exist|is not found/i.test(extracted.message))) {
-    return `${base}。此金鑰無法使用該模型，請在 AI 設定按「檢查可用模型」後改選。`;
+    const btn = PROVIDERS.nvidia && provLabel === PROVIDERS.nvidia.label ? '更新模型清單' : '檢查可用模型';
+    return `${base}。此金鑰無法使用該模型，請在 AI 設定按「${btn}」後改選。`;
   }
   if (status === 404 && /^Route \S+ not found/i.test(extracted.message)) {
     return `${base}。此端點沒有 Chat Completions 路由，請確認自訂 API 端點網址。`;
@@ -393,6 +399,9 @@ export function formatUpstreamFailureMessage(provLabel, status, extracted, didRe
   if (UPSTREAM_TIMEOUT_STATUSES.includes(status)) {
     const tail = didRetry ? `已自動改用推理強度 ${TIMEOUT_FALLBACK_EFFORT} 重試仍逾時` : '上游超過 100 秒未開始回應';
     return `${base}。${tail}；請在 AI 設定改選較快的模型，或稍後再試。`;
+  }
+  if (status === 429 && PROVIDERS.nvidia?.free && provLabel === PROVIDERS.nvidia.label) {
+    return `${base}。免費帳號速率或額度已達上限，請稍後再試或改用其他服務商。`;
   }
   if (didRetry && (status === 429 || status === 503)) {
     return `${base}。已自動重試仍失敗，請稍後再試或改選其他服務商。`;
@@ -593,7 +602,10 @@ export async function handleAnalyze(req, env = {}, userArg = '') {
 
   const modelEffort = resolveModelAndEffort(req, env, provCfg);
   if (modelEffort.error) return json({ error: modelEffort.error }, 400);
-  const { model, reasoningEffort } = modelEffort;
+  const { model } = modelEffort;
+  const effortSent = sendsReasoningEffort(providerId, model);
+  const reasoningEffort = effortSent ? modelEffort.reasoningEffort : 'none';
+  const reqProfile = provCfg.request;
 
   const epCheck = validateEndpointUrl(req.headers.get('x-ai-endpoint'), provCfg.chatUrl);
   if (epCheck.error) return json({ error: epCheck.error }, 400);
@@ -660,8 +672,8 @@ export async function handleAnalyze(req, env = {}, userArg = '') {
         };
         const upstreamBody = {
           model,
-          reasoning_effort: reasoningEffort,
-          max_completion_tokens: MAX_TOKENS,
+          ...(effortSent ? { reasoning_effort: reasoningEffort } : {}),
+          [reqProfile.maxTokensField]: reqProfile.maxTokens,
           stream: true,
           stream_options: { include_usage: true },
           messages: [

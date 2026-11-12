@@ -125,7 +125,7 @@ if (scansOnly) {
 }
 // 7. 機密與 API 金鑰
 {
-  const pats = [/sk-ant-[A-Za-z0-9_-]{10,}/, /\bsk-[A-Za-z0-9]{20,}/, /AKIA[0-9A-Z]{16}/, /(API_KEY|_TOKEN|_SECRET)\s*[:=]\s*["'][^"']{8,}/, /x-api-key/i, /api\.anthropic\.com/];
+  const pats = [/sk-ant-[A-Za-z0-9_-]{10,}/, /\bsk-[A-Za-z0-9]{20,}/, /\bnvapi-[A-Za-z0-9_-]{20,}/, /AKIA[0-9A-Z]{16}/, /(API_KEY|_TOKEN|_SECRET)\s*[:=]\s*["'][^"']{8,}/, /x-api-key/i, /api\.anthropic\.com/];
   // 掃描所有會部署的追蹤檔案（排除第三方函式庫、相依套件鎖定檔與二進位測試檔）
   let files = [];
   try {
