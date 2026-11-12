@@ -6900,12 +6900,18 @@ function setTab(t,fromHistory=false){
   if(tab==="deep"&&!parsed.deepSub)S.deepSub=S.deepSub||"cross";
   if(tab==="improve"&&!parsed.improveSub)S.improveSub=S.improveSub||"compare";
   if(S.tab&&S.tab!==tab)SCROLL[S.tab]=scrollY;
-  const changed=S.tab!==tab||(tab==="deep"&&parsed.deepSub)||(tab==="improve"&&parsed.improveSub)||(tab==="settings"&&!!parsed.settingsPane);
+  const sameSettings=S.tab==="settings"&&tab==="settings";
+  const changed=!sameSettings&&(S.tab!==tab||(tab==="deep"&&parsed.deepSub)||(tab==="improve"&&parsed.improveSub));
   S.tab=tab;
   $$(".tab").forEach(x=>{const sel=x.dataset.tab===tab;x.setAttribute("aria-selected",sel);x.tabIndex=sel?0:-1});
   applyDeepImproveSubnav();
   syncMobileTabs(tab);
   tabIntoView(tab);
+  if(sameSettings){
+    if(!fromHistory){const h=tabHashFor(tab,S.deepSub,S.improveSub,S.settingsPane);try{if(location.hash!=="#"+h){history.pushState({tab:h}, "", "#"+h);location.hash="#"+h}}catch(e){}}
+    markSettingsAnchor(S.settingsPane);if(S.settingsPane)nextFrame(()=>scrollSettingsAnchor(S.settingsPane));
+    return;
+  }
   const locked=showPanels(tab);
   const is3DOn=(tab==="sim3d")||(S.duo&&S.duo.active&&(S.duo.leftTab==="sim3d"||S.duo.rightTab==="sim3d"));if(!is3DOn&&typeof suspendDuoSim3D==="function")suspendDuoSim3D();else if(!is3DOn){stopPlay();if(T&&T.raf)T.raf=0}
   applyScope();

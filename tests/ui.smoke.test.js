@@ -91,6 +91,13 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   assert.equal(d.querySelector("#aiSettingsCard").hidden, false, "AI 設定卡保持可見");
   assert.ok(d.querySelector("#p-settings #aiSettingsCard"), "AI 詳細設定卡應位於設定頁");
   assert.ok(d.querySelector("#p-settings #btnThemeSettings"), "主題切換應位於設定介面段");
+  d.querySelector("#inAiKey").value = "sk-draft-unsaved";
+  d.querySelector("#inAiDailyLim").value = "7";
+  d.querySelector('[data-settings-anchor="spec"]').click();
+  assert.equal(d.querySelector("#inAiKey").value, "sk-draft-unsaved", "同頁切到規格時保留未儲存的 AI 金鑰");
+  assert.equal(d.querySelector("#inAiDailyLim").value, "7", "同頁切區段時保留未儲存的配額");
+  d.querySelector('[data-settings-anchor="ai"]').click();
+  assert.equal(d.querySelector("#inAiKey").value, "sk-draft-unsaved", "再點 AI 區段也不重載已存設定");
   w.SPI_TEST_HOOK.setSub("specs", "spec");
   assert.equal(w.SPI_TEST_HOOK.S.tab, "settings", "舊別名 specs 應打開設定頁");
   assert.equal(w.SPI_TEST_HOOK.S.settingsPane, "spec");
