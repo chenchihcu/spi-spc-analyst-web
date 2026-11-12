@@ -23,11 +23,19 @@ function open() {
     } });
   return { w: dom.window, errs, charts };
 }
+async function ready(w) {   // 條件輪詢（帶逾時），不用固定休眠
+  for (let i = 0; i < 200; i++) {
+    const H = w.SPI_TEST_HOOK;
+    if (H && typeof H.setTab === "function" && H.S?.rows?.length) return;
+    await new Promise((r) => setTimeout(r, 10));
+  }
+  throw new Error("頁面初始化逾時：SPI_TEST_HOOK 未就緒");
+}
 const arChart = (charts) => charts.filter((c) => c?.options?.scales?.x?.title?.text === "面積比 AR").at(-1);
 
 test("群組數 ≤ 色盤：逐群組列圖例，參考線分成兩項", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const { w, errs, charts } = open();
-  await new Promise((r) => setTimeout(r, 50));
+  await ready(w);
   w.SPI_TEST_HOOK.setTab("deep/adv");
   const leg = w.document.querySelector("#arLeg");
   const groups = [...new Set(w.SPI_TEST_HOOK.S.rows.map((r) => r.group))];
@@ -42,7 +50,7 @@ test("群組數 ≤ 色盤：逐群組列圖例，參考線分成兩項", { skip
 
 test("群組數 > 色盤（以 refdes 分群）：圖例只列判讀等級，不列群組名稱", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const { w, errs, charts } = open();
-  await new Promise((r) => setTimeout(r, 50));
+  await ready(w);
   const S = w.SPI_TEST_HOOK.S;
   for (const r of S.rows) r.group = "X" + r.pad;   // 每個焊墊各成一群，模擬大量 refdes 群組
   const groups = new Set(S.rows.map((r) => r.group));
