@@ -146,6 +146,73 @@ test("立榮格式：明確指定面別，座標檔面別不符時提醒；改�
   assert.equal(d.querySelector("#inRunName").value, "DEMO_BOT TOP", "名稱補上指定的面別");
 });
 
+test("立榮格式：面別未選且檔名無 TOP／BOT 時，依座標檔推定面別並預填，不誤報另一面", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { dom } = await cloudPage();
+  await tick(60);
+  const w = dom.window, d = w.document;
+  setVendor(dom, "lirong");
+  await applyControlledPlace(w, d, 'DEMO', 'V1', 'BOTH', 'mil', Buffer.from(PLACE), 'place.csv');
+  d.querySelector('#selSide').value = '';
+  await pick(dom, "#fileIn", "spi-data.csv", Buffer.from(WIDE));
+  const prev = d.querySelector("#mapPrev").textContent;
+  assert.match(prev, /面別依座標檔推定為 TOP（2\/3 個元件對得上），請確認/);
+  assert.match(prev, /座標檔對應 2\/3 個元件/);
+  assert.match(prev, /找不到 1 個位號：G9/);
+  assert.doesNotMatch(prev, /屬於另一面/);
+  assert.equal(d.querySelector('#selSide').value, 'TOP', '推定結果預填到面別下拉');
+  const hint = d.querySelector('#selSideAuto');
+  assert.equal(hint.hidden, false, '面別旁顯示推定提醒');
+  assert.match(hint.textContent, /系統推定為 TOP 面：受控座標檔 TOP 面對得上 2\/3 個元件/);
+  assert.ok(d.querySelector('#selSide').classList.contains('inferred'));
+  d.querySelector('#inImpStencil').value = '100'; d.querySelector('#inImpStencil').dispatchEvent(new w.Event('change'));
+  assert.equal(hint.hidden, false, '改鋼板厚度重新轉換不算確認，提醒保留');
+  const side = d.querySelector('#selSide'); side.value = 'TOP'; side.dispatchEvent(new w.Event('change'));
+  assert.equal(hint.hidden, true, '使用者自己選面別後提醒消失');
+  assert.ok(!side.classList.contains('inferred'));
+});
+
+test("立榮格式：推定填入的面別在換檔時重新判定，不當成使用者選擇", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { dom } = await cloudPage();
+  await tick(60);
+  const w = dom.window, d = w.document;
+  setVendor(dom, "lirong");
+  await applyControlledPlace(w, d, 'DEMO', 'V1', 'BOTH', 'mil', Buffer.from(PLACE), 'place.csv');
+  d.querySelector('#selSide').value = '';
+  await pick(dom, "#fileIn", "first.csv", Buffer.from(WIDE));
+  assert.equal(d.querySelector('#selSide').value, 'TOP');
+  d.querySelector("#mapBox").hidden = true;
+  await pick(dom, "#fileIn", "second_BOT.csv", Buffer.from(WIDE));
+  assert.equal(d.querySelector('#selSide').value, 'BOT', '第二個檔依自己的檔名判定');
+  assert.match(d.querySelector("#mapPrev").textContent, /BOT 面（依檔名判定）/);
+});
+
+test("立榮格式：整列都沒有量測值的位號不參與面別推定", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { dom } = await cloudPage();
+  await tick(60);
+  const w = dom.window, d = w.document;
+  setVendor(dom, "lirong");
+  const place2 = PLACE + "C0402,Q1,C0402,2,L6-BOTTOM,0,200,100\nC0402,Q2,C0402,2,L6-BOTTOM,0,300,100\nC0402,Q3,C0402,2,L6-BOTTOM,0,400,100\n";
+  await applyControlledPlace(w, d, 'DEMO', 'V1', 'BOTH', 'mil', Buffer.from(place2), 'place.csv');
+  const blank = (ref) => [ref, "", "", "", "1", "", "", "", "", "", "", "", "", ""].join(",");
+  d.querySelector('#selSide').value = '';
+  await pick(dom, "#fileIn", "mixed.csv", Buffer.from([WIDE, blank("Q1_1"), blank("Q2_1"), blank("Q3_1")].join("\n")));
+  assert.equal(d.querySelector('#selSide').value, 'TOP', '3 個未量測的 BOT 位號不能蓋過 2 個有量測的 TOP 位號');
+  assert.match(d.querySelector("#mapPrev").textContent, /推定為 TOP（2\/3 個元件對得上）/);
+});
+
+test("立榮格式：面別未選時依檔名 BOT 判定", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { dom } = await cloudPage();
+  await tick(60);
+  const w = dom.window, d = w.document;
+  setVendor(dom, "lirong");
+  await applyControlledPlace(w, d, 'DEMO', 'V1', 'BOTH', 'mil', Buffer.from(PLACE), 'place.csv');
+  d.querySelector('#selSide').value = '';
+  await pick(dom, "#fileIn", "DEMO_BOT.csv", Buffer.from(WIDE));
+  assert.match(d.querySelector("#mapPrev").textContent, /BOT 面（依檔名判定）/);
+  assert.equal(d.querySelector('#selSide').value, 'BOT');
+  assert.match(d.querySelector('#selSideAuto').textContent, /系統推定為 BOT 面：檔名含 BOT/);
+});
+
 test("通用格式下讀到立榮橫排檔會自動切換；選立榮卻上傳一般檔會清楚說明", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const { dom } = page();
   await tick(60);
