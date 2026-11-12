@@ -1195,7 +1195,8 @@ button.load-state{border:none;font:inherit;cursor:default}
     </div>
     <div class="legend" id="leg3d" style="margin-top:10px"></div>
     <div id="grid3dWarn" class="banner warn" style="display:none;margin:8px 0;padding:8px 12px;background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn);border-radius:4px;font-size:var(--fs-caption)">
-      ⚠️ <b>無實際印刷位置座標</b>：目前焊墊依序排列為示意網格，與實際 PCBA 板面印刷佈局不符。若有 CAD 座標檔，請至「匯入與規格」或「資料庫」套用座標檔以還原真實佈局。
+      ⚠️ <b>無實際印刷位置座標</b>：<span id="grid3dCount"></span>焊墊依序排列為示意網格，與實際 PCBA 板面印刷佈局不符。若有 CAD 座標檔，請套用同料號、同面別的受控座標檔以還原元件位置。
+      <button type="button" id="btnGridApplyPlace" class="btn-sm" style="margin-left:6px">套用座標檔</button>
     </div>
     <div class="view3d" id="view3d" aria-label="錫膏沉積 3D 模擬，拖曳旋轉、滾輪縮放、點選焊墊看數據">
       <div class="hud" id="hud">拖曳旋轉 · 滾輪或雙指縮放 · 點選錫膏看量測值</div>
@@ -8505,8 +8506,9 @@ function build3D(){safeBoard2D();if(!T.ok||!window.THREE||!T||!T.root||!T.root.c
   }
   const warnEl=$("#grid3dWarn");
   if(warnEl){
-    const hasGridPads=[...P.values()].some(p=>p.grid);
-    warnEl.style.display=hasGridPads?"block":"none";
+    let nGridAll=0;for(const p of P.values())if(p.grid)nGridAll++;
+    warnEl.style.display=nGridAll?"block":"none";
+    const cntEl=$("#grid3dCount");if(cntEl)cntEl.textContent=nGridAll?`${nGridAll} 個`:"";
   }
   const cuMat=new THREE.MeshStandardMaterial({color:0xc87533,metalness:.85,roughness:.25});
   const hs=S.specs.height,vs=S.specs.volume;
@@ -9096,6 +9098,8 @@ $("#selVendor").onchange=()=>{try{localStorage.setItem("spi-vendor",$("#selVendo
 $("#selSide").onchange=()=>{syncIdentityHints();reconvert()};
 $("#placeClear").onclick=()=>{PLACE=null;placeSave();placeShow();reconvert();clearImportFieldErrors("btnSelectPlace");renderImportSourceSummary();updateImportWorkflow();syncIdentityHints();syncPlaceToCurrentRun({notify:false})};
 $("#btnSelectPlace").onclick=()=>{if(typeof openRecPickerModal==="function")openRecPickerModal("place");else{$("#btnOpenRecModal")?.click();$("#btnPickPlace")?.click()}};
+/* 3D 示意網格警示：一鍵開啟座標檔庫，選取後由 use-place 動作套用至目前回合 */
+$("#btnGridApplyPlace").onclick=()=>$("#btnSelectPlace").onclick();
 $("#btnRegisterPlace").onclick=()=>{if(typeof openRecPickerModal==="function")openRecPickerModal("pairs");RETURN_IMPORT_AFTER_PLACE=true;if($("#upPlacePart"))$("#upPlacePart").value=safeId($("#inPart").value);if($("#upPlaceRev"))$("#upPlaceRev").value=($("#inRev").value||"").trim();const side=$("#selSide").value;if((side==="TOP"||side==="BOT")&&$("#upPlaceSide"))$("#upPlaceSide").value=side;parkPlaceForm();$("#upPlaceSide")?.focus()};
 $("#placeChoices").onclick=async e=>{const b=e.target.closest("[data-pick-place]");if(!b)return;const rec=(RecDB.cache||[]).find(x=>x.id===b.dataset.pickPlace);if(!rec){toast("找不到這份座標檔，請重新整理");return}try{await usePlaceRec(rec);syncPlaceToCurrentRun({notify:true});if(IMP&&IMP.raw)reconvert()}catch(er){toast(er.message)}};
 async function saveControlledPlacement(fl,part,rev,side,unit){
