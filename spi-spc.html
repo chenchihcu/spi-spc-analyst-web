@@ -157,7 +157,7 @@ details[open].iss-card>summary{border-bottom:1px solid var(--line);border-radius
 .rec-acts .sep{width:1px;align-self:stretch;min-height:24px;background:var(--line);margin:0 2px}
 .pill.rev{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
 .pill.arch{background:var(--surface2);color:var(--ink);border:1px dashed var(--muted)}
-tr.rec-new>td{background:var(--accent-soft)}
+tr.rec-new>td,.pair-row.rec-new{background:var(--accent-soft)}
 .up-place-row{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:flex-end}
 .up-place-row .field{margin:0;min-width:0;max-width:100%}
 .up-place-row label,.up-place-lab{display:block;font-size:var(--fs-caption);color:var(--muted)}
@@ -169,6 +169,17 @@ tr.rec-new>td{background:var(--accent-soft)}
 .proof-tbl th{font-size:var(--fs-caption);color:var(--muted);font-weight:700}
 .proof-list{max-height:240px;overflow:auto;overflow-wrap:anywhere;padding:6px 0;margin:0}
 .proof-refs li{padding:2px 0}
+.pair-card{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--surface);display:flex;flex-direction:column;gap:8px;min-width:0}
+.pair-card h4{margin:0;font-size:var(--fs-ui);font-weight:700}
+.pair-slot{border:1px dashed var(--line);border-radius:8px;padding:8px;min-width:0;display:flex;flex-direction:column;gap:6px}
+.pair-slot>b{font-size:var(--fs-ui);font-weight:700}
+.pair-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding-top:6px;border-top:1px solid var(--line);min-width:0}
+.pair-row .pair-meta{min-width:0;overflow-wrap:anywhere}
+.pair-more{margin:0}
+.pair-more summary{cursor:pointer;font-size:var(--fs-ui);font-weight:700}
+.pair-orphan{border:1px solid var(--warn);background:var(--warn-soft);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:6px}
+#placeChoices{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-width:0}
+#placeChoices button{font-size:var(--fs-caption)}
 @media (max-width:600px){.proof-tbl thead{display:none}.proof-tbl,.proof-tbl tbody,.proof-tbl tr,.proof-tbl td{display:block;width:100%}.proof-tbl tr{border-bottom:1px solid var(--line);padding:6px 0}.proof-tbl td{border:none;padding:2px 0}.proof-tbl td[data-label]::before{content:attr(data-label) "：";color:var(--muted);font-size:var(--fs-caption)}}
 .seg-btn.active{font-weight:700;box-shadow:inset 0 0 0 1px var(--muted)}
 .imp-step-title{font-size:var(--fs-ui);font-weight:700;color:var(--ink);margin:10px 0 6px}
@@ -381,7 +392,7 @@ td.num,th.num{text-align:right}
 .seg button{border:none;border-radius:0;background:var(--surface);min-height:32px;padding:5px 11px}
 #recPickerQ,#recPickerReload{min-height:34px}
 /* 觸控：放在基準高度之後，否則同權重的基準規則會蓋掉 44px */
-@media (pointer:coarse){.seg button,#recPickerQ,#recPickerReload{min-height:44px}}
+@media (pointer:coarse){.seg button,#recPickerQ,#recPickerReload,.pair-card button,.pair-more summary,#placeChoices button{min-height:44px}}
 #mapBox{grid-template-columns:minmax(0,1fr)}
 #mapBox>*{min-width:0}
 .imp-flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:8px;list-style:none;margin:0 0 8px;padding:0}
@@ -571,6 +582,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   input[type=password]{min-height:44px;min-width:44px;font-size:var(--fs-input)!important}
   .card .cbtn,.toc button,.how summary{min-height:44px!important;display:inline-flex!important;align-items:center!important;padding:0 12px!important}
   .chipbtn,.chip.chipBtn,a.chip,.seg button,.linkbtn,.rec-act button{min-height:44px!important;min-width:44px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important}
+  .seg button[hidden]{display:none!important}
 
   .subtabs{
     display:flex;
@@ -939,7 +951,7 @@ button.load-state{border:none;font:inherit;cursor:default}
     <svg class="mitcorp-logo" viewBox="0 0 248 45" width="143" height="26" fill="currentColor" fill-rule="evenodd" role="img" aria-label="Mitcorp"><path d="M13.8,-0.0L28.5,-0.1L29.2,0.0L30.6,1.0L31.5,2.9L34.7,29.0L35.0,29.8L36.2,30.2L37.5,29.8L38.3,28.2L46.9,3.5L48.0,1.5L48.8,0.8L50.5,-0.1L66.3,0.0L67.6,1.0L68.4,3.2L68.4,30.8L68.3,32.2L67.7,33.8L66.0,34.8L62.8,35.0L59.2,34.8L57.7,33.8L57.3,31.5L57.3,5.8L56.7,4.5L55.2,4.0L53.0,4.7L52.0,6.5L43.5,31.5L42.2,33.3L41.2,34.1L38.2,34.8L28.8,34.8L26.0,34.0L24.6,32.5L24.0,29.8L20.9,5.8L20.2,4.5L18.5,4.0L17.0,4.5L16.5,5.2L12.3,26.8L11.3,30.0L10.5,31.5L8.4,33.8L6.3,35.0L2.2,35.7L1.2,35.7L0.0,35.0L0.0,30.2L1.2,29.6L4.5,28.9L5.4,28.0L6.2,26.2L10.7,3.0L11.9,1.0L13.8,-0.0ZM73.2,-0.0L83.8,0.0L84.6,1.3L84.5,4.2L83.8,5.4L82.8,5.7L75.5,5.8L73.2,5.5L72.7,4.8L72.5,2.8L72.6,1.0L73.2,-0.0ZM90.0,1.7L95.5,1.6L97.2,2.1L97.8,2.8L98.2,4.0L98.3,8.5L98.6,9.2L99.3,9.7L109.8,9.8L110.9,10.2L111.4,12.0L110.9,13.2L110.2,13.6L99.8,13.7L98.8,14.1L98.2,15.5L98.3,27.0L99.0,29.8L100.5,30.9L104.2,31.1L112.5,30.9L113.1,31.5L113.2,33.0L113.0,33.8L112.2,34.6L110.5,35.0L104.5,35.3L95.8,35.1L92.0,33.9L89.9,32.2L88.9,30.5L88.4,27.5L88.4,5.5L88.6,3.0L89.2,2.1L90.0,1.7ZM130.5,9.2L135.5,9.3L144.3,10.0L145.5,10.4L146.1,11.0L146.2,13.2L145.7,14.0L145.0,14.3L140.3,13.8L133.0,13.6L129.5,13.9L127.0,14.9L125.1,17.0L124.3,20.0L124.3,24.0L125.1,27.8L127.0,29.8L130.0,30.9L137.5,31.1L145.2,30.4L146.0,31.0L146.3,32.0L146.2,33.5L145.5,34.3L142.5,35.0L135.2,35.4L129.5,35.4L124.0,34.9L120.5,33.9L118.2,32.8L116.1,30.8L115.1,29.2L114.0,25.5L113.9,20.0L115.0,15.8L116.1,14.0L118.2,12.0L120.5,10.8L124.2,9.8L130.5,9.2ZM161.8,9.5L168.5,9.3L174.8,9.9L178.2,10.8L180.2,11.8L182.8,14.0L183.9,15.8L184.7,18.8L184.9,24.5L184.7,26.2L183.8,29.2L181.8,32.0L178.8,33.9L175.5,34.9L166.0,35.7L156.8,34.8L153.8,33.8L152.0,32.9L150.4,31.5L149.2,30.0L148.3,28.0L147.9,25.5L148.0,18.2L149.1,15.0L151.0,12.8L154.0,11.0L158.0,9.8L161.8,9.5ZM203.0,9.5L209.8,9.4L210.7,10.5L210.8,11.8L210.5,12.8L209.5,13.6L201.8,13.9L200.2,14.2L199.2,14.8L198.7,16.0L198.7,31.0L198.3,33.5L197.5,34.5L196.2,34.9L190.5,34.8L189.1,33.8L188.8,32.0L188.7,15.2L189.2,12.5L190.0,11.7L191.9,10.8L197.2,9.8L203.0,9.5ZM224.0,9.5L230.5,9.3L237.9,9.8L242.2,10.9L244.2,12.0L246.2,14.0L247.0,15.2L247.8,17.3L247.8,27.8L246.9,30.0L245.9,31.5L244.8,32.6L242.8,33.8L240.0,34.8L232.2,35.5L223.2,35.4L222.6,36.0L222.4,36.8L222.2,43.5L221.3,44.8L213.5,44.8L212.6,43.5L212.4,41.8L212.6,13.0L213.2,11.7L214.6,10.8L218.5,9.9L224.0,9.5ZM75.5,9.9L79.0,9.8L81.5,10.0L82.8,10.8L83.4,12.0L83.5,32.2L83.0,33.8L81.5,34.8L75.5,34.8L74.1,34.0L73.7,33.2L73.6,12.0L74.0,10.8L75.5,9.9ZM163.2,13.0L160.8,14.0L159.4,15.2L158.3,18.8L158.1,22.5L158.3,26.5L159.2,29.2L160.5,30.8L162.8,31.8L166.0,32.1L169.8,31.8L172.0,30.8L173.0,29.8L173.9,28.2L174.4,25.0L174.4,21.8L173.9,16.5L173.0,15.0L171.9,14.0L168.5,12.9L163.2,13.0ZM226.0,13.0L223.5,13.5L222.7,14.0L222.4,14.5L222.5,30.5L224.0,31.6L227.5,31.9L232.5,31.9L235.0,31.0L236.0,30.1L237.0,28.7L237.7,25.5L237.8,20.8L237.0,16.2L235.3,14.0L233.0,13.1L230.2,12.8L226.0,13.0Z"/></svg>
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.18.5</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.19.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <div class="db-capsule-group" role="group" aria-label="雲端記錄庫與套用狀態">
@@ -1435,9 +1447,12 @@ button.load-state{border:none;font:inherit;cursor:default}
         <div class="row" id="placeRow" hidden>
           <span class="lbl" style="align-self:center">受控座標檔（必選）</span>
           <button type="button" id="btnSelectPlace" aria-describedby="btnSelectPlaceError">從資料庫選取</button><span class="note" id="btnSelectPlaceError" aria-live="polite"></span>
+          <button type="button" id="btnRegisterPlace">先登錄座標檔</button>
           <button id="placeClear" hidden>移除座標檔</button>
           <span class="note" id="placeState" role="status" aria-live="polite"></span>
         </div>
+        <div id="placeChoices" role="group" aria-label="符合的座標檔"></div>
+        <p class="note" id="placeChoiceNote" style="margin:0">位號與原檔指紋於套用時由伺服器確認。</p>
         <p class="note" id="vendorNote" hidden style="margin:0">立榮格式每列一焊墊（各板橫排），TOP／BOT 分別匯入；高度 % 依<b>鋼板厚度（必填）</b>換算 µm，並由座標檔對應位置與封裝群組。</p>
       </div>
       <h4 class="imp-step-title">② 選擇量測檔或貼上資料</h4>
@@ -1779,8 +1794,9 @@ button.load-state{border:none;font:inherit;cursor:default}
 
       <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px">
         <div class="seg" role="tablist" style="display:inline-flex;border:1px solid var(--line);border-radius:8px;padding:2px;background:var(--surface2)">
-          <button type="button" class="seg-btn active" id="btnPickSpi" style="padding:5px 14px;border:none;border-radius:6px;background:var(--surface);font-weight:700;cursor:pointer;font-size:var(--fs-ui)">量測記錄 (<span id="countPickSpi">0</span>)</button>
-          <button type="button" class="seg-btn" id="btnPickPlace" style="padding:5px 14px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-size:var(--fs-ui)">座標檔庫 (<span id="countPickPlace">0</span>)</button>
+          <button type="button" class="seg-btn active" id="btnPickPairs" style="padding:5px 14px;border:none;border-radius:6px;background:var(--surface);font-weight:700;cursor:pointer;font-size:var(--fs-ui)">配對</button>
+          <button type="button" class="seg-btn" id="btnPickSpi" hidden style="padding:5px 14px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-size:var(--fs-ui)">量測記錄 (<span id="countPickSpi">0</span>)</button>
+          <button type="button" class="seg-btn" id="btnPickPlace" hidden style="padding:5px 14px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-size:var(--fs-ui)">座標檔庫 (<span id="countPickPlace">0</span>)</button>
           <button type="button" class="seg-btn" id="btnPickSpecs" style="padding:5px 14px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-size:var(--fs-ui)">規格與稽核</button>
         </div>
         <div class="rec-picker-search" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;flex:1 1 240px;max-width:420px">
@@ -1805,13 +1821,24 @@ button.load-state{border:none;font:inherit;cursor:default}
           <button type="button" class="seg-btn" data-qfilter="ng" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:transparent">僅異常</button>
           <button type="button" class="seg-btn" data-qfilter="pass" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:transparent">僅合格</button>
         </div>
+        <div class="seg" id="pickLinkSeg" style="display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden">
+          <button type="button" class="seg-btn active" data-link="" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:var(--surface)">全部對應</button>
+          <button type="button" class="seg-btn" data-link="unlinked" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:transparent">未搭配</button>
+          <button type="button" class="seg-btn" data-link="missing" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:transparent">座標檔不存在</button>
+          <button type="button" class="seg-btn" data-link="unused" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:transparent">座標無引用</button>
+        </div>
         <button type="button" id="recPickerClearFilters">清除全部篩選</button>
       </div>
 
       <div id="recPickerNotice" class="note" role="status" style="margin:0"></div>
 
+      <div id="boxPickPairs" style="max-height:56vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px">
+        <div id="pairFormHost"></div>
+        <div id="pairBoard"></div>
+      </div>
+
       <!-- 量測記錄表格與卡片流 -->
-      <div id="boxPickSpi" style="max-height:56vh;overflow-y:auto">
+      <div id="boxPickSpi" hidden style="max-height:56vh;overflow-y:auto">
         <div class="rec-desktop-view tbl">
           <table id="tblPickSpi"></table>
         </div>
@@ -1869,7 +1896,7 @@ button.load-state{border:none;font:inherit;cursor:default}
       </div>
     </div>
     <div class="sheet-foot" style="padding:10px 18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:var(--surface2);flex:0 0 auto">
-      <span class="note" style="font-size:var(--fs-caption);min-width:0">原始檔不可修改；「驗證」檢查指紋與座標對應。管理者可刪除量測與座標檔，刪除會寫入稽核紀錄。</span>
+      <span class="note" style="font-size:var(--fs-caption);min-width:0">原始檔不可修改；「對應證明」檢查指紋與座標對應。管理者可刪除量測與座標檔，刪除會寫入稽核紀錄。</span>
       <div style="display:flex;gap:8px;flex:none">
         <button type="button" id="btnRecPickerGoImport" style="font-size:var(--fs-body)">＋ 匯入新檔</button>
         <button type="button" id="btnRecPickerCloseBottom" class="primary" style="font-size:var(--fs-body)">完成</button>
@@ -8968,6 +8995,7 @@ function syncPlaceToCurrentRun(opts={}){
       saveRunsSoon();
     }
     updateLoadStates();
+    syncIdentityHints();
     if(opts.notify){
       toast(`座標檔未套用至目前回合：${res.reason}`);
     }
@@ -8981,6 +9009,7 @@ function vendorUI(){
   if(v==="zsf")$("#vendorNote").textContent="振順豐格式每列是一個焊墊，Height(mm)1、Volume(mm)1…為絕對值。系統會依座標檔或開孔設定換算為體積 %、高度 µm、面積 %。缺開孔尺寸或鋼板厚度時將拒絕換算。";
   else $("#vendorNote").textContent="立榮格式每列是一個焊墊，Height(%)1、Volume(%)1…分別是第 1、2…片板。高度 % 依鋼板厚度換算；座標檔只提供元件中心，沒有實際焊墊座標時不產生位置推估。";
   placeShow();
+  syncIdentityHints();
 }
 try{const v=localStorage.getItem("spi-vendor");if(v&&[...$("#selVendor").options].some(o=>o.value===v))$("#selVendor").value=v}catch(e){}
 placeLoad();vendorUI();
@@ -9019,16 +9048,35 @@ function reconvertThk(){if(!IMP||!IMP.conv||!IMP.conv.hPct||!thkOk(impThk())||IM
 function recPartNote(){const n=$("#recNote");if(!IMP||IMP.demo){n.textContent="";return}if(IMP.rec){n.textContent=`來自資料庫的原始檔（${IMP.rec.user}，${fmtTime(IMP.rec.created)}），套用時不會重複存檔`;return}
   partHint("#inPart","#inPartHint");
   if(IMP.reimportOf){const o=IMP.reimportOf,p=safeId($("#inPart").value);n.innerHTML=`重新匯入舊紀錄 ${esc(o.lot||o.part)}：請選擇受控座標並填寫工單或日期；原始檔不變，舊紀錄保留`+(PLACE&&PLACE.part&&p&&p!==PLACE.part?`<br><span class="err">座標檔料號為 ${esc(PLACE.part)}，與量測料號不同</span>`:"");return}
-  const p=safeId($("#inPart").value);n.innerHTML=PLACE&&PLACE.part&&p&&p!==PLACE.part?`<span class="err">座標檔料號為 ${esc(PLACE.part)}，與量測料號不同</span>`:`正式匯入會保存原始檔與受控座標引用；${recWhere()}`}
+  const p=safeId($("#inPart").value);n.innerHTML=PLACE&&PLACE.part&&p&&p!==PLACE.part?`<span class="err">座標檔料號為 ${esc(PLACE.part)}，與量測料號不同</span>`:`正式匯入會保存原始檔與受控座標引用；${recWhere()}`;
+  syncIdentityHints()}
+function renderPlaceChoices(){const box=$("#placeChoices");if(!box)return;
+  const part=safeId($("#inPart")?.value||""),rev=($("#inRev")?.value||"").trim(),side=$("#selSide")?.value||"";
+  const all=((typeof RecDB==="undefined"||!RecDB?null:RecDB.cache)||[]).filter(p=>p.kind==="place"&&p.lifecycle==="active"&&p.validation_source==="server_verified");
+  if(!part||!rev||!side){box.innerHTML=`<span class="note">填好料號、版次與面別後，這裡列出符合的座標檔。</span>`;return}
+  const rows=all.filter(p=>p.part===part&&p.rev===rev&&placeSideHolds(p.side,side));
+  box.innerHTML=rows.length?rows.map(p=>`<button type="button" data-pick-place="${esc(p.id)}">${esc(p.part)} ${esc(p.rev)} ${esc(p.side==="BOTH"?"TOP＋BOT":p.side)}${PLACE&&PLACE.recId===p.id?"（已選）":""}</button>`).join(""):`<span class="note">沒有符合 ${esc(part)} ${esc(rev)} ${esc(side)} 的有效座標檔。</span>`}
+function syncIdentityHints(){const set=(id,msg)=>{const hint=$("#"+id+"Error"),el=$("#"+id);if(!hint||!el)return;
+  if(!msg){if(hint.dataset.pair==="1"){hint.textContent="";hint.classList.remove("err");hint.dataset.pair="";el.removeAttribute("aria-invalid")}return}
+  hint.dataset.pair="1";hint.classList.add("err");hint.textContent=msg;el.setAttribute("aria-invalid","true")};
+  if(!PLACE){set("inPart","");set("inRev","");set("selSide","");renderPlaceChoices();return}
+  const part=safeId($("#inPart")?.value||""),rev=($("#inRev")?.value||"").trim(),side=$("#selSide")?.value||"";
+  set("inPart",part&&part!==PLACE.part?`與所選座標料號 ${PLACE.part} 不同`:"");
+  set("inRev",rev&&rev!==PLACE.rev?`與所選座標版次 ${PLACE.rev} 不同`:"");
+  set("selSide",side&&!placeSideHolds(PLACE.side,side)?`量測面不在座標面別 ${PLACE.side==="BOTH"?"TOP＋BOT":PLACE.side} 內`:"");
+  renderPlaceChoices()}
 $("#inPart").oninput=()=>{partHint("#inPart","#inPartHint");recPartNote()};
 $("#inPart").onchange=()=>prefillImpThk();
+$("#inRev").oninput=()=>syncIdentityHints();
 $("#inImpStencil").onchange=()=>{$("#inImpStencil").removeAttribute("aria-invalid");reconvertThk()};
 /* 加工廠格式、面別、座標檔變更時，若已讀取檔案就重新轉換 */
 function reconvert(){if(!IMP||!IMP.raw)return;try{convertImp(false);$("#inRunName").value=impName();$("#parseErr").textContent="";renderMap();renderImportSourceSummary();updateImportWorkflow()}catch(e){$("#parseErr").textContent=e.message;$("#mapBox").hidden=true;IMP=null;showImportValidationError(e.message);updateImportWorkflow()}}
 $("#selVendor").onchange=()=>{try{localStorage.setItem("spi-vendor",$("#selVendor").value)}catch(e){}vendorUI();reconvert()};
-$("#selSide").onchange=reconvert;
-$("#placeClear").onclick=()=>{PLACE=null;placeSave();placeShow();reconvert();clearImportFieldErrors("btnSelectPlace");renderImportSourceSummary();updateImportWorkflow();syncPlaceToCurrentRun({notify:false})};
+$("#selSide").onchange=()=>{syncIdentityHints();reconvert()};
+$("#placeClear").onclick=()=>{PLACE=null;placeSave();placeShow();reconvert();clearImportFieldErrors("btnSelectPlace");renderImportSourceSummary();updateImportWorkflow();syncIdentityHints();syncPlaceToCurrentRun({notify:false})};
 $("#btnSelectPlace").onclick=()=>{if(typeof openRecPickerModal==="function")openRecPickerModal("place");else{$("#btnOpenRecModal")?.click();$("#btnPickPlace")?.click()}};
+$("#btnRegisterPlace").onclick=()=>{RETURN_IMPORT_AFTER_PLACE=true;if(typeof openRecPickerModal==="function")openRecPickerModal("pairs");if($("#upPlacePart"))$("#upPlacePart").value=safeId($("#inPart").value);if($("#upPlaceRev"))$("#upPlaceRev").value=($("#inRev").value||"").trim();const side=$("#selSide").value;if((side==="TOP"||side==="BOT")&&$("#upPlaceSide"))$("#upPlaceSide").value=side;parkPlaceForm();$("#upPlaceSide")?.focus()};
+$("#placeChoices").onclick=async e=>{const b=e.target.closest("[data-pick-place]");if(!b)return;const rec=(RecDB.cache||[]).find(x=>x.id===b.dataset.pickPlace);if(!rec){toast("找不到這份座標檔，請重新整理");return}try{await usePlaceRec(rec)}catch(er){toast(er.message)}};
 async function saveControlledPlacement(fl,part,rev,side,unit){
   if(RecDB.mode!=="cloud")throw new Error("請先登入並連線到雲端資料庫");
   if(!RecDB.isAdmin){await RecDB.list();if(!RecDB.isAdmin)throw new Error("只有管理者可以上傳座標檔")}
@@ -10459,12 +10507,16 @@ function updateLoadStates(){const run=curRun(),src=runSrc(run),unmatched=src?.un
   const set=(id,state,message)=>{const el=$(id);if(!el)return;el.dataset.state=state;el.querySelector("span:last-child").textContent=message;el.setAttribute("aria-label",message)};
   const valid=src&&src.lifecycle==="active";
   const spiText=src?.lifecycle==="pending_review"?"待管理者判定":src?.lifecycle==="superseded"?"歷史修正前版本":src?.lifecycle==="legacy"?"舊資料・未受控":"未套用";
-  set("#stateSpi",LOAD_ERROR.spi?"error":valid?"ok":"idle",LOAD_ERROR.spi?`量測紀錄：${LOAD_ERROR.spi}`:valid?`量測紀錄：已套用${unmatched.length?`・${unmatched.length} 個位號無座標`:""}`:`量測紀錄：${spiText}`);
+  const link=valid?measurementLink({kind:"spi",placeId:src.placeId,part:src.part,rev:src.rev,side:src.side},typeof RecDB==="undefined"||!RecDB?null:RecDB.cache):null;
+  const extra=unmatched.length?`・${unmatched.length} 個位號無座標`:"";
+  const spiMsg=LOAD_ERROR.spi?`量測紀錄：${LOAD_ERROR.spi}`:!valid?`量測紀錄：${spiText}`:link&&link.v==="ok"?`量測已套用，座標身分相符${extra}`:link&&link.v==="missing"?"量測已套用，座標檔不存在":link&&link.v==="bad"?`量測已套用，座標${link.text}`:link&&link.v==="none"?`量測已套用，尚未搭配座標${extra}`:`量測紀錄：已套用${extra}`;
+  set("#stateSpi",LOAD_ERROR.spi?"error":valid?"ok":"idle",spiMsg);
   const spiEl=$("#stateSpi");
   if(spiEl){const openList=unmatched.length>0&&!LOAD_ERROR.spi;spiEl.classList.toggle("is-action",openList);spiEl.tabIndex=openList?0:-1;spiEl.setAttribute("aria-disabled",openList?"false":"true");spiEl.title=openList?"查看無座標位號":"量測紀錄狀態。載入請用記錄庫"}
   const applied=valid&&src.placeId;
   const previewApplied=!applied&&Boolean(run&&run.info&&run.info.placePreview&&(!PLACE||!PLACE.recId||PLACE.recId===run.info.placePreview.recId));
-  set("#statePlace",LOAD_ERROR.place?"error":(applied||previewApplied)?"ok":"idle",LOAD_ERROR.place?`座標檔：${LOAD_ERROR.place}`:applied?"座標檔：已套用":previewApplied?"座標檔：已套用（檢視）":PLACE?"座標檔：已選取":"座標檔：未套用");
+  const placeMsg=LOAD_ERROR.place?`座標檔：${LOAD_ERROR.place}`:previewApplied?`座標檔：已套用（檢視）${link&&link.v==="ok"?"，身分相符":""}`:applied&&link&&link.v==="ok"?"量測已套用，座標身分相符":applied&&link&&link.v==="missing"?"量測已套用，座標檔不存在":applied&&link&&link.v==="bad"?`量測已套用，座標${link.text}`:applied?"量測已套用，座標已引用":PLACE?"座標檔：已選取":"座標檔：未套用";
+  set("#statePlace",LOAD_ERROR.place?"error":(applied||previewApplied)?"ok":"idle",placeMsg);
 }
 $("#stateSpi").onclick=()=>{const refs=runSrc(curRun())?.unmatchedRefs||[];if(!refs.length)return;$("#unmatchedRefsTitle").textContent=`無座標位號（${refs.length}）`;$("#unmatchedRefsList").textContent=refs.join("、");openModal("unmatchedRefsModal","[data-close]")};
 function srcLine(s){return s?`批號 ${s.lot}｜產品料號 ${s.part}${s.supplierWo?"｜廠商工單 "+s.supplierWo:""}${s.outsourceWo?"｜委外工單 "+s.outsourceWo:""}${s.side?"｜"+s.side+" 面":""}｜原始檔 ${s.name}（SHA-256 ${String(s.sha256).slice(0,12)}…，${s.user}，${fmtTime(s.created)}）${s.placePart?`｜座標檔 ${s.placePart} ${s.placeRev}`:""}`:""}
@@ -10498,7 +10550,7 @@ async function usePlaceRec(rec){const g=await RecDB.get(rec);if(!g.ok)throw new 
   const tab=/\.xlsx$/i.test(rec.name)?(await xlsxTable(g.bytes.buffer.slice(g.bytes.byteOffset,g.bytes.byteOffset+g.bytes.length))).tab:csvTable(decodeBytes(g.bytes));
   const unit=rec.unit||rec.meta?.unit,side=rec.side;
   if(!unit||!side)throw new Error("歷史座標缺少已驗證的單位或面別，不能用於新匯入");
-  PLACE={recId:rec.id,part:rec.part,rev:rec.rev,name:rec.name,tab,unit,side,res:parsePlacement(tab,unit,side)};placeSave();placeShow();clearImportValidationError();clearImportFieldErrors("btnSelectPlace");renderImportSourceSummary();updateImportWorkflow();LOAD_ERROR.place="";updateLoadStates()}
+  PLACE={recId:rec.id,part:rec.part,rev:rec.rev,name:rec.name,tab,unit,side,res:parsePlacement(tab,unit,side)};placeSave();placeShow();clearImportValidationError();clearImportFieldErrors("btnSelectPlace");renderImportSourceSummary();updateImportWorkflow();syncIdentityHints();LOAD_ERROR.place="";updateLoadStates()}
 async function openRecord(rec, opt = {}){busy(true,"正在從資料庫取回原始檔…");
   try{const g=await RecDB.get(rec);if(!g.ok)throw new Error("原始檔指紋與上傳時不同，已停止開啟");
     /* 只用當時的座標檔重現；沒有連結座標檔（或已刪除）時，這次匯入不套用目前的座標檔，避免位置與分群和當初不同 */
@@ -11880,9 +11932,13 @@ async function downloadDeliverablesQueue(types) {
   }
 }
 
-let PICKER_TAB = "spi";
+let PICKER_TAB = "pairs";
 let PICKER_SIDE_FILTER = "";
 let PICKER_QUALITY_FILTER = "all";
+let PICKER_LINK_FILTER = "";
+let RETURN_IMPORT_AFTER_PLACE = false;
+let PICKER_FOCUS_IMPORT = "";
+const PAIR_CITE_OPEN = new Set();
 let EDITING_REC_ID = null, DELETING_REC_ID = null;
 let UP_PLACE_FILE_OBJ = null, UP_PLACE_SOURCE_ID = null;
 
@@ -11935,12 +11991,29 @@ function partHint(inSel, hintSel) {
   el.innerHTML = !r ? "" : r.exact ? '<span class="rec-ok">✓ 既有料號</span>' : r.near ? `<span class="err">與既有料號 <span class="mono">${esc(r.near)}</span> 相近，請確認不是打錯</span>` : "";
   return r;
 }
+function placeSideHolds(placeSide, measSide) {
+  const p = String(placeSide || "").toUpperCase(), m = String(measSide || "").toUpperCase();
+  if (p === "BOTH" || p === "ALL") return m === "TOP" || m === "BOT";
+  return !!m && p === m;
+}
+function measurementLink(rec, list) {
+  if (!rec || !rec.placeId) return { v: "none", text: "尚未搭配" };
+  if (!Array.isArray(list)) return { v: "unknown", text: "座標已引用" };
+  const p = list.find(x => x.kind === "place" && x.id === rec.placeId);
+  if (!p) return { v: "missing", text: "座標檔不存在" };
+  if (String(rec.part || "") !== String(p.part || "")) return { v: "bad", text: "身分不符：料號", place: p };
+  if (String(rec.rev || "") !== String(p.rev || "")) return { v: "bad", text: "身分不符：版次", place: p };
+  if (!placeSideHolds(p.side, rec.side)) return { v: "bad", text: "身分不符：面別", place: p };
+  return { v: "ok", text: "身分相符", place: p };
+}
 function placeText(r, list) {
-  if (!r.placeId) return null;
-  const p = (list || RecDB.cache || []).find(x => x.id === r.placeId && x.kind === "place");
-  if (!p) return { missing: true, text: "✗ 座標檔不存在", html: '<span class="rec-bad">✗ 座標檔不存在</span>' };
-  const t = `${p.part} ${p.rev}`, arch = p.lifecycle === "archived";
-  return { place: p, text: t + (arch ? "（已封存）" : ""), html: `<span class="mono">${esc(t)}</span>${arch ? '<span class="note">（已封存）</span>' : ""}` };
+  const st = measurementLink(r, list || (typeof RecDB === "undefined" || !RecDB ? null : RecDB.cache));
+  if (st.v === "none" || st.v === "unknown") return null;
+  if (st.v === "missing") return { missing: true, text: "✗ 座標檔不存在", html: '<span class="rec-bad">✗ 座標檔不存在</span>' };
+  const p = st.place, arch = p.lifecycle === "archived";
+  const t = `${p.part} ${p.rev}`;
+  const mark = st.v === "ok" ? '<span class="rec-ok">身分相符</span>' : `<span class="rec-bad">${esc(st.text)}</span>`;
+  return { place: p, text: t + (arch ? "（已封存）" : "") + " " + st.text, html: `<span class="mono">${esc(t)}</span>${arch ? '<span class="note">（已封存）</span>' : ""}<br>${mark}` };
 }
 function reimportMap(list) {
   const m = new Map();
@@ -11950,9 +12023,10 @@ function reimportMap(list) {
 const canReimport = r => r.kind === "spi" && r.validation_source === "legacy" && RecDB.mode === "cloud";
 function placeCell(r, list, reimp) {
   const pt = placeText(r, list); if (pt) return pt.html;
+  if (r.placeId && !Array.isArray(list)) return `<span class="note">座標已引用</span>`;
   const again = reimp.get(r.id);
-  if (again && again.length) return `<span class="note">無座標引用</span><br><button type="button" class="linkbtn" data-pact="goto" data-id="${esc(again[0].id)}">已重新匯入 →</button>`;
-  return `<span class="note">無座標引用</span>${canReimport(r) ? ` · <button type="button" class="linkbtn" data-pact="reimport" data-id="${esc(r.id)}">重新受控匯入</button>` : ""}`;
+  if (again && again.length) return `<span class="note">尚未搭配</span> · <span class="note">無座標引用</span><br><button type="button" class="linkbtn" data-pact="goto" data-id="${esc(again[0].id)}">已重新匯入 →</button>`;
+  return `<span class="note">尚未搭配</span> · <span class="note">無座標引用</span>${canReimport(r) ? ` · <button type="button" class="linkbtn" data-pact="reimport" data-id="${esc(r.id)}">重新受控匯入</button>` : ""}`;
 }
 /* 判定（§6）：由上往下取第一個成立的；401／網路錯誤不進到這裡 */
 function proofVerdict(lc, browserOk) {
@@ -12129,9 +12203,19 @@ function closeRecDeleteModal() {
   if (cancel) cancel.disabled = false;
   if (closeBtn) closeBtn.disabled = false;
 }
+function parkPlaceForm() {
+  const form = $("#boxUploadPlaceForm");
+  if (!form) return;
+  if (PICKER_TAB === "specs") { form.hidden = true; return; }
+  const host = PICKER_TAB === "place" ? $("#boxPickPlace") : $("#pairFormHost");
+  if (host && form.parentElement !== host) {
+    if (PICKER_TAB === "place") host.prepend(form);
+    else host.appendChild(form);
+  }
+}
 function resetPickerFilters() {
-  PICKER_SIDE_FILTER = ""; PICKER_QUALITY_FILTER = "all";
-  for (const [sel, attr, val] of [["#pickSideSeg", "side", ""], ["#pickQualitySeg", "qfilter", "all"]])
+  PICKER_SIDE_FILTER = ""; PICKER_QUALITY_FILTER = "all"; PICKER_LINK_FILTER = "";
+  for (const [sel, attr, val] of [["#pickSideSeg", "side", ""], ["#pickQualitySeg", "qfilter", "all"], ["#pickLinkSeg", "link", ""]])
     $$(`${sel} button`).forEach(b => { const on = (b.dataset[attr] || "") === val; b.classList.toggle("active", on); b.style.background = on ? "var(--surface)" : "transparent"; });
 }
 function scrollToPickerRow(id) {
@@ -12185,6 +12269,7 @@ async function renderRecPicker(force) {
     return;
   }
   if($("#boxUploadPlaceForm"))$("#boxUploadPlaceForm").hidden=!RecDB.isAdmin||RecDB.mode!=="cloud";
+  parkPlaceForm();
 
   const partFilterSel = $("#pickPartFilter");
   if (partFilterSel) {
@@ -12199,13 +12284,17 @@ async function renderRecPicker(force) {
   const sideFilter = PICKER_SIDE_FILTER;
   const qualityFilter = PICKER_QUALITY_FILTER;
   // 品質篩選只對量測記錄有意義；座標檔庫分頁隱藏，切回時沿用原本的選擇
-  if ($("#pickQualitySeg")) $("#pickQualitySeg").style.display = PICKER_TAB === "place" ? "none" : "inline-flex";
+  if ($("#pickQualitySeg")) $("#pickQualitySeg").style.display = (PICKER_TAB === "spi" || PICKER_TAB === "pairs") ? "inline-flex" : "none";
+  if ($("#pickLinkSeg")) $("#pickLinkSeg").style.display = PICKER_TAB === "specs" ? "none" : "inline-flex";
   const reimp = reimportMap(list);
 
   const hit = r => {
     if (!importSearchMatch(r, q)) return false;
     if (selectedPart && r.part !== selectedPart) return false;
     if (sideFilter && (r.side || "").toUpperCase() !== sideFilter && (r.side || "").toUpperCase() !== "BOTH") return false;
+    if (PICKER_LINK_FILTER === "unlinked" && !(r.kind === "spi" && !r.placeId)) return false;
+    if (PICKER_LINK_FILTER === "missing" && !(r.kind === "spi" && r.placeId && !(list || []).some(x => x.kind === "place" && x.id === r.placeId))) return false;
+    if (PICKER_LINK_FILTER === "unused" && (r.kind !== "place" || (list || []).some(x => x.kind === "spi" && x.placeId === r.id))) return false;
     if (r.kind === "spi" && qualityFilter === "pass") {
       const defs = r.qualitySnapshot ? (r.qualitySnapshot.defects ?? r.qualitySnapshot.totalDefects ?? 0) : null;
       if (defs == null || defs > 0) return false;
@@ -12228,7 +12317,10 @@ async function renderRecPicker(force) {
   if(q)activeFilters.push("搜尋「"+$("#recPickerQ").value.trim()+"」");
   if(selectedPart)activeFilters.push("料號 "+selectedPart);
   if(sideFilter)activeFilters.push(sideFilter+" 面");
-  if(PICKER_TAB!=="place"&&qualityFilter!=="all")activeFilters.push(qualityFilter==="ng"?"僅異常":"僅合格");
+  if((PICKER_TAB==="spi"||PICKER_TAB==="pairs")&&qualityFilter!=="all")activeFilters.push(qualityFilter==="ng"?"僅異常":"僅合格");
+  if(PICKER_LINK_FILTER==="unlinked")activeFilters.push("未搭配");
+  if(PICKER_LINK_FILTER==="missing")activeFilters.push("座標檔不存在");
+  if(PICKER_LINK_FILTER==="unused")activeFilters.push("座標無引用");
   if($("#recPickerQClear"))$("#recPickerQClear").hidden=!q;
   if($("#recPickerClearFilters"))$("#recPickerClearFilters").hidden=!activeFilters.length;
   $("#recPickerNotice").textContent="量測紀錄 "+S1.length+" 筆；座標檔 "+P1.length+" 筆。"+(activeFilters.length?"目前篩選："+activeFilters.join("、"):"目前未套用篩選。");
@@ -12271,10 +12363,10 @@ async function renderRecPicker(force) {
         <td style="text-align:right">
           <div class="rec-acts">
             ${!["pending_review","superseded"].includes(r.lifecycle)?`<button class="primary btn-sm" data-pact="load" data-id="${esc(r.id)}" title="載入有效量測分析">載入分析</button>`:""}
-            <button class="btn-sm" data-pact="ver" data-id="${esc(r.id)}" title="檢查原檔指紋與座標對應">驗證</button>
+            <button class="btn-sm" data-pact="ver" data-id="${esc(r.id)}" title="檢查原檔指紋與座標對應">對應證明</button>
             <button class="btn-sm" data-pact="open" data-id="${esc(r.id)}" title="開啟至匯入對應面板以檢視或調整欄位">調整</button>
             ${editBtn(r)}
-            <button class="btn-sm" data-pact="dl" data-id="${esc(r.id)}">匯出</button>
+            <button class="btn-sm" data-pact="dl" data-id="${esc(r.id)}">下載原檔</button>
             ${RecDB.isAdmin&&r.lifecycle==="pending_review"?`<span class="sep" aria-hidden="true"></span><button class="btn-sm" data-pact="new-batch" data-id="${esc(r.id)}">新一批</button><button class="btn-sm" data-pact="correct" data-id="${esc(r.id)}">修正既有</button>`:""}
             ${delBtn(r)}
           </div>
@@ -12310,18 +12402,18 @@ async function renderRecPicker(force) {
         </div>
         <div class="note" style="font-size:var(--fs-caption);margin:8px 0;line-height:1.4">
           工單: ${wo}<br>
-          座標: ${pt ? (pt.missing ? '<span class="rec-bad">✗ 座標檔不存在</span>' : `<span class="mono">${esc(pt.text)}</span>`) : again && again.length ? "無座標引用（已重新匯入）" : "無座標引用"}<br>
+          座標: ${placeCell(r, list, reimp)}<br>
           上傳: ${esc(fmtTime(r.created))} · ${esc(r.user)}
           ${r.note ? `<br><span style="color:var(--ink)">備註: ${esc(r.note)}</span>` : ""}
         </div>
         <div class="rec-card-actions" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
           ${!["pending_review","superseded"].includes(r.lifecycle)?`<button class="primary" data-pact="load" data-id="${esc(r.id)}" style="flex:1 1 120px;min-height:44px;font-size:var(--fs-body);font-weight:700">載入分析</button>`:""}
-          <button data-pact="ver" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-body)">驗證</button>
+          <button data-pact="ver" data-id="${esc(r.id)}" style="flex:0 0 60px;font-size:var(--fs-body)">對應證明</button>
           <button data-pact="open" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-body)">調整</button>
           ${again && again.length ? `<button data-pact="goto" data-id="${esc(again[0].id)}" style="min-height:44px;font-size:var(--fs-body)">已重新匯入 →</button>` : !pt && canReimport(r) ? `<button data-pact="reimport" data-id="${esc(r.id)}" style="min-height:44px;font-size:var(--fs-body)">重新受控匯入</button>` : ""}
           ${RecDB.isAdmin&&r.lifecycle==="pending_review"?`<button data-pact="new-batch" data-id="${esc(r.id)}">新一批</button><button data-pact="correct" data-id="${esc(r.id)}">修正既有</button>`:""}
           ${editBtn(r)}
-          <button data-pact="dl" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-body)">匯出</button>
+          <button data-pact="dl" data-id="${esc(r.id)}" style="flex:0 0 60px;font-size:var(--fs-body)">下載原檔</button>
           ${delBtn(r)}
         </div>
       </div>`;
@@ -12356,9 +12448,9 @@ async function renderRecPicker(force) {
         <td style="text-align:right">
           <div class="rec-acts">
             ${isCur ? '<span class="pill ok">目前已選取</span>' : selectable?`<button class="primary btn-sm" data-pact="use-place" data-id="${esc(r.id)}">選取</button>`:r.lifecycle==="archived"?`<span class="note" title="${ARCHIVED_TIP}">不可用於新匯入</span>`:""}
-            <button class="btn-sm" data-pact="ver" data-id="${esc(r.id)}" title="檢查原檔指紋並列出引用的量測">驗證</button>
+            <button class="btn-sm" data-pact="ver" data-id="${esc(r.id)}" title="檢查原檔指紋並列出引用的量測">對應證明</button>
             ${editBtn(r)}
-            <button class="btn-sm" data-pact="dl" data-id="${esc(r.id)}">匯出</button>
+            <button class="btn-sm" data-pact="dl" data-id="${esc(r.id)}">下載原檔</button>
             ${RecDB.isAdmin&&(selectable||r.validation_source==="legacy")?'<span class="sep" aria-hidden="true"></span>':""}
             ${RecDB.isAdmin&&selectable?`<button class="btn-sm" data-pact="archive-place" data-id="${esc(r.id)}">封存</button>`:""}
             ${RecDB.isAdmin&&r.validation_source==="legacy"?`<button class="btn-sm" data-pact="register-legacy-place" data-id="${esc(r.id)}">驗證納管</button>`:""}
@@ -12366,7 +12458,7 @@ async function renderRecPicker(force) {
           </div>
         </td>
       </tr>`;
-    }).join("") + `</tbody>` : `<tbody><tr><td colspan="9" class="note" style="text-align:center;padding:24px">${q || selectedPart || sideFilter ? "沒有符合篩選條件的座標檔" : "資料庫目前尚無座標檔。可利用上方表單獨立上傳，或於匯入時上傳。"}</td></tr></tbody>`;
+    }).join("") + `</tbody>` : `<tbody><tr><td colspan="9" class="note" style="text-align:center;padding:24px">${q || selectedPart || sideFilter || PICKER_LINK_FILTER ? "沒有符合篩選條件的座標檔" : "資料庫目前尚無座標檔。請用上方表單登錄。"}</td></tr></tbody>`;
   }
 
   const cardsPlace = $("#cardsPickPlace");
@@ -12394,12 +12486,93 @@ async function renderRecPicker(force) {
           ${isCur ? '<button class="primary" disabled style="flex:1 1 120px;min-height:44px;font-size:var(--fs-body)">目前已選取</button>' : selectable?`<button class="primary" data-pact="use-place" data-id="${esc(r.id)}" style="flex:1 1 120px;min-height:44px;font-size:var(--fs-body)">選取此座標檔</button>`:""}
           ${RecDB.isAdmin&&selectable?`<button data-pact="archive-place" data-id="${esc(r.id)}">封存</button>`:""}
           ${RecDB.isAdmin&&r.validation_source==="legacy"?`<button data-pact="register-legacy-place" data-id="${esc(r.id)}">驗證納管</button>`:""}
-          <button data-pact="ver" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-body)">驗證</button>
-          <button data-pact="dl" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-body)">匯出</button>
+          <button data-pact="ver" data-id="${esc(r.id)}" style="flex:0 0 60px;font-size:var(--fs-body)">對應證明</button>
+          <button data-pact="dl" data-id="${esc(r.id)}" style="flex:0 0 60px;font-size:var(--fs-body)">下載原檔</button>
           ${delBtn(r)}
         </div>
       </div>`;
     }).join("") : `<div class="note" style="text-align:center;padding:24px">無符合篩選條件的座標檔</div>`;
+  }
+
+  function pairMore(html) {
+    return html.trim() ? `<details class="pair-more"><summary>更多</summary><div class="rec-acts">${html}</div></details>` : "";
+  }
+  function spiPairRow(r) {
+    const st = measurementLink(r, list);
+    const hl = PICKER_HIGHLIGHT && PICKER_HIGHLIGHT.id === r.id ? " rec-new" : "";
+    const primary = !["pending_review", "superseded"].includes(r.lifecycle) ? `<button type="button" class="primary btn-sm" data-pact="load" data-id="${esc(r.id)}">載入分析</button>` : "";
+    const pairBtn = st.place
+      ? `<button type="button" class="btn-sm" data-pact="dl-pair" data-id="${esc(r.id)}">下載這一對</button>`
+      : `<button type="button" class="btn-sm" disabled>下載這一對</button><span class="note">座標原檔不在，只能下載量測原檔</span>`;
+    const status = st.v === "ok" ? `<span class="rec-ok">身分相符</span>` : st.v === "bad" ? `<span class="rec-bad">${esc(st.text)}</span>` : st.v === "missing" ? `<span class="rec-bad">座標檔不存在</span>` : `<span class="note">尚未搭配</span>`;
+    const more = `<button type="button" class="btn-sm" data-pact="ver" data-id="${esc(r.id)}">對應證明</button><button type="button" class="btn-sm" data-pact="dl" data-id="${esc(r.id)}">下載原檔</button><button type="button" class="btn-sm" data-pact="open" data-id="${esc(r.id)}">調整</button>${editBtn(r)}${RecDB.isAdmin && r.lifecycle === "pending_review" ? `<button type="button" class="btn-sm" data-pact="new-batch" data-id="${esc(r.id)}">新一批</button><button type="button" class="btn-sm" data-pact="correct" data-id="${esc(r.id)}">修正既有</button>` : ""}${delBtn(r)}`;
+    return `<div class="pair-row${hl}" data-row-id="${esc(r.id)}"><div class="pair-meta"><b>${esc(r.lot || "未提供批號")}</b> · ${esc(r.side || "—")} · ${status}<br><span class="note">${esc(r.name || "")}</span></div><div class="rec-acts">${primary}${pairBtn}${pairMore(more)}</div></div>`;
+  }
+  function placePairRow(p) {
+    const selectable = p.lifecycle === "active" && p.validation_source === "server_verified";
+    const isCur = PLACE && PLACE.recId === p.id;
+    const users = (list || []).filter(x => x.kind === "spi" && x.placeId === p.id).sort((a, b) => b.created - a.created);
+    const cite = users.length
+      ? `<button type="button" class="linkbtn" data-pact="cite" data-id="${esc(p.id)}">被 ${users.length} 筆量測引用</button><div id="cite-${esc(p.id)}" class="note"${PAIR_CITE_OPEN.has(p.id) ? "" : " hidden"}>${users.slice(0, 20).map(x => `${esc(x.lot || "未提供批號")}・${esc(x.side || "—")}`).join("、")}${users.length > 20 ? `，另 ${users.length - 20} 筆` : ""}</div>`
+      : `<span class="note">尚無量測引用</span>`;
+    const primary = isCur ? `<span class="pill ok">目前已選取</span>` : selectable ? `<button type="button" class="primary btn-sm" data-pact="use-place" data-id="${esc(p.id)}">選取</button>` : "";
+    const more = `<button type="button" class="btn-sm" data-pact="ver" data-id="${esc(p.id)}">對應證明</button><button type="button" class="btn-sm" data-pact="dl" data-id="${esc(p.id)}">下載原檔</button>${editBtn(p)}${RecDB.isAdmin && selectable ? `<button type="button" class="btn-sm" data-pact="archive-place" data-id="${esc(p.id)}">封存</button>` : ""}${RecDB.isAdmin && p.validation_source === "legacy" ? `<button type="button" class="btn-sm" data-pact="register-legacy-place" data-id="${esc(p.id)}">驗證納管</button>` : ""}${delBtn(p)}`;
+    const hl = isCur || (PICKER_HIGHLIGHT && PICKER_HIGHLIGHT.id === p.id) ? " rec-new" : "";
+    const side = p.side === "BOTH" ? "TOP＋BOT" : (p.side || "—");
+    const fresh = PICKER_HIGHLIGHT && PICKER_HIGHLIGHT.id === p.id && PICKER_HIGHLIGHT.label ? ` <span class="pill warn">${esc(PICKER_HIGHLIGHT.label)}</span>` : "";
+    return `<div class="pair-row${hl}" data-row-id="${esc(p.id)}"><div class="pair-meta"><b class="mono">${esc(p.part)}</b> ${esc(p.rev)} · ${esc(side)}${fresh} · ${esc(p.name || "")}<br>${cite}</div><div class="rec-acts">${primary}${pairMore(more)}</div></div>`;
+  }
+  function renderPairBoard() {
+    const board = $("#pairBoard");
+    if (!board) return;
+    const cited = id => (list || []).some(x => x.kind === "spi" && x.placeId === id);
+    const groups = new Map();
+    const ensure = (part, rev) => {
+      const key = `${part || ""}\u0000${rev || ""}`;
+      if (!groups.has(key)) groups.set(key, { part: part || "", rev: rev || "", places: [], spi: [] });
+      return groups.get(key);
+    };
+    for (const p of P1) if (cited(p.id)) ensure(p.part, p.rev).places.push(p);
+    const orphanSpi = [];
+    for (const r of S1) {
+      const st = measurementLink(r, list);
+      if (st.v === "ok" || st.v === "bad") ensure(r.part, r.rev).spi.push(r);
+      else orphanSpi.push(r);
+    }
+    const orphanPlace = P1.filter(p => !cited(p.id));
+    const uploadBtn = (part, rev) => RecDB.isAdmin && RecDB.mode === "cloud"
+      ? `<button type="button" data-pair-upload data-pair-part="${esc(part)}" data-pair-rev="${esc(rev)}">登錄座標檔</button>`
+      : `<span class="note">只有管理者可以登錄座標檔</span>`;
+    const importBtn = (part, rev, place) => {
+      const side = place && (place.side === "TOP" || place.side === "BOT") ? place.side : "";
+      const pid = place && place.lifecycle === "active" && place.validation_source === "server_verified" ? place.id : "";
+      return `<button type="button" data-pair-import data-pair-part="${esc(part)}" data-pair-rev="${esc(rev)}" data-pair-side="${esc(side)}" data-place-id="${esc(pid)}">匯入量測</button>`;
+    };
+    const filtered = q || selectedPart || sideFilter || PICKER_LINK_FILTER || (qualityFilter !== "all" && (PICKER_TAB === "spi" || PICKER_TAB === "pairs"));
+    let html = "";
+    if (orphanSpi.length || orphanPlace.length) {
+      html += `<section class="pair-orphan" aria-label="未成對"><b>未成對</b>`;
+      html += orphanPlace.map(p => `<div class="pair-slot"><b>座標檔</b>${placePairRow(p)}<p class="note" style="margin:0">此座標還沒有量測。</p>${importBtn(p.part, p.rev, p)}</div>`).join("");
+      html += orphanSpi.map(r => `<div class="pair-slot"><b>量測紀錄</b>${spiPairRow(r)}${r.placeId ? "" : uploadBtn(r.part, r.rev)}</div>`).join("");
+      html += `</section>`;
+    }
+    if (!groups.size && !orphanSpi.length && !orphanPlace.length) {
+      html += `<p class="note">${filtered ? "沒有符合篩選的檔案。" : "尚無量測與座標。先登錄座標檔，再匯入同一料號與版次的量測。"}</p>`;
+    }
+    for (const key of [...groups.keys()].sort((a, b) => a.localeCompare(b, "zh-Hant"))) {
+      const g = groups.get(key);
+      const place = g.places.find(p => p.lifecycle === "active" && p.validation_source === "server_verified") || g.places[0];
+      const fresh = PICKER_HIGHLIGHT && g.places.concat(g.spi).some(x => x.id === PICKER_HIGHLIGHT.id) && PICKER_HIGHLIGHT.label ? ` <span class="pill warn">${esc(PICKER_HIGHLIGHT.label)}</span>` : "";
+      html += `<article class="pair-card"><h4><span class="mono">${esc(g.part || "無料號")}</span> ${esc(g.rev || "無版次")}${fresh}</h4><div class="pair-slot"><b>座標檔</b>${g.places.length ? g.places.map(placePairRow).join("") : `<p class="note" style="margin:0">此版次還沒有座標檔。</p>${uploadBtn(g.part, g.rev)}`}</div><div class="pair-slot"><b>量測紀錄</b>${g.spi.length ? g.spi.map(spiPairRow).join("") : `<p class="note" style="margin:0">此版次還沒有量測。</p>`}${importBtn(g.part, g.rev, place)}</div></article>`;
+    }
+    board.innerHTML = html;
+  }
+  renderPairBoard();
+  if (PICKER_FOCUS_IMPORT) {
+    const want = PICKER_FOCUS_IMPORT;
+    PICKER_FOCUS_IMPORT = "";
+    const btn = [...document.querySelectorAll("#pairBoard [data-pair-import]")].find(b => `${b.dataset.pairPart}\u0000${b.dataset.pairRev}` === want);
+    if (btn) btn.focus();
   }
 
   if (PICKER_TAB === "specs") {
@@ -12426,8 +12599,8 @@ function setupRecPicker() {
   let pickerReturnFocus = null;
 
   function setPickerTab(tab, shouldRender = false) {
-    PICKER_TAB = tab === "place" ? "place" : tab === "specs" ? "specs" : "spi";
-    const tabs = [["spi", $("#btnPickSpi")], ["place", $("#btnPickPlace")], ["specs", $("#btnPickSpecs")]];
+    PICKER_TAB = tab === "place" ? "place" : tab === "specs" ? "specs" : tab === "spi" ? "spi" : "pairs";
+    const tabs = [["pairs", $("#btnPickPairs")], ["spi", $("#btnPickSpi")], ["place", $("#btnPickPlace")], ["specs", $("#btnPickSpecs")]];
     tabs.forEach(([name, btn]) => {
       if (!btn) return;
       const on = PICKER_TAB === name;
@@ -12435,16 +12608,19 @@ function setupRecPicker() {
       btn.style.background = on ? "var(--surface)" : "transparent";
       if (on) btn.style.fontWeight = "700"; else btn.style.fontWeight = "";
     });
+    if ($("#boxPickPairs")) $("#boxPickPairs").hidden = PICKER_TAB !== "pairs";
     if ($("#boxPickSpi")) $("#boxPickSpi").hidden = PICKER_TAB !== "spi";
     if ($("#boxPickPlace")) $("#boxPickPlace").hidden = PICKER_TAB !== "place";
     if ($("#boxPickSpecs")) $("#boxPickSpecs").hidden = PICKER_TAB !== "specs";
-    if ($("#pickSideSeg")) $("#pickSideSeg").style.display = PICKER_TAB === "spi" ? "inline-flex" : "none";
-    if ($("#pickQualitySeg")) $("#pickQualitySeg").style.display = PICKER_TAB === "spi" ? "inline-flex" : "none";
+    if ($("#pickSideSeg")) $("#pickSideSeg").style.display = PICKER_TAB === "specs" ? "none" : "inline-flex";
+    if ($("#pickQualitySeg")) $("#pickQualitySeg").style.display = (PICKER_TAB === "spi" || PICKER_TAB === "pairs") ? "inline-flex" : "none";
+    if ($("#pickLinkSeg")) $("#pickLinkSeg").style.display = PICKER_TAB === "specs" ? "none" : "inline-flex";
+    parkPlaceForm();
     if (shouldRender) renderRecPicker();
   }
 
-  function open(wantTab = "spi") {
-    const targetTab = wantTab === "place" ? "place" : wantTab === "specs" ? "specs" : "spi";
+  function open(wantTab = "pairs") {
+    const targetTab = wantTab === "place" ? "place" : wantTab === "specs" ? "specs" : wantTab === "spi" ? "spi" : "pairs";
     if (modal.hidden) pickerReturnFocus = document.activeElement;
     modal.hidden = false;
     modal.classList.add("open");
@@ -12466,12 +12642,12 @@ function setupRecPicker() {
   }
 
   const btnOpen = $("#btnOpenRecModal");
-  if (btnOpen) btnOpen.onclick = () => open("spi");
+  if (btnOpen) btnOpen.onclick = () => open("pairs");
   const mBtnOpen = $("#mBtnOpenRecModal");
   if (mBtnOpen) {
     mBtnOpen.onclick = () => {
       if (typeof moreSheetCtrl !== "undefined" && moreSheetCtrl) moreSheetCtrl.close();
-      open("spi");
+      open("pairs");
     };
   }
   const btnClose = $("#recPickerClose");
@@ -12487,7 +12663,8 @@ function setupRecPicker() {
     };
   }
 
-  const bSpi = $("#btnPickSpi"), bPlace = $("#btnPickPlace"), bSpecs = $("#btnPickSpecs");
+  const bPairs = $("#btnPickPairs"), bSpi = $("#btnPickSpi"), bPlace = $("#btnPickPlace"), bSpecs = $("#btnPickSpecs");
+  if (bPairs) bPairs.onclick = () => setPickerTab("pairs", true);
   if (bSpi) bSpi.onclick = () => setPickerTab("spi", true);
   if (bPlace) bPlace.onclick = () => setPickerTab("place", true);
   if (bSpecs) bSpecs.onclick = () => setPickerTab("specs", true);
@@ -12591,6 +12768,22 @@ function setupRecPicker() {
     });
   }
 
+  const linkSeg = $("#pickLinkSeg");
+  if (linkSeg) {
+    linkSeg.addEventListener("click", e => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+      linkSeg.querySelectorAll("button").forEach(b => {
+        b.classList.remove("active");
+        b.style.background = "transparent";
+      });
+      btn.classList.add("active");
+      btn.style.background = "var(--surface)";
+      PICKER_LINK_FILTER = btn.dataset.link || "";
+      renderRecPicker();
+    });
+  }
+
   // 獨立座標上傳表單事件
   const upPlaceFile = $("#upPlaceFile");
   if (upPlaceFile) {
@@ -12651,8 +12844,20 @@ function setupRecPicker() {
         if ($("#upPlacePartHint")) $("#upPlacePartHint").textContent = "";
         if (upPlaceFile) upPlaceFile.value = "";
         if ($("#upPlaceFileName")) $("#upPlaceFileName").textContent = "";
-        if (sv) { PICKER_PART_PRESET = sv.part; resetPickerFilters(); if ($("#recPickerQ")) $("#recPickerQ").value = ""; PICKER_HIGHLIGHT = { id: sv.id, label: "剛存入" }; }
+        if (sv) { PICKER_PART_PRESET = sv.part; resetPickerFilters(); if ($("#recPickerQ")) $("#recPickerQ").value = ""; PICKER_HIGHLIGHT = { id: sv.id, label: "剛存入" }; if (!RETURN_IMPORT_AFTER_PLACE) PICKER_FOCUS_IMPORT = `${sv.part}\u0000${sv.rev}`; }
         await renderRecPicker(true);
+        if (sv && RETURN_IMPORT_AFTER_PLACE) {
+          RETURN_IMPORT_AFTER_PLACE = false;
+          try { await usePlaceRec(sv); } catch (er) { toast(er.message); }
+          if ($("#inPart") && !$("#inPart").value) $("#inPart").value = sv.part || "";
+          if ($("#inRev") && !$("#inRev").value) $("#inRev").value = sv.rev || "";
+          if ($("#selSide") && !$("#selSide").value && (sv.side === "TOP" || sv.side === "BOT")) $("#selSide").value = sv.side;
+          close();
+          setTab("data");
+          setSub("import");
+          syncIdentityHints();
+          return;
+        }
         if (sv) scrollToPickerRow(sv.id);
         await renderRecords(true);
         syncPlaceToCurrentRun({notify:true});
@@ -12762,11 +12967,58 @@ function setupRecPicker() {
 
   modal.addEventListener("click", async e => {
     if (e.target === modal) { close(); return; }
+    const impBtn = e.target.closest("[data-pair-import]");
+    if (impBtn) {
+      const part = impBtn.dataset.pairPart || "", rev = impBtn.dataset.pairRev || "", side = impBtn.dataset.pairSide || "", placeId = impBtn.dataset.placeId || "";
+      close();
+      setTab("data");
+      setSub("import");
+      if ($("#inPart")) $("#inPart").value = part;
+      if ($("#inRev")) $("#inRev").value = rev;
+      if ((side === "TOP" || side === "BOT") && $("#selSide")) $("#selSide").value = side;
+      const prec = placeId && (RecDB.cache || []).find(x => x.id === placeId);
+      if (prec) { try { await usePlaceRec(prec); } catch (er) { toast(er.message); } }
+      syncIdentityHints();
+      $("#fileIn")?.focus();
+      return;
+    }
+    const upBtn = e.target.closest("[data-pair-upload]");
+    if (upBtn) {
+      if ($("#upPlacePart")) $("#upPlacePart").value = upBtn.dataset.pairPart || "";
+      if ($("#upPlaceRev")) $("#upPlaceRev").value = upBtn.dataset.pairRev || "";
+      parkPlaceForm();
+      const form = $("#boxUploadPlaceForm");
+      if (form) { form.hidden = !(RecDB.isAdmin && RecDB.mode === "cloud"); if (form.scrollIntoView) form.scrollIntoView({ block: "center" }); }
+      $("#upPlaceSide")?.focus();
+      return;
+    }
     const b = e.target.closest("[data-pact]");
     if (!b) return;
-    const id = b.dataset.id, act = b.dataset.pact, rec = await recFind(id);
+    const id = b.dataset.id, act = b.dataset.pact;
+    if (act === "cite") {
+      if (PAIR_CITE_OPEN.has(id)) PAIR_CITE_OPEN.delete(id); else PAIR_CITE_OPEN.add(id);
+      const box = document.getElementById("cite-" + id);
+      if (box) box.hidden = !PAIR_CITE_OPEN.has(id);
+      return;
+    }
+    const rec = await recFind(id);
     if (!rec) { toast("找不到這筆紀錄，請重新整理"); return; }
     try {
+      if (act === "dl-pair") {
+        const place = rec.kind === "spi" && rec.placeId ? (RecDB.cache || []).find(x => x.kind === "place" && x.id === rec.placeId) : null;
+        const g = await RecDB.get(rec);
+        await saveBytes(rec.name, g.bytes);
+        if (!place) { toast("座標原檔不在，只能下載量測原檔"); return; }
+        const gp = await RecDB.get(place);
+        let pname = place.name || "place.csv";
+        if (pname === rec.name) {
+          const dot = pname.lastIndexOf(".");
+          pname = dot > 0 ? pname.slice(0, dot) + "-place" + pname.slice(dot) : pname + "-place";
+        }
+        await saveBytes(pname, gp.bytes);
+        toast(!g.ok || !gp.ok ? "注意：檔案指紋與上傳時不同" : "已下載量測與座標原檔");
+        return;
+      }
       if (act === "load") {
         close();
         await openRecord(rec, { autoApply: true });
@@ -12862,7 +13114,7 @@ function setupRecPicker() {
         const g = await RecDB.get(rec);
         await saveBytes(rec.name, g.bytes);
         if (!g.ok) toast("注意：檔案指紋與上傳時不同");
-        else toast("已匯出 " + rec.name);
+        else toast("已下載原檔 " + rec.name);
         return;
       }
       if (act === "ver" && RecDB.mode === "cloud") {

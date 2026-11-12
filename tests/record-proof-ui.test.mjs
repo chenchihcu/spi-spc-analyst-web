@@ -181,3 +181,32 @@ test("座標登錄：相近料號要再按一次才存入；存入後篩選切�
   assert.match($("#upPlacePartHint").textContent, /既有料號/);
   assert.deepEqual(t.errs, []);
 });
+
+test("配對卡：未成對顯示尚未搭配與座標檔不存在；從卡片匯入帶入料號版次面別", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const t = await cloudPage(), { d, $, w, cloud } = t;
+  $("#btnOpenRecModal").click();
+  $("#btnPickPlace").click();
+  assert.ok(await until(() => /尚無座標檔/.test($("#tblPickPlace").textContent)), $("#tblPickPlace").textContent);
+  assert.doesNotMatch($("#tblPickPlace").textContent, /於匯入時上傳/);
+  $("#recPickerClose").click();
+  const place = await cloud.upload({ kind: "place", part: "PAIR-1", rev: "V4", side: "TOP", unit: "mm", name: "pair.csv" }, PLACE_CSV);
+  await cloud.upload({ kind: "spi", part: "PAIR-1", rev: "V4", side: "TOP", placeId: place.id, workOrder: "WO-P", lot: "LOT-PAIR", name: "m.csv", vendor: "lirong" }, WIDE);
+  await seedLegacy(cloud, { id: "legacynopairrecord0001", part: "PAIR-1", lot: "LOT-NONE", side: "TOP", name: "none.csv", stencil: 120 }, WIDE);
+  await seedLegacy(cloud, { id: "legacymissingpair00001", part: "PAIR-1", lot: "LOT-MISS", side: "TOP", name: "miss.csv", placeId: "missingplace0000000000" }, WIDE);
+  await w.SPI_TEST_HOOK.RecDB.list();
+  $("#btnOpenRecModal").click();
+  assert.ok(await until(() => !$("#boxPickPairs").hidden && /LOT-NONE/.test($("#pairBoard").textContent)));
+  assert.match($("#pairBoard").textContent, /尚未搭配/);
+  assert.match($("#pairBoard").textContent, /座標檔不存在/);
+  assert.match($("#pairBoard").textContent, /身分相符/);
+  assert.match($("#pairBoard").textContent, /被 1 筆量測引用/);
+  const imp = [...d.querySelectorAll("#pairBoard [data-pair-import]")].find(b => b.dataset.pairPart === "PAIR-1" && b.dataset.pairRev === "V4" && b.dataset.placeId === place.id);
+  assert.ok(imp, "已配對的卡片可匯入量測");
+  imp.click();
+  const filled = await until(() => $("#inPart").value === "PAIR-1" && $("#inRev").value === "V4" && $("#selSide").value === "TOP" && w.SPI_TEST_HOOK.getPlace()?.recId === place.id);
+  assert.ok(filled, JSON.stringify({ part: $("#inPart") && $("#inPart").value, rev: $("#inRev") && $("#inRev").value, side: $("#selSide") && $("#selSide").value, place: w.SPI_TEST_HOOK.getPlace(), toast: $("#toast") && $("#toast").textContent, errs: t.errs, tab: $("#p-data") && $("#p-data").hidden }));
+  $("#inRev").value = "V9";
+  $("#inRev").dispatchEvent(new w.Event("input"));
+  assert.match($("#inRevError").textContent, /版次/);
+  assert.deepEqual(t.errs, []);
+});
