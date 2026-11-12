@@ -85,3 +85,24 @@ test("頁面送出的摘要可通過驗證，且不含原始 SPI 資料", { skip
   assert.ok(Buffer.byteLength(sent.o.body) < 20_000, `摘要大小 ${Buffer.byteLength(sent.o.body)} bytes`);
   assert.match(d.querySelector("#aiOut").textContent, /測試回覆/, "狀態：" + d.querySelector("#aiState").textContent);
 });
+
+test("AI 分析失敗訊息只在狀態列顯示一次", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const html = fs.readFileSync(HTML, "utf8").replace(/<script src=[^>]+><\/script>/g, "");
+  const dom = new JSDOM(html, { runScripts: "dangerously", url: "https://site.example/", beforeParse(w) {
+    w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === "measureText" ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
+    Object.defineProperty(w.HTMLElement.prototype, "offsetParent", { get() { let e = this; while (e) { if (e.hidden) return null; e = e.parentElement; } return w.document.body; } });
+    w.Element.prototype.scrollIntoView = () => {}; w.matchMedia = () => ({ matches: false, addEventListener() {} }); w.ResizeObserver = class { observe() {} }; w.scrollTo = () => {};
+    w.Chart = class { constructor() {} destroy() {} static register() {} };
+    if (!w.TextDecoder) w.TextDecoder = TextDecoder;
+    w.fetch = async () => new Response("\n\n［AI 分析失敗：503 This model is currently experiencing high demand.。已自動重試仍失敗，請稍後再試或改選其他服務商。］", { status: 200 });
+  } });
+  const d = dom.window.document;
+  await new Promise((r) => setTimeout(r, 50));
+  d.querySelector("[data-tab=ai]").click();
+  d.querySelector("#btnAI").click();
+  for (let i = 0; i < 50 && !/失敗/.test(d.querySelector("#aiState").textContent); i++) await new Promise((r) => setTimeout(r, 20));
+  const st = d.querySelector("#aiState").textContent;
+  assert.match(st, /^AI 分析失敗：503 This model is currently experiencing high demand/);
+  assert.doesNotMatch(st, /[［］]/);
+  assert.equal(d.querySelector("#aiOut").textContent.trim(), "", "結果區不應重複顯示失敗訊息");
+});
