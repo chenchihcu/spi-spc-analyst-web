@@ -41,7 +41,22 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   assert.equal(d.characterSet, "UTF-8", "文件字元編碼需為 UTF-8 (D-01)");
   const vp = d.querySelector('meta[name="viewport"]');
   assert.ok(vp && vp.content.includes("width=device-width") && vp.content.includes("viewport-fit=cover"), "需含正確的 viewport meta (D-01)");
-  assert.equal(d.querySelectorAll(".iss-card").length, 0, "首頁先呈現零件位置");
+  assert.equal($("#pmapDetails").open, false, "首頁問題地圖預設收合");
+  assert.ok(d.querySelectorAll("#issList .iss-case").length >= 1, "首頁直接顯示問題定義分組");
+  assert.ok(d.querySelectorAll("#issList .iss-card").length > 0, "首頁預設應列出統計問題卡");
+  assert.equal(d.querySelectorAll("#issList details.iss-card[open]").length, 0, "問題卡片預設收合");
+  assert.ok($("#railSheet .rail-states #stateSpi"), "量測狀態應在分析設定列右側／行動設定面板內");
+  assert.ok($("#railSheet .rail-states #statePlace"), "座標狀態應在分析設定列右側／行動設定面板內");
+  assert.equal(d.querySelector("header.top #stateSpi"), null, "頂欄不再重複擺放量測狀態膠囊");
+  const catSel = $("#selIssCat");
+  assert.ok(catSel, "面向篩選應為單一精簡下拉選單");
+  const firstCat = [...catSel.options].find((o) => o.value !== "all");
+  if (firstCat) {
+    change(catSel, firstCat.value);
+    assert.equal(w.SPI_TEST_HOOK.S.issCat, firstCat.value);
+    change($("#selIssCat"), "all");
+  }
+  $("#pmapDetails").open = true;
   assert.match($("#pmap").textContent, /這批沒有座標/);
   assert.equal($("#pmap svg"), null);
   assert.ok($("#pmap [data-part]"));
@@ -49,6 +64,7 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   assert.ok($(".part-map-detail"));
   assert.equal(d.querySelectorAll(".iss-card").length, 0, "點零件只開短卡");
   $("#pmapClear").click();
+  $("#pmapDetails").open = false;
 
   // 以「抓出問題」為目的的介面要素：問題地圖、證據迷你圖、嚴重度分段、來源提示
   assert.ok(d.querySelectorAll(".iss-card svg.ev").length === d.querySelectorAll(".iss-card").length, "每個問題卡片都應有證據迷你圖");
@@ -120,7 +136,7 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   assert.equal(d.querySelectorAll("#issList details.iss-card[open]").length, 0, "換回合後全部收合");
   change($("#selRun"), "1"); tab("issues");
   const hook = w.SPI_TEST_HOOK;
-  assert.equal(hook.S.pmapSelection.mode, "overview");
+  assert.equal(hook.S.pmapSelection.mode, "all");
   const before = hook.issuesCsv(hook.S.F);
   const batch = $("#pmap [data-mode=batch]");
   assert.ok(!batch.disabled);
@@ -154,6 +170,11 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   change($("#selMetric"), $("#selMetric").value);
   assert.equal(hook.S.relChart, "specScatter", "已移除的關係圖種應回到規格散點");
   assert.equal($("#selRelChart").value, "specScatter");
+  tab("deep");
+  for (const rk of ["parallel", "radar", "specScatter"]) {
+    change($("#selRelChart"), rk);
+    assert.equal(hook.S.relChart, rk);
+  }
 
   assert.deepEqual(errs, []);
 });

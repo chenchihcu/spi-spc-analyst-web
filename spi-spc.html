@@ -69,7 +69,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:v
 .wrap{max-width:1280px;margin:0 auto}
 h1,h2,h3{text-wrap:balance;margin:0;font-weight:700}
 .num,.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
-header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding-block:18px 12px}
+header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding-block:10px 8px}
 .brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .mitcorp-logo{display:block;height:26px;width:auto;color:var(--logo-ink);flex-shrink:0}
 .brand-sep{width:1px;height:22px;background:var(--line);flex-shrink:0}
@@ -98,7 +98,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-
 }
 /* ---------- v9.7 瀏覽體驗：精簡頁首、可收合卡片、本頁目錄、回到頂端 ---------- */
 .brand .ver{font-size:var(--fs-caption);color:var(--muted);white-space:nowrap}
-.brand .ver b{font-weight:700;color:var(--ink)}
+.brand .ver b{font-weight:400;color:var(--muted)}
 .toprow{gap:8px}
 .menuwrap{position:relative}
 .menu{position:absolute;right:0;top:calc(100% + 6px);z-index:30;min-width:200px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.14);padding:6px;display:grid;gap:2px}
@@ -107,7 +107,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-
 .menu button:hover,.menu a:hover,.menu button:focus-visible,.menu a:focus-visible{background:var(--surface2)}
 .menu button[hidden],.menu a[hidden]{display:none}
 .menu-user{margin:0;padding:8px 12px 6px;font-size:var(--fs-caption);color:var(--muted);border-bottom:1px solid var(--line)}
-.specbtn{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-ui);align-self:flex-end}
+.specbtn{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-ui);align-self:center}
 .specbtn .lbl{color:var(--muted);font-size:var(--fs-caption)}
 /* 黏性頂部：往下捲時把設定列推出畫面，只留頁籤；往上捲再出現（高度不變，內容不跳動） */
 .sticky{transition:top .18s ease}
@@ -213,7 +213,7 @@ table.show-all tr.more-row{display:table-row}
 .report-preview-wrap{display:flex;justify-content:center;background:var(--surface2);padding:20px 10px;border-radius:var(--r);overflow-x:auto}
 .report-preview{--surface:#FFFFFF;--surface2:#E8ECE6;--ink:#18201B;--muted:#58625B;--line:#D2D8D1;--logo-ink:#04273F;--ok:#25683F;--ok-soft:#DDEFE3;--warn:#87570B;--warn-soft:#F6E9CF;--ng:#A83327;--ng-soft:#F7DDD9;color-scheme:light;width:100%;max-width:820px;background:#ffffff;color:#1a1a1a;padding:36px 40px;box-shadow:0 4px 20px rgba(0,0,0,0.12);border-radius:4px;font-family:var(--f-body);line-height:1.6}
 @media (max-width:768px){.report-preview-wrap{padding:10px 0;background:transparent}.report-preview{padding:16px 12px;box-shadow:none;border-radius:0}}
-#busy{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--surface);padding:9px 16px;border-radius:999px;font-size:var(--fs-ui);box-shadow:0 4px 18px rgba(0,0,0,.18)}#busy[hidden]{display:none}
+#busy{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:96;display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--surface);padding:9px 16px;border-radius:999px;font-size:var(--fs-ui);box-shadow:0 4px 18px rgba(0,0,0,.18)}#busy[hidden]{display:none}
 .spin{width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(1turn)}}
 @media (prefers-reduced-motion:reduce){.spin{animation-duration:2.4s}}
 .shareRow{display:flex;gap:8px;margin:10px 0;align-items:center}.shareRow input{flex:1;min-width:0;font-family:var(--f-mono);font-size:var(--fs-caption)}
@@ -221,7 +221,7 @@ table.show-all tr.more-row{display:table-row}
 .chip{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-caption);padding:3px 10px;border-radius:999px;background:var(--surface2);color:var(--muted);white-space:nowrap}
 .chip b{color:var(--ink);font-weight:700}
 .sticky{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg)}
-.rail{padding-block:10px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px 16px;align-items:flex-end}
+.rail{padding-block:6px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
 .vsep{width:1px;height:34px;background:var(--line);align-self:flex-end}
 .how{margin:-4px 0 10px;font-size:var(--fs-caption);color:var(--muted)}
 .how summary{cursor:pointer;width:max-content;color:var(--accent-ink)}
@@ -262,11 +262,13 @@ table.show-all tr.more-row{display:table-row}
 .ev-cap{font-size:var(--fs-caption);color:var(--muted);margin-bottom:2px}
 .iss-body{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:12px 20px;align-items:start}
 @media (max-width:720px){.iss-body{grid-template-columns:1fr}}
-#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--surface);padding:10px 16px;border-radius:10px;font-size:var(--fs-ui);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50;max-width:min(560px,calc(100% - 32px));display:inline-flex;align-items:center;gap:10px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--surface);padding:10px 16px;border-radius:10px;font-size:var(--fs-ui);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:95;max-width:min(560px,calc(100% - 32px));display:inline-flex;align-items:center;gap:10px}
 #toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 #toast .toast-close{all:unset;cursor:pointer;color:var(--surface);opacity:.85;font-size:var(--fs-body);padding:4px 8px;min-width:28px;min-height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px}
 #toast .toast-close:hover,#toast .toast-close:focus-visible{opacity:1;background:rgba(255,255,255,.15)}
-.iss-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+.iss-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 12px}
+.iss-top-main{min-width:0;flex:1 1 280px}
+#fmLine{margin:0;font-size:var(--fs-ui)}
 .iss{display:grid;grid-template-columns:minmax(0,1fr);gap:6px}
 .iss-case,.iss-case-body{min-width:0;overflow-wrap:anywhere}
 .iss-case>summary{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;cursor:pointer;min-height:44px}
@@ -443,7 +445,12 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
    全域 [hidden]{display:none!important} 會蓋過不帶 !important 的規則；手機版的 :not(.open) 權重較高且在後，仍可收合 */
 .rail-sheet-modal,.rail-sheet-modal[hidden]{display:contents!important}
 .rail-sheet-modal .sheet-backdrop,.rail-sheet-modal .sheet-handle,.rail-sheet-modal .sheet-head{display:none}
+.rail-sheet-modal .sheet-panel{width:100%}
 .rail-fields{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:flex-end}
+.rail .rail-fields{gap:8px 14px;align-items:center;width:100%}
+.rail .rail-fields .field{flex-direction:row;align-items:center;gap:6px}
+.rail .rail-fields .field label{white-space:nowrap}
+.rail-states{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px;margin-left:auto;min-width:0;max-width:100%}
 
 @media (max-width:600px), (pointer:coarse) and (max-height:500px){
   :root{--navbar-h:76px}
@@ -483,9 +490,8 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     align-items:center;
     justify-content:space-between;
     width:100%;
-    height:44px;
     min-height:44px;
-    padding:0 14px;
+    padding:6px 14px;
     border-radius:var(--r);
     background:var(--surface);
     border:1px solid var(--line);
@@ -500,6 +506,10 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   .rail-sheet-modal .sheet-backdrop{display:none!important}
   .rail-sheet-modal .sheet-handle,.rail-sheet-modal .sheet-head{display:flex}
   .rail-fields{display:flex;flex-direction:column;gap:14px}
+  .rail .rail-fields{align-items:stretch}
+  .rail .rail-fields .field{flex-direction:column;align-items:stretch;gap:4px}
+  .rail-states{margin-left:0;display:flex;flex-direction:column;align-items:stretch;gap:8px;width:100%}
+  .rail-states .load-state{max-width:100%;min-height:44px;white-space:normal;justify-content:flex-start}
   .rail-fields select{width:100%;min-height:44px;font-size:var(--fs-input)!important}
   .rail-fields .specbtn{width:100%;min-height:44px;justify-content:center;border:1px solid var(--line);border-radius:var(--r);background:var(--surface2)}
 
@@ -635,9 +645,12 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   #p-issues>.iss-top{order:1;gap:6px}
   #p-issues>.iss-top h2{font-size:var(--fs-issue-title-mobile)!important}
   #p-issues>.iss-top #issSub{display:none}
+  #p-issues>.issues-subviews{order:2}
   #p-issues>#pmapDetails,#p-issues>#fmLine{order:2}
   #p-issues>#issFilter{order:2;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:4px}
   #p-issues>#issFilter>*{flex-shrink:0}
+  #p-issues #issFilter{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:6px}
+  #p-issues #issFilter>*{flex-shrink:0}
   #p-issues>#issList{order:3}
   #p-issues>.card{order:4}
   #p-issues>details.how{order:5}
@@ -907,15 +920,15 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
   font-size:var(--fs-body);
   font-weight:700;
 }
-.load-state{display:inline-flex;align-items:center;gap:6px;min-height:36px;max-width:min(36vw,260px);font-size:var(--fs-caption);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.load-state{display:inline-flex;align-items:center;gap:6px;min-height:32px;max-width:100%;font-size:var(--fs-caption);white-space:normal;overflow-wrap:anywhere}
 button.load-state{border:none;font:inherit;cursor:default}
 .load-state .light{width:10px;height:10px;border-radius:50%;background:var(--muted);flex:none}
 .load-state[data-state="ok"] .light{background:var(--ok)}
 .load-state[data-state="error"] .light{background:var(--ng)}
-.load-state>span:last-child{overflow:hidden;text-overflow:ellipsis}
+.load-state>span:last-child{min-width:0}
 .load-state.is-action{cursor:pointer}
 .load-state.is-action:hover{background:var(--surface)}
-@media(max-width:720px){.load-state{max-width:44vw;min-height:44px}}
+@media(max-width:720px){.load-state{max-width:100%;min-height:44px}}
 .db-capsule-group{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:var(--surface2);padding:2px;gap:2px;max-width:100%}
 .db-capsule-group>.chip.chipBtn{border:none;background:transparent;border-radius:999px;min-height:32px;padding:3px 10px}
 .db-capsule-group>.chip.chipBtn:hover{background:var(--surface)}
@@ -928,18 +941,26 @@ button.load-state{border:none;font:inherit;cursor:default}
 .panel-subnav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:8px}
 .panel-subnav button{border:1px solid transparent;background:transparent;border-radius:6px;padding:4px 10px;font-size:var(--fs-ui);cursor:pointer;color:var(--ink)}
 .panel-subnav button[aria-current="page"]{background:var(--surface);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.panel-subnav.panel-subnav--inline{padding:3px;border-radius:999px;gap:2px;flex-shrink:0}
+.panel-subnav--inline button{border-radius:999px;padding:4px 12px;min-height:30px}
+#issFilter{gap:6px;align-items:center}
+.iss-cat-sel{min-height:30px;padding:4px 28px 4px 10px;border-radius:999px;font-size:var(--fs-caption)}
 .tab.tab--sub{font-size:var(--fs-caption);opacity:.88}
 .ai-compact-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 12px!important}
-@media(pointer:coarse){.panel-subnav button,.db-capsule-group>.chip.chipBtn,.load-state.is-action,#btnGoAiCfg{min-height:44px}}
+@media(pointer:coarse){.panel-subnav button,.panel-subnav--inline button,.iss-cat-sel,.db-capsule-group>.chip.chipBtn,.load-state.is-action,#btnGoAiCfg{min-height:44px}.iss-cat-sel{font-size:var(--fs-input)!important}}
 
 .menu .duo-toggle-btn{display:block;width:100%;text-align:left;padding:12px 14px;border:none;background:transparent;font:inherit;color:inherit;cursor:pointer}
-.pmap-details{min-width:0}
-.pmap-details summary{list-style:none;cursor:pointer;min-height:44px;display:flex;align-items:center;padding:8px 0}
+#p-issues{padding-top:12px;gap:10px}
+.pmap-details{min-width:0;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:2px 12px}
+.pmap-details[open]{padding-bottom:12px}
+.pmap-details summary{list-style:none;cursor:pointer;min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0}
+.pmap-details summary h3{margin:0;font-size:var(--fs-heading);display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px}
+.pmap-details summary h3 small{font-weight:400;font-size:var(--fs-caption);color:var(--muted)}
+.pmap-details[open]>summary .pmap-chev{transform:rotate(180deg)}
 .pmap-details summary::-webkit-details-marker{display:none}
 @media(pointer:coarse){.pmap-details summary{min-height:44px}}
 @media(min-width:1280px){
   header.top,.brand,.toprow{flex-wrap:nowrap!important}
-  .load-state{max-width:min(18vw,190px)!important}
 }
 </style>
 <!-- 開機期間：瀏覽器可能在主程式執行前先畫出空的問題頁，之後清單填入會把下方內容整片推走（CLS）；主程式跑完才顯示 -->
@@ -956,12 +977,10 @@ button.load-state{border:none;font:inherit;cursor:default}
     <svg class="mitcorp-logo" viewBox="0 0 248 45" width="143" height="26" fill="currentColor" fill-rule="evenodd" role="img" aria-label="Mitcorp"><path d="M13.8,-0.0L28.5,-0.1L29.2,0.0L30.6,1.0L31.5,2.9L34.7,29.0L35.0,29.8L36.2,30.2L37.5,29.8L38.3,28.2L46.9,3.5L48.0,1.5L48.8,0.8L50.5,-0.1L66.3,0.0L67.6,1.0L68.4,3.2L68.4,30.8L68.3,32.2L67.7,33.8L66.0,34.8L62.8,35.0L59.2,34.8L57.7,33.8L57.3,31.5L57.3,5.8L56.7,4.5L55.2,4.0L53.0,4.7L52.0,6.5L43.5,31.5L42.2,33.3L41.2,34.1L38.2,34.8L28.8,34.8L26.0,34.0L24.6,32.5L24.0,29.8L20.9,5.8L20.2,4.5L18.5,4.0L17.0,4.5L16.5,5.2L12.3,26.8L11.3,30.0L10.5,31.5L8.4,33.8L6.3,35.0L2.2,35.7L1.2,35.7L0.0,35.0L0.0,30.2L1.2,29.6L4.5,28.9L5.4,28.0L6.2,26.2L10.7,3.0L11.9,1.0L13.8,-0.0ZM73.2,-0.0L83.8,0.0L84.6,1.3L84.5,4.2L83.8,5.4L82.8,5.7L75.5,5.8L73.2,5.5L72.7,4.8L72.5,2.8L72.6,1.0L73.2,-0.0ZM90.0,1.7L95.5,1.6L97.2,2.1L97.8,2.8L98.2,4.0L98.3,8.5L98.6,9.2L99.3,9.7L109.8,9.8L110.9,10.2L111.4,12.0L110.9,13.2L110.2,13.6L99.8,13.7L98.8,14.1L98.2,15.5L98.3,27.0L99.0,29.8L100.5,30.9L104.2,31.1L112.5,30.9L113.1,31.5L113.2,33.0L113.0,33.8L112.2,34.6L110.5,35.0L104.5,35.3L95.8,35.1L92.0,33.9L89.9,32.2L88.9,30.5L88.4,27.5L88.4,5.5L88.6,3.0L89.2,2.1L90.0,1.7ZM130.5,9.2L135.5,9.3L144.3,10.0L145.5,10.4L146.1,11.0L146.2,13.2L145.7,14.0L145.0,14.3L140.3,13.8L133.0,13.6L129.5,13.9L127.0,14.9L125.1,17.0L124.3,20.0L124.3,24.0L125.1,27.8L127.0,29.8L130.0,30.9L137.5,31.1L145.2,30.4L146.0,31.0L146.3,32.0L146.2,33.5L145.5,34.3L142.5,35.0L135.2,35.4L129.5,35.4L124.0,34.9L120.5,33.9L118.2,32.8L116.1,30.8L115.1,29.2L114.0,25.5L113.9,20.0L115.0,15.8L116.1,14.0L118.2,12.0L120.5,10.8L124.2,9.8L130.5,9.2ZM161.8,9.5L168.5,9.3L174.8,9.9L178.2,10.8L180.2,11.8L182.8,14.0L183.9,15.8L184.7,18.8L184.9,24.5L184.7,26.2L183.8,29.2L181.8,32.0L178.8,33.9L175.5,34.9L166.0,35.7L156.8,34.8L153.8,33.8L152.0,32.9L150.4,31.5L149.2,30.0L148.3,28.0L147.9,25.5L148.0,18.2L149.1,15.0L151.0,12.8L154.0,11.0L158.0,9.8L161.8,9.5ZM203.0,9.5L209.8,9.4L210.7,10.5L210.8,11.8L210.5,12.8L209.5,13.6L201.8,13.9L200.2,14.2L199.2,14.8L198.7,16.0L198.7,31.0L198.3,33.5L197.5,34.5L196.2,34.9L190.5,34.8L189.1,33.8L188.8,32.0L188.7,15.2L189.2,12.5L190.0,11.7L191.9,10.8L197.2,9.8L203.0,9.5ZM224.0,9.5L230.5,9.3L237.9,9.8L242.2,10.9L244.2,12.0L246.2,14.0L247.0,15.2L247.8,17.3L247.8,27.8L246.9,30.0L245.9,31.5L244.8,32.6L242.8,33.8L240.0,34.8L232.2,35.5L223.2,35.4L222.6,36.0L222.4,36.8L222.2,43.5L221.3,44.8L213.5,44.8L212.6,43.5L212.4,41.8L212.6,13.0L213.2,11.7L214.6,10.8L218.5,9.9L224.0,9.5ZM75.5,9.9L79.0,9.8L81.5,10.0L82.8,10.8L83.4,12.0L83.5,32.2L83.0,33.8L81.5,34.8L75.5,34.8L74.1,34.0L73.7,33.2L73.6,12.0L74.0,10.8L75.5,9.9ZM163.2,13.0L160.8,14.0L159.4,15.2L158.3,18.8L158.1,22.5L158.3,26.5L159.2,29.2L160.5,30.8L162.8,31.8L166.0,32.1L169.8,31.8L172.0,30.8L173.0,29.8L173.9,28.2L174.4,25.0L174.4,21.8L173.9,16.5L173.0,15.0L171.9,14.0L168.5,12.9L163.2,13.0ZM226.0,13.0L223.5,13.5L222.7,14.0L222.4,14.5L222.5,30.5L224.0,31.6L227.5,31.9L232.5,31.9L235.0,31.0L236.0,30.1L237.0,28.7L237.7,25.5L237.8,20.8L237.0,16.2L235.3,14.0L233.0,13.1L230.2,12.8L226.0,13.0Z"/></svg>
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）">版本 <b class="num" id="appVer">v10.22.0</b> · 更新 <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.22.1</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
-    <div class="db-capsule-group" role="group" aria-label="雲端記錄庫與套用狀態">
-      <button type="button" class="chip load-state" id="stateSpi" data-state="idle" tabindex="-1" aria-disabled="true" title="量測紀錄狀態。載入請用記錄庫"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
-      <span class="chip load-state" id="statePlace" data-state="idle" role="status" title="座標檔狀態。選取請用記錄庫"><span class="light" aria-hidden="true"></span><span>座標檔：未套用</span></span>
+    <div class="db-capsule-group" role="group" aria-label="記錄庫與匯出">
       <button type="button" class="chip chipBtn chip-rec-lib" id="btnOpenRecModal" title="開啟量測紀錄與座標檔資料庫，選取歷史檔案載入分析"><svg class="ui-ico ui-ico--folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>記錄庫 ▾</button>
       <button type="button" class="chip chipBtn chip-export-hub" id="btnOpenExportModal" title="開啟資料與報告匯出中心，支援依角色一覽下載與批次打包"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>匯出 ▾</button>
     </div>
@@ -996,8 +1015,11 @@ button.load-state{border:none;font:inherit;cursor:default}
         <div class="field"><label for="selRun">試產回合</label><select id="selRun"></select></div>
         <div class="field" data-scope="a"><label for="selMetric">量測項目</label><select id="selMetric"></select></div>
         <div class="field" data-scope="a"><label for="selGroup">元件群組</label><select id="selGroup"></select></div>
-<p class="note" id="railNote" hidden style="margin:0;align-self:center;max-width:42ch"></p>
         <button class="specbtn" id="railSpecBtn" title="鋼板厚度與規格在「資料與規格 → 規格」修改"><span class="lbl">鋼板／規格</span> <b id="railSum"></b> <span aria-hidden="true">✎</span></button>
+        <div class="rail-states" role="group" aria-label="資料與座標狀態">
+          <button type="button" class="chip load-state" id="stateSpi" data-state="idle" tabindex="-1" aria-disabled="true" title="量測紀錄狀態。載入請用記錄庫"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
+          <span class="chip load-state" id="statePlace" data-state="idle" role="status" title="座標檔狀態。選取請用記錄庫"><span class="light" aria-hidden="true"></span><span>座標檔：未套用</span></span>
+        </div>
       </div>
     </div>
   </div>
@@ -1023,22 +1045,23 @@ button.load-state{border:none;font:inherit;cursor:default}
 </div>
 
 <section class="panel" id="p-issues" role="tabpanel">
-  <nav class="panel-subnav" aria-label="問題偵測子視圖">
-    <button type="button" data-subnav-issues="list" aria-current="page">問題清單</button>
-    <button type="button" data-subnav-issues="cross">交叉驗證</button>
-  </nav>
-  <div class="issues-subviews" style="display:grid;gap:12px">
-    <div data-issues-sub="list">
-
   <div class="iss-top">
-    <h2 id="issHead" style="font-size:var(--fs-title)">掃描中…</h2>
-    <p class="note" id="issSub" style="margin:4px 0 0;max-width:80ch"></p>
+    <div class="iss-top-main">
+      <h2 id="issHead" style="font-size:var(--fs-title)">掃描中…</h2>
+      <p class="note" id="issSub" style="margin:4px 0 0;max-width:80ch"></p>
+    </div>
+    <nav class="panel-subnav panel-subnav--inline" aria-label="問題偵測子視圖">
+      <button type="button" data-subnav-issues="list" aria-current="page">問題清單</button>
+      <button type="button" data-subnav-issues="cross">交叉驗證</button>
+    </nav>
   </div>
-    <details class="pmap-details" id="pmapDetails" open><summary><h3 style="display:inline;margin:0">問題地圖 <small id="pmapSub"></small></h3></summary><div class="pmap" id="pmap"></div>
-    <div class="legend" style="margin:8px 0 0"><span><i class="sq" style="background:var(--ng)"></i>✕ 嚴重</span><span><i class="sq" style="background:var(--warn)"></i>! 警示</span><span><i class="sq" style="background:var(--series2)"></i>ℹ 資訊</span><span><i class="sq" style="background:var(--surface2);outline:1px solid var(--line)"></i>無問題</span></div></details>
-  <p id="fmLine"></p>
-  <div class="row" id="issFilter" role="group" aria-label="篩選問題"></div>
-  <div class="iss" id="issList"></div>
+  <div class="issues-subviews" style="display:grid;gap:12px">
+    <div data-issues-sub="list" style="display:grid;gap:10px">
+      <details class="pmap-details" id="pmapDetails"><summary><h3 style="margin:0">問題地圖 <small id="pmapSub"></small></h3><span class="iss-chev pmap-chev" aria-hidden="true">▾</span></summary><div class="pmap" id="pmap"></div>
+      <div class="legend" style="margin:8px 0 0"><span><i class="sq" style="background:var(--ng)"></i>✕ 嚴重</span><span><i class="sq" style="background:var(--warn)"></i>! 警示</span><span><i class="sq" style="background:var(--series2)"></i>ℹ 資訊</span><span><i class="sq" style="background:var(--surface2);outline:1px solid var(--line)"></i>無問題</span></div></details>
+      <p id="fmLine"></p>
+      <div class="row" id="issFilter" role="group" aria-label="篩選問題"></div>
+      <div class="iss" id="issList"></div>
     </div>
     <div data-issues-sub="cross" hidden>
 <div class="card" id="fmCard"><h3>失效模式交叉比對 </h3>
@@ -1238,11 +1261,15 @@ button.load-state{border:none;font:inherit;cursor:default}
     
   <div class="card"><h3>量測項目相關矩陣 <small id="corrSub"></small></h3>
             <div class="tbl"><table class="corr" id="corrTbl"></table></div></div>
-  <div class="card">
+  <div class="card" id="cardAlign">
     <h3>對位分解 </h3>
-        <div class="toolbar"><div class="field"><label for="selAlignBoard">板號</label><select id="selAlignBoard"></select></div><div class="field"><label for="inVec">箭頭放大 <span class="num" id="vecOut">40×</span></label><input type="range" id="inVec" min="10" max="150" value="40" step="5"></div></div>
-    <div class="grid2" style="margin-top:10px">
-      <canvas class="vec" id="vecCv" width="900" height="600" role="img" aria-label="偏移向量圖"></canvas>
+        <div class="toolbar" id="alignToolbar"><div class="field"><label for="selAlignBoard">板號</label><select id="selAlignBoard"></select></div><div class="field" id="alignVecField"><label for="inVec">箭頭放大 <span class="num" id="vecOut">40×</span></label><input type="range" id="inVec" min="10" max="150" value="40" step="5"></div></div>
+    <div id="alignEmpty" style="margin:8px 0" hidden></div>
+    <div class="grid2" id="alignGrid" style="margin-top:10px;align-items:start">
+      <div id="alignVecWrap">
+        <canvas class="vec" id="vecCv" width="900" height="600" role="img" aria-label="偏移向量圖"></canvas>
+        <div id="alignVecEmpty" class="empty-state" style="padding:24px 16px" hidden></div>
+      </div>
       <div class="tbl" style="max-height:380px;overflow:auto"><table id="alignTbl"></table></div>
     </div>
   </div>
@@ -1262,11 +1289,11 @@ button.load-state{border:none;font:inherit;cursor:default}
     <div class="tbl" style="margin-top:10px;max-height:280px;overflow:auto"><table id="morphTbl"></table></div>
   </div>
 
-  <div class="grid2">
+  <div class="grid2" id="advPauseLisaGrid" style="align-items:start">
     <div class="card" id="cardPause">
       <h3>停線時效與鋼板壽命衰退 <small id="pauseSub"></small></h3>
             <div id="pauseMsg" style="margin:8px 0"></div>
-      <div class="tbl" style="max-height:260px;overflow:auto"><table id="pauseTbl"></table></div>
+      <div class="tbl" id="pauseTblWrap" style="max-height:260px;overflow:auto"><table id="pauseTbl"></table></div>
     </div>
     <div class="card" id="cardLISA">
       <h3>空間自相關與局部聚類 <small id="lisaSub"></small></h3>
@@ -1278,7 +1305,7 @@ button.load-state{border:none;font:inherit;cursor:default}
         <span><i class="sq" style="background:var(--lisa-hl)"></i>HL 空間離群</span>
         <span><i class="sq" style="background:var(--lisa-ns)"></i>NS 無顯著</span>
       </div>
-      <div class="chartbox" style="height:320px;position:relative"><canvas id="cLISA" role="img" aria-label="LISA 空間聚類分佈圖" style="display:block;width:100%;height:100%"></canvas></div>
+      <div class="chartbox" id="lisaChartBox" style="height:320px;position:relative"><canvas id="cLISA" role="img" aria-label="LISA 空間聚類分佈圖" style="display:block;width:100%;height:100%"></canvas></div>
     </div>
   </div>
   <div class="card" id="cardRelChart">
@@ -1286,7 +1313,8 @@ button.load-state{border:none;font:inherit;cursor:default}
     <div class="toolbar"><div class="field"><label for="selRelChart">圖種</label>
       <select id="selRelChart"><option value="specScatter">規格散點（體積 × 高度）</option><option value="parallel">平行座標</option><option value="radar">Radar（體積／面積／高度）</option></select></div></div>
     <div id="relChartMsg" class="note" style="margin:8px 0"></div>
-    <div class="chartbox tall"><canvas id="cRelChart" role="img" aria-label="關係圖"></canvas></div>
+    <div id="relChartEmpty" class="empty-state" style="padding:24px 16px" hidden></div>
+    <div class="chartbox tall" id="relChartBox"><canvas id="cRelChart" role="img" aria-label="關係圖"></canvas></div>
   </div>
 <div class="card">
     <h3>統計異常點集中清單 <small id="statsSub"></small></h3>
@@ -4368,9 +4396,9 @@ function calcNonNormalCapability(vals, lsl, usl, mode = "auto") {
 
 // 4. 停線時效衰退與首片檢定分析
 function analyzePauseDecay(rows, pauseThresholdMin = 15) {
-  if (!rows || !rows.length) return { hasPause: false, events: [], safeDwellLimitMin: null };
+  if (!rows || !rows.length) return { hasPause: false, applicable: false, events: [], safeDwellLimitMin: null, reason: "尚無量測資料" };
   const rowsWithTs = rows.filter(r => r.ts != null && isFinite(r.ts));
-  if (rowsWithTs.length < 5) return { hasPause: false, events: [], reason: "無足夠時間戳記資料" };
+  if (rowsWithTs.length < 5) return { hasPause: false, applicable: false, events: [], reason: "無足夠時間戳記資料" };
 
   const bMap = new Map();
   for (const r of rowsWithTs) {
@@ -4378,7 +4406,7 @@ function analyzePauseDecay(rows, pauseThresholdMin = 15) {
     if (!cur || r.ts < cur.ts) bMap.set(r.board, { board: r.board, ts: r.ts });
   }
   const boardTimes = [...bMap.values()].sort((a, b) => a.ts - b.ts);
-  if (boardTimes.length < 2) return { hasPause: false, events: [] };
+  if (boardTimes.length < 2) return { hasPause: false, applicable: false, events: [], reason: "有效時間戳記板數不足（需 ≥ 2 片板）" };
 
   const pauseEvents = [];
   const threshMs = pauseThresholdMin * 60 * 1000;
@@ -4394,7 +4422,7 @@ function analyzePauseDecay(rows, pauseThresholdMin = 15) {
     }
   }
 
-  if (!pauseEvents.length) return { hasPause: false, events: [], safeDwellLimitMin: null };
+  if (!pauseEvents.length) return { hasPause: false, applicable: true, events: [], safeDwellLimitMin: null };
 
   const postBoards = new Set(pauseEvents.map(e => e.postBoard));
   const postRows = rows.filter(r => postBoards.has(r.board) && r.volume != null && isFinite(r.volume));
@@ -4414,6 +4442,7 @@ function analyzePauseDecay(rows, pauseThresholdMin = 15) {
 
   return {
     hasPause: true,
+    applicable: true,
     events: pauseEvents,
     postBoardCount: postBoards.size,
     avgVolumeDropPct: dropPct,
@@ -6670,7 +6699,7 @@ function pmapState() {
     const old = S.pmapSelection?.board;
     const index = buildPartProblemIndex(S.rows, S.F);
     pmapCache = {rows:S.rows,findings:S.F,index};
-    S.pmapSelection = {board:index.boards.has(old) ? old : index.worstBoard, mode:"overview"};
+    S.pmapSelection = {board:index.boards.has(old) ? old : index.worstBoard, mode:"all"};
   }
   return pmapCache.index;
 }
@@ -6777,10 +6806,12 @@ function renderPmap() {
       ${groupCount?`<p>群組 ${esc(hitGroups.join("、"))}</p><button type="button" data-mode="group" data-map-focus="group">群組相關問題 ${groupCount} 項</button>`:""}</div>`;
   }
   const pos=index.order.indexOf(selection.board);
+  const hitPartCount=items.filter(item=>item.level).length;
+  if($("#pmapSub"))$("#pmapSub").textContent=`${selection.board}（第 ${pos+1}／${index.order.length} 片）· ${hitPartCount} 顆零件有相關問題`;
   const batchCount=pmapEvidence(index,{...selection,mode:"batch"}).size;
   const change=(target,disabled,caption)=>`<button type="button" data-map-move="${target}" data-map-focus="${target}" ${disabled?"disabled":""}>${caption}</button>`;
   root.innerHTML=`<div class="part-map-nav">${change("prev",pos===0,"上一片")}${change("next",pos===index.order.length-1,"下一片")}${change("worst",!index.hasBoardHits || selection.board===index.worstBoard,"最嚴重的一片")}</div>
-    <p role="status">${esc(selection.board)} · 第 ${pos+1}／${index.order.length} 片${index.hasBoardHits&&selection.board===index.worstBoard?" · 最嚴重的一片":""} · ${items.filter(item=>item.level).length} 顆零件有相關問題${S.boardInferred?" · 推定子群組":""}</p>
+    <p role="status">${esc(selection.board)} · 第 ${pos+1}／${index.order.length} 片${index.hasBoardHits&&selection.board===index.worstBoard?" · 最嚴重的一片":""} · ${hitPartCount} 顆零件有相關問題${S.boardInferred?" · 推定子群組":""}</p>
     ${chart}${detail}<div class="part-map-nav"><button type="button" data-mode="batch" data-map-focus="batch" ${batchCount?"":"disabled"}>整批問題 ${batchCount} 項</button>${index.unresolved.size?`<button type="button" data-mode="unresolved" data-map-focus="unresolved">位置待確認 ${index.unresolved.size} 項</button>`:""}<button type="button" id="pmapClear" data-mode="all" data-map-focus="all">顯示全部問題</button></div>`;
   const focus = key => [...root.querySelectorAll("[data-map-focus]")].find(el=>el.dataset.mapFocus===key);
   function pick(i) {
@@ -6793,7 +6824,7 @@ function renderPmap() {
     if (button?.dataset.mode) pmapSelect({...selection,pad:null,mode:button.dataset.mode});
     if (button?.dataset.mapMove) {
       const move=button.dataset.mapMove;
-      pmapSelect({board:move==="worst"?index.worstBoard:index.order[pos+(move==="next"?1:-1)],mode:"overview"});
+      pmapSelect({board:move==="worst"?index.worstBoard:index.order[pos+(move==="next"?1:-1)],mode:"all"});
     }
   };
   const svg=root.querySelector("svg"), plot=root.querySelector(".part-map-plot");
@@ -6833,23 +6864,27 @@ function renderPmap() {
 const ISS_OPEN=new Set(),SCROLL={},ISS_PAGE=150,ISS_PG={F:null,k:"",n:ISS_PAGE,all:false};
 function issToolsState(){const all=$$("#issList details.iss-card"),open=all.filter(d=>d.open).length;const e=$("#issExpand"),c=$("#issCollapse");if(e)e.disabled=all.length>0&&open===all.length;if(c)c.disabled=open===0}
 function renderIssues(){const F=S.F||[],c={ng:0,warn:0,info:0};F.forEach(x=>c[x.lv]++);
+  const filterEl=$("#issFilter");
   if(!S.rows||!S.rows.length){
     $("#issHead").textContent="尚未匯入量測資料";
     $("#issSub").textContent="請至「資料與規格」匯入 SPI 數據檔案，或點選頂部「載入範例資料」開始分析。";
+    if($("#pmapSub"))$("#pmapSub").textContent="";
     $("#pmap").innerHTML='<p class="note" style="padding:16px 0">尚無焊墊分佈數據</p>';
-    $("#issFilter").innerHTML="";
+    filterEl.innerHTML="";filterEl.hidden=true;
     $("#issList").innerHTML='<div class="note" style="text-align:center;padding:32px 16px"><p style="font-size:var(--fs-heading);margin-bottom:8px">尚無問題偵測結果</p><p>匯入資料後，系統將自動依十個面向進行統計檢定並列出異常問題。</p></div>';
     return;
   }
-  if(F.pending){$("#issHead").textContent=`正在偵測問題（${S.rows.length.toLocaleString()} 筆）…`;$("#issSub").textContent="資料量大，於背景計算中，完成後會自動顯示結果。";$("#pmap").innerHTML="";$("#issList").innerHTML='<p class="note">計算中…</p>';return}
+  if(F.pending){$("#issHead").textContent=`正在偵測問題（${S.rows.length.toLocaleString()} 筆）…`;$("#issSub").textContent="資料量大，於背景計算中，完成後會自動顯示結果。";if($("#pmapSub"))$("#pmapSub").textContent="計算中…";filterEl.hidden=true;$("#pmap").innerHTML="";$("#issList").innerHTML='<p class="note">計算中…</p>';return}
   const caseList=(F.meta&&F.meta.cases)||[];
   $("#issHead").textContent=F.length?`${caseList.length} 個問題定義（${F.length} 項統計發現）：嚴重 ${c.ng}、警示 ${c.warn}、資訊 ${c.info}`:"未偵測到統計上顯著的問題";
   $("#issSub").textContent=F.length?"":"十個面向皆在正常範圍。";
   fmLine();
   renderPmap();
   const cats=[...new Set(F.map(x=>x.cat))];
-  $("#issFilter").innerHTML=[["all","全部 "+F.length],["ng","嚴重 "+c.ng],["warn","警示 "+c.warn],["info","資訊 "+c.info]].map(([v,t])=>`<button class="chipbtn" data-lv="${v}" aria-pressed="${S.issLv===v}">${t}</button>`).join("")
-    +'<span class="vsep" aria-hidden="true" style="height:24px"></span>'+[["all","全部面向"],...cats.map(k=>[k,`${k} ${F.filter(x=>x.cat===k).length}`])].map(([v,t])=>`<button class="chipbtn" data-cat="${v}" aria-pressed="${S.issCat===v}">${t}</button>`).join("")
+  filterEl.hidden=!F.length||(S.pmapSelection?.mode==="overview"&&Boolean(S.pmapSelection?.part));
+  filterEl.innerHTML=[["all","全部 "+F.length],["ng","嚴重 "+c.ng],["warn","警示 "+c.warn],["info","資訊 "+c.info]].map(([v,t])=>`<button class="chipbtn" data-lv="${v}" aria-pressed="${S.issLv===v}">${t}</button>`).join("")
+    +'<span class="vsep" aria-hidden="true" style="height:24px"></span>'
+    +`<select id="selIssCat" class="iss-cat-sel" aria-label="篩選面向">${[["all","全部面向"],...cats.map(k=>[k,`${k} (${F.filter(x=>x.cat===k).length})`])].map(([v,t])=>`<option value="${esc(v)}"${S.issCat===v?" selected":""}>${esc(t)}</option>`).join("")}</select>`
     +'<span class="vsep" aria-hidden="true" style="height:24px"></span>'+[["cases","依問題定義"],["rules","依統計規則"]].map(([v,t])=>`<button class="chipbtn" data-group="${v}" aria-pressed="${S.issGroup===v}">${t}</button>`).join("")
     +`<span class="iss-tools"><button class="chipbtn" id="issExpand">全部展開</button><button class="chipbtn" id="issCollapse">全部收合</button></span>`;
   $("#issExpand").onclick=()=>{
@@ -6858,7 +6893,9 @@ function renderIssues(){const F=S.F||[],c={ng:0,warn:0,info:0};F.forEach(x=>c[x.
     issToolsState();
   };
   $("#issCollapse").onclick=()=>{ISS_OPEN.clear();$$("#issList details").forEach(d=>d.open=false);issToolsState()};
-  for(const [attr,state] of [["lv","issLv"],["cat","issCat"],["group","issGroup"]]){
+  const catSel=$("#selIssCat");
+  if(catSel)catSel.onchange=()=>{S.issCat=catSel.value;renderIssues();$("#selIssCat")?.focus({preventScroll:true})};
+  for(const [attr,state] of [["lv","issLv"],["group","issGroup"]]){
     const selector="#issFilter [data-"+attr+"]";
     $$(selector).forEach(button=>button.onclick=()=>{
       const value=button.dataset[attr];
@@ -6907,7 +6944,10 @@ function renderIssues(){const F=S.F||[],c={ng:0,warn:0,info:0};F.forEach(x=>c[x.
     listHtml=["ng","warn","info"].map(lv=>{const q=L.filter(x=>x.lv===lv),show=q.slice(0,Math.max(0,left));left-=show.length;return show.length?`<h3 class="sevhead"><span class="pill ${lv}">${LVL[lv]}</span> ${q.length} 項${show.length<q.length?`（顯示前 ${show.length} 項）`:""}</h3>`+show.map(card).join(""):""}).join("");
     more=Math.max(0,L.length-lim);
   }
-  $("#issList").innerHTML=L.length?listHtml+(more?`<p class="iss-more"><button class="chipbtn" id="issMore">再顯示 ${Math.min(more,ISS_PAGE)} 項（尚有 ${more} 項未顯示）</button></p>`:""):'<p class="note">此篩選條件下沒有問題。</p>';
+  const emptyNote=(S.pmapSelection?.mode==="overview"&&S.pmapSelection?.part)
+    ?'<p class="note">已在問題地圖展開該零件摘要；點選焊墊、群組問題或「顯示全部問題」查看問題卡片。</p>'
+    :'<p class="note">此篩選條件下沒有問題。</p>';
+  $("#issList").innerHTML=L.length?listHtml+(more?`<p class="iss-more"><button class="chipbtn" id="issMore">再顯示 ${Math.min(more,ISS_PAGE)} 項（尚有 ${more} 項未顯示）</button></p>`:""):emptyNote;
   if($("#issMore"))$("#issMore").onclick=()=>{ISS_PG.n+=ISS_PAGE;renderIssues()};
   $$("#issList details.iss-card").forEach(d=>d.addEventListener("toggle",()=>{const id=+d.dataset.id;if(d.open)ISS_OPEN.add(id);else ISS_OPEN.delete(id);issToolsState()}));
   $$("#issList details.iss-case").forEach(d=>d.addEventListener("toggle",()=>{
@@ -6995,7 +7035,7 @@ function renderTabByName(k){const fn=({issues:renderIssuesPanel,overview:renderO
 $("#selMetric").onchange=e=>{S.metric=e.target.value;syncControls();recompute()};
 $("#selGroup").onchange=e=>{S.group=e.target.value;recompute()};
 $("#selChart").onchange=e=>{S.chart=e.target.value;applyScope();recompute()};
-if($("#selRelChart"))$("#selRelChart").onchange=e=>{S.relChart=normalizeRelChart(e.target.value);if($("#selRelChart").value!==S.relChart)$("#selRelChart").value=S.relChart;};
+if($("#selRelChart"))$("#selRelChart").onchange=e=>{S.relChart=normalizeRelChart(e.target.value);if($("#selRelChart").value!==S.relChart)$("#selRelChart").value=S.relChart;renderRelChartUI()};
 if($("#selXrSize"))$("#selXrSize").onchange=e=>{S.xrSize=+e.target.value;recompute()};
 if($("#selXrMode"))$("#selXrMode").onchange=e=>{S.xrMode=e.target.value;recompute()};
 $("#selPad").onchange=e=>{S.pad=e.target.value;recompute()};
@@ -7005,7 +7045,7 @@ if($("#selParetoDim"))$("#selParetoDim").onchange=e=>{S.paretoDim=e.target.value
 /* WAI-ARIA 頁籤：關聯面板、方向鍵切換、只有目前頁籤可 Tab 聚焦 */
 $$(".tab").forEach(t=>{const p=$("#p-"+t.dataset.tab);t.id="tab-"+t.dataset.tab;t.setAttribute("aria-controls","p-"+t.dataset.tab);if(p)p.setAttribute("aria-labelledby",t.id);t.onclick=()=>setTab(t.dataset.tab)});
 $(".tabs").addEventListener("keydown",e=>{const T=$$(".tab"),i=T.findIndex(t=>t.dataset.tab===S.tab);let j=null;if(e.key==="ArrowRight")j=(i+1)%T.length;else if(e.key==="ArrowLeft")j=(i-1+T.length)%T.length;else if(e.key==="Home")j=0;else if(e.key==="End")j=T.length-1;if(j==null)return;e.preventDefault();setTab(T[j].dataset.tab);T[j].focus()});
-const AN_TABS=new Set(["overview","control","capability","sim3d","deep","ai"]),RAIL_NOTE={issues:"問題偵測自動掃描全部量測項目與元件群組，不需要選擇。","issues:cross":"交叉驗證涵蓋全部量測項目。","deep":"製程跡象卡片會隨上方量測項目與群組更新。","improve:compare":"此頁使用頁內的 A／B 回合選項。","improve:dfm":"設計改善涵蓋全部元件群組。","improve:lab":"此頁使用各區塊內的選項。",report:"分析報告涵蓋整批試產資料，可勾選匯出章節。"};
+const AN_TABS=new Set(["overview","control","capability","sim3d","deep","ai"]);
 function isAnalysisScopeTab(){return AN_TABS.has(S.tab)||(S.tab==="control"&&S.controlSub==="uni")}
 function applyScope(){const analOn=isAnalysisScopeTab();const chartOn=S.tab==="control"&&S.controlSub==="uni";
 $$("[data-scope=a]").forEach(el=>{el.hidden=!analOn});
@@ -7014,8 +7054,7 @@ $$("[data-scope=c]").forEach(el=>{
   else if(el.id==="xrSizeField"||el.id==="xrModeField")el.hidden=!chartOn||S.chart!=="xbarr";
   else el.hidden=!chartOn;
 });
-let noteKey=S.tab;if(S.tab==="issues")noteKey="issues:"+(S.issuesSub||"list");else if(S.tab==="improve")noteKey="improve:"+(S.improveSub||"compare");
-const n=RAIL_NOTE[noteKey];$("#railNote").hidden=!n;$("#railNote").textContent=n||""}
+}
 /* 選取的頁籤捲到可見範圍（平板直式時頁籤列放不下）；並依可捲動方向顯示淡出提示 */
 function tabIntoView(t){const bar=$(".tabs"),el=$(`.tab[data-tab="${t}"]`);if(!bar||!el)return;const l=el.offsetLeft-bar.offsetLeft,r=l+el.offsetWidth;
   if(l<bar.scrollLeft+24)bar.scrollLeft=Math.max(0,l-24);else if(r>bar.scrollLeft+bar.clientWidth-24)bar.scrollLeft=r-bar.clientWidth+24;tabFade()}
@@ -7558,6 +7597,10 @@ function renderAdv(){
   if(!hasData()){
     $("#arSub").textContent="尚未載入量測資料。";$("#arLeg").innerHTML="";
     $("#arTbl").innerHTML='<tbody><tr><td colspan="10" class="note">尚無資料</td></tr></tbody>';
+    if($("#alignToolbar"))$("#alignToolbar").hidden=true;
+    if($("#alignGrid"))$("#alignGrid").hidden=true;
+    if($("#alignEmpty")){$("#alignEmpty").hidden=false;$("#alignEmpty").innerHTML='<span class="pill na">不適用</span> <span class="note">尚未載入量測資料。</span>';}
+    renderMorphologyUI();renderPauseDecayUI();renderLISAUI();renderRelChartUI();
     return;
   }
   const A=S.A;V=advAnalyze(S,A);const ink=css("--muted"),grid=css("--grid"),ng=css("--ng"),ok=css("--ok"),warn=css("--warn");
@@ -7597,6 +7640,15 @@ function renderAdv(){
   $("#alignTbl").innerHTML=V.align.length?`<thead><tr><th>板</th><th class="num">平移 X</th><th class="num">平移 Y</th><th class="num">旋轉 °</th><th class="num">伸縮 X/Y ppm</th><th>判讀</th></tr></thead><tbody>`+V.align.map(a=>{const tags=[];if(Math.max(Math.abs(a.tx),Math.abs(a.ty))>25)tags.push("平移");if(a.rotEdge>20)tags.push("旋轉");if(a.strEdge>20)tags.push("伸縮");
     return`<tr data-b="${a.board}" style="cursor:pointer${a.board===$("#selAlignBoard").value?";background:var(--accent-soft)":""}"><td class="mono">${a.board}</td><td class="num mono">${f(a.tx,1)}</td><td class="num mono">${f(a.ty,1)}</td><td class="num mono">${f(a.thDeg,3)}</td><td class="num mono">${f(a.ex*1000,0)} / ${f(a.ey*1000,0)}</td><td>${tags.length?tags.map(t=>`<span class="pill warn">${t}</span>`).join(" "):'<span class="pill ok">正常</span>'}</td></tr>`}).join("")+"</tbody>":'<tbody><tr><td class="note">需要 X/Y 座標與 X/Y 偏移欄位才能分解</td></tr></tbody>';
   $$("#alignTbl tr[data-b]").forEach(tr=>tr.onclick=()=>{$("#selAlignBoard").value=tr.dataset.b;S.board=tr.dataset.b;renderAdv()});
+  if(!V.align.length){
+    if($("#alignToolbar"))$("#alignToolbar").hidden=true;
+    if($("#alignGrid"))$("#alignGrid").hidden=true;
+    if($("#alignEmpty")){$("#alignEmpty").hidden=false;$("#alignEmpty").innerHTML='<span class="pill na">不適用</span> <span class="note">需要 X/Y 座標與 X/Y 偏移欄位才能分解</span>';}
+  }else{
+    if($("#alignToolbar"))$("#alignToolbar").hidden=false;
+    if($("#alignGrid"))$("#alignGrid").hidden=false;
+    if($("#alignEmpty"))$("#alignEmpty").hidden=true;
+  }
   drawVec();
   // 刮刀前 / 後
   const sk=V.stroke;
@@ -7614,6 +7666,7 @@ function renderAdv(){
   renderMorphologyUI();
   renderPauseDecayUI();
   renderLISAUI();
+  renderRelChartUI();
   }
 
 
@@ -7778,15 +7831,27 @@ function renderPauseDecayUI(){
   const msgEl = $("#pauseMsg");
   const subEl = $("#pauseSub");
   const tblEl = $("#pauseTbl");
+  const tblWrap = $("#pauseTblWrap") || (tblEl && tblEl.closest(".tbl"));
   if (!msgEl || !tblEl) return;
 
-  if (!pauseRes || !pauseRes.hasPause) {
-    if (subEl) subEl.textContent = "未檢出停線事件（停機間隔均 < 15 分鐘）";
-    msgEl.innerHTML = `<span class="pill ok">連續生產</span> <span class="note">${pauseRes && pauseRes.reason ? esc(pauseRes.reason) : "本批印刷未發生超過 15 分鐘之停線中斷，錫膏維持穩態連續滾動。"}</span>`;
-    tblEl.innerHTML = `<tbody><tr><td class="note">無停線事件紀錄</td></tr></tbody>`;
+  const notApplicable = !pauseRes || pauseRes.applicable === false || (!pauseRes.hasPause && Boolean(pauseRes.reason));
+  if (notApplicable) {
+    if (subEl) subEl.textContent = "不適用（缺時間戳記）";
+    msgEl.innerHTML = `<span class="pill na">不適用</span> <span class="note">${esc(pauseRes && pauseRes.reason ? pauseRes.reason : "無足夠時間戳記資料")}</span>`;
+    tblEl.innerHTML = "";
+    if (tblWrap) tblWrap.hidden = true;
     return;
   }
 
+  if (!pauseRes.hasPause) {
+    if (subEl) subEl.textContent = "未檢出停線事件（停機間隔均 < 15 分鐘）";
+    msgEl.innerHTML = `<span class="pill ok">連續生產</span> <span class="note">本批印刷未發生超過 15 分鐘之停線中斷，錫膏維持穩態連續滾動。</span>`;
+    tblEl.innerHTML = "";
+    if (tblWrap) tblWrap.hidden = true;
+    return;
+  }
+
+  if (tblWrap) tblWrap.hidden = false;
   const drop = pauseRes.avgVolumeDropPct;
   const isNg = drop > 8;
   if (subEl) subEl.textContent = `共 ${pauseRes.events.length} 次停線（≥15分）· 建議靜置上限 ≤ ${pauseRes.safeDwellLimitMin} 分鐘`;
@@ -7807,12 +7872,17 @@ function renderLISAUI(){
   const A = S.A;
   const msgEl = $("#lisaMsg");
   const subEl = $("#lisaSub");
+  const legEl = $("#lisaLeg");
+  const boxEl = $("#lisaChartBox");
   const cv = $("#cLISA");
   if (!msgEl || !cv) return;
   if (!A || !hasValidSpatialXY(A.rows, realXY)) {
     const na = spatialChartUnavailableText();
-    if (subEl) subEl.textContent = na.long;
-    msgEl.innerHTML = `<span class="pill na">不適用</span> <span class="note">${esc(na.long)}</span>`;
+    const detail = na.long.replace(/^不適用[（(]([^）)]+)[）)]\s*[—-]?\s*/, "$1 — ");
+    if (subEl) subEl.textContent = na.short;
+    msgEl.innerHTML = `<span class="pill na">不適用</span> <span class="note">${esc(detail)}</span>`;
+    if (legEl) legEl.hidden = true;
+    if (boxEl) boxEl.hidden = true;
     const ctx0 = cv.getContext("2d");
     if (ctx0) ctx0.clearRect(0, 0, cv.width, cv.height);
     return;
@@ -7820,12 +7890,16 @@ function renderLISAUI(){
   const sa = A.spatialAutocorr || { valid: false, reason: "有效座標數不足" };
   if (!sa.valid) {
     const na = spatialChartUnavailableText();
-    if (subEl) subEl.textContent = sa.reason || na.long;
+    if (subEl) subEl.textContent = "不適用";
     msgEl.innerHTML = `<span class="pill na">不適用</span> <span class="note">${esc(sa.reason || na.long)}</span>`;
+    if (legEl) legEl.hidden = true;
+    if (boxEl) boxEl.hidden = true;
     const ctx = cv.getContext("2d");
     if (ctx) ctx.clearRect(0, 0, cv.width, cv.height);
     return;
   }
+  if (legEl) legEl.hidden = false;
+  if (boxEl) boxEl.hidden = false;
 
   const isSig = sa.isSignificant;
   if (subEl) subEl.textContent = `Moran's I = ${sa.moranI} · Z = ${sa.zScore}${sa.pPerm != null ? ` · 置換 p = ${sa.pPerm}` : ""} · ${isSig ? "空間顯著群聚" : "空間隨機分佈"}`;
@@ -7881,6 +7955,244 @@ function renderLISAUI(){
   ctx.restore();
 }
 
+function renderRelChartUI(){
+  const sel = $("#selRelChart");
+  const subEl = $("#relChartSub");
+  const msgEl = $("#relChartMsg");
+  const boxEl = $("#relChartBox");
+  const emptyEl = $("#relChartEmpty");
+  const cv = $("#cRelChart");
+  if (!cv) return;
+
+  const kind = normalizeRelChart(S.relChart || (sel && sel.value) || "specScatter");
+  S.relChart = kind;
+  if (sel && sel.value !== kind) sel.value = kind;
+
+  const showEmpty = (sub, msg) => {
+    if (charts.cRelChart) { charts.cRelChart.destroy(); delete charts.cRelChart; }
+    if (subEl) subEl.textContent = sub || "";
+    if (msgEl) { msgEl.textContent = ""; msgEl.hidden = true; }
+    if (boxEl) boxEl.hidden = true;
+    if (emptyEl) {
+      emptyEl.hidden = false;
+      emptyEl.innerHTML = `<div class="desc">${esc(msg)}</div>`;
+    }
+  };
+  const showChart = (sub, msg) => {
+    if (emptyEl) { emptyEl.hidden = true; emptyEl.innerHTML = ""; }
+    if (boxEl) boxEl.hidden = false;
+    if (subEl) subEl.textContent = sub || "";
+    if (msgEl) { msgEl.textContent = msg || ""; msgEl.hidden = !msg; }
+  };
+
+  if (!hasData()) {
+    showEmpty("", "尚未載入量測資料。");
+    return;
+  }
+
+  const dup = relChartDuplicateReason(kind, {
+    x: kind === "specScatter" ? "volume" : "area",
+    y: "height",
+    dims: ["volume", "area", "height"]
+  });
+  if (dup) {
+    showEmpty("不適用", dup);
+    return;
+  }
+
+  const rows = S.rows.filter(r => isAllGrp(S.group) || r.group === S.group);
+  const ink = css("--muted"), grid = css("--grid"), fs = chartCaptionFontPx();
+
+  if (kind === "specScatter") {
+    if (S.heightUnit === "unknown") {
+      showEmpty("高度單位未知", "來源未記錄高度單位；高度散點暫不顯示");
+      return;
+    }
+    const valid = rows.filter(r => r.volume != null && isFinite(r.volume) && r.height != null && isFinite(r.height));
+    if (!valid.length) {
+      showEmpty("無有效資料", "目前篩選範圍無同時包含體積與高度的有效樣本");
+      return;
+    }
+    const step = Math.max(1, Math.floor(valid.length / 2000));
+    const okPts = [], badPts = [], cl = clsOf(S);
+    valid.forEach((r, i) => {
+      const isBad = cl(r).length > 0;
+      if (i % step && !isBad) return;
+      (isBad ? badPts : okPts).push({ x: r.volume, y: r.height, r });
+    });
+    const shown = okPts.length + badPts.length;
+    const disc = scatterDisplayDisclosure(valid.length, shown);
+    showChart("體積 × 高度", disc ? disc.text : "");
+    mk("cRelChart", {
+      type: "scatter",
+      data: {
+        datasets: [
+          { label: "正常", data: okPts, pointRadius: 2, backgroundColor: css("--series2") + "99" },
+          { label: "不良", data: badPts, pointRadius: 3.5, pointStyle: "triangle", backgroundColor: css("--ng") }
+        ]
+      },
+      options: baseOpts({
+        scales: {
+          x: { type: "linear", title: { display: true, text: "體積 (%)", color: ink, font: { size: fs } }, ticks: { color: ink, font: { family: "IBM Plex Mono", size: fs } }, grid: { color: grid } },
+          y: { title: { display: true, text: `高度 (${METRICS.height.unit})`, color: ink, font: { size: fs } }, ticks: { color: ink, font: { family: "IBM Plex Mono", size: fs } }, grid: { color: grid } }
+        },
+        plugins: {
+          legend: { display: true, position: "bottom", labels: { color: css("--ink"), boxWidth: 10, font: { size: fs } } },
+          tooltip: { callbacks: { label: i => `${i.raw.r.board} ${i.raw.r.pad}  體積 ${f(i.raw.x, 1)}%  高度 ${f(i.raw.y, 1)} ${METRICS.height.unit}` } }
+        }
+      })
+    });
+    return;
+  }
+
+  if (kind === "parallel" || kind === "radar") {
+    const dims = ["volume", "area", "height"];
+    const pts = rows.filter(r => dims.every(k => r[k] != null && isFinite(r[k])));
+    if (pts.length < 10) {
+      showEmpty("樣本不足", "需至少 10 筆同時具備體積、面積與高度之量測資料");
+      return;
+    }
+
+    const p = dims.length, m = pts.length;
+    const mu = dims.map(d => pts.reduce((s, r) => s + r[d], 0) / m);
+    const cov = Array.from({ length: p }, () => Array.from({ length: p }, () => 0));
+    for (const r of pts) {
+      for (let j = 0; j < p; j++) {
+        for (let k = 0; k < p; k++) cov[j][k] += (r[dims[j]] - mu[j]) * (r[dims[k]] - mu[k]);
+      }
+    }
+    for (let j = 0; j < p; j++) for (let k = 0; k < p; k++) cov[j][k] /= Math.max(1, m - 1);
+    const invRes = matInvAndCond(cov);
+    const condVal = (invRes.det <= 0 || !isFinite(invRes.cond)) ? 1e13 : invRes.cond;
+    const rej = relChartCollinearityReject(dims, condVal);
+    if (rej) {
+      showEmpty("特徵共線", rej);
+      return;
+    }
+
+    const hNote = S.heightUnit === "unknown" ? "（高度單位未知）" : "";
+    const dimLabels = dims.map(k => k === "height" && S.heightUnit === "unknown" ? METRICS[k].short : `${METRICS[k].short} (${METRICS[k].unit})`);
+
+    if (kind === "radar") {
+      const refs = dims.map((k, idx) => {
+        if (k === "height" && S.heightUnit === "unknown") return mu[idx] || 1;
+        const tgt = S.specs && S.specs[k] ? specTgtFallback(S.specs[k], mu[idx]) : mu[idx];
+        return tgt && isFinite(tgt) && Math.abs(tgt) > 1e-9 ? tgt : (mu[idx] || 1);
+      });
+      const bMap = new Map();
+      for (const r of pts) {
+        let e = bMap.get(r.board);
+        if (!e) { e = { label: r.board, sums: [0, 0, 0], n: 0 }; bMap.set(r.board, e); }
+        for (let j = 0; j < p; j++) e.sums[j] += r[dims[j]];
+        e.n++;
+      }
+      const boardList = [...bMap.values()];
+      const useBoards = boardList.length >= 2;
+      const entities = useBoards
+        ? boardList.filter((_, i) => i % Math.max(1, Math.ceil(boardList.length / 6)) === 0).slice(0, 6).map(e => ({ label: e.label, raw: e.sums.map((s, j) => s / e.n) }))
+        : pts.filter((_, i) => i % Math.max(1, Math.ceil(pts.length / 6)) === 0).slice(0, 6).map(r => ({ label: r.pad, raw: dims.map(k => r[k]) }));
+
+      showChart("體積／面積／高度", `以目標／均值為 100% 標準化 · 顯示 ${entities.length} ${useBoards ? "片板" : "個焊墊"}${hNote}`);
+      mk("cRelChart", {
+        type: "radar",
+        data: {
+          labels: dimLabels,
+          datasets: entities.map((e, i) => ({
+            label: e.label,
+            data: e.raw.map((v, j) => (v / refs[j]) * 100),
+            rawVals: e.raw,
+            borderColor: ZCOL[i % ZCOL.length],
+            backgroundColor: ZCOL[i % ZCOL.length] + "28",
+            borderWidth: 1.8,
+            pointRadius: 3
+          }))
+        },
+        options: baseOpts({
+          scales: {
+            r: {
+              ticks: { maxTicksLimit: 5, color: ink, backdropColor: "transparent", callback: v => (Math.abs(v - Math.round(v)) < 1e-6 ? f(v, 0) : f(v, 1)) + "%", font: { family: "IBM Plex Mono", size: fs } },
+              grid: { color: grid },
+              angleLines: { color: grid },
+              pointLabels: { color: css("--ink"), font: { size: fs } }
+            }
+          },
+          plugins: {
+            legend: { display: true, position: "bottom", labels: { color: css("--ink"), boxWidth: 10, font: { size: fs } } },
+            tooltip: {
+              callbacks: {
+                label: ctx => {
+                  const j = ctx.dataIndex, k = dims[j];
+                  const raw = ctx.dataset.rawVals ? ctx.dataset.rawVals[j] : ctx.raw;
+                  const unit = k === "height" && S.heightUnit === "unknown" ? "" : " " + METRICS[k].unit;
+                  return `${ctx.dataset.label} · ${METRICS[k].short}: ${f(raw, 1)}${unit}（基準 ${f(ctx.raw, 1)}%）`;
+                }
+              }
+            }
+          }
+        })
+      });
+      return;
+    }
+
+    // 平行座標（各軸依樣本範圍標準化 0–100%）
+    const bounds = dims.map(k => {
+      let lo = Infinity, hi = -Infinity;
+      for (const r of pts) { const v = r[k]; if (v < lo) lo = v; if (v > hi) hi = v; }
+      return { lo, span: hi - lo };
+    });
+    const cl = clsOf(S), badSample = [], okSample = [];
+    for (const r of pts) (cl(r).length ? badSample : okSample).push(r);
+    const pickEven = (arr, limit) => {
+      if (arr.length <= limit) return arr;
+      const st = arr.length / limit, out = [];
+      for (let i = 0; i < limit; i++) out.push(arr[Math.floor(i * st)]);
+      return out;
+    };
+    const badPick = pickEven(badSample, 16);
+    const okPick = pickEven(okSample, 40 - badPick.length);
+    const sample = [...okPick, ...badPick];
+
+    showChart("體積 × 面積 × 高度", `各軸依樣本範圍標準化（0–100%）· 顯示 ${sample.length} / ${pts.length} 筆${hNote}`);
+    mk("cRelChart", {
+      type: "line",
+      data: {
+        labels: dimLabels,
+        datasets: sample.map(r => {
+          const isBad = cl(r).length > 0;
+          return {
+            label: `${r.board} ${r.pad}`,
+            data: dims.map((k, j) => bounds[j].span > 0 ? ((r[k] - bounds[j].lo) / bounds[j].span) * 100 : 50),
+            rawVals: dims.map(k => r[k]),
+            borderColor: isBad ? css("--ng") + "CC" : css("--series2") + "55",
+            borderWidth: isBad ? 1.8 : 1.1,
+            pointRadius: isBad ? 3 : 2,
+            tension: 0
+          };
+        })
+      },
+      options: baseOpts({
+        scales: {
+          x: { ticks: { color: css("--ink"), font: { size: fs } }, grid: { color: grid } },
+          y: { min: 0, max: 100, ticks: { color: ink, callback: v => v + "%", font: { family: "IBM Plex Mono", size: fs } }, grid: { color: grid }, title: { display: true, text: "軸向標準化位置 (%)", color: ink, font: { size: fs } } }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => {
+                const j = ctx.dataIndex, k = dims[j];
+                const raw = ctx.dataset.rawVals ? ctx.dataset.rawVals[j] : ctx.raw;
+                const unit = k === "height" && S.heightUnit === "unknown" ? "" : " " + METRICS[k].unit;
+                return `${ctx.dataset.label} · ${METRICS[k].short}: ${f(raw, 1)}${unit}`;
+              }
+            }
+          }
+        }
+      })
+    });
+  }
+}
+
 function renderClosedLoopUI(){
   const A = S.A;
   const pc = (A && A.printerCorr) || calcPrinterCorrection(S.rows);
@@ -7929,8 +8241,34 @@ function exportCorrectionJson(){
   };
   save("printer-correction.json", JSON.stringify(payload, null, 2));
 }
-function drawVec(){const cv=$("#vecCv");if(!cv.offsetParent)return;const ctx=cv.getContext("2d"),b=$("#selAlignBoard").value,a=V&&V.align.find(x=>x.board===b),rs=S.rows.filter(r=>r.board===b&&(isAllGrp(S.group)||r.group===S.group)&&r.offx!=null),k=+$("#inVec").value/1000;
-  const X=mapXf(cv);ctx.clearRect(0,0,cv.width,cv.height);ctx.fillStyle=css("--surface2");ctx.fillRect(0,0,cv.width,cv.height);
+function drawVec(){
+  const cv=$("#vecCv"),emptyEl=$("#alignVecEmpty"),vecField=$("#alignVecField");
+  if(!cv)return;
+  const ctx=cv.getContext("2d");
+  if(!V||!V.align||!V.align.length){
+    if(ctx)ctx.clearRect(0,0,cv.width,cv.height);
+    if(emptyEl)emptyEl.hidden=true;
+    return;
+  }
+  const b=$("#selAlignBoard").value,a=V.align.find(x=>x.board===b),rs=S.rows.filter(r=>r.board===b&&(isAllGrp(S.group)||r.group===S.group)&&r.offx!=null&&r.offy!=null&&realXY(r));
+  if(!a||a.noCoords||!rs.length){
+    cv.hidden=true;
+    if(vecField)vecField.hidden=true;
+    if(emptyEl){
+      emptyEl.hidden=false;
+      emptyEl.innerHTML='<div class="desc">缺實際 X/Y 座標，僅計算整板平移；無法繪製偏移向量圖</div>';
+    }
+    if(ctx)ctx.clearRect(0,0,cv.width,cv.height);
+    return;
+  }
+  cv.hidden=false;
+  if(vecField)vecField.hidden=false;
+  if(emptyEl){emptyEl.hidden=true;emptyEl.innerHTML="";}
+  if(!cv.offsetParent)return;
+  const k=+$("#inVec").value/1000;
+  const[xa,xb]=minMax(rs,r=>r.x),[ya,yb]=minMax(rs,r=>r.y),pad=24,x0=xa-3,x1=xb+3,y0=ya-3,y1=yb+3,sc=Math.min((cv.width-2*pad)/Math.max(x1-x0,1e-6),(cv.height-2*pad)/Math.max(y1-y0,1e-6));
+  const X={pad,toPx:(x,y)=>[pad+(x-x0)*sc,pad+(y1-y)*sc]};
+  ctx.clearRect(0,0,cv.width,cv.height);ctx.fillStyle=css("--surface2");ctx.fillRect(0,0,cv.width,cv.height);
   const arrow=(x,y,dx,dy,col,w)=>{const[px,py]=X.toPx(x,y),[qx,qy]=X.toPx(x+dx*k,y+dy*k);ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(qx,qy);ctx.stroke();const an=Math.atan2(qy-py,qx-px),hl=Math.min(9,Math.hypot(qx-px,qy-py)*.4);ctx.beginPath();ctx.moveTo(qx,qy);ctx.lineTo(qx-hl*Math.cos(an-.45),qy-hl*Math.sin(an-.45));ctx.lineTo(qx-hl*Math.cos(an+.45),qy-hl*Math.sin(an+.45));ctx.fill()};
   const oxLim=S.specs.offx?(hasUsl(S.specs.offx)?Math.abs(S.specs.offx.usl):hasLsl(S.specs.offx)?Math.abs(S.specs.offx.lsl):Infinity):Infinity;
   const oyLim=S.specs.offy?(hasUsl(S.specs.offy)?Math.abs(S.specs.offy.usl):hasLsl(S.specs.offy)?Math.abs(S.specs.offy.lsl):Infinity):Infinity;
@@ -8626,6 +8964,14 @@ function pos3D(rows){
   }
   T.pos={rows,map};return map;
 }
+function updateGrid3dWarn(P){
+  const warnEl=$("#grid3dWarn");
+  if(!warnEl)return;
+  let nGridAll=0;
+  if(P)for(const p of P.values())if(p.grid)nGridAll++;
+  warnEl.style.display=nGridAll?"block":"none";
+  const cntEl=$("#grid3dCount");if(cntEl)cntEl.textContent=nGridAll?`${nGridAll} 個`:"";
+}
 /* 板面範圍（含 4 mm 邊）：單趟累加，萬筆以上不展開成參數 */
 function ext3D(P){let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
   for(const p of P.values()){if(p.x<x0)x0=p.x;if(p.x>x1)x1=p.x;if(p.y<y0)y0=p.y;if(p.y>y1)y1=p.y}
@@ -8654,7 +9000,7 @@ function pos3DNote(){
     P.size?size3DNote(ext3D(P)):""
   ].filter(Boolean).join(" · ");
 }
-function build3D(){safeBoard2D();if(!T.ok||!window.THREE||!T||!T.root||!T.root.children)return;const A=S.A;while(T.root.children.length){const o=T.root.children.pop();o.geometry&&o.geometry.dispose();if(Array.isArray(o.material))o.material.forEach(m=>m&&m.dispose&&m.dispose());else if(o.material&&o.material.dispose)o.material.dispose();if(typeof o.dispose==="function")o.dispose()}
+function build3D(){safeBoard2D();updateGrid3dWarn(S.rows?pos3D(S.rows):null);if(!T.ok||!window.THREE||!T||!T.root||!T.root.children)return;const A=S.A;while(T.root.children.length){const o=T.root.children.pop();o.geometry&&o.geometry.dispose();if(Array.isArray(o.material))o.material.forEach(m=>m&&m.dispose&&m.dispose());else if(o.material&&o.material.dispose)o.material.dispose();if(typeof o.dispose==="function")o.dispose()}
   const all=S.rows,P=pos3D(all);
   if(!P.size){T.meshes=[];draw3();show3DFallback("此回合沒有焊墊座標，也沒有可對應的元件中心座標，無法繪製 3D。請改看下方「本板 vs 全體」。");$("#view3d .webgl-fallback").dataset.diag="1";return}
   const E=ext3D(P),{x0,x1,y0,y1}=E,cx=(x0+x1)/2,cy=(y0+y1)/2;
@@ -8671,12 +9017,7 @@ function build3D(){safeBoard2D();if(!T.ok||!window.THREE||!T||!T.root||!T.root.c
   if(hud&&isDense){
     hud.insertAdjacentHTML("beforeend",`<br><span class="note">已啟用高密度降階渲染（共 ${rows.length.toLocaleString()} 焊墊）</span>`);
   }
-  const warnEl=$("#grid3dWarn");
-  if(warnEl){
-    let nGridAll=0;for(const p of P.values())if(p.grid)nGridAll++;
-    warnEl.style.display=nGridAll?"block":"none";
-    const cntEl=$("#grid3dCount");if(cntEl)cntEl.textContent=nGridAll?`${nGridAll} 個`:"";
-  }
+  updateGrid3dWarn(P);
   const cuMat=new THREE.MeshStandardMaterial({color:0xc87533,metalness:.85,roughness:.25});
   const hs=S.specs.height,vs=S.specs.volume,vTgt=specTgtFallback(vs,100);
   const vHalf=hasTwoSpec(vs)?(vs.usl-vs.lsl)/2:hasUsl(vs)?Math.max(1,vs.usl-vTgt):hasLsl(vs)?Math.max(1,vTgt-vs.lsl):25;
@@ -8788,7 +9129,7 @@ function loadScript(src){return new Promise((ok,no)=>{const s=document.createEle
 function ensureThree(){if(window.THREE)return Promise.resolve();return threeP||(threeP=loadScript("vendor/three-r128.min.js").catch(()=>loadScript("https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js")).catch(e=>{threeP=null;throw e}))}
 /* 側欄 2D（HUD、不良表、比較圖、剖面）出錯時只標示錯誤，不可擋住 3D 初始化 */
 function safeBoard2D(){try{renderBoard2D();return true}catch(e){console.error("3D 頁側欄更新失敗：",e);const h=$("#hud");if(h)h.insertAdjacentHTML("beforeend",`<br><span style="color:var(--ng)">側欄圖表更新失敗：${esc(e&&e.message||String(e))}</span>`);return false}}
-async function render3D(){safeBoard2D();if(!window.THREE){$("#hud").textContent="載入 3D 元件中…";try{await ensureThree()}catch(e){}if(S.tab!=="sim3d")return}if(!init3D()){safeBoard2D();return}size3();build3D()}
+async function render3D(){safeBoard2D();updateGrid3dWarn(S.rows?pos3D(S.rows):null);if(!window.THREE){$("#hud").textContent="載入 3D 元件中…";try{await ensureThree()}catch(e){}if(S.tab!=="sim3d")return}if(!init3D()){safeBoard2D();return}size3();build3D()}
 $("#selBoard").onchange=e=>{S.board=e.target.value;if(!T.ok){renderBoard2D();return}build3D()};
 $("#btnWorst").onclick=()=>{if(S.A.worst){S.board=S.A.worst.board;$("#selBoard").value=S.board;if(!T.ok){renderBoard2D();return}build3D()}};
 let playT=0;function stopPlay(){clearInterval(playT);playT=0;$("#btnPlay").setAttribute("aria-pressed","false");$("#btnPlay").textContent="逐板播放"}
@@ -9161,16 +9502,60 @@ function placeSave(){try{if(PLACE)localStorage.setItem("spi-place",JSON.stringif
 function placeShow(){const st=$("#placeState");$("#placeClear").hidden=!PLACE;if(!PLACE){st.textContent="未套用受控座標檔";return}
   const r=PLACE.res,declared=headerPlaceUnit(PLACE.tab.head),declaredText=declared==="conflict"?"（欄名單位互相衝突）":declared?`（欄名標示 ${declared}）`:"（登錄時選擇）";st.textContent=`料號 ${PLACE.part} 版次 ${PLACE.rev} · ${PLACE.name}：${r.items.length} 個元件（TOP ${r.top}、BOT ${r.bot}），單位 ${r.unit}${declaredText}；無焊墊座標${r.warn?`；⚠️ ${r.warn}`:""}`}
 /* ---------- 舊資料／未綁定回合的受控座標檢視套用 ---------- */
-function runTargetSide(run){
+function runHasGridPos(run){
+  return Boolean(run&&Array.isArray(run.rows)&&run.rows.some(r=>r&&r.gridPos));
+}
+function runHasAppliedPlace(run,placeId){
+  if(!run||!placeId||runHasGridPos(run))return false;
   const src=runSrc(run);
-  let side=src?.side||"";
-  if(!side||side==="ALL"||side==="BOTH") side=detectSide(run?.name||src?.name||"");
-  return side==="BOT"?"BOT":"TOP";
+  if(run.info&&run.info.placePreview&&run.info.placePreview.recId===placeId)return true;
+  if(src&&src.lifecycle==="active"&&src.placeId===placeId)return true;
+  return false;
+}
+function resolvePlaceSideForRun(run,place){
+  const src=runSrc(run);
+  const rawSide=String(src?.side||"").toUpperCase();
+  if(rawSide==="TOP"||rawSide==="BOT")return{ok:true,side:rawSide};
+  const nameSide=detectSide(run?.name||src?.name||"");
+  if(nameSide==="TOP"||nameSide==="BOT")return{ok:true,side:nameSide};
+  if(place&&place.res&&Array.isArray(place.res.items)){
+    const sides=new Set(place.res.items.map(it=>it.side).filter(s=>s==="TOP"||s==="BOT"));
+    if(sides.size===1)return{ok:true,side:[...sides][0]};
+    if(sides.size===2&&run&&Array.isArray(run.rows)){
+      const bySide={TOP:new Set(),BOT:new Set()};
+      for(const it of place.res.items){
+        if(it.side==="TOP"||it.side==="BOT"){
+          bySide[it.side].add(it.ref);
+          bySide[it.side].add(String(it.ref).toUpperCase());
+        }
+      }
+      let topHits=0,botHits=0;
+      const seen=new Set();
+      for(const r of run.rows){
+        const rawComp=r.comp||r.pad;
+        const cleanRef=String(rawComp).replace(/_\d+$/,"").replace(/-[^-]+$/,"").trim();
+        const key=cleanRef||String(rawComp);
+        if(!key||seen.has(key))continue;
+        seen.add(key);
+        const up=key.toUpperCase(),rawUp=String(rawComp).toUpperCase();
+        if(bySide.TOP.has(rawComp)||bySide.TOP.has(key)||bySide.TOP.has(rawUp)||bySide.TOP.has(up))topHits++;
+        if(bySide.BOT.has(rawComp)||bySide.BOT.has(key)||bySide.BOT.has(rawUp)||bySide.BOT.has(up))botHits++;
+      }
+      if(topHits!==botHits&&Math.max(topHits,botHits)>0){
+        return{ok:true,side:topHits>botHits?"TOP":"BOT"};
+      }
+      return{ok:false,reason:`此回合未標示面別，且雙面座標檔 TOP（${topHits}）與 BOT（${botHits}）對上的元件數無法區分，請先確認量測面別`};
+    }
+  }
+  return{ok:true,side:"TOP"};
+}
+function runTargetSide(run){
+  return resolvePlaceSideForRun(run,null).side||"TOP";
 }
 function canApplyPlacePreview(run){
   if(!run||run.sample)return false;
   const src=runSrc(run);
-  if(src&&src.lifecycle==="active"&&src.placeId)return false;
+  if(src&&src.lifecycle==="active"&&src.placeId&&!runHasGridPos(run))return false;
   return true;
 }
 function clearPlacePreviewFromRun(run){
@@ -9198,43 +9583,54 @@ function applyPlacePreviewToRun(run,place){
   if(!canApplyPlacePreview(run))return{ok:false,reason:"此回合不支援套用檢視座標"};
   if(!place||!place.res||!place.res.items)return{ok:false,reason:"座標檔未解析或無元件"};
   const src=runSrc(run);
-  const part=src?.part||safeId($("#inPart")?.value)||"";
+  const impPart=(typeof IMP!=="undefined"&&IMP&&$("#mapBox")&&!$("#mapBox").hidden)?safeId($("#inPart")?.value):"";
+  const part=src?.part||run.info?.part||impPart||"";
   if(part&&place.part&&place.part!==part){
     return{ok:false,reason:`料號不符（目前回合 ${part}，座標檔 ${place.part}）`};
   }
-  const side=runTargetSide(run);
+  const sideRes=resolvePlaceSideForRun(run,place);
+  if(!sideRes.ok)return sideRes;
+  const side=sideRes.side;
   const itemsOnSide=place.res.items.filter(it=>it.side===side);
   if(!itemsOnSide.length){
     return{ok:false,reason:`座標檔不包含目前回合的 ${side} 面座標`};
   }
-  const byRef=new Map();
+  const byRef=new Map(),byRefUpper=new Map();
   for(const it of itemsOnSide){
     byRef.set(it.ref,it);
+    const up=String(it.ref).toUpperCase();
+    if(!byRefUpper.has(up))byRefUpper.set(up,it);
   }
   const allRows=[run.rows,run._rawRows].filter(Boolean);
   const seenRows=new Set();
-  let matchedCount=0,unmatchedCount=0;
+  const matchedEntries=[],unmatchedGridRows=[];
   for(const rows of allRows){
     for(const r of rows){
       if(seenRows.has(r))continue;
       seenRows.add(r);
       const rawComp=r.comp||r.pad;
       const cleanRef=String(rawComp).replace(/_\d+$/,"").replace(/-[^-]+$/,"").trim();
-      const it=byRef.get(rawComp)||byRef.get(cleanRef);
-      if(it){
-        matchedCount++;
-        r.componentX=it.x;
-        r.componentY=it.y;
-        delete r.x;
-        delete r.y;
-        delete r.gridPos;
-      }else{
-        unmatchedCount++;
-      }
+      const it=byRef.get(rawComp)||byRef.get(cleanRef)||byRefUpper.get(String(rawComp).toUpperCase())||byRefUpper.get(cleanRef.toUpperCase());
+      if(it)matchedEntries.push([r,it]);
+      else if(r.gridPos)unmatchedGridRows.push(r);
     }
   }
+  const matchedCount=matchedEntries.length;
+  const unmatchedCount=seenRows.size-matchedCount;
   if(matchedCount===0){
     return{ok:false,reason:`座標檔 ${place.part} ${place.rev} 在 ${side} 面找不到與目前量測相符的位號`};
+  }
+  for(const [r,it] of matchedEntries){
+    r.componentX=it.x;
+    r.componentY=it.y;
+    delete r.x;
+    delete r.y;
+    delete r.gridPos;
+  }
+  for(const r of unmatchedGridRows){
+    delete r.x;
+    delete r.y;
+    delete r.gridPos;
   }
   run.info=run.info||{};
   run.info.placePreview={
@@ -9250,32 +9646,36 @@ function applyPlacePreviewToRun(run,place){
 }
 function syncPlaceToCurrentRun(opts={}){
   const run=curRun();
-  if(!run)return;
+  if(!run)return{ok:false,reason:"目前沒有可套用的分析回合"};
   const isPre=Boolean(run.info&&run.info.placePreview);
   if(!PLACE){
     if(isPre){
       clearPlacePreviewFromRun(run);
       T.pos=null;
       if(T.ok&&typeof build3D==="function")build3D();
+      else if(S.rows)updateGrid3dWarn(pos3D(S.rows));
       updateLoadStates();
       saveRunsSoon();
     }
-    return;
+    return{ok:true,cleared:true};
   }
   const res=applyPlacePreviewToRun(run,PLACE);
   if(res.ok){
     T.pos=null;
     if(T.ok&&typeof build3D==="function")build3D();
+    else if(S.rows)updateGrid3dWarn(pos3D(S.rows));
     updateLoadStates();
     saveRunsSoon();
     if(opts.notify){
-      toast(`已套用座標檔 ${PLACE.part} ${PLACE.rev} 檢視（${res.side} 面對應 ${res.matched} 個焊墊）`);
+      const extra=res.unmatched?`（另 ${res.unmatched} 個焊墊無座標未繪出）`:"";
+      toast(`已套用座標檔 ${PLACE.part} ${PLACE.rev} 檢視（${res.side} 面對應 ${res.matched} 個焊墊${extra}）`);
     }
   }else{
     if(isPre){
       clearPlacePreviewFromRun(run);
       T.pos=null;
       if(T.ok&&typeof build3D==="function")build3D();
+      else if(S.rows)updateGrid3dWarn(pos3D(S.rows));
       saveRunsSoon();
     }
     updateLoadStates();
@@ -9284,6 +9684,7 @@ function syncPlaceToCurrentRun(opts={}){
       toast(`座標檔未套用至目前回合：${res.reason}`);
     }
   }
+  return res;
 }
 
 
@@ -9371,8 +9772,8 @@ $("#selVendor").onchange=()=>{try{localStorage.setItem("spi-vendor",$("#selVendo
 $("#selSide").onchange=()=>{delete $("#selSide").dataset.auto;if(IMP)IMP.sideAuto=null;showSideAuto();syncIdentityHints();reconvert()};
 $("#placeClear").onclick=()=>{PLACE=null;placeSave();placeShow();reconvert();clearImportFieldErrors("btnSelectPlace");renderImportSourceSummary();updateImportWorkflow();syncIdentityHints();syncPlaceToCurrentRun({notify:false})};
 $("#btnSelectPlace").onclick=()=>{if(typeof openRecPickerModal==="function")openRecPickerModal("place");else{$("#btnOpenRecModal")?.click();$("#btnPickPlace")?.click()}};
-/* 3D 示意網格警示：一鍵開啟座標檔庫，選取後由 use-place 動作套用至目前回合 */
-$("#btnGridApplyPlace").onclick=()=>$("#btnSelectPlace").onclick();
+/* 3D 示意網格警示：一鍵開啟座標檔庫，選取後套用至目前回合 */
+$("#btnGridApplyPlace").onclick=()=>{if(typeof openRecPickerModal==="function")openRecPickerModal("place",{forRunPlace:true});else $("#btnSelectPlace").onclick()};
 $("#btnRegisterPlace").onclick=()=>{if(typeof openRecPickerModal==="function")openRecPickerModal("pairs");RETURN_IMPORT_AFTER_PLACE=true;if($("#upPlacePart"))$("#upPlacePart").value=safeId($("#inPart").value);if($("#upPlaceRev"))$("#upPlaceRev").value=($("#inRev").value||"").trim();const side=$("#selSide").value;if((side==="TOP"||side==="BOT")&&$("#upPlaceSide"))$("#upPlaceSide").value=side;parkPlaceForm();$("#upPlaceSide")?.focus()};
 $("#placeChoices").onclick=async e=>{const b=e.target.closest("[data-pick-place]");if(!b)return;const rec=(RecDB.cache||[]).find(x=>x.id===b.dataset.pickPlace);if(!rec){toast("找不到這份座標檔，請重新整理");return}try{await usePlaceRec(rec);syncPlaceToCurrentRun({notify:true});if(IMP&&IMP.raw)reconvert()}catch(er){toast(er.message)}};
 async function saveControlledPlacement(fl,part,rev,side,unit){
@@ -10809,13 +11210,13 @@ function updateLoadStates(){const run=curRun(),src=runSrc(run),unmatched=src?.un
   const spiText=src?.lifecycle==="pending_review"?"待管理者判定":src?.lifecycle==="superseded"?"歷史修正前版本":src?.lifecycle==="legacy"?"舊資料・未受控":"未套用";
   const link=valid?measurementLink({kind:"spi",placeId:src.placeId,part:src.part,rev:src.rev,side:src.side},typeof RecDB==="undefined"||!RecDB?null:RecDB.cache):null;
   const extra=unmatched.length?`・${unmatched.length} 個位號無座標`:"";
-  const spiMsg=LOAD_ERROR.spi?`量測紀錄：${LOAD_ERROR.spi}`:!valid?`量測紀錄：${spiText}`:link&&link.v==="ok"?`量測已套用，座標身分相符${extra}`:link&&link.v==="missing"?"量測已套用，座標檔不存在":link&&link.v==="bad"?`量測已套用，座標${link.text}`:link&&link.v==="none"?`量測已套用，尚未搭配座標${extra}`:`量測紀錄：已套用${extra}`;
+  const spiMsg=LOAD_ERROR.spi?`量測紀錄：${LOAD_ERROR.spi}`:!valid?`量測紀錄：${spiText}`:`量測紀錄：已套用${extra}`;
   set("#stateSpi",LOAD_ERROR.spi?"error":valid?"ok":"idle",spiMsg);
   const spiEl=$("#stateSpi");
   if(spiEl){const openList=unmatched.length>0&&!LOAD_ERROR.spi;spiEl.classList.toggle("is-action",openList);spiEl.tabIndex=openList?0:-1;spiEl.setAttribute("aria-disabled",openList?"false":"true");spiEl.title=openList?"查看無座標位號":"量測紀錄狀態。載入請用記錄庫"}
   const applied=valid&&src.placeId;
   const previewApplied=!applied&&Boolean(run&&run.info&&run.info.placePreview&&(!PLACE||!PLACE.recId||PLACE.recId===run.info.placePreview.recId));
-  const placeMsg=LOAD_ERROR.place?`座標檔：${LOAD_ERROR.place}`:previewApplied?`座標檔：已套用（檢視）${link&&link.v==="ok"?"，身分相符":""}`:applied&&link&&link.v==="ok"?"量測已套用，座標身分相符":applied&&link&&link.v==="missing"?"量測已套用，座標檔不存在":applied&&link&&link.v==="bad"?`量測已套用，座標${link.text}`:applied?"量測已套用，座標已引用":PLACE?"座標檔：已選取":"座標檔：未套用";
+  const placeMsg=LOAD_ERROR.place?`座標檔：${LOAD_ERROR.place}`:previewApplied?`座標檔：已套用（檢視）${link&&link.v==="ok"?"，身分相符":""}`:applied&&link&&link.v==="ok"?"座標檔：已套用（身分相符）":applied&&link&&link.v==="missing"?"座標檔：不存在（已連結）":applied&&link&&link.v==="bad"?`座標檔：${link.text}`:applied?"座標檔：已連結":PLACE?"座標檔：已選取":"座標檔：未套用";
   set("#statePlace",LOAD_ERROR.place?"error":(applied||previewApplied)?"ok":"idle",placeMsg);
 }
 $("#stateSpi").onclick=()=>{const refs=runSrc(curRun())?.unmatchedRefs||[];if(!refs.length)return;$("#unmatchedRefsTitle").textContent=`無座標位號（${refs.length}）`;$("#unmatchedRefsList").textContent=refs.join("、");openModal("unmatchedRefsModal","[data-close]")};
@@ -12248,6 +12649,8 @@ let PICKER_TAB = "pairs";
 let PICKER_SIDE_FILTER = "";
 let PICKER_QUALITY_FILTER = "all";
 let PICKER_LINK_FILTER = "";
+let PICKER_FOR_RUN_PLACE = false;
+let PICKER_AUTO_PART_FILTER = null;
 let RETURN_IMPORT_AFTER_PLACE = false;
 let PICKER_FOCUS_IMPORT = "";
 const PAIR_CITE_OPEN = new Set();
@@ -12585,6 +12988,24 @@ async function renderRecPicker(force) {
   if($("#boxUploadPlaceForm"))$("#boxUploadPlaceForm").hidden=!RecDB.isAdmin||RecDB.mode!=="cloud";
   parkPlaceForm();
 
+  if (PICKER_AUTO_PART_FILTER) {
+    const { part, side } = PICKER_AUTO_PART_FILTER;
+    PICKER_AUTO_PART_FILTER = null;
+    if (part && (list || []).some(r => r.kind === "place" && r.lifecycle === "active" && r.validation_source === "server_verified" && r.part === part)) {
+      PICKER_PART_PRESET = part;
+      if ((side === "TOP" || side === "BOT") && (list || []).some(r => r.kind === "place" && r.lifecycle === "active" && r.validation_source === "server_verified" && r.part === part && placeSideHolds(r.side, side))) {
+        PICKER_SIDE_FILTER = side;
+        $$("#pickSideSeg button").forEach(b => {
+          const on = (b.dataset.side || "").toUpperCase() === side;
+          b.classList.toggle("active", on);
+          b.style.background = on ? "var(--surface)" : "transparent";
+        });
+      }
+    }
+    if (part && $("#upPlacePart") && !$("#upPlacePart").value) $("#upPlacePart").value = part;
+    if ((side === "TOP" || side === "BOT") && $("#upPlaceSide") && !$("#upPlaceSide").value) $("#upPlaceSide").value = side;
+  }
+
   const partFilterSel = $("#pickPartFilter");
   if (partFilterSel) {
     const curVal = PICKER_PART_PRESET ?? partFilterSel.value;
@@ -12749,6 +13170,8 @@ async function renderRecPicker(force) {
     </tr></thead><tbody>` + P1.map(r => {
       const isCur = PLACE && PLACE.recId === r.id;
       const selectable=r.lifecycle==="active"&&r.validation_source==="server_verified";
+      const curR = curRun();
+      const needsApply = isCur && selectable && canApplyPlacePreview(curR) && !runHasAppliedPlace(curR, r.id);
       const defBadge = placeBadge(r, selectable), hl = PICKER_HIGHLIGHT && PICKER_HIGHLIGHT.id === r.id;
       return `<tr data-row-id="${esc(r.id)}"${isCur || hl ? ' class="rec-new"' : ""}>
         <td><b class="mono">${esc(r.part)}</b>${hl && PICKER_HIGHLIGHT.label ? ` <span class="pill warn">${esc(PICKER_HIGHLIGHT.label)}</span>` : ""}<br><span class="note" title="${esc(r.name || "")}" style="font-size:var(--fs-caption);display:inline-block;max-width:14ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom">${esc(r.name || "")}</span></td>
@@ -12761,7 +13184,7 @@ async function renderRecPicker(force) {
         <td>${fp(r)}</td>
         <td style="text-align:right">
           <div class="rec-acts">
-            ${isCur ? '<span class="pill ok">目前已選取</span>' : selectable?`<button class="primary btn-sm" data-pact="use-place" data-id="${esc(r.id)}">選取</button>`:r.lifecycle==="archived"?`<span class="note" title="${ARCHIVED_TIP}">不可用於新匯入</span>`:""}
+            ${isCur ? `<span class="pill ok">目前已選取</span>${needsApply ? `<button class="primary btn-sm" data-pact="apply-place" data-id="${esc(r.id)}">套用到目前回合</button>` : ""}` : selectable?`<button class="primary btn-sm" data-pact="use-place" data-id="${esc(r.id)}">選取</button>`:r.lifecycle==="archived"?`<span class="note" title="${ARCHIVED_TIP}">不可用於新匯入</span>`:""}
             <button class="btn-sm" data-pact="ver" data-id="${esc(r.id)}" title="檢查原檔指紋並列出引用的量測">對應證明</button>
             ${editBtn(r)}
             <button class="btn-sm" data-pact="dl" data-id="${esc(r.id)}">下載原檔</button>
@@ -12777,8 +13200,10 @@ async function renderRecPicker(force) {
 
   const cardsPlace = $("#cardsPickPlace");
   if (cardsPlace) {
+    const curR = curRun();
     cardsPlace.innerHTML = P1.length ? P1.map(r => {
       const isCur = PLACE && PLACE.recId === r.id,selectable=r.lifecycle==="active"&&r.validation_source==="server_verified";
+      const needsApply = isCur && selectable && canApplyPlacePreview(curR) && !runHasAppliedPlace(curR, r.id);
       return `<div class="rec-card" data-row-id="${esc(r.id)}" style="padding:12px;background:${PICKER_HIGHLIGHT && PICKER_HIGHLIGHT.id === r.id ? "var(--accent-soft)" : "var(--surface)"};border:1px solid var(--line);border-radius:10px;margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
           <div style="min-width:0">
@@ -12797,7 +13222,7 @@ async function renderRecPicker(force) {
           ${r.note ? `<br><span style="color:var(--ink)">備註: ${esc(r.note)}</span>` : ""}
         </div>
         <div class="rec-card-actions" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
-          ${isCur ? '<button class="primary" disabled style="flex:1 1 120px;min-height:44px;font-size:var(--fs-body)">目前已選取</button>' : selectable?`<button class="primary" data-pact="use-place" data-id="${esc(r.id)}" style="flex:1 1 120px;min-height:44px;font-size:var(--fs-body)">選取此座標檔</button>`:""}
+          ${isCur ? (needsApply ? `<button class="primary" data-pact="apply-place" data-id="${esc(r.id)}" style="flex:1 1 120px;font-size:var(--fs-body)">套用到目前回合</button><span class="pill ok" style="align-self:center">目前已選取</span>` : '<button class="primary" disabled style="flex:1 1 120px;min-height:44px;font-size:var(--fs-body)">目前已選取</button>') : selectable?`<button class="primary" data-pact="use-place" data-id="${esc(r.id)}" style="flex:1 1 120px;min-height:44px;font-size:var(--fs-body)">選取此座標檔</button>`:""}
           ${RecDB.isAdmin&&selectable?`<button data-pact="archive-place" data-id="${esc(r.id)}">封存</button>`:""}
           ${RecDB.isAdmin&&r.validation_source==="legacy"?`<button data-pact="register-legacy-place" data-id="${esc(r.id)}">驗證納管</button>`:""}
           <button data-pact="ver" data-id="${esc(r.id)}" style="flex:0 0 60px;font-size:var(--fs-body)">對應證明</button>
@@ -12825,11 +13250,13 @@ async function renderRecPicker(force) {
   function placePairRow(p) {
     const selectable = p.lifecycle === "active" && p.validation_source === "server_verified";
     const isCur = PLACE && PLACE.recId === p.id;
+    const curR = curRun();
+    const needsApply = isCur && selectable && canApplyPlacePreview(curR) && !runHasAppliedPlace(curR, p.id);
     const users = (list || []).filter(x => x.kind === "spi" && x.placeId === p.id).sort((a, b) => b.created - a.created);
     const cite = users.length
       ? `<button type="button" class="linkbtn" data-pact="cite" data-id="${esc(p.id)}">被 ${users.length} 筆量測引用</button><div id="cite-${esc(p.id)}" class="note"${PAIR_CITE_OPEN.has(p.id) ? "" : " hidden"}>${users.slice(0, 20).map(x => `${esc(x.lot || "未提供批號")}・${esc(x.side || "—")}`).join("、")}${users.length > 20 ? `，另 ${users.length - 20} 筆` : ""}</div>`
       : `<span class="note">尚無量測引用</span>`;
-    const primary = isCur ? `<span class="pill ok">目前已選取</span>` : selectable ? `<button type="button" class="primary btn-sm" data-pact="use-place" data-id="${esc(p.id)}">選取</button>` : "";
+    const primary = isCur ? `<span class="pill ok">目前已選取</span>${needsApply ? `<button type="button" class="primary btn-sm" data-pact="apply-place" data-id="${esc(p.id)}">套用到目前回合</button>` : ""}` : selectable ? `<button type="button" class="primary btn-sm" data-pact="use-place" data-id="${esc(p.id)}">選取</button>` : "";
     const more = `<button type="button" class="btn-sm" data-pact="ver" data-id="${esc(p.id)}">對應證明</button><button type="button" class="btn-sm" data-pact="dl" data-id="${esc(p.id)}">下載原檔</button>${editBtn(p)}${RecDB.isAdmin && selectable ? `<button type="button" class="btn-sm" data-pact="archive-place" data-id="${esc(p.id)}">封存</button>` : ""}${RecDB.isAdmin && p.validation_source === "legacy" ? `<button type="button" class="btn-sm" data-pact="register-legacy-place" data-id="${esc(p.id)}">驗證納管</button>` : ""}${delBtn(p)}`;
     const hl = isCur || (PICKER_HIGHLIGHT && PICKER_HIGHLIGHT.id === p.id) ? " rec-new" : "";
     const side = p.side === "BOTH" ? "TOP＋BOT" : (p.side || "—");
@@ -12937,7 +13364,7 @@ function setupRecPicker() {
     if (shouldRender) renderRecPicker();
   }
 
-  function open(wantTab = "pairs") {
+  function open(wantTab = "pairs", opts = {}) {
     const targetTab = wantTab === "place" ? "place" : wantTab === "specs" ? "specs" : wantTab === "spi" ? "spi" : "pairs";
     if (modal.hidden) pickerReturnFocus = document.activeElement;
     modal.hidden = false;
@@ -12945,6 +13372,19 @@ function setupRecPicker() {
     document.body.style.overflow = "hidden";
     PICKER_HIGHLIGHT = null;
     RETURN_IMPORT_AFTER_PLACE = false;
+    PICKER_FOR_RUN_PLACE = Boolean(opts && opts.forRunPlace);
+    PICKER_AUTO_PART_FILTER = null;
+    if (PICKER_FOR_RUN_PLACE) {
+      if ($("#recPickerQ")) $("#recPickerQ").value = "";
+      if ($("#pickPartFilter")) $("#pickPartFilter").value = "";
+      PICKER_PART_PRESET = null;
+      resetPickerFilters();
+      const run = curRun(), src = runSrc(run);
+      const part = src?.part || run?.info?.part || "";
+      const rawSide = String(src?.side || "").toUpperCase();
+      const side = (rawSide === "TOP" || rawSide === "BOT") ? rawSide : detectSide(run?.name || src?.name || "");
+      PICKER_AUTO_PART_FILTER = { part, side };
+    }
     setPickerTab(targetTab, false);
     renderRecPicker(true);
     const qIn = $("#recPickerQ");
@@ -12954,6 +13394,8 @@ function setupRecPicker() {
 
   function close() {
     RETURN_IMPORT_AFTER_PLACE = false;
+    PICKER_FOR_RUN_PLACE = false;
+    PICKER_AUTO_PART_FILTER = null;
     modal.classList.remove("open");
     modal.hidden = true;
     if (!document.querySelector(".open[role=dialog],.db-modal.open")) document.body.style.overflow = "";
@@ -13396,14 +13838,32 @@ function setupRecPicker() {
         $("#boxUploadPlaceForm").scrollIntoView({behavior:"smooth",block:"center"});
         $("#upPlacePart").focus();return;
       }
-      if (act === "use-place") {
+      if (act === "use-place" || act === "apply-place") {
         if(rec.lifecycle!=="active"||rec.validation_source!=="server_verified")throw new Error("座標檔未通過受控驗證或已封存");
-        await usePlaceRec(rec);
+        if (act === "use-place" || !PLACE || PLACE.recId !== rec.id) {
+          await usePlaceRec(rec);
+        }
         LOAD_ERROR.place="";updateLoadStates();
-        renderRecPicker();
-        renderRecords();
-        syncPlaceToCurrentRun({notify:true});
+        const syncRes = syncPlaceToCurrentRun({notify:true});
         if (IMP && IMP.raw) reconvert();
+        if (PICKER_FOR_RUN_PLACE || act === "apply-place") {
+          if (syncRes && syncRes.ok) {
+            close();
+            return;
+          }
+          await renderRecPicker();
+          const notice = $("#recPickerNotice");
+          if (notice && syncRes && !syncRes.ok) {
+            notice.innerHTML = `<span class="err">無法套用至目前回合：${esc(syncRes.reason)}</span>`;
+            notice.scrollIntoView?.({ block: "nearest" });
+          }
+          return;
+        }
+        await renderRecPicker();
+        if (syncRes && !syncRes.ok && curRun() && !curRun().sample && runHasGridPos(curRun())) {
+          const notice = $("#recPickerNotice");
+          if (notice) notice.innerHTML = `<span class="err">座標檔已選取，但未套用至目前回合：${esc(syncRes.reason)}</span>`;
+        }
         return;
       }
       if (act === "archive-place") {
@@ -13487,7 +13947,9 @@ function setupRecPicker() {
       }
     } catch(er) {
       toast("操作失敗：" + (er.message || String(er)));
-      renderRecPicker();
+      await renderRecPicker();
+      const notice = $("#recPickerNotice");
+      if (notice) notice.innerHTML = `<span class="err">操作失敗：${esc(er.message || String(er))}</span>`;
     }
   });
 }
@@ -13632,7 +14094,7 @@ function pdfFileName(){
 function specDownloadInfo(rec){const raw=rec&&rec.ver!=null?String(rec.ver).trim():"",hasVersion=!!raw&&!/^(?:undefined|null)$/i.test(raw),version=hasVersion?safeFn(raw):"",filename="料號規格_"+safeFn(rec&&rec.part)+"_"+(hasVersion?"v"+version:"版本未知")+".json";
   return{filename,warning:hasVersion?"":"這筆規格紀錄沒有版本號；匯出檔名已標示「版本未知」"}}
 if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")window.SPI_TEST_HOOK.specDownloadInfo=specDownloadInfo;
-if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{getPlace:()=>PLACE,S,RecDB,renderIssues,renderPmap,renderOverview,renderLISAUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,setSub,updateSettingsUi,scrollSettingsAnchor,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,pick,drawHeat,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,calcShapeFactor,getSolderGrainTexture,getRealPasteMat,createSolderPasteGeometry,selectPadForProfile,highlightSelectedPad3D,focusPad3D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,getReportChapters,renderMailChapterSummary,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,setupRecPicker,renderRecPicker,openRecord,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus,setupExportCenter,openExportCenterModal,closeExportCenterModal,triggerExportByType,downloadDeliverablesQueue,applyPlacePreviewToRun,clearPlacePreviewFromRun,syncPlaceToCurrentRun,pos3DNote,usePlaceRec});
+if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{getPlace:()=>PLACE,S,RecDB,renderIssues,renderPmap,renderOverview,renderLISAUI,renderRelChartUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,recompute,switchRun,setTab,setSub,updateSettingsUi,scrollSettingsAnchor,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,pick,drawHeat,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,calcShapeFactor,getSolderGrainTexture,getRealPasteMat,createSolderPasteGeometry,selectPadForProfile,highlightSelectedPad3D,focusPad3D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,getReportChapters,renderMailChapterSummary,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,setupRecPicker,renderRecPicker,openRecord,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus,setupExportCenter,openExportCenterModal,closeExportCenterModal,triggerExportByType,downloadDeliverablesQueue,applyPlacePreviewToRun,clearPlacePreviewFromRun,syncPlaceToCurrentRun,pos3DNote,usePlaceRec});
 if($("#geomPadFile"))$("#geomPadFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{const p=parseGeometryPadListCsv(rd.result);if(!p.ok){toast("幾何焊墊清單："+p.error);e.target.value="";return}S.geometryPads=p.pads;persist();updatePadCoverageState();recompute();renderGeomPadStatus();toast(`已匯入 ${p.pads.length} 個幾何焊墊`);e.target.value=""};rd.readAsText(f)});
 if($("#geomPadClear"))$("#geomPadClear").onclick=()=>{S.geometryPads=null;S.padCoverage=null;S.pendingVerify=false;persist();updatePadCoverageState();recompute();renderGeomPadStatus()};
 const initHash=(location.hash||"").slice(1);
