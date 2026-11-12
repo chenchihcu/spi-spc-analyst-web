@@ -400,3 +400,22 @@ test("前端座標檔登錄守衛 placeSizeErr 與伺服器 placementSizeError �
   assert.throws(() => H.parsePlacement({ head: ["RefDes", "X(mm)", "Y(mil)", "Layer"], data: [["U1", "10", "20", "TOP"], ["U2", "30", "40", "TOP"]] }, "mm", "TOP"), /座標單位與欄名不一致/);
   assert.equal(H.parsePlacement({ head: ["RefDes", "X", "Y", "Layer"], data: [["U1", "10", "20", "TOP"], ["U2", "30", "40", "TOP"]] }, "mm", "TOP").items.length, 2);
 });
+
+test("2D 全板熱圖模式切換：#segHeatMode 在各板平均與不良密度間切換並更新副標與圖例", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const dom = createPage();
+  const w = dom.window, H = await waitFor(() => w.SPI_TEST_HOOK?.drawHeat && w.SPI_TEST_HOOK);
+  const seg = w.document.getElementById("segHeatMode");
+  assert.ok(seg, "全板熱圖卡片應有顯示模式切換群組");
+  const btnAvg = seg.querySelector('[data-hm="avg"]'), btnDen = seg.querySelector('[data-hm="density"]');
+  assert.ok(btnAvg && btnDen);
+  assert.equal(H.S.heatMode, "avg");
+  btnDen.click();
+  assert.equal(H.S.heatMode, "density");
+  assert.equal(btnDen.getAttribute("aria-pressed"), "true");
+  assert.equal(btnAvg.getAttribute("aria-pressed"), "false");
+  assert.match(w.document.getElementById("heatSub").textContent, /局部不良密度/);
+  assert.match(w.document.getElementById("heatLeg").textContent, /高密度/);
+  btnAvg.click();
+  assert.equal(H.S.heatMode, "avg");
+  assert.equal(btnAvg.getAttribute("aria-pressed"), "true");
+});
