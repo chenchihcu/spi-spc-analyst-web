@@ -210,3 +210,65 @@ test("配對卡：未成對顯示尚未搭配與座標檔不存在；從卡片�
   assert.match($("#inRevError").textContent, /版次/);
   assert.deepEqual(t.errs, []);
 });
+
+test("配對審查修正：捷徑選座標會重轉、身分警示不被冒泡清除、篩選保留引用座標、狀態徽章、取消登錄不殘留", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const t = await cloudPage(), { d, $, w, cloud } = t;
+  const place = await cloud.upload({ kind: "place", part: "REV-1", rev: "V1", side: "TOP", unit: "mm", name: "rev.csv" }, PLACE_CSV);
+  await cloud.upload({ kind: "spi", part: "REV-1", rev: "V1", side: "TOP", placeId: place.id, workOrder: "WO-R", lot: "LOT-ONLY-SPI", name: "m.csv", vendor: "lirong" }, WIDE);
+  await w.SPI_TEST_HOOK.RecDB.list();
+
+  // 篩選只命中量測（批號）時，配對卡仍顯示它引用的座標，匯入鈕帶既有座標 ID，並顯示狀態徽章
+  $("#btnOpenRecModal").click();
+  assert.ok(await until(() => !$("#boxPickPairs").hidden && /LOT-ONLY-SPI/.test($("#pairBoard").textContent)));
+  $("#recPickerQ").value = "LOT-ONLY-SPI";
+  await w.SPI_TEST_HOOK.renderRecPicker();
+  assert.ok(/LOT-ONLY-SPI/.test($("#pairBoard").textContent));
+  const card = [...d.querySelectorAll("#pairBoard .pair-card")].find(c => /LOT-ONLY-SPI/.test(c.textContent));
+  assert.ok(card, $("#pairBoard").textContent);
+  assert.doesNotMatch(card.textContent, /此版次還沒有座標檔/, "引用的座標不應被篩選成空位");
+  assert.match(card.textContent, /被 1 筆量測引用/);
+  assert.equal(card.querySelector("[data-pair-import]").dataset.placeId, place.id);
+  assert.match(card.querySelector(`[data-row-id] .pill`)?.textContent || "", /有效/, "量測列顯示生命週期徽章");
+
+  // 按「先登錄座標檔」後關閉，返回匯入的意圖要清除
+  $("#recPickerClose").click();
+  w.SPI_TEST_HOOK.setTab("data"); w.SPI_TEST_HOOK.setSub("import");
+  $("#btnRegisterPlace").click();
+  assert.ok(await until(() => !$("#recPickerModal").hidden));
+  $("#recPickerClose").click();
+  $("#btnOpenRecModal").click();
+  $("#upPlacePart").value = "OTHER-1"; $("#upPlaceRev").value = "V7"; $("#upPlaceSide").value = "TOP"; $("#upPlaceUnit").value = "mm";
+  const up = $("#upPlaceFile");
+  Object.defineProperty(up, "files", { configurable: true, value: [new w.File([Buffer.from(PLACE_CSV)], "other.csv")] });
+  up.dispatchEvent(new w.Event("change"));
+  $("#btnSubmitPlace").click();
+  if (await until(() => /確認是新料號並存入/.test($("#btnSubmitPlace").textContent), 20)) $("#btnSubmitPlace").click();
+  assert.ok(await until(() => /已存入座標檔 OTHER-1/.test($("#upPlaceState").textContent)), $("#upPlaceState").textContent);
+  assert.equal($("#recPickerModal").hidden, false, "一般登錄留在記錄庫");
+  assert.notEqual(w.SPI_TEST_HOOK.getPlace()?.part, "OTHER-1", "一般登錄不改目前選取的座標");
+  $("#recPickerClose").click();
+
+  // 匯入卡：解析量測後用「符合的座標檔」捷徑選取，待匯入資料要依新座標重轉
+  w.SPI_TEST_HOOK.setTab("data"); w.SPI_TEST_HOOK.setSub("import");
+  $("#inPart").value = "REV-1"; $("#inRev").value = "V1"; $("#selSide").value = "TOP";
+  $("#selSide").dispatchEvent(new w.Event("change", { bubbles: true }));
+  const fin = $("#fileIn");
+  Object.defineProperty(fin, "files", { configurable: true, value: [new w.File([Buffer.from(WIDE)], "m2.csv")] });
+  fin.dispatchEvent(new w.Event("change"));
+  assert.ok(await until(() => !$("#mapBox").hidden || $("#parseErr").textContent), "量測已解析");
+  $("#inPart").value = "REV-1"; $("#inRev").value = "V1"; $("#selSide").value = "TOP";
+  $("#inRev").dispatchEvent(new w.Event("input", { bubbles: true }));
+  assert.match($("#mapBox").textContent, /尚未選取受控座標檔/, "選座標前的轉換沒有座標");
+  const btn = await until(() => $(`#placeChoices [data-pick-place="${place.id}"]`)) && $(`#placeChoices [data-pick-place="${place.id}"]`);
+  assert.ok(btn, $("#placeChoices").textContent);
+  btn.click();
+  assert.ok(await until(() => w.SPI_TEST_HOOK.getPlace()?.recId === place.id));
+  assert.ok(await until(() => /座標檔對應 1\/1 個元件/.test($("#mapBox").textContent)), "選取座標後依新座標重新轉換待匯入資料：" + $("#mapBox").textContent.slice(0, 300));
+
+  // 版次與座標不符的警示，經過匯入卡的冒泡清除後仍保留
+  $("#inRev").value = "V9";
+  $("#inRev").dispatchEvent(new w.Event("input", { bubbles: true }));
+  assert.match($("#inRevError").textContent, /與所選座標版次 V1 不同/);
+  assert.equal($("#inRev").getAttribute("aria-invalid"), "true");
+  assert.deepEqual(t.errs, []);
+});
