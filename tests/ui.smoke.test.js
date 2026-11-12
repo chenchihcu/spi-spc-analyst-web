@@ -98,9 +98,13 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   tab("ai");
   d.querySelector("#btnGoAiCfg").click();
   assert.equal(d.querySelector("#appSettingsModal").hidden, false, "AI 設定轉跳應開啟介面與 AI 設定對話框");
+  // .db-modal 預設 display:none，只有 .open 才顯示；只清 hidden 時按鈕看似無反應
+  assert.ok(d.querySelector("#appSettingsModal").classList.contains("open"), "AI 設定對話框應加上 .open 才會實際顯示");
   assert.ok(d.querySelector("#appSettingsModal #aiSettingsCard"), "AI 詳細設定卡應在設定對話框");
   assert.ok(d.querySelector("#appSettingsModal #btnThemeSettings"), "主題切換應在設定對話框");
   d.querySelector("#appSettingsClose").click();
+  assert.equal(d.querySelector("#appSettingsModal").hidden, true, "關閉後設定對話框應隱藏");
+  assert.ok(!d.querySelector("#appSettingsModal").classList.contains("open"), "關閉後應移除 .open");
   w.SPI_TEST_HOOK.setSub("specs", "spec");
   assert.equal(w.SPI_TEST_HOOK.S.sub, "settings", "舊別名 specs 應對應規格子分頁");
   w.SPI_TEST_HOOK.setTab("deep/cross");
