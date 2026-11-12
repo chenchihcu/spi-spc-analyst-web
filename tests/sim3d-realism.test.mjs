@@ -177,3 +177,95 @@ test("雙向焦點聯動：點選焊墊同步更新 2D 截面剖面、HUD 形狀
   H.focusPad3D("U1.A1");
   assert.equal(H.S.selectedPad, mockPad, "focusPad3D 正確設定 selectedPad");
 });
+
+test("局部不良密度（OOS Density）空間雜湊：計算鄰近區域不良密度並與色階映射一致", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const dom = createPage();
+  const H = await waitFor(() => dom.window.SPI_TEST_HOOK?.computeLocalOosDensity && dom.window.SPI_TEST_HOOK);
+  const S = H.S;
+  const saved = [S.specs, S.htol, S.step, S.specsG, S.heightUnit];
+  try {
+    S.specs = {
+      volume: { lsl: 70, tgt: 100, usl: 130 },
+      height: { lsl: 90, tgt: 120, usl: 150 },
+      hpct: { lsl: 75, tgt: 100, usl: 125 },
+      area: { lsl: 70, tgt: 100, usl: 130 },
+      offx: { lsl: -75, tgt: 0, usl: 75 },
+      offy: { lsl: -75, tgt: 0, usl: 75 },
+    };
+    S.htol = { lo: 75, hi: 125 }; S.step = { on: false, zones: [] }; S.specsG = {}; S.heightUnit = "um";
+    assert.equal(H.computeLocalOosDensity([], (r) => ({ x: r.x, y: r.y }), (r) => (r.volume < 70 ? ["INS"] : [])).size, 0, "無有效座標回傳空 Map");
+
+    // 4 個相鄰焊墊：只有 1 個 OOS
+    const rows = [
+      { pad: "P1", x: 10, y: 10, volume: 50 },
+      { pad: "P2", x: 11, y: 10, volume: 100 },
+      { pad: "P3", x: 10, y: 11, volume: 100 },
+      { pad: "P4", x: 11, y: 11, volume: 100 },
+      { pad: "Q1", x: 50, y: 50, volume: 50 }, // 遠端孤立不良點
+    ];
+    const dm = H.computeLocalOosDensity(rows, (r) => ({ x: r.x, y: r.y }), (r) => (r.volume < 70 ? ["INS"] : []));
+    assert.ok(Math.abs(dm.get(rows[0]) - 0.25) < 1e-6, "4 鄰點中有 1 個不良，局部密度為 0.25");
+    assert.equal(dm.get(rows[4]), 1, "遠端孤立不良點群聚密度為 1.0");
+    assert.equal(H.densityColor(0), "#10b981", "密度 0 對應低密度綠");
+    assert.equal(H.densityColor(0.25), "#f59e0b", "密度 0.25 對應中密度琥珀");
+    assert.equal(H.densityColor(1), "#ef4444", "密度 1 對應極高密度紅");
+  } finally {
+    [S.specs, S.htol, S.step, S.specsG, S.heightUnit] = saved;
+  }
+});
+
+test("3D InstancedMesh 批次渲染、高密度降階、pick 反查與不良密度著色自動切換", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const dom = createPage();
+  const w = dom.window, H = await waitFor(() => w.SPI_TEST_HOOK?.build3D && w.SPI_TEST_HOOK);
+  const T = H.T, S = H.S;
+
+  // 點選「不良密度」著色時，若在「真實外觀」應自動切換至「品質熱圖」
+  S.sim3dMode = "real";
+  const btnDensity = w.document.querySelector('#segColor button[data-v="density"]');
+  assert.ok(btnDensity && btnDensity.textContent.trim() === "不良密度");
+  btnDensity.click();
+  assert.equal(S.colorMode, "density");
+  assert.equal(S.sim3dMode, "heatmap", "點選不良密度應自動切換外觀為品質熱圖");
+  assert.equal(w.document.querySelector('#seg3dRenderMode button[data-m="heatmap"]').getAttribute("aria-pressed"), "true");
+
+  // 模擬已初始化的 3D 場景測試 build3D 產物
+  const THREE = w.THREE;
+  T.ok = true;
+  T.root = new THREE.Group();
+  T.cam = new THREE.PerspectiveCamera(45, 1, 0.1, 500);
+  T.fitSpan = null;
+  const savedRows = S.rows, savedBoard = S.board, savedGroup = S.group;
+  try {
+    S.board = "B01"; S.group = "ALL"; S.ghost = true; S.bridgeWarn = true;
+    S.rows = [
+      { board: "B01", pad: "U1.1", group: "U1", x: 10, y: 10, w: 0.6, d: 0.6, volume: 100, area: 100, height: 120, bridgemargin: 10 },
+      { board: "B01", pad: "U1.2", group: "U1", x: 12, y: 10, w: 0.6, d: 0.6, volume: 100, area: 100, height: 120, shape: "round" },
+    ];
+    H.pos3D(S.rows);
+    H.build3D();
+    const names = T.root.children.map((c) => c.name).filter(Boolean);
+    assert.ok(names.includes("cuRect") && names.includes("cuRound"), "銅墊應使用 InstancedMesh 批次建立");
+    assert.ok(names.includes("pasteRectInst") && names.includes("pasteRoundInst"), "品質熱圖錫膏應使用 InstancedMesh 批次建立");
+    assert.ok(names.includes("ghostMerged"), "鋼板虛線應合併為單一 LineSegments");
+    assert.ok(names.includes("bridgeWarnInst"), "橋接預警環應使用 InstancedMesh 批次建立");
+    const rectInst = T.root.children.find((c) => c.name === "pasteRectInst");
+    assert.equal(rectInst.userData.rows[0], S.rows[0], "InstancedMesh userData.rows[0] 應對應原焊墊列，供 Raycaster instanceId 反查");
+
+    // 超過 2500 顆焊墊時，即使在真實外觀模式也應啟用高密度降階渲染
+    S.sim3dMode = "real";
+    const bigRows = Array.from({ length: H.HIGH_DENSITY_3D_THRESHOLD + 50 }, (_, i) => ({
+      board: "B01", pad: `P${i}`, group: "G1", x: (i % 60) * 1.2, y: Math.floor(i / 60) * 1.2,
+      w: 0.6, d: 0.6, volume: 100, area: 100, height: 120,
+    }));
+    S.rows = bigRows;
+    H.pos3D(S.rows);
+    H.build3D();
+    const bigPasteInst = T.root.children.find((c) => c.name === "pasteRectInst");
+    assert.ok(bigPasteInst && bigPasteInst.count === bigRows.length, "超過門檻應以單一 InstancedMesh 繪製錫膏");
+    assert.match(w.document.getElementById("hud").textContent, /高密度降階渲染/, "HUD 應揭露高密度降階渲染模式");
+  } finally {
+    T.ok = false; T.root = null;
+    S.rows = savedRows; S.board = savedBoard; S.group = savedGroup;
+    S.sim3dMode = "real"; S.colorMode = "volume";
+  }
+});

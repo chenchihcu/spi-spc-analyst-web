@@ -1,0 +1,46 @@
+# Release Readiness Report
+
+**Project:** SPI·SPC 分析台
+**Version:** v10.21.2（main `4968d8f`）
+**Date:** 2026-11-12
+**Overall Status:** NEEDS REVIEW（本機關卡無失敗；2 項警告經判讀非缺陷）
+
+## Summary
+
+本機全部自動關卡通過：518 項測試 0 失敗、穩定製程模擬 7／7、Cloudflare build 與 Worker dry-run 皆 exit 0。`release-check` 依規則回報 `NEEDS REVIEW`，原因是 2 項警告，判讀後都不是缺陷。正式站、UI 矩陣與 iPhone 真機未在本次驗證。
+
+## Checks（本次實際執行）
+
+| 類別 | 狀態 | 結果 | 下一步 |
+|---|---|---|---|
+| SPA 啟動 | ✅ | FACT：`node --test tests/ui.smoke.test.js` 2／2 通過 | — |
+| 版本 | ✅ | FACT：主頁 v10.21.2，與 CHANGELOG 最新條目一致 | — |
+| 更新紀錄 | ✅ | FACT：最新條目 v10.21.2，有日期 | — |
+| 除錯殘留 | ⚠️ | FACT：`spi-spc.html` 有 4 處 console 輸出（8227、8566、11982、11996）。INFERENCE：4 處都是 `console.warn`／`console.error`，在錯誤處理分支內，且畫面上另有可見的降級提示，屬刻意的診斷輸出，不是遺留的 debug | 保留 |
+| 文件 | ✅ | FACT：README 有快速開始／使用／設定 | — |
+| 相依 | ✅ | FACT：package.json 與 vendor 函式庫皆鎖定版本。INFERENCE：three.js r128 版本較舊但穩定 | — |
+| 測試 | ⚠️ | FACT：`npm run release-check`（內含完整 `npm test`）64 個檔案，518 項通過、0 失敗、4 項略過。FACT：其中 2 項需要 `C:/Users/user/Documents/x3000 spidata` 下的本機樣本檔（`tests/controlled-import.test.mjs`:93、122），本容器沒有這些檔案 | 在有樣本檔的 Windows 電腦上執行，確認這 2 項 |
+| 機密 | ✅ | FACT：掃描 197 個檔案，沒有硬編碼的金鑰或密碼雜湊 | — |
+| 無障礙 | ✅ | FACT：101 個靜態控制項都有標籤 | — |
+| 判定模擬 | ✅ | FACT：`npm run test:slow` 7／7 通過 | — |
+| Cloudflare build | ✅ | FACT：`npm run build:cloudflare` exit 0；`npx wrangler deploy --dry-run` exit 0 | — |
+| Streamlit | N/A | 本專案不是 Streamlit／Python | — |
+
+## Blockers
+
+無。
+
+## Warnings
+
+- [除錯殘留] INFERENCE：4 處 console 輸出都是錯誤診斷 → 不需修改。
+- [測試] FACT：4 項略過，其中 2 項缺本機樣本檔 → 在有樣本檔的電腦上補跑。
+
+## NOT TESTED
+
+- 正式站 Worker／D1 資料庫路徑：本容器沒有登入憑證，未送出 `POST /__login`（依 `classifyRecordsProbe` 判定為 `not_done`）。
+- UI 驗證矩陣（4 種寬度 × 明亮／深色）。
+- iPhone 真機。
+
+## Recommendations — Next Best Step
+
+在有 `x3000 spidata` 樣本檔的 Windows 電腦上執行 `node --test tests/controlled-import.test.mjs`，確認被略過的 2 項。

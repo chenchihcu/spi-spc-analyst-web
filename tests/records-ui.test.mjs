@@ -4,6 +4,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { createHash } from "node:crypto";
+import { gzipSync } from "node:zlib";
 
 const require = createRequire(import.meta.url);
 const { JSDOM } = (() => { try { return require("jsdom"); } catch { return {}; } })();
@@ -440,5 +441,199 @@ test("3D 示意網格警示的「套用座標檔」按鈕開啟座標檔庫", { 
   btn.click();
   assert.ok(await until(() => !$("#recPickerModal").hidden), "應開啟資料庫對話框");
   assert.equal($("#boxPickPlace").hidden, false, "應直接切到座標檔庫");
+  assert.deepEqual(errs, []);
+});
+
+test("從 3D 警示開啟座標庫：已選取座標檔仍顯示「套用到目前回合」按鈕並於成功後自動關閉", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { dom, errs, cloud } = await cloudPage();
+  const w = dom.window, d = w.document, $ = (s) => d.querySelector(s);
+  const part = "301-000100124";
+  await uploadSpec(dom, cloud, part);
+  await cloud.upload(
+    { kind: "place", part: "999-OTHER", rev: "V1", side: "TOP", unit: "mm", name: "other.csv" },
+    "RefDes,X,Y,PartType,Layer\nR1,1,2,R0402,TOP\n"
+  );
+  const p301Rec = await cloud.upload(
+    { kind: "place", part, rev: "V1", side: "TOP", unit: "mm", name: "p301.csv" },
+    "RefDes,X,Y,PartType,Layer\nC1,12.5,34.8,C0402,TOP\n"
+  );
+
+  const WIDE = "Component ID,Height(%)1,Volume(%)1,Area(%)1,PAD ID,Result1,Height(%)2,Volume(%)2,Area(%)2,Result2\n" +
+    "C1_1,100,101,99,1,PASS,102,103,98,PASS\n";
+  const raw = Buffer.from(WIDE);
+  const res = await cloud.repo.createRecord({
+    id: "legacygridrun000000001",
+    kind: "spi",
+    part,
+    lot: "L-GRID",
+    side: "TOP",
+    vendor: "lirong",
+    name: "grid_TOP.csv",
+    stencil: 120,
+    user: "old@example.test",
+    created: Date.now() - 1000,
+    bytes: raw.length,
+    sha256: createHash("sha256").update(raw).digest("hex"),
+    lifecycle: "legacy",
+    validation_source: "legacy",
+  }, gzipSync(raw));
+  assert.ok(res.record);
+
+  await w.SPI_TEST_HOOK.openRecord(res.record, { autoApply: false });
+  $("#btnApply").click();
+  assert.ok(await until(() => w.SPI_TEST_HOOK.curRun()?.info?.src?.id === res.record.id), "應建立處於示意網格之分析回合");
+  const cur = w.SPI_TEST_HOOK.curRun();
+  assert.equal(cur.rows[0].gridPos, true, "尚未套用檢視座標前應為 gridPos");
+
+  // 模擬已預先載入 PLACE（例如先前或另一操作已選取），但目前回合仍處於示意網格
+  await w.SPI_TEST_HOOK.usePlaceRec(p301Rec);
+  assert.equal(getPlacePart(w), part);
+  assert.equal(cur.rows[0].gridPos, true);
+
+  w.SPI_TEST_HOOK.setTab("sim3d");
+  assert.equal($("#grid3dWarn").style.display, "block", "3D 警示橫幅應顯示");
+
+  // 模擬先前殘留搜尋字串
+  $("#recPickerQ").value = "殘留搜尋字串";
+
+  $("#grid3dWarn #btnGridApplyPlace").click();
+  assert.ok(await until(() => !$("#recPickerModal").hidden && !$("#boxPickPlace").hidden && $("#pickPartFilter").value === part), "應開啟座標檔庫並自動篩選為目前回合料號");
+  assert.equal($("#recPickerQ").value, "", "從 3D 警示開啟應清除殘留搜尋字串");
+  const applyBtn = await (async () => {
+    await until(() => d.querySelector('#tblPickPlace [data-pact="apply-place"]'));
+    return d.querySelector('#tblPickPlace [data-pact="apply-place"]');
+  })();
+  assert.ok(applyBtn, "已選取的座標檔列應顯示可點擊的「套用到目前回合」按鈕");
+  assert.match(applyBtn.textContent, /套用到目前回合/);
+  assert.ok([...d.querySelectorAll('#tblPickPlace .pill.ok')].some(el => el.textContent.includes("目前已選取")), "仍保留「目前已選取」狀態標記");
+
+  applyBtn.click();
+  assert.ok(await until(() => $("#recPickerModal").hidden), "套用成功後應自動關閉對話框");
+  assert.equal(cur.rows[0].gridPos, undefined, "套用後應清除 gridPos");
+  assert.equal(cur.rows[0].componentX, 12.5, "應寫入元件 X 座標");
+  assert.equal(cur.rows[0].componentY, 34.8, "應寫入元件 Y 座標");
+  assert.equal($("#grid3dWarn").style.display, "none", "套用後 3D 警示橫幅應立即隱藏");
+
+  // 再清除後以「選取」(use-place) 從 #btnGridApplyPlace 開啟並一鍵套用且自動關閉
+  $("#placeClear").click();
+  assert.equal(cur.rows[0].gridPos, true, "清除後還原為 gridPos");
+  assert.equal($("#grid3dWarn").style.display, "block", "清除後警示橫幅應重新顯示");
+  $("#grid3dWarn #btnGridApplyPlace").click();
+  assert.ok(await until(() => !$("#recPickerModal").hidden && d.querySelector('#tblPickPlace [data-pact="use-place"]')));
+  d.querySelector('#tblPickPlace [data-pact="use-place"]').click();
+  assert.ok(await until(() => $("#recPickerModal").hidden), "從 3D 警示開啟按「選取」並套用成功時亦應自動關閉視窗");
+  assert.equal(cur.rows[0].gridPos, undefined);
+  assert.equal($("#grid3dWarn").style.display, "none");
+  assert.deepEqual(errs, []);
+});
+
+test("從 3D 警示開啟選取不符座標檔：維持視窗開啟並在 #recPickerNotice 顯示原因", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { dom, errs, cloud } = await cloudPage();
+  const w = dom.window, d = w.document, $ = (s) => d.querySelector(s);
+  const part = "PART-A";
+  await uploadSpec(dom, cloud, part);
+  await cloud.upload(
+    { kind: "place", part: "PART-B", rev: "V1", side: "TOP", unit: "mm", name: "b.csv" },
+    "RefDes,X,Y,PartType,Layer\nR1,1,2,R0402,TOP\n"
+  );
+  const WIDE = "Component ID,Height(%)1,Volume(%)1,Area(%)1,PAD ID,Result1,Height(%)2,Volume(%)2,Area(%)2,Result2\n" +
+    "C1_1,100,101,99,1,PASS,102,103,98,PASS\n";
+  const raw = Buffer.from(WIDE);
+  const res = await cloud.repo.createRecord({
+    id: "legacymismatch00000001",
+    kind: "spi",
+    part,
+    lot: "L-A",
+    side: "TOP",
+    vendor: "lirong",
+    name: "a_TOP.csv",
+    stencil: 120,
+    user: "old@example.test",
+    created: Date.now() - 1000,
+    bytes: raw.length,
+    sha256: createHash("sha256").update(raw).digest("hex"),
+    lifecycle: "legacy",
+    validation_source: "legacy",
+  }, gzipSync(raw));
+
+  await w.SPI_TEST_HOOK.openRecord(res.record, { autoApply: false });
+  $("#btnApply").click();
+  assert.ok(await until(() => w.SPI_TEST_HOOK.curRun()?.info?.src?.id === res.record.id));
+  w.SPI_TEST_HOOK.setTab("sim3d");
+
+  $("#grid3dWarn #btnGridApplyPlace").click();
+  assert.ok(await until(() => !$("#recPickerModal").hidden && d.querySelector('#tblPickPlace [data-pact="use-place"]')));
+  d.querySelector('#tblPickPlace [data-pact="use-place"]').click();
+  assert.ok(await until(() => /無法套用至目前回合/.test($("#recPickerNotice").textContent)), "#recPickerNotice 應顯示具體無法套用原因");
+  assert.match($("#recPickerNotice").textContent, /料號不符/);
+  assert.equal($("#recPickerModal").hidden, false, "套用失敗時應維持視窗開啟");
+  assert.equal(w.SPI_TEST_HOOK.curRun().rows[0].gridPos, true, "失敗時不得清除 gridPos");
+  assert.equal($("#grid3dWarn").style.display, "block", "失敗時應維持 3D 警示橫幅");
+  assert.deepEqual(errs, []);
+});
+
+test("原座標遺失之 active 回合、未標面別自動推定、與部分未對上焊墊處理", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { dom, errs } = page([]);
+  await tick(50);
+  const w = dom.window, d = w.document, $ = (s) => d.querySelector(s);
+  const h = w.SPI_TEST_HOOK;
+
+  const GEN_CSV = "Board,Pad,Component,Volume,Height(um),Area\n" +
+    [1, 2, 3, 4, 5].flatMap(b => [
+      `B${b},P1,C1_1,100,120,100`,
+      `B${b},P1,FID1_1,100,120,100`,
+    ]).join("\n") + "\n";
+  // 1. active 紀錄但原本連結的 placeId 無法取回 -> 開啟後退回 gridPos，且沒有明確 TOP/BOT 面別
+  const activeMissingPlace = await seedHistorical(w, {
+    id: "activegrid0000000001",
+    kind: "spi",
+    part: "P-BOT",
+    lot: "L-BOT",
+    side: "",
+    vendor: "generic",
+    name: "board_unknown_side.csv",
+    placeId: "missingplace0000000000",
+    stencil: 120,
+    lifecycle: "active",
+    validation_source: "server_verified",
+  }, GEN_CSV);
+
+  // 2. 雙面座標檔（TOP 僅 R99、BOT 含 C1）-> 應依位號自動推定為 BOT 面
+  const bothPlace = await seedHistorical(w, {
+    id: "placeboth00000000001",
+    kind: "place",
+    part: "P-BOT",
+    rev: "V1",
+    side: "BOTH",
+    unit: "mm",
+    name: "pbot_both.csv",
+    lifecycle: "active",
+    validation_source: "server_verified",
+  }, "RefDes,X,Y,PartType,Layer\nR99,1,2,R0402,TOP\nC1,20.1,40.2,C0402,BOT\n");
+
+  await h.openRecord(activeMissingPlace, { autoApply: false });
+  $("#btnApply").click();
+  assert.ok(await until(() => h.curRun()?.info?.src?.id === activeMissingPlace.id));
+  const cur = h.curRun();
+  assert.equal(cur.rows.every(r => r.gridPos === true), true, "缺原座標時全板應為 gridPos");
+
+  await h.usePlaceRec(bothPlace);
+  const res = h.syncPlaceToCurrentRun({ notify: true });
+  assert.equal(res.ok, true, "原座標遺失之 active 回合應允許套用檢視座標，且應自動推定為 BOT 面");
+  assert.equal(res.side, "BOT");
+  const c1Row = cur.rows.find(r => r.comp.startsWith("C1"));
+  const fidRow = cur.rows.find(r => r.comp.startsWith("FID1"));
+  assert.equal(c1Row.componentX, 20.1);
+  assert.equal(c1Row.componentY, 40.2);
+  assert.equal(c1Row.gridPos, undefined);
+  assert.equal(fidRow.gridPos, undefined, "部分未對上焊墊應一併清除 gridPos 以免拉歪示意板面");
+  assert.equal(fidRow.x, undefined);
+  assert.match(h.pos3DNote(), /元件中心示意/);
+  assert.match(h.pos3DNote(), /無座標未繪出/);
+  assert.doesNotMatch(h.pos3DNote(), /排列示意網格/);
+  assert.equal($("#grid3dWarn").style.display, "none", "部分對上並清除殘餘 gridPos 後不應顯示示意網格警示");
+
+  $("#placeClear").click();
+  assert.equal(cur.rows.every(r => r.gridPos === true), true, "清除座標檔後應完整還原全板 gridPos");
   assert.deepEqual(errs, []);
 });
