@@ -146,6 +146,34 @@ test("立榮格式：明確指定面別，座標檔面別不符時提醒；改�
   assert.equal(d.querySelector("#inRunName").value, "DEMO_BOT TOP", "名稱補上指定的面別");
 });
 
+test("立榮格式：面別未選且檔名無 TOP／BOT 時，依座標檔推定面別並預填，不誤報另一面", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { dom } = await cloudPage();
+  await tick(60);
+  const w = dom.window, d = w.document;
+  setVendor(dom, "lirong");
+  await applyControlledPlace(w, d, 'DEMO', 'V1', 'BOTH', 'mil', Buffer.from(PLACE), 'place.csv');
+  d.querySelector('#selSide').value = '';
+  await pick(dom, "#fileIn", "spi-data.csv", Buffer.from(WIDE));
+  const prev = d.querySelector("#mapPrev").textContent;
+  assert.match(prev, /面別依座標檔推定為 TOP（2\/3 個元件對得上），請確認/);
+  assert.match(prev, /座標檔對應 2\/3 個元件/);
+  assert.match(prev, /找不到 1 個位號：G9/);
+  assert.doesNotMatch(prev, /屬於另一面/);
+  assert.equal(d.querySelector('#selSide').value, 'TOP', '推定結果預填到面別下拉');
+});
+
+test("立榮格式：面別未選時依檔名 BOT 判定", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { dom } = await cloudPage();
+  await tick(60);
+  const w = dom.window, d = w.document;
+  setVendor(dom, "lirong");
+  await applyControlledPlace(w, d, 'DEMO', 'V1', 'BOTH', 'mil', Buffer.from(PLACE), 'place.csv');
+  d.querySelector('#selSide').value = '';
+  await pick(dom, "#fileIn", "DEMO_BOT.csv", Buffer.from(WIDE));
+  assert.match(d.querySelector("#mapPrev").textContent, /BOT 面（依檔名判定）/);
+  assert.equal(d.querySelector('#selSide').value, 'BOT');
+});
+
 test("通用格式下讀到立榮橫排檔會自動切換；選立榮卻上傳一般檔會清楚說明", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const { dom } = page();
   await tick(60);
