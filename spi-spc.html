@@ -396,6 +396,8 @@ td.num,th.num{text-align:right}
 .toolbar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:flex-end}
 .seg{display:inline-flex;flex-wrap:wrap;max-width:100%;border:1px solid var(--line);border-radius:7px;overflow:hidden}
 .seg button{border:none;border-radius:0;background:var(--surface);min-height:32px;padding:5px 11px}
+#aiProviderSeg button{flex:1 1 auto}
+#aiKeyBadge{max-width:100%}#aiKeyBadge .pill{white-space:normal;overflow-wrap:anywhere;border-radius:10px}
 #recPickerQ,#recPickerReload{min-height:34px}
 /* 觸控：放在基準高度之後，否則同權重的基準規則會蓋掉 44px */
 @media (pointer:coarse){.seg button,#recPickerQ,#recPickerReload{min-height:44px}}

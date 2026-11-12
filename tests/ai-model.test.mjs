@@ -559,8 +559,8 @@ test('NVIDIA：使用者金鑰轉發到 NVIDIA 端點，用 max_tokens；推薦�
 });
 
 test('NVIDIA：伺服器 NVIDIA_API_KEY 備援；無金鑰回 400；OpenAI 與 Antigravity 的請求欄位不變', async () => {
-  const rSrv = await postWithCapture({ NVIDIA_API_KEY: 'nvapi-server-key' }, { headers: { 'X-AI-Provider': 'nvidia' } });
-  assert.equal(rSrv.calls[0].headers.Authorization, 'Bearer nvapi-server-key');
+  const rSrv = await postWithCapture({ NVIDIA_API_KEY: 'nv-srv' }, { headers: { 'X-AI-Provider': 'nvidia' } });
+  assert.equal(rSrv.calls[0].headers.Authorization, 'Bearer nv-srv');
 
   const rNone = await postWithCapture(ENV, { headers: { 'X-AI-Provider': 'nvidia' } });
   assert.equal(rNone.res.status, 400);
