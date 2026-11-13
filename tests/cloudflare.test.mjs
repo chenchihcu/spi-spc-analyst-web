@@ -38,7 +38,7 @@ const env = {
   ...credentials,
   DB: mockDb(),
   BLOBS: mockBlobs(),
-  ASSETS: { fetch: async (req) => new Response(req.url.includes('/vendor/') ? 'font' : '<h1>SPI·SPC</h1>', { headers: { 'Content-Type': 'text/html' } }) },
+  ASSETS: { fetch: async (req) => new Response(req.url.includes('/vendor/') ? 'font' : req.url.includes('/offline/spi-spc-offline.html') ? '<h1>offline</h1>' : '<h1>SPI·SPC</h1>', { headers: { 'Content-Type': 'text/html' } }) },
 };
 const request = (path, headers) => new Request('https://spi.example.test' + path, { headers });
 
@@ -77,3 +77,18 @@ test('Cloudflare Worker serves only selected assets to an authenticated user', a
   assert.equal((await handleRequest(request('/tests/cloudflare.test.mjs', headers), env)).status, 404);
 });
 
+
+test('Cloudflare Worker serves the offline build only to a logged-in user, as a versioned download', async () => {
+  const { APP_VERSION } = await import('../lib/version.mjs');
+  const anon = await handleRequest(request('/download/offline'), env);
+  assert.equal(anon.status, 303, '未登入不可下載離線版');
+  assert.equal((await handleRequest(request('/offline/spi-spc-offline.html'), env)).status, 303, '產物路徑不可繞過登入');
+  const token = await issueToken(env, 'local@example.com', Math.floor(Date.now() / 1000));
+  const headers = { cookie: `${COOKIE}=${token}` };
+  const res = await handleRequest(request('/download/offline', headers), env);
+  assert.equal(res.status, 200);
+  assert.equal(await res.text(), '<h1>offline</h1>');
+  assert.equal(res.headers.get('content-disposition'), `attachment; filename="spi-spc-offline-${APP_VERSION}.html"`);
+  assert.equal(res.headers.get('cache-control'), 'private, no-store');
+  assert.equal((await handleRequest(request('/offline/spi-spc-offline.html', headers), env)).status, 404, '只開放 /download/offline 一個入口');
+});

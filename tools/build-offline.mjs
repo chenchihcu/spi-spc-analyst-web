@@ -4,7 +4,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
-import { formatBuilt } from './build-cloudflare.mjs';
+import { formatBuilt } from './build-time.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const MAX_BYTES = 15 * 1024 * 1024; // claude.ai 頁面上限 16 MB，留 1 MB 餘裕
@@ -19,7 +19,7 @@ function replaceOnce(html, pattern, replacement, label) {
   return html.split(pattern).join(replacement);
 }
 
-export async function buildOffline({ out = join(root, 'dist-offline'), now = new Date() } = {}) {
+export async function buildOffline({ out = join(root, 'dist-offline'), now = new Date(), name } = {}) {
   const { APP_VERSION } = await import('../lib/version.mjs');
   let html = await readFile(join(root, 'spi-spc.html'), 'utf8');
   const built = formatBuilt(now);
@@ -67,7 +67,7 @@ export async function buildOffline({ out = join(root, 'dist-offline'), now = new
   if (bytes > MAX_BYTES) throw new Error(`離線打包：產物 ${(bytes / 1048576).toFixed(1)} MB 超過 15 MB`);
 
   await mkdir(out, { recursive: true });
-  const file = join(out, `spi-spc-offline-${APP_VERSION}.html`);
+  const file = join(out, name || `spi-spc-offline-${APP_VERSION}.html`);
   await writeFile(file, html);
   return { file, bytes, built, version: APP_VERSION };
 }

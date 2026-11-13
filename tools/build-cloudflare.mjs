@@ -1,18 +1,13 @@
 import { cp, mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
+import { formatBuilt } from './build-time.mjs';
+import { buildOffline } from './build-offline.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const allowed = new Set(['index.html', 'vendor', '_headers']);
+const allowed = new Set(['index.html', 'vendor', '_headers', 'offline']);
 
-// 更新時間一律以台北時間（UTC+8）顯示，與 CHANGELOG 相同格式 YYYY-MM-DD HH:mm:ss
-export const formatBuilt = (date) => {
-  const p = Object.fromEntries(new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Taipei', hourCycle: 'h23',
-    year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit',
-  }).formatToParts(date).map(({ type, value }) => [type, value]));
-  return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}:${p.second}`;
-};
+export { formatBuilt } from './build-time.mjs';
 
 // 主頁的 #appBuilt 換成本次 build 時間；登入頁經 package.json 的 #build-info 條件匯入讀同一個值
 export async function build({ out = join(root, 'dist'), info = join(root, '.build', 'build-info.mjs'), now = new Date() } = {}) {
@@ -30,6 +25,8 @@ export async function build({ out = join(root, 'dist'), info = join(root, '.buil
   await mkdir(dirname(info), { recursive: true });
   await writeFile(info, `// 由 tools/build-cloudflare.mjs 產生，勿手改\nexport const APP_VERSION = ${JSON.stringify(APP_VERSION)};\nexport const APP_BUILT = ${JSON.stringify(built)};\n`);
   await cp(join(root, 'vendor'), join(out, 'vendor'), { recursive: true, force: true });
+  // 離線版單檔：只經 Worker 的 /download/offline（需登入）提供下載
+  await buildOffline({ out: join(out, 'offline'), now, name: 'spi-spc-offline.html' });
   try {
     await cp(join(root, '_headers'), join(out, '_headers'), { force: true });
   } catch {}
@@ -38,5 +35,5 @@ export async function build({ out = join(root, 'dist'), info = join(root, '.buil
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const { built, bytes } = await build();
-  console.log(`Cloudflare assets: index.html, vendor/, _headers (${bytes} HTML bytes), built ${built} (UTC+8)`);
+  console.log(`Cloudflare assets: index.html, vendor/, offline/, _headers (${bytes} HTML bytes), built ${built} (UTC+8)`);
 }

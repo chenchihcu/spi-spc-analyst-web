@@ -996,6 +996,7 @@ button.load-state{border:none;font:inherit;cursor:default}
         <button role="menuitem" class="duo-toggle-btn" id="duoToggleBtn" title="切換折疊雙欄模式" aria-label="切換雙欄模式" aria-pressed="false">雙欄模式</button>
         <button role="menuitem" id="btnShare" hidden title="把目前的回合與畫面做成連結，傳給同事開啟">分享連結</button>
         <button role="menuitem" id="btnMyShares" hidden title="檢視與管理自己建立的分享連結">我的分享</button>
+        <a role="menuitem" id="offlineLink" href="/download/offline" hidden title="下載單一 HTML 檔，不連網也能分析；資料不會存檔">下載離線版</a>
         <a role="menuitem" id="logoutLink" href="/__logout" hidden>登出</a>
       </div>
     </div>
@@ -11072,7 +11073,7 @@ const HAS_API=/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 /* 是否有登入後端：以 /__me 實際回應判斷（自訂網域也適用），不依網址名稱 */
 const ME_PROBE=typeof fetch==="function"&&/^https?:$/.test(location.protocol)&&!/(^|\.)claude(usercontent)?\.(ai|com)$/.test(location.hostname);
 const meP=ME_PROBE?fetch("/__me",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>j&&j.user?j:null).catch(()=>null):Promise.resolve(null);
-meP.then(j=>{if(!j)return;$("#userName").textContent=j.user;$("#userChip").hidden=false;$("#logoutLink").hidden=false;if(window.CompressionStream){$("#btnShare").hidden=false;$("#btnShare").onclick=createShare}});
+meP.then(j=>{if(!j)return;$("#userName").textContent=j.user;$("#userChip").hidden=false;$("#logoutLink").hidden=false;if(!OFFLINE)$("#offlineLink").hidden=false;if(window.CompressionStream){$("#btnShare").hidden=false;$("#btnShare").onclick=createShare}});
 /* ---------- 分享連結：壓縮後上傳到本網站（Cloudflare D1＋R2），連結需登入才能開啟，30 天失效 ---------- */
 async function gzipJSON(o){return new Uint8Array(await new Response(new Response(JSON.stringify(o)).body.pipeThrough(new CompressionStream("gzip"))).arrayBuffer())}
 const SHARE_MAX=4*1048576,SHARE_RAW_MAX=200*1048576;
