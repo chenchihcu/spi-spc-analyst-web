@@ -27,10 +27,11 @@ function page(saved, cloud, preloadPlace) {
     Object.assign(w, { Response, DecompressionStream });
     withIdb(w);
     if (cloud) installBrowserCloud(w, cloud);
-    if (preloadPlace) w.localStorage.setItem('spi-place', preloadPlace);
     w.SPI_TEST_HOOK = { bootSample: true };
     w.addEventListener("error", (e) => errs.push(e.message));
   } });
+  // 座標檔不再存於瀏覽器：以測試掛鉤模擬「目前已選取的座標檔」
+  if (preloadPlace) dom.window.SPI_TEST_HOOK.setPlace(JSON.parse(preloadPlace));
   return { dom, errs };
 }
 const CSV = "Board,Pad,Component,Volume,Height(um),Area\n" + Array.from({ length: 60 }, (_, i) => `B${Math.floor(i / 6) + 1},P${i % 6},U1,${100 + (i % 5)},120,100`).join("\n");
