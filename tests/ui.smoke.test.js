@@ -69,10 +69,25 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   // 以「抓出問題」為目的的介面要素：問題地圖、證據迷你圖、嚴重度分段、來源提示
   assert.ok(d.querySelectorAll(".iss-card svg.ev").length === d.querySelectorAll(".iss-card").length, "每個問題卡片都應有證據迷你圖");
   assert.ok(d.querySelectorAll("#issList .iss-case").length >= 1, "預設應依問題定義分組");
+  // 嚴重度篩選鈕上的數字＝點下去顯示的數量：依問題定義數案、依統計規則數卡
+  const chipCheck = (sel) => {
+    for (const lv of ["ng", "warn", "info", "all"]) {
+      const chip = d.querySelector(`#issFilter [data-lv="${lv}"]`);
+      const n = Number(chip.textContent.match(/\d+/)[0]);
+      chip.click();
+      assert.equal(d.querySelectorAll(sel).length, n, `${chip.textContent} 點下去應顯示 ${n} 項（${sel}）`);
+    }
+  };
+  assert.match($("#issHead").textContent, /^\d+ 個問題定義：嚴重 \d+、警示 \d+、資訊 \d+（\d+ 項統計發現）$/);
+  const headN = $("#issHead").textContent.match(/\d+/g).map(Number);
+  assert.equal(headN[1] + headN[2] + headN[3], headN[0], "案檢視嚴重度加總等於問題定義數");
+  chipCheck("#issList .iss-case");
   const rulesBtn = d.querySelector('#issFilter [data-group="rules"]');
   assert.ok(rulesBtn, "應有依統計規則切換");
   rulesBtn.click();
   assert.ok(d.querySelectorAll("#issList .sevhead").length >= 2, "統計規則檢視應依嚴重度分段");
+  assert.match($("#issHead").textContent, /^\d+ 項統計發現：嚴重 \d+、警示 \d+、資訊 \d+（\d+ 個問題定義）$/);
+  chipCheck("#issList .iss-card");
   // 問題卡片預設收合成一行，可全部展開／收合
   assert.equal(d.querySelectorAll("#issList details.iss-card[open]").length, 0, "問題卡片預設收合");
   assert.ok(d.querySelectorAll("#issList details.iss-card > summary .iss-sum-t b").length === d.querySelectorAll(".iss-card").length, "每張卡片的摘要列有標題");

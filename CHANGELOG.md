@@ -9,6 +9,12 @@
 - **從網站下載**：`npm run build:cloudflare` 同時產生 `dist/offline/spi-spc-offline.html`。登入後在「更多」選單按「下載離線版」，經 Worker 的 `/download/offline`（需登入，`private, no-store`）下載 `spi-spc-offline-v<版本>.html`；產物路徑本身不對外開放。`formatBuilt` 移到 `tools/build-time.mjs`，避免兩個 build 腳本互相匯入。
 - **網站版不變**：沒有旗標時仍維持雲端受控匯入，未登入時拒絕正式新匯入；`RecDB.create` 仍 fail-closed。
 - **測試**：新增 `tests/offline-build.test.mjs`（打包產物無外部資源、離線匯入與套用規格不寫資料庫、網站版未登入仍拒絕新匯入）；`tests/cloudflare.test.mjs` 新增離線版下載需登入、檔名帶版本、產物路徑不可直接存取。
+## v10.23.2 — 2026-11-13（問題頁嚴重度計數與篩選單位一致）
+
+- **根因**：「依問題定義」檢視的標題寫「N 個問題定義」，後面的嚴重／警示／資訊卻是卡片張數（例：38 個問題定義，16+20+6=42）；篩選時又先以案的嚴重度剔除整案、再以卡片嚴重度剔除成員，嚴重度較低的卡若落在嚴重案中就消失。範例資料點「警示 12」只顯示 10 張、「資訊 7」只顯示 3 張。
+- **修正**：計數單位跟著檢視。依問題定義：`N 個問題定義：嚴重 a、警示 b、資訊 c（M 項統計發現）`，a+b+c=N，篩選鈕依案的嚴重度、案內成員全數顯示；依統計規則：`M 項統計發現：嚴重…（N 個問題定義）`，依卡片計數。新增 `issueCaseCounts`、`issueCaseRows`，`renderIssues`、`flashIssue`、全部展開共用同一份案清單；跳到被篩掉的卡時自動切回「全部」。
+- **不變**：`detectIssues` 結果、卡片 id／順序、`F.meta.verdict`（仍數卡片）、CSV／Markdown／AI 匯出。
+- **測試**：`tests/problem-cases.test.mjs` 新增案／卡計數加總與案嚴重度一致測試。規格見 `docs/spec-problem-cases-rfc.md`。
 
 ## v10.23.1 — 2026-11-13（分析設定列狀態燈號與文案同步）
 
