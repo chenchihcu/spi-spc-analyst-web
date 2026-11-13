@@ -6512,7 +6512,7 @@ function flashIssue(id){
   pmapState();
   if (!issueList("all").some(x=>x.id===id)) pmapSelect({...S.pmapSelection,mode:"all",pad:null});
   const caseView=S.issGroup==="cases";
-  if (S.issLv!=="all" && !(caseView ? issueCaseRows().some(c=>c.card_ids.includes(id)) : issueList().some(x=>x.id===id))) S.issLv="all";
+  if (S.issLv!=="all" && !(caseView ? issueCaseRows().some(c=>c.card_ids.includes(id)) : issueList().some(x=>x.id===id))) { S.issLv="all"; renderIssues(); } /* 先畫一次讓分頁鍵同步，否則下方加大的 ISS_PG.n 會被 renderIssues 重設 */
   if (!$("#iss-"+id)) {
     const list=issueList();
     const index=caseView
