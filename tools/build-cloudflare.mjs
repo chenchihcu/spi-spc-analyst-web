@@ -25,8 +25,9 @@ export async function build({ out = join(root, 'dist'), info = join(root, '.buil
   await mkdir(dirname(info), { recursive: true });
   await writeFile(info, `// 由 tools/build-cloudflare.mjs 產生，勿手改\nexport const APP_VERSION = ${JSON.stringify(APP_VERSION)};\nexport const APP_BUILT = ${JSON.stringify(built)};\n`);
   await cp(join(root, 'vendor'), join(out, 'vendor'), { recursive: true, force: true });
-  // 離線版單檔：只經 Worker 的 /download/offline（需登入）提供下載
-  await buildOffline({ out: join(out, 'offline'), now, name: 'spi-spc-offline.html' });
+  // 離線版單檔：只經 Worker 的 /download/offline（需登入）提供下載。
+  // 副檔名用 .bin：Workers 靜態資產會把 .html 路徑轉址成無副檔名網址，ASSETS.fetch 拿不到 200
+  await buildOffline({ out: join(out, 'offline'), now, name: 'spi-spc-offline.bin' });
   try {
     await cp(join(root, '_headers'), join(out, '_headers'), { force: true });
   } catch {}
