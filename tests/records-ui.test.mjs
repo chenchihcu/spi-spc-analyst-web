@@ -409,14 +409,17 @@ test("歷史舊資料回合在選取相符座標檔後即時套用檢視座標�
   // 5. 選取不相符料號的座標檔 -> 應提示不符，且不套用至目前回合
   await hook.usePlaceRec(otherPlace);
   hook.syncPlaceToCurrentRun({ notify: true });
-  assert.match($("#statePlace").textContent, /已選取/, "不符座標檔應僅顯示已選取，不顯示已套用");
+  assert.match($("#statePlace").textContent, /座標檔：未套用（已選 999-DIFFERENT V1，料號不符/, "不符座標檔應寫明未套用與原因，不顯示已套用");
+  assert.equal($("#statePlace").dataset.state, "idle", "未用於目前回合的座標檔不亮燈");
+  assert.equal($("#stateSpi").dataset.state, "warn", "舊資料回合已用於分析但未受控，量測紀錄亮警示燈");
+  assert.match($("#stateSpi").textContent, /舊資料・未受控（已用於分析）/);
   assert.equal(cur.rows[0].gridPos, true, "不符料號不得清除 gridPos");
 
   // 6. 選取相符料號與面別的座標檔 -> 應自動套用檢視座標
   await hook.usePlaceRec(placeRec);
   hook.syncPlaceToCurrentRun({ notify: true });
-  assert.match($("#statePlace").textContent, /座標檔：已套用（檢視）/, "相符座標檔應顯示已套用（檢視）");
-  assert.equal($("#statePlace").dataset.state, "ok", "膠囊狀態應亮綠燈 ok");
+  assert.match($("#statePlace").textContent, /座標檔：已套用（檢視，未受控）/, "相符座標檔應顯示已套用（檢視，未受控）");
+  assert.equal($("#statePlace").dataset.state, "warn", "舊資料回合的檢視座標未受控，亮警示燈 warn");
   assert.equal(cur.rows[0].gridPos, undefined, "套用座標後應清除 gridPos");
   assert.equal(cur.rows[0].componentX, 12.5, "應填入對應的元件 X 座標");
   assert.equal(cur.rows[0].componentY, 34.8, "應填入對應的元件 Y 座標");
@@ -635,5 +638,35 @@ test("原座標遺失之 active 回合、未標面別自動推定、與部分未
 
   $("#placeClear").click();
   assert.equal(cur.rows.every(r => r.gridPos === true), true, "清除座標檔後應完整還原全板 gridPos");
+  assert.deepEqual(errs, []);
+});
+
+test("狀態膠囊定義：兩顆燈只描述目前分析回合，燈號與文案一一對應", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { dom, errs } = page([]);
+  const hook = dom.window.SPI_TEST_HOOK;
+  assert.ok(await until(() => typeof hook.loadStateModel === "function"));
+  const m = (o) => JSON.parse(JSON.stringify(hook.loadStateModel(o)));
+  const active = { lifecycle: "active", placeId: "P1", unmatchedRefs: [] };
+  // 量測紀錄
+  assert.deepEqual(m({}).spi, { state: "idle", text: "量測紀錄：未套用" });
+  assert.deepEqual(m({ src: active }).spi, { state: "ok", text: "量測紀錄：已套用（受控）" });
+  assert.equal(m({ src: { ...active, unmatchedRefs: ["R1", "R2"] } }).spi.text, "量測紀錄：已套用（受控）・2 個位號無座標");
+  assert.deepEqual(m({ src: { lifecycle: "legacy" } }).spi, { state: "warn", text: "量測紀錄：舊資料・未受控（已用於分析）" });
+  assert.equal(m({ src: { lifecycle: "pending_review" } }).spi.state, "warn");
+  assert.equal(m({ src: { lifecycle: "superseded" } }).spi.text, "量測紀錄：歷史修正前版本");
+  assert.equal(m({ src: { lifecycle: "unavailable" } }).spi.text, "量測紀錄：狀態無法確認");
+  assert.deepEqual(m({ src: active, err: { spi: "雲端檔已刪除" } }).spi, { state: "error", text: "量測紀錄：雲端檔已刪除" });
+  // 座標檔
+  assert.deepEqual(m({}).place, { state: "idle", text: "座標檔：未套用" });
+  assert.deepEqual(m({ src: active, link: { v: "ok" } }).place, { state: "ok", text: "座標檔：已套用（身分相符）" });
+  assert.deepEqual(m({ src: active }).place, { state: "ok", text: "座標檔：已連結" });
+  assert.equal(m({ src: active, link: { v: "missing" } }).place.state, "error");
+  assert.deepEqual(m({ src: active, link: { v: "bad", text: "面別不符" } }).place, { state: "error", text: "座標檔：面別不符" });
+  assert.deepEqual(m({ src: { lifecycle: "legacy" }, preview: true }).place, { state: "warn", text: "座標檔：已套用（檢視，未受控）" });
+  // 已選取但沒有用到目前回合：不亮燈，寫明原因，不再單獨顯示「已選取」
+  const sel = m({ src: { lifecycle: "legacy" }, place: { part: "A1", rev: "V2" }, placeReason: "料號不符" }).place;
+  assert.deepEqual(sel, { state: "idle", text: "座標檔：未套用（已選 A1 V2，料號不符）" });
+  assert.equal(m({ place: { part: "A1", rev: "V2" } }).place.text, "座標檔：未套用（已選 A1 V2，未用於目前回合）");
+  assert.equal(m({ src: active, err: { place: "讀取失敗" } }).place.state, "error");
   assert.deepEqual(errs, []);
 });
