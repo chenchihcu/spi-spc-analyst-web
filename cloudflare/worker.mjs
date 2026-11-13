@@ -1,5 +1,6 @@
 import { configured, handle as handleAuth, users } from '../lib/auth-handler.mjs';
 import { SEC } from '../lib/security-headers.mjs';
+import { APP_VERSION } from '#build-info';
 import { Repo } from '../lib/repo.mjs';
 import { checkMeta, checkMetaPatch, clean, MAX_GZ, MAX_RAW } from '../lib/records-core.mjs';
 import { checkSpecBody, MAX_SPEC_RAW } from '../lib/part-spec-core.mjs';
@@ -414,6 +415,16 @@ async function route(req, env) {
     return env.ASSETS.fetch(new Request(assetUrl, req));
   }
   if (path.startsWith('/vendor/')) return env.ASSETS.fetch(req);
+  if (path === '/download/offline') {
+    // 離線版單檔：已登入使用者下載後可不連網使用；檔名帶版本
+    const asset = await env.ASSETS.fetch(new Request(new URL('/offline/spi-spc-offline.html', url), req));
+    if (!asset.ok) return plain('離線版尚未建置', 404);
+    const h = new Headers(asset.headers);
+    h.set('Content-Type', 'text/html; charset=utf-8');
+    h.set('Content-Disposition', `attachment; filename="spi-spc-offline-${APP_VERSION}.html"`);
+    h.set('Cache-Control', 'private, no-store');
+    return new Response(asset.body, { status: 200, headers: h });
+  }
   return plain('Not found', 404);
 }
 
