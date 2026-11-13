@@ -273,7 +273,7 @@ function resolveModelAndEffort(req, env, provCfg) {
   }
 
   const hdrEffort = (req.headers.get('x-ai-reasoning-effort') || '').trim().toLowerCase();
-  let reasoningEffort = String(env?.AI_REASONING_EFFORT || DEFAULT_REASONING_EFFORT).trim().toLowerCase();
+  let reasoningEffort = String(env?.AI_REASONING_EFFORT || provCfg.defaultEffort || DEFAULT_REASONING_EFFORT).trim().toLowerCase();
   if (!ALLOWED_EFFORTS.includes(reasoningEffort)) reasoningEffort = DEFAULT_REASONING_EFFORT;
   if (hdrEffort) {
     if (!ALLOWED_EFFORTS.includes(hdrEffort)) {
@@ -436,21 +436,72 @@ function abortableDelay(ms, signal) {
   });
 }
 
-async function fetchUpstreamWithRetry(targetUrl, headers, bodyPayload, signal, provLabel, onEffortFallback) {
+// 即時清單服務商（NVIDIA 免費帳號）的備援競速，依據 2026-11-13 實測（CHANGELOG v10.24.0）：
+// - 部分模型排隊 113–143 秒才送回應標頭，Worker 在 100 秒就收到 524；選定模型的標頭看門狗設 95 秒。
+// - 可用模型 2 秒內回應：選定模型 raceDelayMs 內沒產出第一個 token 就開始試備援，每個備援的標頭看門狗 20 秒。
+// - 模型清單含許多此帳號不能用的模型（404 立即回應）：備援以工作池進行，同時最多 FALLBACK_CONCURRENCY 個，
+//   失敗一個補下一個，整體 overallMs 內。第一個產出內容或推理 token 者勝出，其餘中止；選定模型仍可勝出。
+export const UPSTREAM_TIMEOUTS = { primaryHeaderMs: 95000, fallbackHeaderMs: 20000, raceDelayMs: 10000, overallMs: 120000 };
+export const MAX_FALLBACK_MODELS = 40;
+export const FALLBACK_CONCURRENCY = 6;
+// 這些結果代表「此模型現在不能用」，改試下一個候選模型
+const MODEL_UNAVAILABLE_STATUSES = [404, 410, 524];
+
+function linkedAbort(parentSignal) {
+  const ctrl = new AbortController();
+  const onAbort = () => ctrl.abort();
+  if (parentSignal?.aborted) ctrl.abort();
+  else parentSignal?.addEventListener?.('abort', onAbort, { once: true });
+  return ctrl;
+}
+
+/** 單一模型的請求：429／503 退避重試、524 降推理強度重試（可關閉）、拒收 reasoning_effort 時去掉欄位重試一次、可選回應標頭看門狗。 */
+async function fetchUpstreamWithRetry(targetUrl, headers, bodyPayload, signal, provLabel, onEffortFallback, opts = {}) {
+  const { headerTimeoutMs = 0, effortFallback = true } = opts;
   let didRetry = false;
   let timeoutFallbackUsed = false;
+  let effortDropped = false;
   const startedAt = Date.now();
   for (let attempt = 0; attempt < UPSTREAM_RETRY_MAX_ATTEMPTS; attempt++) {
-    const res = await fetch(targetUrl, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(bodyPayload),
-      signal,
-    });
-    if (res.ok) return { res, didRetry };
+    const ctrl = linkedAbort(signal);
+    let timedOut = false;
+    const timer = headerTimeoutMs > 0 ? setTimeout(() => { timedOut = true; ctrl.abort(); }, headerTimeoutMs) : null;
+    let res;
+    try {
+      res = await fetch(targetUrl, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(bodyPayload),
+        signal: ctrl.signal,
+      });
+    } catch (e) {
+      if (timedOut && !signal?.aborted) {
+        const waitedMs = Date.now() - startedAt;
+        return {
+          res: null,
+          timedOut: true,
+          modelUnavailable: true,
+          outcome: `等待 ${Math.round(waitedMs / 1000)} 秒未開始回應`,
+          error: `${provLabel} 超過 ${Math.round(headerTimeoutMs / 1000)} 秒未開始回應${formatTimeoutDiagnostics(provLabel, { model: bodyPayload.model, effort: bodyPayload.reasoning_effort, waitedMs })}；請在 AI 設定改選其他模型，或稍後再試。`,
+          didRetry,
+        };
+      }
+      throw e;
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+    if (res.ok) return { res, didRetry, bodyPayload };
     const bodyText = await res.text();
+    if (res.status === 400 && !effortDropped && bodyPayload.reasoning_effort && /reasoning_effort/i.test(bodyText)) {
+      effortDropped = true;
+      didRetry = true;
+      const { reasoning_effort: _drop, ...rest } = bodyPayload;
+      bodyPayload = rest;
+      continue;
+    }
     if (UPSTREAM_TIMEOUT_STATUSES.includes(res.status)) {
-      const canFallback = !timeoutFallbackUsed
+      const canFallback = effortFallback
+        && !timeoutFallbackUsed
         && bodyPayload.reasoning_effort
         && bodyPayload.reasoning_effort !== TIMEOUT_FALLBACK_EFFORT;
       if (canFallback) {
@@ -463,6 +514,8 @@ async function fetchUpstreamWithRetry(targetUrl, headers, bodyPayload, signal, p
       }
       return {
         res: null,
+        modelUnavailable: true,
+        outcome: `${res.status} 逾時`,
         error: formatUpstreamFailureMessage(provLabel, res.status, extractUpstreamError(bodyText), didRetry && timeoutFallbackUsed, {
           model: bodyPayload.model,
           effort: bodyPayload.reasoning_effort,
@@ -483,13 +536,185 @@ async function fetchUpstreamWithRetry(targetUrl, headers, bodyPayload, signal, p
       await abortableDelay(plan.waitMs, signal);
       continue;
     }
+    const unavailable = MODEL_UNAVAILABLE_STATUSES.includes(res.status);
     return {
       res: null,
+      modelUnavailable: unavailable,
+      outcome: res.status === 410 ? '410 已下架' : res.status === 404 ? '404 帳號無此模型' : `HTTP ${res.status}`,
       error: formatUpstreamFailureMessage(provLabel, res.status, plan.extracted, didRetry),
       didRetry,
     };
   }
   return { res: null, error: `${provLabel} 回應 HTTP 429`, didRetry: true };
+}
+
+/** 解析瀏覽器送來的備援模型（即時清單），去重、排除選定模型、格式檢查、最多 MAX_FALLBACK_MODELS 個。 */
+export function parseFallbackModels(raw, selected) {
+  const out = [];
+  for (const part of String(raw || '').split(',')) {
+    const m = part.trim();
+    if (!m || m === selected || out.includes(m)) continue;
+    if (!/^[A-Za-z0-9._:/-]{2,120}$/.test(m)) continue;
+    out.push(m);
+    if (out.length >= MAX_FALLBACK_MODELS) break;
+  }
+  return out;
+}
+
+/** SSE 事件是否已帶出內容或推理 token（只有角色、空 delta 的事件不算）。 */
+function sseHasToken(text) {
+  for (const line of text.split(/\r?\n/)) {
+    const t = line.trim();
+    if (!t.startsWith('data:')) continue;
+    const d = t.slice(5).trim();
+    if (!d || d === '[DONE]') continue;
+    let ev;
+    try { ev = JSON.parse(d); } catch { continue; }
+    const delta = Array.isArray(ev.choices) ? ev.choices[0]?.delta : null;
+    if (delta && [delta.content, delta.reasoning_content, delta.reasoning].some((x) => typeof x === 'string' && x.length > 0)) return true;
+    if (ev.type === 'content_block_delta') return true;
+  }
+  return false;
+}
+
+/** 非 SSE 的回應內容（例如 200 但本文是錯誤 JSON），截短供失敗訊息顯示。 */
+function nonSseSnippet(text) {
+  return text.split(/\r?\n/).map((l) => l.trim()).filter((l) => l && !l.startsWith('data:') && !l.startsWith(':')).join(' ').slice(0, 200);
+}
+
+/**
+ * 開始回應後先讀到第一個內容／推理 token 才算這個模型可用；讀到的片段原樣重播給呼叫端。
+ * 標頭回來但沒有任何 token（空串流、錯誤本文、逾時）時回報失敗，讓競速繼續等其他模型。
+ */
+async function primeSseStream(res, timeoutMs) {
+  const reader = res.body.getReader();
+  const dec = new TextDecoder();
+  const chunks = [];
+  let text = '';
+  const deadline = Date.now() + timeoutMs;
+  for (;;) {
+    const remaining = deadline - Date.now();
+    let timer;
+    const r = remaining > 0
+      ? await Promise.race([reader.read(), new Promise((ok) => { timer = setTimeout(() => ok({ timeout: true }), remaining); })])
+      : { timeout: true };
+    clearTimeout(timer);
+    if (r.timeout) {
+      reader.cancel().catch(() => {});
+      return { ok: false, outcome: `開始回應後 ${Math.round(timeoutMs / 1000)} 秒沒有內容` };
+    }
+    if (r.done) {
+      const raw = nonSseSnippet(text);
+      return { ok: false, outcome: `回應為空${raw ? `：${raw}` : ''}` };
+    }
+    chunks.push(r.value);
+    text += dec.decode(r.value, { stream: true });
+    if (sseHasToken(text)) {
+      const replay = new ReadableStream({
+        start(c) { for (const x of chunks) c.enqueue(x); },
+        async pull(c) {
+          const { done, value } = await reader.read();
+          if (done) c.close(); else c.enqueue(value);
+        },
+        cancel() { return reader.cancel(); },
+      });
+      return { ok: true, res: new Response(replay, { status: res.status, headers: res.headers }) };
+    }
+  }
+}
+
+/**
+ * 候選模型請求。非即時清單服務商：只送選定模型（行為與原本相同，含 524 降推理強度）。
+ * 即時清單服務商：選定模型先送；它不能用（逾時、524、404、410）或 raceDelayMs 內未開始回應時，並行送出備援模型，
+ * 第一個開始回應者勝出、其餘中止。選定模型的其他錯誤（金鑰、配額等）直接停止。
+ */
+async function fetchWithModelFallback(targetUrl, headers, baseBody, candidates, signal, provLabel, providerId, reasoningEffort, onEffortFallback) {
+  const live = Boolean(PROVIDERS[providerId]?.liveModels);
+  if (!live) {
+    const up = await fetchUpstreamWithRetry(targetUrl, headers, baseBody, signal, provLabel, onEffortFallback);
+    return { ...up, model: candidates[0], tried: [] };
+  }
+  const bodyFor = (m, i) => {
+    if (i === 0) return baseBody;
+    const { model: _m, reasoning_effort: _e, ...rest } = baseBody;
+    return { model: m, ...(sendsReasoningEffort(providerId, m) ? { reasoning_effort: reasoningEffort } : {}), ...rest };
+  };
+  const startedAt = Date.now();
+  const outcomes = new Map();
+  const ctrls = new Map();
+  return new Promise((resolve) => {
+    let settled = false;
+    let pending = 0;
+    let fallbacksStarted = false;
+    let raceTimer = null;
+    const primary = candidates[0];
+    const primaryNote = () => outcomes.get(primary) || `等待 ${Math.round((Date.now() - startedAt) / 1000)} 秒未開始回應`;
+    const finish = (result) => {
+      if (settled) return;
+      settled = true;
+      if (raceTimer) clearTimeout(raceTimer);
+      for (const [m, c] of ctrls) if (m !== result.model) c.abort();
+      resolve(result);
+    };
+    const allFailed = () => {
+      const list = candidates.filter((m) => outcomes.has(m)).map((m) => `${m}（${outcomes.get(m)}）`).join('、');
+      return {
+        res: null,
+        tried: candidates.filter((m) => outcomes.has(m)).map((m) => ({ model: m, outcome: outcomes.get(m) })),
+        error: `${provLabel} 候選模型都無法開始回應：${list}；請稍後再試，或在 AI 設定按「更新模型清單」後改選其他模型。`,
+      };
+    };
+    const queue = candidates.slice(1).map((m, j) => [m, j + 1]);
+    const overallDeadline = startedAt + UPSTREAM_TIMEOUTS.overallMs;
+    const fillPool = () => {
+      while (!settled && queue.length && pending < FALLBACK_CONCURRENCY + (outcomes.has(primary) ? 0 : 1) && Date.now() < overallDeadline) {
+        const [m, i] = queue.shift();
+        launch(m, i);
+      }
+    };
+    const afterFailure = (i) => {
+      if (i === 0) startFallbacks();
+      else if (fallbacksStarted) fillPool();
+      if (fallbacksStarted && pending === 0) finish(allFailed());
+    };
+    const launch = (m, i) => {
+      const c = linkedAbort(signal);
+      ctrls.set(m, c);
+      pending += 1;
+      fetchUpstreamWithRetry(targetUrl, headers, bodyFor(m, i), c.signal, provLabel, null, {
+        headerTimeoutMs: i === 0 ? UPSTREAM_TIMEOUTS.primaryHeaderMs : UPSTREAM_TIMEOUTS.fallbackHeaderMs,
+        effortFallback: false,
+      }).then(async (up) => {
+        if (up.res && !settled) {
+          const primed = await primeSseStream(up.res, UPSTREAM_TIMEOUTS.fallbackHeaderMs);
+          if (primed.ok) up = { ...up, res: primed.res };
+          else up = { res: null, modelUnavailable: true, outcome: primed.outcome };
+        }
+        pending -= 1;
+        if (settled) { up.res?.body?.cancel?.().catch?.(() => {}); return; }
+        if (up.res) {
+          finish({ ...up, model: m, tried: i === 0 ? [] : [{ model: primary, outcome: primaryNote() }] });
+          return;
+        }
+        outcomes.set(m, up.outcome || '失敗');
+        if (i === 0 && !up.modelUnavailable) { finish({ ...up, model: m, tried: [] }); return; }
+        afterFailure(i);
+      }, (e) => {
+        pending -= 1;
+        if (settled) return;
+        if (signal?.aborted) { settled = true; resolve({ res: null, aborted: true, tried: [] }); return; }
+        outcomes.set(m, String(e?.message || e).slice(0, 120));
+        afterFailure(i);
+      });
+    };
+    const startFallbacks = () => {
+      if (fallbacksStarted || settled) return;
+      fallbacksStarted = true;
+      fillPool();
+    };
+    if (candidates.length > 1) raceTimer = setTimeout(startFallbacks, UPSTREAM_TIMEOUTS.raceDelayMs);
+    launch(primary, 0);
+  });
 }
 
 /** OpenAI 相容端點的模型清單網址：…/chat/completions → …/models；不是這個形狀的自訂端點回 null。 */
@@ -670,12 +895,19 @@ export async function handleAnalyze(req, env = {}, userArg = '') {
   const userMessages = buildMessages(payload);
   const estInputTokens = Math.max(100, Math.ceil((SYSTEM_PROMPT.length + JSON.stringify(userMessages).length) / 3.5));
 
+  const candidates = provCfg.liveModels
+    ? [model, ...parseFallbackModels(req.headers.get('x-ai-fallback-models'), model)]
+    : [model];
+
   const upstreamCtrl = new AbortController();
   const enc = new TextEncoder();
 
   const body = new ReadableStream({
     async start(controller) {
       let outChars = 0;
+      let reasoningChars = 0;
+      let nonSseText = '';
+      let usedModel = model;
       let usageReported = null;
       let finishReason = null;
       let effortNote = '';
@@ -696,21 +928,30 @@ export async function handleAnalyze(req, env = {}, userArg = '') {
             ...userMessages,
           ],
         };
-        const upstream = await fetchUpstreamWithRetry(
+        const upstream = await fetchWithModelFallback(
           targetUrl,
           upstreamHeaders,
           upstreamBody,
+          candidates,
           upstreamCtrl.signal,
           provCfg.label,
+          providerId,
+          modelEffort.reasoningEffort,
           (fromEffort, toEffort) => {
             effortNote = `（${provCfg.label} 以推理強度 ${fromEffort} 超過 100 秒未回應，已自動改用推理強度 ${toEffort} 重試）\n\n`;
           },
         );
+        if (upstream.aborted) return;
         if (!upstream.res) {
           controller.enqueue(enc.encode(`\n\n［AI 分析失敗：${upstream.error}］`));
           return;
         }
         const res = upstream.res;
+        usedModel = upstream.model;
+        if (upstream.tried.length) {
+          const why = upstream.tried.map((t) => `${t.model} ${t.outcome}`).join('、');
+          controller.enqueue(enc.encode(`（${provCfg.label} ${why}，已自動改用模型 ${usedModel}）\n\n`));
+        }
         if (effortNote) controller.enqueue(enc.encode(effortNote));
 
         const reader = res.body.getReader();
@@ -725,7 +966,10 @@ export async function handleAnalyze(req, env = {}, userArg = '') {
           buf = lines.pop() || '';
           for (const line of lines) {
             const trimmed = line.trim();
-            if (!trimmed.startsWith('data:')) continue;
+            if (!trimmed.startsWith('data:')) {
+              if (trimmed && !trimmed.startsWith(':') && nonSseText.length < 200) nonSseText += (nonSseText ? ' ' : '') + trimmed;
+              continue;
+            }
             const dataStr = trimmed.slice(5).trim();
             if (!dataStr || dataStr === '[DONE]') continue;
             let ev;
@@ -735,6 +979,8 @@ export async function handleAnalyze(req, env = {}, userArg = '') {
             }
             const choice = Array.isArray(ev.choices) ? ev.choices[0] : null;
             if (choice) {
+              const reasoningText = choice.delta?.reasoning_content ?? choice.delta?.reasoning;
+              if (typeof reasoningText === 'string') reasoningChars += reasoningText.length;
               const deltaText = choice.delta?.content;
               if (typeof deltaText === 'string' && deltaText.length > 0) {
                 outChars += deltaText.length;
@@ -750,13 +996,18 @@ export async function handleAnalyze(req, env = {}, userArg = '') {
           }
         }
 
-        if (finishReason === 'length' || finishReason === 'max_tokens') {
+        if (outChars === 0) {
+          const why = reasoningChars > 0
+            ? `只輸出推理、沒有正文（結束原因 ${finishReason || '未提供'}，推理約 ${reasoningChars} 字）`
+            : `沒有輸出任何內容（結束原因 ${finishReason || '未提供'}${(nonSseText + buf.trim()).trim() ? `；上游回應：${(nonSseText + ' ' + buf.trim()).trim().slice(0, 200)}` : ''}）`;
+          controller.enqueue(enc.encode(`\n\n［AI 分析失敗：${provCfg.label} ${usedModel} ${why}；請把推理強度調低或改選其他模型］`));
+        } else if (finishReason === 'length' || finishReason === 'max_tokens') {
           controller.enqueue(enc.encode('\n\n（回覆已達長度上限，內容可能不完整）'));
         }
 
         const inTok = usageReported?.prompt_tokens ?? usageReported?.input_tokens ?? estInputTokens;
         const outTok = usageReported?.completion_tokens ?? usageReported?.output_tokens ?? Math.max(50, Math.ceil(outChars / 2));
-        await recordUsage(env?.DB, keys, inTok, outTok, Date.now(), provCfg, model);
+        await recordUsage(env?.DB, keys, inTok, outTok, Date.now(), provCfg, usedModel);
       } catch (e) {
         if (e?.name !== 'AbortError') {
           controller.enqueue(enc.encode(`\n\n［AI 分析失敗：${e?.status ? e.status + ' ' : ''}${e?.message || e}］`));

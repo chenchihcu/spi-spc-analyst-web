@@ -47,7 +47,7 @@ const modelsReply = (models) => async (url) => {
 const optionValues = ($) => [...$("#selAiModel").options].map((o) => o.value);
 
 test("NVIDIA：三個服務商皆有金鑰欄位；更新模型清單會新增、移除、改選，失敗沿用舊清單，重新載入後還原", { skip: !JSDOM && "未安裝 jsdom（npm install）" }, async () => {
-  let reply = modelsReply(["openai/gpt-oss-120b", "meta/llama-next-70b", "nvidia/nemotron-new"]);
+  let reply = modelsReply(["openai/gpt-oss-20b", "meta/old-model"]);
   const calls = [];
   const fetchImpl = (url, init) => { calls.push({ url: String(url), headers: (init && init.headers) || {} }); return reply(url, init); };
   const a = open({}, fetchImpl);
@@ -59,34 +59,46 @@ test("NVIDIA：三個服務商皆有金鑰欄位；更新模型清單會新增�
   assert.equal($("#btnAiCheckModels").textContent, "更新模型清單");
   assert.equal($("#aiModelListNote").hidden, false);
   assert.equal($("#aiModelListNote").textContent, "尚未更新模型清單");
-  assert.deepEqual(optionValues($), ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "custom"], "未更新前用內建清單");
+  assert.deepEqual(optionValues($), ["openai/gpt-oss-20b", "custom"], "未更新前用內建清單");
   assert.equal($("#aiPriceLabel").textContent, "免費帳號不計費，受 NVIDIA 帳號速率與額度限制");
   assert.equal($("#inAiUsdLim").disabled, true, "免費服務商不設定美金上限");
 
-  // 選已不在帳號清單內的 20b，再更新：20b 被移除、新模型出現、改選仍可用的推薦模型
+  // 第一次更新取得含 meta/old-model 的清單並選它；第二次更新它已下架：新模型出現、改選仍可用的推薦模型
   $("#inAiKeyNvidia").value = "nvapi-test-key-000000";
-  $("#selAiModel").value = "openai/gpt-oss-20b";
+  $("#btnAiCheckModels").click();
+  await waitFor(() => /模型清單已更新/.test($("#aiCfgMsg").textContent), "第一次清單更新完成");
+  $("#selAiModel").value = "meta/old-model";
   $("#selAiModel").dispatchEvent(new w.Event("change"));
+  $("#aiCfgMsg").textContent = "";
+  reply = modelsReply(["openai/gpt-oss-20b", "meta/llama-next-70b", "nvidia/nemotron-new", "nvidia/nemotron-3-embed-1b"]);
   $("#btnAiCheckModels").click();
   await waitFor(() => /模型清單已更新/.test($("#aiCfgMsg").textContent), "清單更新完成");
   const call = calls.find((c) => c.url.includes("models=1"));
   assert.match(call.url, /provider=nvidia/);
   assert.equal(call.headers["X-Nvidia-Key"], "nvapi-test-key-000000");
-  assert.deepEqual(optionValues($), ["openai/gpt-oss-120b", "meta/llama-next-70b", "nvidia/nemotron-new", "custom"]);
-  assert.equal($("#selAiModel").value, "openai/gpt-oss-120b");
-  assert.match($("#aiCfgMsg").textContent, /共 3 個/);
-  assert.match($("#aiCfgMsg").textContent, /openai\/gpt-oss-20b 已不在清單，已改選 openai\/gpt-oss-120b/);
-  assert.match($("#aiModelListNote").textContent, /^模型清單更新於 \d{4}-\d{2}-\d{2} \d{2}:\d{2} · 3 個模型$/);
+  assert.deepEqual(optionValues($), ["openai/gpt-oss-20b", "meta/llama-next-70b", "nvidia/nemotron-3-embed-1b", "nvidia/nemotron-new", "custom"]);
+  assert.equal($("#selAiModel").value, "openai/gpt-oss-20b");
+  assert.match($("#aiCfgMsg").textContent, /共 4 個/);
+  assert.match($("#aiCfgMsg").textContent, /meta\/old-model 已不在清單，已改選 openai\/gpt-oss-20b/);
+  assert.match($("#aiModelListNote").textContent, /^模型清單更新於 \d{4}-\d{2}-\d{2} \d{2}:\d{2} · 4 個模型$/);
   const cached = JSON.parse(w.localStorage.getItem("spi-ai-models"));
-  assert.deepEqual(cached.nvidia.models, ["openai/gpt-oss-120b", "meta/llama-next-70b", "nvidia/nemotron-new"]);
+  assert.deepEqual(cached.nvidia.models, ["openai/gpt-oss-20b", "meta/llama-next-70b", "nvidia/nemotron-new", "nvidia/nemotron-3-embed-1b"]);
+  // 備援模型：即時清單中排除選定模型與非對話模型（嵌入），推薦模型在前
+  assert.deepEqual([...w.SPI_TEST_HOOK.aiFallbackModels("nvidia", "openai/gpt-oss-20b")], ["meta/llama-next-70b", "nvidia/nemotron-new"]);
+  assert.deepEqual([...w.SPI_TEST_HOOK.aiFallbackModels("nvidia", "meta/llama-next-70b")], ["openai/gpt-oss-20b", "nvidia/nemotron-new"]);
+  assert.deepEqual([...w.SPI_TEST_HOOK.aiFallbackModels("openai", "gpt-6.1-terra")], [], "非即時清單服務商不送備援");
+  // 曾成功產生分析的模型排在最前；重新整理清單後仍保留
+  w.SPI_TEST_HOOK.saveAiGoodModel("nvidia", "nvidia/nemotron-new");
+  assert.deepEqual([...w.SPI_TEST_HOOK.aiFallbackModels("nvidia", "openai/gpt-oss-20b")], ["nvidia/nemotron-new", "meta/llama-next-70b"]);
   assert.equal(JSON.stringify(cached).includes("nvapi-"), false, "模型清單快取不得含金鑰");
 
-  // 選即時清單中的新模型：不當成自訂模型，且推理強度停用（此模型不送 reasoning_effort）
+  // 選即時清單中的新模型：不當成自訂模型，推理強度可選（NVIDIA 所有模型都送 reasoning_effort，預設 low）
   $("#selAiModel").value = "meta/llama-next-70b";
   $("#selAiModel").dispatchEvent(new w.Event("change"));
   assert.equal($("#aiCustomModelField").hidden, true);
-  assert.equal($("#selAiEffort").disabled, true);
-  $("#selAiModel").value = "openai/gpt-oss-120b";
+  assert.equal($("#selAiEffort").disabled, false);
+  assert.equal($("#selAiEffort").value, "low");
+  $("#selAiModel").value = "openai/gpt-oss-20b";
   $("#selAiModel").dispatchEvent(new w.Event("change"));
   assert.equal($("#selAiEffort").disabled, false);
 
@@ -95,7 +107,7 @@ test("NVIDIA：三個服務商皆有金鑰欄位；更新模型清單會新增�
   $("#btnAiCheckModels").click();
   await waitFor(() => /更新失敗/.test($("#aiCfgMsg").textContent), "失敗訊息");
   assert.match($("#aiCfgMsg").textContent, /NVIDIA 模型清單更新失敗：401 Unauthorized；沿用上次的清單/);
-  assert.deepEqual(optionValues($), ["openai/gpt-oss-120b", "meta/llama-next-70b", "nvidia/nemotron-new", "custom"]);
+  assert.deepEqual(optionValues($), ["openai/gpt-oss-20b", "meta/llama-next-70b", "nvidia/nemotron-3-embed-1b", "nvidia/nemotron-new", "custom"]);
   assert.equal($("#btnAiCheckModels").textContent, "更新模型清單");
   assert.equal($("#btnAiCheckModels").disabled, false);
 
@@ -112,7 +124,7 @@ test("NVIDIA：三個服務商皆有金鑰欄位；更新模型清單會新增�
   const cfg = JSON.parse(store["spi-ai-config"]);
   cfg.activeProvider = "nvidia"; cfg.providers.nvidia.model = "nvidia/nemotron-new";
   store["spi-ai-config"] = JSON.stringify(cfg);
-  const b = open(store, modelsReply(["openai/gpt-oss-120b"]));
+  const b = open(store, modelsReply(["openai/gpt-oss-20b"]));
   await new Promise((r) => setTimeout(r, 50));
   b.w.SPI_TEST_HOOK.setTab("ai");
   await waitFor(() => optionValues(b.$).includes("nvidia/nemotron-new"), "還原清單");
@@ -123,17 +135,17 @@ test("NVIDIA：三個服務商皆有金鑰欄位；更新模型清單會新增�
 test("NVIDIA：清單超過 24 小時且已填金鑰時，進入 AI 頁自動更新一次", { skip: !JSDOM && "未安裝 jsdom（npm install）" }, async () => {
   const old = Date.now() - 25 * 3600 * 1000;
   const store = {
-    "spi-ai-models": JSON.stringify({ nvidia: { at: old, models: ["openai/gpt-oss-120b", "old/retired-model"] } }),
+    "spi-ai-models": JSON.stringify({ nvidia: { at: old, models: ["openai/gpt-oss-20b", "old/retired-model"] } }),
     "spi-ai-config": JSON.stringify({ activeProvider: "nvidia", providers: { nvidia: { apiKey: "nvapi-test-key-000000", model: "old/retired-model" } } }),
   };
   let n = 0;
-  const base = modelsReply(["openai/gpt-oss-120b", "brand/new-model"]);
+  const base = modelsReply(["openai/gpt-oss-20b", "brand/new-model"]);
   const c = open(store, (url, init) => { if (String(url).includes("models=1")) n += 1; return base(url, init); });
   await new Promise((r) => setTimeout(r, 50));
   c.w.SPI_TEST_HOOK.setTab("ai");
   await waitFor(() => optionValues(c.$).includes("brand/new-model"), "自動更新");
-  assert.deepEqual(optionValues(c.$), ["openai/gpt-oss-120b", "brand/new-model", "custom"]);
-  assert.equal(c.$("#selAiModel").value, "openai/gpt-oss-120b", "已下架的模型改選可用模型");
+  assert.deepEqual(optionValues(c.$), ["openai/gpt-oss-20b", "brand/new-model", "custom"]);
+  assert.equal(c.$("#selAiModel").value, "openai/gpt-oss-20b", "已下架的模型改選可用模型");
   assert.match(c.$("#aiCfgMsg").textContent, /old\/retired-model 已不在清單/);
   c.w.SPI_TEST_HOOK.setTab("overview");
   c.w.SPI_TEST_HOOK.setTab("ai");
