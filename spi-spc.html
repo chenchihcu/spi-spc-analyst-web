@@ -927,6 +927,7 @@ button.load-state{border:none;font:inherit;cursor:default}
 .load-state .light{width:10px;height:10px;border-radius:50%;background:var(--muted);flex:none}
 .load-state[data-state="ok"] .light{background:var(--ok)}
 .load-state[data-state="error"] .light{background:var(--ng)}
+.load-state[data-state="warn"] .light{background:var(--warn)}
 .load-state>span:last-child{min-width:0}
 .load-state.is-action{cursor:pointer}
 .load-state.is-action:hover{background:var(--surface)}
@@ -1020,7 +1021,7 @@ button.load-state{border:none;font:inherit;cursor:default}
         <button class="specbtn" id="railSpecBtn" title="鋼板厚度與規格在「資料與規格 → 規格」修改"><span class="lbl">鋼板／規格</span> <b id="railSum"></b> <span aria-hidden="true">✎</span></button>
         <div class="rail-states" role="group" aria-label="資料與座標狀態">
           <button type="button" class="chip load-state" id="stateSpi" data-state="idle" tabindex="-1" aria-disabled="true" title="量測紀錄狀態。載入請用記錄庫"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
-          <span class="chip load-state" id="statePlace" data-state="idle" role="status" title="座標檔狀態。選取請用記錄庫"><span class="light" aria-hidden="true"></span><span>座標檔：未套用</span></span>
+          <span class="chip load-state" id="statePlace" data-state="idle" role="status" title="目前分析回合用到的座標檔。選取請用記錄庫"><span class="light" aria-hidden="true"></span><span>座標檔：未套用</span></span>
         </div>
       </div>
     </div>
@@ -4800,6 +4801,11 @@ function buildProblemCases(F,st){
   cases.sort((a,b)=>LV[a.lv]-LV[b.lv]||a.id-b.id);
   return cases;
 }
+/* 問題頁計數：依問題定義檢視數「案」（案的嚴重度＝成員最高），依統計規則檢視數「卡」；兩者不可混用 */
+function issueCaseCounts(F,cases){const cards={ng:0,warn:0,info:0},byCase={ng:0,warn:0,info:0};
+  for(const x of F||[])if(x.lv in cards)cards[x.lv]++;
+  for(const c of cases||(F&&F.meta&&F.meta.cases)||[])if(c.lv in byCase)byCase[c.lv]++;
+  return {cards,cases:byCase};}
 /* onStage(i,n,名稱)：可選的進度回呼（背景計算時回報進度），不影響結果 */
 function detectIssues(st,onStage){
   const R=st.rows;if(!R.length)return[];
@@ -6221,7 +6227,7 @@ function computeLocalOosDensity(rows,coordGetter,clsFn){
   }
   return out;
 }
-if(typeof module!=="undefined")module.exports={issuesMd,fmMd,rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,adSample,adSampleHash,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,areaRatio,maxThkForAR,detectIssues,buildProblemCases,overallVerdict,compareRuns,dfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,groupBasisOfRow,groupBasisForRows,groupBasisLabel,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor};
+if(typeof module!=="undefined")module.exports={issuesMd,fmMd,rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,adSample,adSampleHash,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,areaRatio,maxThkForAR,detectIssues,buildProblemCases,issueCaseCounts,overallVerdict,compareRuns,dfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,groupBasisOfRow,groupBasisForRows,groupBasisLabel,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor};
 </script>
 <script>
 
@@ -6504,11 +6510,13 @@ $("#ctxClose").onclick=()=>{S.ctx=null;showCtx()};
 function flashIssue(id){
   if (!S.F.some(x=>x.id===id) || !S.rows.length) return;
   pmapState();
-  if (!issueList().some(x=>x.id===id)) pmapSelect({...S.pmapSelection,mode:"all",pad:null});
+  if (!issueList("all").some(x=>x.id===id)) pmapSelect({...S.pmapSelection,mode:"all",pad:null});
+  const caseView=S.issGroup==="cases";
+  if (S.issLv!=="all" && !(caseView ? issueCaseRows().some(c=>c.card_ids.includes(id)) : issueList().some(x=>x.id===id))) { S.issLv="all"; renderIssues(); } /* 先畫一次讓分頁鍵同步，否則下方加大的 ISS_PG.n 會被 renderIssues 重設 */
   if (!$("#iss-"+id)) {
-    const list=issueList(), allow=new Set(list.map(x=>x.id));
-    const index=S.issGroup==="cases"
-      ? (S.F.meta?.cases || []).filter(c=>c.card_ids.some(cardId=>allow.has(cardId))).findIndex(c=>c.card_ids.includes(id))
+    const list=issueList();
+    const index=caseView
+      ? issueCaseRows().findIndex(c=>c.card_ids.includes(id))
       : ["ng","warn","info"].flatMap(lv=>list.filter(x=>x.lv===lv)).findIndex(x=>x.id===id);
     ISS_PG.n=Math.max(ISS_PG.n,(Math.floor(index/ISS_PAGE)+1)*ISS_PAGE);
     renderIssues();
@@ -6528,11 +6536,18 @@ function flashIssue(id){
 let IB_ROWS=null,IB_B=[],IB_C=new WeakMap();
 function issueBoards(x){if(IB_ROWS!==S.rows){IB_ROWS=S.rows;IB_B=[...new Set(S.rows.map(r=>r.board))];IB_C=new WeakMap()}
   let out=IB_C.get(x);if(out)return out;const B=IB_B;out=new Set();x.ents.forEach(e=>{if(e.startsWith("b:"))out.add(e.slice(2));if(e.startsWith("drift:")){const i=B.indexOf(e.slice(6));if(i>=0)B.slice(i).forEach(b=>out.add(b))}});IB_C.set(x,out);return out}
-function issueList(){
+function issueList(lv=S.issLv){
   if (!S.rows.length || S.F.pending) return [];
   if (ISS_PG.all) return S.F;
   const index=pmapState(), ids=pmapEvidence(index,S.pmapSelection);
-  return S.F.filter(x=>(ids===null || ids.has(x.id))&&(S.issLv==="all"||x.lv===S.issLv)&&(S.issCat==="all"||x.cat===S.issCat)&&(!S.issEnt||(S.issEnt.startsWith("b:")?issueBoards(x).has(S.issEnt.slice(2)):x.ents.includes(S.issEnt))))}
+  return S.F.filter(x=>(ids===null || ids.has(x.id))&&(lv==="all"||x.lv===lv)&&(S.issCat==="all"||x.cat===S.issCat)&&(!S.issEnt||(S.issEnt.startsWith("b:")?issueBoards(x).has(S.issEnt.slice(2)):x.ents.includes(S.issEnt))))}
+/* 依問題定義檢視的案：嚴重度篩選只看案的嚴重度，案內成員不再依卡片嚴重度剔除（否則「警示 N」點下去會少卡） */
+function issueCaseRows(lv=S.issLv){
+  if (!S.rows.length || S.F.pending) return [];
+  const byId=new Map(S.F.map(x=>[x.id,x])), allow=new Set(issueList("all").map(x=>x.id));
+  return (S.F.meta?.cases||[]).map(c=>({...c,members:c.card_ids.map(id=>byId.get(id)).filter(x=>x&&allow.has(x.id))}))
+    .filter(c=>c.members.length&&(lv==="all"||c.lv===lv));
+}
 /* 證據迷你圖（SVG）：序列＝每板一點，長條＝群組／焊墊／分箱；異常處以嚴重度顏色標示 */
 function evSvg(ev,lv){if(!ev||!ev.values||!ev.values.some(isFinite))return"";const W=320,H=76,pl=34,pr=6,pt=6,pb=16,iw=W-pl-pr,ih=H-pt-pb,V=ev.values,n=V.length;
   const fin=V.filter(isFinite).concat((ev.ref||[]).filter(isFinite));let lo=Math.min(...fin),hi=Math.max(...fin);if(ev.type==="bars"&&lo>0&&ev.unit!=="%"&&lo/hi>.5)lo=lo*.9;if(hi===lo){hi+=1;lo-=1}const pad=(hi-lo)*.08;lo-=pad;hi+=pad;
@@ -6888,7 +6903,7 @@ function renderPmap() {
 }
 const ISS_OPEN=new Set(),SCROLL={},ISS_PAGE=150,ISS_PG={F:null,k:"",n:ISS_PAGE,all:false};
 function issToolsState(){const all=$$("#issList details.iss-card"),open=all.filter(d=>d.open).length;const e=$("#issExpand"),c=$("#issCollapse");if(e)e.disabled=all.length>0&&open===all.length;if(c)c.disabled=open===0}
-function renderIssues(){const F=S.F||[],c={ng:0,warn:0,info:0};F.forEach(x=>c[x.lv]++);
+function renderIssues(){const F=S.F||[],cnt=issueCaseCounts(F),caseView=S.issGroup==="cases";
   const filterEl=$("#issFilter");
   if(!S.rows||!S.rows.length){
     $("#issHead").textContent="尚未匯入量測資料";
@@ -6901,19 +6916,23 @@ function renderIssues(){const F=S.F||[],c={ng:0,warn:0,info:0};F.forEach(x=>c[x.
   }
   if(F.pending){$("#issHead").textContent=`正在偵測問題（${S.rows.length.toLocaleString()} 筆）…`;$("#issSub").textContent="資料量大，於背景計算中，完成後會自動顯示結果。";if($("#pmapSub"))$("#pmapSub").textContent="計算中…";filterEl.hidden=true;$("#pmap").innerHTML="";$("#issList").innerHTML='<p class="note">計算中…</p>';return}
   const caseList=(F.meta&&F.meta.cases)||[];
-  $("#issHead").textContent=F.length?`${caseList.length} 個問題定義（${F.length} 項統計發現）：嚴重 ${c.ng}、警示 ${c.warn}、資訊 ${c.info}`:"未偵測到統計上顯著的問題";
+  /* 計數單位跟著檢視：依問題定義數案、依統計規則數卡，標題與篩選鈕一致，點下去的數量等於鈕上的數字 */
+  const c=caseView?cnt.cases:cnt.cards,total=caseView?caseList.length:F.length;
+  $("#issHead").textContent=F.length?(caseView
+    ?`${caseList.length} 個問題定義：嚴重 ${c.ng}、警示 ${c.warn}、資訊 ${c.info}（${F.length} 項統計發現）`
+    :`${F.length} 項統計發現：嚴重 ${c.ng}、警示 ${c.warn}、資訊 ${c.info}（${caseList.length} 個問題定義）`):"未偵測到統計上顯著的問題";
   $("#issSub").textContent=F.length?"":"十個面向皆在正常範圍。";
   fmLine();
   renderPmap();
   const cats=[...new Set(F.map(x=>x.cat))];
   filterEl.hidden=!F.length||(S.pmapSelection?.mode==="overview"&&Boolean(S.pmapSelection?.part));
-  filterEl.innerHTML=[["all","全部 "+F.length],["ng","嚴重 "+c.ng],["warn","警示 "+c.warn],["info","資訊 "+c.info]].map(([v,t])=>`<button class="chipbtn" data-lv="${v}" aria-pressed="${S.issLv===v}">${t}</button>`).join("")
+  filterEl.innerHTML=[["all","全部 "+total],["ng","嚴重 "+c.ng],["warn","警示 "+c.warn],["info","資訊 "+c.info]].map(([v,t])=>`<button class="chipbtn" data-lv="${v}" aria-pressed="${S.issLv===v}">${t}</button>`).join("")
     +'<span class="vsep" aria-hidden="true" style="height:24px"></span>'
     +`<select id="selIssCat" class="iss-cat-sel" aria-label="篩選面向">${[["all","全部面向"],...cats.map(k=>[k,`${k} (${F.filter(x=>x.cat===k).length})`])].map(([v,t])=>`<option value="${esc(v)}"${S.issCat===v?" selected":""}>${esc(t)}</option>`).join("")}</select>`
     +'<span class="vsep" aria-hidden="true" style="height:24px"></span>'+[["cases","依問題定義"],["rules","依統計規則"]].map(([v,t])=>`<button class="chipbtn" data-group="${v}" aria-pressed="${S.issGroup===v}">${t}</button>`).join("")
     +`<span class="iss-tools"><button class="chipbtn" id="issExpand">全部展開</button><button class="chipbtn" id="issCollapse">全部收合</button></span>`;
   $("#issExpand").onclick=()=>{
-    issueList().forEach(x=>ISS_OPEN.add(x.id));
+    (caseView?issueCaseRows().flatMap(k=>k.members):issueList()).forEach(x=>ISS_OPEN.add(x.id));
     $$("#issList details").forEach(d=>{if(d.dataset.case)ISS_OPEN.add("c"+d.dataset.case);d.open=true});
     issToolsState();
   };
@@ -6960,8 +6979,7 @@ function renderIssues(){const F=S.F||[],c={ng:0,warn:0,info:0};F.forEach(x=>c[x.
   const pgK=[S.issLv,S.issCat,S.issEnt,S.issGroup].join("|");if(ISS_PG.F!==F||ISS_PG.k!==pgK){ISS_PG.F=F;ISS_PG.k=pgK;ISS_PG.n=ISS_PAGE}
   const lim=ISS_PG.all?Infinity:ISS_PG.n;let listHtml="",more=0;
   if(S.issGroup==="cases"){
-    const allow=new Set(L.map(x=>x.id));
-    let rows=(F.meta&&F.meta.cases||[]).map(c=>({...c,members:c.card_ids.map(id=>byId[id]).filter(x=>x&&allow.has(x.id))})).filter(c=>c.members.length&&(S.issLv==="all"||c.lv===S.issLv));
+    const rows=issueCaseRows();
     const show=rows.slice(0,lim);more=Math.max(0,rows.length-lim);
     listHtml=show.length?show.map(caseShell).join(""):"";
   }else{
@@ -6972,7 +6990,7 @@ function renderIssues(){const F=S.F||[],c={ng:0,warn:0,info:0};F.forEach(x=>c[x.
   const emptyNote=(S.pmapSelection?.mode==="overview"&&S.pmapSelection?.part)
     ?'<p class="note">已在問題地圖展開該零件摘要；點選焊墊、群組問題或「顯示全部問題」查看問題卡片。</p>'
     :'<p class="note">此篩選條件下沒有問題。</p>';
-  $("#issList").innerHTML=L.length?listHtml+(more?`<p class="iss-more"><button class="chipbtn" id="issMore">再顯示 ${Math.min(more,ISS_PAGE)} 項（尚有 ${more} 項未顯示）</button></p>`:""):emptyNote;
+  $("#issList").innerHTML=listHtml?listHtml+(more?`<p class="iss-more"><button class="chipbtn" id="issMore">再顯示 ${Math.min(more,ISS_PAGE)} 項（尚有 ${more} 項未顯示）</button></p>`:""):emptyNote;
   if($("#issMore"))$("#issMore").onclick=()=>{ISS_PG.n+=ISS_PAGE;renderIssues()};
   $$("#issList details.iss-card").forEach(d=>d.addEventListener("toggle",()=>{const id=+d.dataset.id;if(d.open)ISS_OPEN.add(id);else ISS_OPEN.delete(id);issToolsState()}));
   $$("#issList details.iss-case").forEach(d=>d.addEventListener("toggle",()=>{
@@ -9685,6 +9703,7 @@ function syncPlaceToCurrentRun(opts={}){
     return{ok:true,cleared:true};
   }
   const res=applyPlacePreviewToRun(run,PLACE);
+  LAST_PLACE_SYNC=res.ok?null:{runId:run.id,recId:PLACE.recId||null,reason:res.reason||""};
   if(res.ok){
     T.pos=null;
     if(T.ok&&typeof build3D==="function")build3D();
@@ -11402,20 +11421,41 @@ async function saveBytes(filename,u8){const d=window.claude&&await window.claude
 function srcInfo(r){return{id:r.id,lot:r.lot||"",part:r.part,rev:r.rev||"",workOrder:r.workOrder||r.work_order||"",measuredDate:r.measuredDate||r.measured_date||"",supplierWo:r.supplierWo||"",outsourceWo:r.outsourceWo||"",side:r.side||"",name:r.name,sha256:r.sha256,user:r.user,created:r.created,store:RecDB.mode,lifecycle:r.lifecycle||"legacy",unmatchedRefs:r.unmatchedRefs||[],placeId:r.placeId||r.place_id||"",placePart:PLACE&&PLACE.recId&&(PLACE.recId===r.placeId||PLACE.recId===r.place_id)?PLACE.part:"",placeRev:PLACE&&PLACE.recId&&(PLACE.recId===r.placeId||PLACE.recId===r.place_id)?PLACE.rev:""}}
 const runSrc=r=>r&&r.info&&r.info.src||null;
 let LOAD_ERROR={spi:"",place:""};
+/* 分析設定列兩顆狀態膠囊只描述「目前分析回合」：量測紀錄＝回合的來源紀錄，座標檔＝回合實際用到的座標。
+   匯入表單或記錄庫已選取、但沒用到這個回合的座標檔，只寫成「未套用（已選…，原因）」。
+   燈號：ok 受控且已用於分析；warn 已用於分析但未受控或狀態待確認；idle 沒有用到；error 失敗。 */
+var LAST_PLACE_SYNC=null;
+const SPI_LC_TEXT={legacy:"舊資料・未受控（已用於分析）",pending_review:"待管理者判定",superseded:"歷史修正前版本",unavailable:"狀態無法確認"};
+function loadStateModel({src,err={},link=null,preview=null,place=null,placeReason=""}){
+  const unmatched=src?.unmatchedRefs||[],valid=Boolean(src&&src.lifecycle==="active");
+  let spi;
+  if(err.spi)spi={state:"error",text:`量測紀錄：${err.spi}`};
+  else if(valid)spi={state:"ok",text:`量測紀錄：已套用（受控）${unmatched.length?`・${unmatched.length} 個位號無座標`:""}`};
+  else if(src)spi={state:"warn",text:`量測紀錄：${SPI_LC_TEXT[src.lifecycle]||SPI_LC_TEXT.legacy}`};
+  else spi={state:"idle",text:"量測紀錄：未套用"};
+  const applied=valid&&src.placeId;let pl;
+  if(err.place)pl={state:"error",text:`座標檔：${err.place}`};
+  else if(applied&&link&&link.v==="missing")pl={state:"error",text:"座標檔：不存在（已連結）"};
+  else if(applied&&link&&link.v==="bad")pl={state:"error",text:`座標檔：${link.text}`};
+  else if(applied&&link&&link.v==="ok")pl={state:"ok",text:"座標檔：已套用（身分相符）"};
+  else if(applied)pl={state:"ok",text:"座標檔：已連結"};
+  else if(preview)pl={state:"warn",text:`座標檔：已套用（檢視，未受控）${link&&link.v==="ok"?"，身分相符":""}`};
+  else if(place)pl={state:"idle",text:`座標檔：未套用（已選 ${[place.part,place.rev].filter(Boolean).join(" ")}${placeReason?`，${placeReason}`:"，未用於目前回合"}）`};
+  else pl={state:"idle",text:"座標檔：未套用"};
+  return{spi,place:pl}}
 function updateLoadStates(){const run=curRun(),src=runSrc(run),unmatched=src?.unmatchedRefs||[];
-  const set=(id,state,message)=>{const el=$(id);if(!el)return;el.dataset.state=state;el.querySelector("span:last-child").textContent=message;el.setAttribute("aria-label",message)};
+  const set=(id,{state,text})=>{const el=$(id);if(!el)return;el.dataset.state=state;el.querySelector("span:last-child").textContent=text;el.setAttribute("aria-label",text)};
   const valid=src&&src.lifecycle==="active";
-  const spiText=src?.lifecycle==="pending_review"?"待管理者判定":src?.lifecycle==="superseded"?"歷史修正前版本":src?.lifecycle==="legacy"?"舊資料・未受控":"未套用";
   const link=valid?measurementLink({kind:"spi",placeId:src.placeId,part:src.part,rev:src.rev,side:src.side},typeof RecDB==="undefined"||!RecDB?null:RecDB.cache):null;
-  const extra=unmatched.length?`・${unmatched.length} 個位號無座標`:"";
-  const spiMsg=LOAD_ERROR.spi?`量測紀錄：${LOAD_ERROR.spi}`:!valid?`量測紀錄：${spiText}`:`量測紀錄：已套用${extra}`;
-  set("#stateSpi",LOAD_ERROR.spi?"error":valid?"ok":"idle",spiMsg);
-  const spiEl=$("#stateSpi");
-  if(spiEl){const openList=unmatched.length>0&&!LOAD_ERROR.spi;spiEl.classList.toggle("is-action",openList);spiEl.tabIndex=openList?0:-1;spiEl.setAttribute("aria-disabled",openList?"false":"true");spiEl.title=openList?"查看無座標位號":"量測紀錄狀態。載入請用記錄庫"}
   const applied=valid&&src.placeId;
   const previewApplied=!applied&&Boolean(run&&run.info&&run.info.placePreview&&(!PLACE||!PLACE.recId||PLACE.recId===run.info.placePreview.recId));
-  const placeMsg=LOAD_ERROR.place?`座標檔：${LOAD_ERROR.place}`:previewApplied?`座標檔：已套用（檢視）${link&&link.v==="ok"?"，身分相符":""}`:applied&&link&&link.v==="ok"?"座標檔：已套用（身分相符）":applied&&link&&link.v==="missing"?"座標檔：不存在（已連結）":applied&&link&&link.v==="bad"?`座標檔：${link.text}`:applied?"座標檔：已連結":PLACE?"座標檔：已選取":"座標檔：未套用";
-  set("#statePlace",LOAD_ERROR.place?"error":(applied||previewApplied)?"ok":"idle",placeMsg);
+  const sync=LAST_PLACE_SYNC&&PLACE&&run&&LAST_PLACE_SYNC.runId===run.id&&LAST_PLACE_SYNC.recId===(PLACE.recId||null)?LAST_PLACE_SYNC:null;
+  const m=loadStateModel({src,err:LOAD_ERROR,link,preview:previewApplied,place:PLACE,placeReason:sync?sync.reason:""});
+  set("#stateSpi",m.spi);
+  const spiEl=$("#stateSpi");
+  if(spiEl){const openList=unmatched.length>0&&!LOAD_ERROR.spi;spiEl.classList.toggle("is-action",openList);spiEl.tabIndex=openList?0:-1;spiEl.setAttribute("aria-disabled",openList?"false":"true");spiEl.title=openList?"查看無座標位號":"目前分析回合的量測紀錄。載入請用記錄庫"}
+  set("#statePlace",m.place);
+  const placeEl=$("#statePlace");if(placeEl)placeEl.title=m.place.text+"。只描述目前分析回合用到的座標";
 }
 $("#stateSpi").onclick=()=>{const refs=runSrc(curRun())?.unmatchedRefs||[];if(!refs.length)return;$("#unmatchedRefsTitle").textContent=`無座標位號（${refs.length}）`;$("#unmatchedRefsList").textContent=refs.join("、");openModal("unmatchedRefsModal","[data-close]")};
 function srcLine(s){return s?`批號 ${s.lot}｜產品料號 ${s.part}${s.supplierWo?"｜廠商工單 "+s.supplierWo:""}${s.outsourceWo?"｜委外工單 "+s.outsourceWo:""}${s.side?"｜"+s.side+" 面":""}｜原始檔 ${s.name}（SHA-256 ${String(s.sha256).slice(0,12)}…，${s.user}，${fmtTime(s.created)}）${s.placePart?`｜座標檔 ${s.placePart} ${s.placeRev}`:""}`:""}
@@ -14292,7 +14332,7 @@ function pdfFileName(){
 function specDownloadInfo(rec){const raw=rec&&rec.ver!=null?String(rec.ver).trim():"",hasVersion=!!raw&&!/^(?:undefined|null)$/i.test(raw),version=hasVersion?safeFn(raw):"",filename="料號規格_"+safeFn(rec&&rec.part)+"_"+(hasVersion?"v"+version:"版本未知")+".json";
   return{filename,warning:hasVersion?"":"這筆規格紀錄沒有版本號；匯出檔名已標示「版本未知」"}}
 if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")window.SPI_TEST_HOOK.specDownloadInfo=specDownloadInfo;
-if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{getPlace:()=>PLACE,S,RecDB,renderIssues,renderPmap,renderOverview,renderLISAUI,renderRelChartUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,aiFallbackModels,saveAiGoodModel,recompute,switchRun,setTab,setSub,updateSettingsUi,scrollSettingsAnchor,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,pick,drawHeat,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,calcShapeFactor,getSolderGrainTexture,getRealPasteMat,createSolderPasteGeometry,selectPadForProfile,highlightSelectedPad3D,focusPad3D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,getReportChapters,renderMailChapterSummary,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,setupRecPicker,renderRecPicker,openRecord,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus,setupExportCenter,openExportCenterModal,closeExportCenterModal,triggerExportByType,downloadDeliverablesQueue,applyPlacePreviewToRun,clearPlacePreviewFromRun,syncPlaceToCurrentRun,pos3DNote,usePlaceRec});
+if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{getPlace:()=>PLACE,S,RecDB,renderIssues,renderPmap,renderOverview,renderLISAUI,renderRelChartUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,aiFallbackModels,saveAiGoodModel,recompute,switchRun,setTab,setSub,updateSettingsUi,scrollSettingsAnchor,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,pick,drawHeat,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,calcShapeFactor,getSolderGrainTexture,getRealPasteMat,createSolderPasteGeometry,selectPadForProfile,highlightSelectedPad3D,focusPad3D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,getReportChapters,renderMailChapterSummary,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,setupRecPicker,renderRecPicker,openRecord,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus,setupExportCenter,openExportCenterModal,closeExportCenterModal,triggerExportByType,downloadDeliverablesQueue,applyPlacePreviewToRun,clearPlacePreviewFromRun,syncPlaceToCurrentRun,pos3DNote,usePlaceRec,loadStateModel,updateLoadStates});
 if($("#geomPadFile"))$("#geomPadFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{const p=parseGeometryPadListCsv(rd.result);if(!p.ok){toast("幾何焊墊清單："+p.error);e.target.value="";return}S.geometryPads=p.pads;persist();updatePadCoverageState();recompute();renderGeomPadStatus();toast(`已匯入 ${p.pads.length} 個幾何焊墊`);e.target.value=""};rd.readAsText(f)});
 if($("#geomPadClear"))$("#geomPadClear").onclick=()=>{S.geometryPads=null;S.padCoverage=null;S.pendingVerify=false;persist();updatePadCoverageState();recompute();renderGeomPadStatus()};
 const initHash=(location.hash||"").slice(1);
