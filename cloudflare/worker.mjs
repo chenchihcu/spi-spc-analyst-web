@@ -417,7 +417,7 @@ async function route(req, env) {
   if (path.startsWith('/vendor/')) return env.ASSETS.fetch(req);
   if (path === '/download/offline') {
     // 離線版單檔：已登入使用者下載後可不連網使用；檔名帶版本
-    const asset = await env.ASSETS.fetch(new Request(new URL('/offline/spi-spc-offline.html', url), req));
+    const asset = await env.ASSETS.fetch(new Request(new URL('/offline/spi-spc-offline.bin', url), req));
     if (!asset.ok) return plain('離線版尚未建置', 404);
     const h = new Headers(asset.headers);
     h.set('Content-Type', 'text/html; charset=utf-8');

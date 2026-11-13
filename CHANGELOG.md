@@ -2,6 +2,12 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.24.1 — 2026-11-13（修正登入後「下載離線版」回 404）
+
+- **根因**：v10.24.0 把離線檔放在 `dist/offline/spi-spc-offline.html`。Cloudflare 靜態資產會把 `.html` 路徑轉址成無副檔名網址，Worker 的 `ASSETS.fetch` 拿到轉址而非 200，`/download/offline` 對已登入使用者回 404「離線版尚未建置」。單元測試用模擬資產，沒有這個轉址，所以未測到。
+- **修正**：build 改輸出 `dist/offline/spi-spc-offline.bin`，Worker 讀取 `.bin`；下載檔名仍為 `spi-spc-offline-v<版本>.html`，`Content-Type` 仍為 `text/html`。產物路徑仍只經需登入的 `/download/offline` 提供。
+- **驗證**：本機 `wrangler dev`（真實 workerd 與靜態資產）登入後下載回 200，內容與 build 產物逐位元相同；未登入回 303；直接存取 `.bin` 路徑登入後 404。`tests/cloudflare.test.mjs` 路徑同步。
+
 ## v10.24.0 — 2026-11-13（離線版：單一 HTML 檔，不連網、不登入）
 
 - **離線打包**：新增 `npm run build:offline`（`tools/build-offline.mjs`），把主頁與 Chart.js、three.js、jsPDF、網頁字型、PDF 中文字型、製程規則 JSON 打包成 `dist-offline/spi-spc-offline-v<版本>.html`（約 7.8 MB）。可直接雙擊開啟，也可放到 claude.ai 頁面；打包時擋下任何外部 `<script src>` 或 `vendor/` 引用，超過 15 MB 即失敗。
