@@ -86,7 +86,10 @@ test("介面整理：空白狀態、範例資料、KPI 寫法、管制界限數�
     assert.equal(items[1].v, A.xs.cl);
     assert.equal(items[2].v, A.xs.pts.at(-1).lcl);
     assert.equal(items[0].t, "UCL " + A.xs.pts.at(-1).ucl.toFixed(2));
-    assert.ok(c1.options.layout.padding.right > 0, "右側留白放數值");
+    assert.ok(!/ -\d/.test(items.map((x) => x.t).join(" ")), "負值用 − 而非連字號");
+    const padFor = (width) => c1.options.layout.padding({ chart: { width } }).right;
+    assert.ok(padFor(1000) > 0, "寬圖保留右側留白放數值");
+    assert.equal(padFor(300), 0, "手機寬度不保留右側留白，數值改印在繪圖區內");
     const c2 = lastChart(charts, "cCtrl2");
     assert.ok(c2 && c2.options.plugins.limitLabels.items.length === 3, "S 圖也標示界限");
     assert.equal(c2.options.plugins.legend.display, false, "S 圖不可出現預設圖例（undefined 標籤）");
