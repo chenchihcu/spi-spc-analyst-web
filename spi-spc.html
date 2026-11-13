@@ -8592,7 +8592,7 @@ function renderCompare(){if(S.runs.length<2){$("#cmpTbl").innerHTML="";$("#cmpLe
   $("#cmpVerdict").className="verdict "+lv;
   $("#cmpTitle").textContent=`${rb.name} 相對 ${ra.name}：${all.verdict}`;
   $("#cmpText").textContent=`改善的群組 ${gs.filter(x=>x.verdict==="改善").length} 個、惡化 ${gs.filter(x=>x.verdict==="惡化").length} 個、有好有壞 ${gs.filter(x=>x.verdict==="有好有壞").length} 個。整體不良率 ${fmtPpm(all.a.rate*1e6)} → ${fmtPpm(all.b.rate*1e6)} PPM（p ${all.pD<.001?"< 0.001":"= "+f(all.pD,3)}）；偵測到的問題 ${FA.length} → ${FB.length} 項（嚴重 ${FA.filter(x=>x.lv==="ng").length} → ${FB.filter(x=>x.lv==="ng").length}）。`;
-  const ar=(a,b)=>isFinite(a)?`${f(a,2)} → ${f(b,2)}`:"—",pv=p=>p==null||!isFinite(p)?"":` <span class="note">p ${p<.001?"< 0.001":"= "+f(p,3)}</span>`;
+  const ar=(a,b)=>isFinite(a)||isFinite(b)?`${f(a,2)} → ${f(b,2)}`:"—",pv=p=>p==null||!isFinite(p)?"":` <span class="note">p ${p<.001?"< 0.001":"= "+f(p,3)}</span>`;
   const arrow=(d,good)=>Math.abs(d)<1e-9?"":good?`<span style="color:var(--ok)">▲</span>`:`<span style="color:var(--ng)">▼</span>`;
   const tgt=specTgtFallback(S.specs.volume,100);
   $("#cmpTbl").innerHTML=`<thead><tr><th>元件群組</th><th class="num">面積比</th><th class="num">轉移效率 %</th><th class="num">錫量 CV %</th><th class="num">${METRICS[S.cmpM].short} Ppk</th><th class="num">不良 PPM（全部判定項目）</th><th>判定</th></tr></thead><tbody>`+R.map(x=>{const pill={改善:"ok",惡化:"ng",有好有壞:"warn",無顯著差異:"na"}[x.verdict];
@@ -8622,7 +8622,7 @@ function exportCompareMd(){if(!CMP)return;const{ra,rb,R,FA,FB}=CMP;save("run-com
   +R.map(x=>{const gLabel=x.g==="整體"&&(x.b.ppkGroup||x.a.ppkGroup)?`整體（最差群組 ${x.b.ppkGroup||x.a.ppkGroup}）`:x.g;
     const detail=(x.better&&x.better.length?"改善："+x.better.join("、"):"")+(x.better&&x.better.length&&x.worse&&x.worse.length?"；":"")+(x.worse&&x.worse.length?"惡化："+x.worse.join("、"):"");
     const verdictCell=detail?`${x.verdict}（${detail}）`:x.verdict;
-    return`| ${gLabel} | ${isFinite(x.a.ar)?f(x.a.ar,2)+" → "+f(x.b.ar,2):"—"} | ${f(x.a.te,1)} → ${f(x.b.te,1)}${x.tTE?`（p ${f(x.tTE.p,3)}）`:""} | ${f(x.a.cv,1)} → ${f(x.b.cv,1)} | ${f(x.a.ppk)} → ${f(x.b.ppk)} | ${fmtPpm(x.a.rate*1e6)} → ${fmtPpm(x.b.rate*1e6)}（p ${f(x.pD,3)}） | ${verdictCell} |`}).join("\n")
+    return`| ${gLabel} | ${isFinite(x.a.ar)||isFinite(x.b.ar)?f(x.a.ar,2)+" → "+f(x.b.ar,2):"—"} | ${f(x.a.te,1)} → ${f(x.b.te,1)}${x.tTE?`（p ${f(x.tTE.p,3)}）`:""} | ${f(x.a.cv,1)} → ${f(x.b.cv,1)} | ${f(x.a.ppk)} → ${f(x.b.ppk)} | ${fmtPpm(x.a.rate*1e6)} → ${fmtPpm(x.b.rate*1e6)}（p ${f(x.pD,3)}） | ${verdictCell} |`}).join("\n")
   +`\n\n## 問題偵測\n\n- A：${FA.length} 項（嚴重 ${FA.filter(x=>x.lv==="ng").length}）\n- B：${FB.length} 項（嚴重 ${FB.filter(x=>x.lv==="ng").length}）\n\n### B 仍存在的問題\n\n${FB.map(x=>`- ［${LVL[x.lv]}］${x.title}`).join("\n")||"- 無"}\n`)};
 
 /* ---------- DFM 建議 ---------- */

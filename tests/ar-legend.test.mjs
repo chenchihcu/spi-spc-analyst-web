@@ -146,3 +146,17 @@ test("轉移效率 A vs B 長條從 0 開始；擦拭週期平均改用點；群
   assert.ok(g.data.datasets[1].pointRadius <= 3, `平均標記半徑 ${g.data.datasets[1].pointRadius}`);
   assert.deepEqual(errs, []);
 });
+
+test("回合比較：A 缺尺寸、B 有尺寸時面積比欄仍顯示 B 的值", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { w, errs } = open();
+  await ready(w);
+  const H = w.SPI_TEST_HOOK, S = H.S;
+  assert.ok(S.runs.length >= 2, "範例有兩個回合");
+  const a = S.runs.find((r) => r.id !== S.runId), b = S.runs.find((r) => r.id === S.runId);   // 目前回合讀 S.rows，改用非目前回合當 A
+  a.rows = a.rows.map((r) => ({ ...r, w: 0.7, d: 0.7, apL: undefined, apW: undefined, dimAssumed: true }));
+  S.cmpA = a.id; S.cmpB = b.id;
+  H.setTab("improve/compare");
+  const cells = [...w.document.querySelectorAll("#cmpTbl tbody tr")].map((tr) => tr.children[1].textContent);
+  assert.ok(cells.some((c) => /^— → \d\.\d\d$/.test(c)), `面積比欄：${cells.join(" | ")}`);
+  assert.deepEqual(errs, []);
+});
