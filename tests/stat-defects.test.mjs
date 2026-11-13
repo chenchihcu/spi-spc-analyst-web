@@ -186,8 +186,8 @@ test("L3 零組內變異的總覽、能力頁、報告與 AI payload 明確呈�
   hook.renderOverview(); hook.setTab("capability"); hook.renderReport();
 
   const kpis = [...w.document.querySelectorAll("#capKpis .kpi")];
-  const cpk = kpis.find(x => x.querySelector(".k")?.textContent === "CPK");
-  const ppk = kpis.find(x => x.querySelector(".k")?.textContent === "PPK");
+  const cpk = kpis.find(x => x.querySelector(".k")?.textContent === "Cpk");
+  const ppk = kpis.find(x => x.querySelector(".k")?.textContent === "Ppk");
   assert.equal(cpk.querySelector(".v").textContent, "—", "能力頁 Cpk 不可顯示有限值");
   assert.match(cpk.querySelector(".s").textContent, /組內變異為零/);
   assert.notEqual(ppk.querySelector(".v").textContent, "—", "能力頁仍須顯示有效 Ppk");
