@@ -446,6 +446,8 @@ export const MAX_FALLBACK_MODELS = 40;
 export const FALLBACK_CONCURRENCY = 6;
 // 這些結果代表「此模型現在不能用」，改試下一個候選模型
 const MODEL_UNAVAILABLE_STATUSES = [404, 410, 524];
+// 輸出上限被上游拒收時的保守值（NVIDIA 原本的設定，實測各模型皆接受）
+const SAFE_MAX_TOKENS = 8192;
 
 function linkedAbort(parentSignal) {
   const ctrl = new AbortController();
@@ -461,6 +463,7 @@ async function fetchUpstreamWithRetry(targetUrl, headers, bodyPayload, signal, p
   let didRetry = false;
   let timeoutFallbackUsed = false;
   let effortDropped = false;
+  let tokensReduced = false;
   const startedAt = Date.now();
   for (let attempt = 0; attempt < UPSTREAM_RETRY_MAX_ATTEMPTS; attempt++) {
     const ctrl = linkedAbort(signal);
@@ -497,6 +500,13 @@ async function fetchUpstreamWithRetry(targetUrl, headers, bodyPayload, signal, p
       didRetry = true;
       const { reasoning_effort: _drop, ...rest } = bodyPayload;
       bodyPayload = rest;
+      continue;
+    }
+    const tokField = ['max_tokens', 'max_completion_tokens'].find((k) => Number(bodyPayload[k]) > SAFE_MAX_TOKENS);
+    if (res.status === 400 && !tokensReduced && tokField && /max_tokens|max_completion_tokens|context|too large|maximum/i.test(bodyText)) {
+      tokensReduced = true;
+      didRetry = true;
+      bodyPayload = { ...bodyPayload, [tokField]: SAFE_MAX_TOKENS };
       continue;
     }
     if (UPSTREAM_TIMEOUT_STATUSES.includes(res.status)) {
@@ -561,8 +571,8 @@ export function parseFallbackModels(raw, selected) {
   return out;
 }
 
-/** SSE 事件是否已帶出內容或推理 token（只有角色、空 delta 的事件不算）。 */
-function sseHasToken(text) {
+/** SSE 事件是否已帶出 token：contentOnly 時只算正文，否則推理 token 也算（只有角色、空 delta 的事件不算）。 */
+function sseHasToken(text, contentOnly = false) {
   for (const line of text.split(/\r?\n/)) {
     const t = line.trim();
     if (!t.startsWith('data:')) continue;
@@ -571,7 +581,8 @@ function sseHasToken(text) {
     let ev;
     try { ev = JSON.parse(d); } catch { continue; }
     const delta = Array.isArray(ev.choices) ? ev.choices[0]?.delta : null;
-    if (delta && [delta.content, delta.reasoning_content, delta.reasoning].some((x) => typeof x === 'string' && x.length > 0)) return true;
+    const fields = contentOnly ? [delta?.content] : [delta?.content, delta?.reasoning_content, delta?.reasoning];
+    if (delta && fields.some((x) => typeof x === 'string' && x.length > 0)) return true;
     if (ev.type === 'content_block_delta') return true;
   }
   return false;
@@ -583,8 +594,9 @@ function nonSseSnippet(text) {
 }
 
 /**
- * 開始回應後先讀到第一個內容／推理 token 才算這個模型可用；讀到的片段原樣重播給呼叫端。
- * 標頭回來但沒有任何 token（空串流、錯誤本文、逾時）時回報失敗，讓競速繼續等其他模型。
+ * 開始回應後先讀到第一個正文 token 才算這個模型可用；讀到的片段（含之前的推理）原樣重播給呼叫端。
+ * 只有推理沒有正文、空串流、錯誤本文或逾時都回報失敗，讓競速繼續等其他模型。
+ * 實測 nemotron-3.5-lightning 不理會 reasoning_effort，推理 216 秒用盡 16384 tokens 仍無正文，所以推理 token 不算數。
  */
 async function primeSseStream(res, timeoutMs) {
   const reader = res.body.getReader();
@@ -595,21 +607,32 @@ async function primeSseStream(res, timeoutMs) {
   for (;;) {
     const remaining = deadline - Date.now();
     let timer;
+    // read() 在請求被中止（競速落敗）時會 reject；轉成結果物件，避免未處理的 rejection
     const r = remaining > 0
-      ? await Promise.race([reader.read(), new Promise((ok) => { timer = setTimeout(() => ok({ timeout: true }), remaining); })])
+      ? await Promise.race([
+        reader.read().catch((error) => ({ error })),
+        new Promise((ok) => { timer = setTimeout(() => ok({ timeout: true }), remaining); }),
+      ])
       : { timeout: true };
     clearTimeout(timer);
+    if (r.error) {
+      reader.cancel().catch(() => {});
+      return { ok: false, outcome: r.error?.name === 'AbortError' ? '已中止' : String(r.error?.message || r.error).slice(0, 120) };
+    }
     if (r.timeout) {
       reader.cancel().catch(() => {});
-      return { ok: false, outcome: `開始回應後 ${Math.round(timeoutMs / 1000)} 秒沒有內容` };
+      const secs = Math.round(timeoutMs / 1000);
+      return { ok: false, outcome: sseHasToken(text) ? `${secs} 秒內只有推理、沒有正文` : `開始回應後 ${secs} 秒沒有內容` };
     }
     if (r.done) {
       const raw = nonSseSnippet(text);
+      if (sseHasToken(text)) return { ok: false, outcome: '只有推理、沒有正文' };
       return { ok: false, outcome: `回應為空${raw ? `：${raw}` : ''}` };
     }
     chunks.push(r.value);
-    text += dec.decode(r.value, { stream: true });
-    if (sseHasToken(text)) {
+    // 只保留最後一段文字做判斷，避免長推理累積成巨大字串
+    text = (text.length > 8192 ? text.slice(-4096) : text) + dec.decode(r.value, { stream: true });
+    if (sseHasToken(text, true)) {
       const replay = new ReadableStream({
         start(c) { for (const x of chunks) c.enqueue(x); },
         async pull(c) {
@@ -661,7 +684,7 @@ async function fetchWithModelFallback(targetUrl, headers, baseBody, candidates, 
       return {
         res: null,
         tried: candidates.filter((m) => outcomes.has(m)).map((m) => ({ model: m, outcome: outcomes.get(m) })),
-        error: `${provLabel} 候選模型都無法開始回應：${list}；請稍後再試，或在 AI 設定按「更新模型清單」後改選其他模型。`,
+        error: `${provLabel} 候選模型都沒有產出分析內容：${list}；請稍後再試，或在 AI 設定按「更新模型清單」後改選其他模型。`,
       };
     };
     const queue = candidates.slice(1).map((m, j) => [m, j + 1]);
@@ -686,9 +709,17 @@ async function fetchWithModelFallback(targetUrl, headers, baseBody, candidates, 
         effortFallback: false,
       }).then(async (up) => {
         if (up.res && !settled) {
-          const primed = await primeSseStream(up.res, UPSTREAM_TIMEOUTS.fallbackHeaderMs);
+          let primed;
+          try {
+            primed = await primeSseStream(up.res, Math.max(1000, overallDeadline - Date.now()));
+          } catch (e) {
+            primed = { ok: false, outcome: String(e?.message || e).slice(0, 120) };
+          }
           if (primed.ok) up = { ...up, res: primed.res };
           else up = { res: null, modelUnavailable: true, outcome: primed.outcome };
+        } else if (up.res) {
+          up.res.body?.cancel?.().catch?.(() => {});
+          up = { res: null, outcome: '已中止' };
         }
         pending -= 1;
         if (settled) { up.res?.body?.cancel?.().catch?.(() => {}); return; }
@@ -715,6 +746,68 @@ async function fetchWithModelFallback(targetUrl, headers, baseBody, candidates, 
     if (candidates.length > 1) raceTimer = setTimeout(startFallbacks, UPSTREAM_TIMEOUTS.raceDelayMs);
     launch(primary, 0);
   });
+}
+
+// 可用性驗證：清單列出的模型不一定能用（404、排隊、過載），以極短請求實測「能開始產出 token」才算可用。
+// 驗證要求在 perModelMs 內產出正文（推理不算）；maxTokens 留給短推理後的正文
+export const PROBE_LIMITS = { maxModels: 40, concurrency: 6, perModelMs: 15000, overallMs: 45000, maxTokens: 512 };
+
+/** 依序以工作池實測模型；回傳可用模型（依開始產出的快慢排序）與每個模型的結果。 */
+export async function probeModels(targetUrl, apiKey, models, provCfg) {
+  const startedAt = Date.now();
+  const results = {};
+  const available = [];
+  const queue = [...models];
+  const reqProfile = provCfg.request;
+  const probeOne = async (m) => {
+    const ctrl = new AbortController();
+    const t0 = Date.now();
+    const body = {
+      model: m,
+      ...(sendsReasoningEffort(provCfg.id, m) ? { reasoning_effort: 'low' } : {}),
+      [reqProfile.maxTokensField]: PROBE_LIMITS.maxTokens,
+      stream: true,
+      messages: [{ role: 'user', content: 'Reply with: ok' }],
+    };
+    try {
+      const up = await fetchUpstreamWithRetry(targetUrl, { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}`, 'cf-aig-collect-log-payload': 'false' },
+        body, ctrl.signal, provCfg.label, null, { headerTimeoutMs: PROBE_LIMITS.perModelMs, effortFallback: false });
+      if (!up.res) { results[m] = up.outcome || '失敗'; return; }
+      const primed = await primeSseStream(up.res, Math.max(1000, PROBE_LIMITS.perModelMs - (Date.now() - t0)));
+      if (!primed.ok) { results[m] = primed.outcome; return; }
+      primed.res.body.cancel().catch(() => {});
+      const ms = Date.now() - t0;
+      results[m] = `可用（${(ms / 1000).toFixed(1)} 秒開始回應）`;
+      available.push({ model: m, ms });
+    } catch (e) {
+      results[m] = String(e?.message || e).slice(0, 120);
+    } finally {
+      ctrl.abort();
+    }
+  };
+  const worker = async () => {
+    while (queue.length && Date.now() - startedAt < PROBE_LIMITS.overallMs) {
+      await probeOne(queue.shift());
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(PROBE_LIMITS.concurrency, models.length) }, worker));
+  for (const m of queue) results[m] = '未驗證（超過驗證時間上限）';
+  available.sort((a, b) => a.ms - b.ms);
+  return { available: available.map((x) => x.model), results };
+}
+
+async function handleProbeModels(req, env, providerId) {
+  const provCfg = PROVIDERS[providerId];
+  if (!provCfg.liveModels) return json({ ok: false, provider: providerId, error: `${provCfg.label} 不支援模型可用性驗證` }, 400);
+  const keyInfo = resolveApiKey(req, env, providerId);
+  if (keyInfo.error) return json({ ok: false, provider: providerId, error: keyInfo.error }, 400);
+  if (!keyInfo.apiKey) return json({ ok: false, provider: providerId, error: `請先填入 ${provCfg.label} API Key，再驗證模型` }, 400);
+  const epCheck = validateEndpointUrl(req.headers.get('x-ai-endpoint'), provCfg.chatUrl);
+  if (epCheck.error) return json({ ok: false, provider: providerId, error: epCheck.error }, 400);
+  const models = parseFallbackModels(req.headers.get('x-ai-probe-models'), '').slice(0, PROBE_LIMITS.maxModels);
+  if (!models.length) return json({ ok: false, provider: providerId, error: '沒有要驗證的模型' }, 400);
+  const { available, results } = await probeModels(epCheck.url, keyInfo.apiKey, models, provCfg);
+  return json({ ok: true, provider: providerId, available, results, probedAt: Date.now() });
 }
 
 /** OpenAI 相容端點的模型清單網址：…/chat/completions → …/models；不是這個形狀的自訂端點回 null。 */
@@ -771,6 +864,11 @@ export async function handleAnalyze(req, env = {}, userArg = '') {
   if (req.method === 'GET') {
     const reqUrl = new URL(req.url);
     const rawProv = reqUrl.searchParams.get('provider') || req.headers.get('x-ai-provider') || 'openai';
+    if (reqUrl.searchParams.get('probe') === '1') {
+      const removedMsg = removedProviderError(rawProv);
+      if (removedMsg) return json({ ok: false, error: removedMsg, code: 'provider_removed' }, 400);
+      return handleProbeModels(req, env, normProvider(rawProv));
+    }
     if (reqUrl.searchParams.get('models') === '1') {
       const removedMsg = removedProviderError(rawProv);
       if (removedMsg) return json({ ok: false, error: removedMsg, code: 'provider_removed' }, 400);

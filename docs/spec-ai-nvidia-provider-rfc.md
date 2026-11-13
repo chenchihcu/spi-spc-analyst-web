@@ -41,13 +41,14 @@
 
 - **FR-1.** `AI_PROVIDER_CATALOG` 新增 `id: 'nvidia'`、`label: 'NVIDIA'`、`chatUrl: https://integrate.api.nvidia.com/v1/chat/completions`、`headerKey: 'x-nvidia-key'`、`free: true`、`liveModels: true`。
 - **FR-2.** 內建推薦模型 `openai/gpt-oss-20b`（預設），費率為 0。這只是尚未更新清單前的起始內容。`openai/gpt-oss-120b` 已於 2026-09-03 下架（410），列於 `removedModels`（v10.24.0）。
-- **FR-3.** 每個服務商有請求設定 `request`：`maxTokensField`、`maxTokens`、`reasoningEffortModels`。既有服務商為 `max_completion_tokens`／16000／`'all'`；NVIDIA 為 `max_tokens`／8192／`'all'`（v10.24.0 起；實測即時清單模型都接受，拒收時後端去掉欄位重試一次），預設推理強度 `defaultEffort: 'low'`。
+- **FR-3.** 每個服務商有請求設定 `request`：`maxTokensField`、`maxTokens`、`reasoningEffortModels`。既有服務商為 `max_completion_tokens`／16000／`'all'`；NVIDIA 為 `max_tokens`／16384（拒收時降為 8192 重試一次）／`'all'`（v10.24.0 起；實測即時清單模型都接受，拒收時後端去掉欄位重試一次），預設推理強度 `defaultEffort: 'low'`。
 
 ### 4.2 Worker（`cloudflare/ai.mjs`）
 
 - **FR-4.** 金鑰來源順序與其他服務商相同：`X-Nvidia-Key`（或 `X-AI-Key`）→ `env.NVIDIA_API_KEY` → 無金鑰回 400。只帶 `X-Nvidia-Key`、未帶 `X-AI-Provider` 時判定為 NVIDIA。
 - **FR-5.** 上游請求的輸出上限欄位名稱與數值取自 `request`。模型不在 `reasoningEffortModels` 時不送 `reasoning_effort`，回應標頭 `X-AI-Reasoning-Effort` 為 `none`。
-- **FR-5a.**（v10.24.0）即時清單服務商的備援競速：瀏覽器以 `X-AI-Fallback-Models` 送最多 40 個對話模型（曾成功者在前）。選定模型 10 秒內沒產出第一個 token、或回 404／410／524 時，後端以工作池（同時最多 6 個、整體 120 秒）並行嘗試，第一個產出內容或推理 token 者勝出、其餘中止；選定模型最多等 95 秒。結果開頭揭露實際模型；全部失敗時逐一列出結果。根因與實測見 CHANGELOG v10.24.0。
+- **FR-5a.**（v10.24.0）即時清單服務商的備援競速：瀏覽器以 `X-AI-Fallback-Models` 送最多 40 個對話模型（曾成功者在前）。選定模型 10 秒內沒產出第一個 token、或回 404／410／524 時，後端以工作池（同時最多 6 個、整體 120 秒）並行嘗試，第一個產出正文 token 者勝出、其餘中止（只有推理不算）；選定模型最多等 95 秒。結果開頭揭露實際模型；全部失敗時逐一列出結果。根因與實測見 CHANGELOG v10.24.0。
+- **FR-5b.**（v10.24.0）`GET /api/analyze?probe=1&provider=nvidia`，標頭 `X-AI-Probe-Models` 列出要驗證的模型（最多 40 個）：以 `Reply with: ok`、`max_tokens: 512` 實測，同時 6 個、每個 15 秒、整體 45 秒，15 秒內產出正文才算可用。回傳 `available`（依開始回應快慢排序）與每個模型的 `results`。前端在更新模型清單後自動執行，所選模型未通過時改選最快的可用模型。
 - **FR-6.** OpenAI 與 Antigravity 送出的 JSON 欄位與順序不變。
 - **FR-7.** 用量計數、配額攔截、`GET ?models=1`、自訂端點檢查沿用既有程式；NVIDIA 的每月美金累計為 0。
 - **FR-8.** NVIDIA 回 429 時，失敗訊息加上「免費帳號速率或額度已達上限，請稍後再試或改用其他服務商」。
@@ -76,7 +77,7 @@
 - **Given** 上一條完成 **When** 上游回錯誤後再按一次 **Then** 選單不變，訊息含「模型清單更新失敗」與「沿用上次的清單」。
 - **Given** 清單已存在 **When** 重新載入頁面 **Then** 選單與所選模型和重新載入前相同。
 - **Given** 清單是 25 小時前的且已填金鑰 **When** 進入 AI 頁 **Then** 自動查詢一次並套用；之後離開再進入不重複查詢。
-- **Given** `X-AI-Provider: nvidia` 與 `X-Nvidia-Key` **When** `POST /api/analyze` **Then** 上游網址為 NVIDIA 端點，`Authorization` 為該金鑰，請求含 `max_tokens: 8192`、不含 `max_completion_tokens`。
+- **Given** `X-AI-Provider: nvidia` 與 `X-Nvidia-Key` **When** `POST /api/analyze` **Then** 上游網址為 NVIDIA 端點，`Authorization` 為該金鑰，請求含 `max_tokens: 16384`、不含 `max_completion_tokens`。
 - **Given** 同上且 `X-AI-Model: meta/llama-next-70b`、`X-AI-Reasoning-Effort: medium` **When** `POST` **Then** 請求含 `reasoning_effort: medium`（v10.24.0 起 NVIDIA 所有模型都送）。
 - **Given** OpenAI 或 Antigravity **When** `POST` **Then** 請求欄位依序為 `model, reasoning_effort, max_completion_tokens, stream, stream_options, messages`。
 - **Given** NVIDIA 用量 100 萬輸入與 50 萬輸出 tokens **When** `GET /api/analyze?provider=nvidia` **Then** `monthlyUsd` 為 0，OpenAI 與 Antigravity 的用量不變。
@@ -109,5 +110,5 @@
 |---|---|---|
 | 內建 gpt-oss 模型在免費帳號清單內 | 2026-11-13 實測：120b 回 410 已下架，20b 在清單內但排隊 113–143 秒 | v10.24.0 移除 120b，改以備援競速處理排隊 |
 | NVIDIA 接受 `stream_options.include_usage` | 跑一次分析 | 上游 400 訊息會顯示；改為依服務商決定是否送出 |
-| `max_tokens: 8192` 不超過所選模型上限 | 跑一次分析 | 調整 `request.maxTokens` |
+| `max_tokens: 16384` 不超過所選模型上限 | 2026-11-13 實測 lightning、gemma-4 接受 32768 | 後端在 400 拒收時降為 8192 重試一次 |
 | 模型接受 `reasoning_effort` | 2026-11-13 實測：gpt-oss-20b、minimax、nemotron-lightning 皆接受 | 後端在 400 拒收時去掉欄位重試一次 |

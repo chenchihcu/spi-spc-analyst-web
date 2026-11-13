@@ -18,6 +18,7 @@ import {
   UPSTREAM_TIMEOUTS,
   parseFallbackModels,
   FALLBACK_CONCURRENCY,
+  PROBE_LIMITS,
 } from '../cloudflare/ai.mjs';
 import { lookupModelPricing } from '../lib/ai-providers.mjs';
 
@@ -559,7 +560,7 @@ test('NVIDIA 524：不做降推理強度重試，訊息列出模型與結果', a
     return new Response('error code: 524', { status: 524, headers: { 'content-type': 'text/plain' } });
   }, async () => {
     const text = await (await handleAnalyze(nvReq({ 'X-AI-Model': 'deepseek-ai/deepseek-r1', 'X-AI-Reasoning-Effort': 'high' }), {}, USER)).text();
-    assert.match(text, /［AI 分析失敗：NVIDIA 候選模型都無法開始回應：deepseek-ai\/deepseek-r1（524 逾時）/);
+    assert.match(text, /［AI 分析失敗：NVIDIA 候選模型都沒有產出分析內容：deepseek-ai\/deepseek-r1（524 逾時）/);
   });
   assert.equal(sent.length, 1, 'NVIDIA 524 不重試');
   assert.equal(sent[0].reasoning_effort, 'high');
@@ -652,7 +653,7 @@ test('NVIDIA 選定模型 410 下架、404 帳號無此模型：立即改試下�
     return hangingFetch(init.signal);
   }, async () => {
     const text = await (await handleAnalyze(nvReq({ 'X-AI-Model': 'old/model', 'X-AI-Fallback-Models': 'missing/model,slow/model' }), {}, USER)).text();
-    assert.match(text, /［AI 分析失敗：NVIDIA 候選模型都無法開始回應：old\/model（410 已下架）、missing\/model（404 帳號無此模型）、slow\/model（等待 \d+ 秒未開始回應）；/);
+    assert.match(text, /［AI 分析失敗：NVIDIA 候選模型都沒有產出分析內容：old\/model（410 已下架）、missing\/model（404 帳號無此模型）、slow\/model（等待 \d+ 秒未開始回應）；/);
   }));
   assert.deepEqual(sent, ['old/model', 'missing/model', 'slow/model']);
 });
@@ -677,8 +678,13 @@ test('模型只輸出推理、沒有正文：顯示失敗原因而不是空白',
     '',
   ].join('\n');
   await withFetch(async () => new Response(reasoningOnly, { status: 200, headers: { 'content-type': 'text/event-stream' } }), async () => {
-    const text = await (await handleAnalyze(nvReq({ 'X-AI-Model': 'nvidia/thinker' }), {}, USER)).text();
-    assert.equal(text, '\n\n［AI 分析失敗：NVIDIA nvidia/thinker 只輸出推理、沒有正文（結束原因 length，推理約 7 字）；請把推理強度調低或改選其他模型］');
+    // 非即時清單服務商：串流結束時才判定
+    const req = new Request('https://spi.example/api/analyze', { method: 'POST', headers: { 'X-OpenAI-Key': 'user-oai-key', 'X-AI-Model': 'o-thinker' }, body: BODY });
+    const text = await (await handleAnalyze(req, {}, USER)).text();
+    assert.equal(text, '\n\n［AI 分析失敗：OpenAI o-thinker 只輸出推理、沒有正文（結束原因 length，推理約 7 字）；請把推理強度調低或改選其他模型］');
+    // NVIDIA：只有推理的模型不算勝出，列在候選結果中
+    const nvText = await (await handleAnalyze(nvReq({ 'X-AI-Model': 'nvidia/thinker' }), {}, USER)).text();
+    assert.match(nvText, /［AI 分析失敗：NVIDIA 候選模型都沒有產出分析內容：nvidia\/thinker（只有推理、沒有正文）；/);
   });
 });
 
@@ -712,7 +718,7 @@ test('NVIDIA：使用者金鑰轉發到 NVIDIA 端點，用 max_tokens；所有�
   assert.equal(r.res.headers.get('X-AI-Reasoning-Effort'), 'low');
   assert.equal(r.calls[0].url, NVIDIA_CHAT_URL);
   assert.equal(r.calls[0].headers.Authorization, 'Bearer nvapi-user-key');
-  assert.equal(r.calls[0].body.max_tokens, 8192);
+  assert.equal(r.calls[0].body.max_tokens, 16384);
   assert.equal('max_completion_tokens' in r.calls[0].body, false);
   assert.equal(r.calls[0].body.reasoning_effort, 'low');
   assert.match(r.text, /分析結果/);
@@ -788,4 +794,95 @@ test('NVIDIA：GET ?models=1 查帳號當下的模型清單；429 訊息說明�
     }), {}, USER);
     assert.match(await res.text(), /AI 分析失敗：.*免費帳號速率或額度已達上限/);
   });
+});
+
+test('NVIDIA 模型可用性驗證：GET ?probe=1 以極短請求實測，能產出正文才算可用（只有推理不算）', async () => {
+  const saved = { ...PROBE_LIMITS };
+  PROBE_LIMITS.perModelMs = 40;
+  const sent = [];
+  try {
+    await withFetch(async (url, init) => {
+      const body = JSON.parse(init.body);
+      sent.push(body);
+      if (body.model === 'gone/model') return Response.json({ status: 404, detail: 'Function not found for account' }, { status: 404 });
+      if (body.model === 'slow/model') return hangingFetch(init.signal);
+      if (body.model === 'empty/model') return new Response('', { status: 200, headers: { 'content-type': 'text/event-stream' } });
+      if (body.model === 'think/model') return new Response(`data: ${JSON.stringify({ choices: [{ delta: { reasoning_content: '想' }, finish_reason: 'length' }] })}\n\ndata: [DONE]\n\n`, { status: 200, headers: { 'content-type': 'text/event-stream' } });
+      return new Response(sse(body.model, 'ok'), { status: 200, headers: { 'content-type': 'text/event-stream' } });
+    }, async () => {
+      const res = await handleAnalyze(new Request('https://spi.example/api/analyze?probe=1&provider=nvidia', {
+        headers: { 'X-Nvidia-Key': 'nvapi-user-key', 'X-AI-Probe-Models': 'gone/model,slow/model,good/model,empty/model,think/model' },
+      }), {}, USER);
+      const j = await res.json();
+      assert.equal(j.ok, true);
+      assert.deepEqual(j.available, ['good/model']);
+      assert.equal(j.results['gone/model'], '404 帳號無此模型');
+      assert.match(j.results['slow/model'], /^等待 \d+ 秒未開始回應$/);
+      assert.equal(j.results['empty/model'], '回應為空');
+      assert.equal(j.results['think/model'], '只有推理、沒有正文');
+      assert.match(j.results['good/model'], /^可用（[\d.]+ 秒開始回應）$/);
+    });
+  } finally {
+    Object.assign(PROBE_LIMITS, saved);
+  }
+  assert.equal(sent.length, 5);
+  assert.equal(sent[0].max_tokens, 512);
+  assert.equal(sent[0].reasoning_effort, 'low');
+  assert.deepEqual(sent[0].messages, [{ role: 'user', content: 'Reply with: ok' }]);
+});
+
+test('模型可用性驗證：沒有金鑰回 400；非即時清單服務商不支援', async () => {
+  const r1 = await handleAnalyze(new Request('https://spi.example/api/analyze?probe=1&provider=nvidia', { headers: { 'X-AI-Probe-Models': 'a/b' } }), {}, USER);
+  assert.equal(r1.status, 400);
+  assert.match((await r1.json()).error, /NVIDIA API Key/);
+  const r2 = await handleAnalyze(new Request('https://spi.example/api/analyze?probe=1&provider=openai', { headers: { 'X-OpenAI-Key': 'sk-user-key', 'X-AI-Probe-Models': 'a/b' } }), {}, USER);
+  assert.equal(r2.status, 400);
+});
+
+test('上游拒收輸出上限（400 提到 max_tokens）：降為 8192 重試一次', async () => {
+  const sent = [];
+  await withFetch(async (url, init) => {
+    const body = JSON.parse(init.body);
+    sent.push(body.max_tokens);
+    if (body.max_tokens > 8192) return Response.json({ error: { message: 'max_tokens must be <= 8192' } }, { status: 400 });
+    return new Response(sse(body.model, '分析結果'), { status: 200, headers: { 'content-type': 'text/event-stream' } });
+  }, async () => {
+    const text = await (await handleAnalyze(nvReq(), {}, USER)).text();
+    assert.equal(text, '分析結果');
+  });
+  assert.deepEqual(sent, [16384, 8192]);
+});
+
+test('NVIDIA 選定模型只推理不出正文：備援中先產出正文的模型勝出，落敗請求中止時沒有未處理的 rejection', async () => {
+  const unhandled = [];
+  const onUnhandled = (e) => unhandled.push(e);
+  process.on('unhandledRejection', onUnhandled);
+  try { await withShortWatchdog(() => withFetch(async (url, init) => {
+    const body = JSON.parse(init.body);
+    if (body.model === 'openai/gpt-oss-20b') {
+      // 持續送推理 token、永遠不出正文
+      const enc = new TextEncoder();
+      let n = 0;
+      const stream = new ReadableStream({
+        async pull(c) {
+          // 真實 fetch 的本文在請求中止後讀取會 reject（AbortError）
+          if (init.signal.aborted) { c.error(Object.assign(new Error('aborted'), { name: 'AbortError' })); return; }
+          if (n > 200) { c.close(); return; }
+          n += 1;
+          await new Promise((r) => setTimeout(r, 2));
+          c.enqueue(enc.encode(`data: ${JSON.stringify({ choices: [{ delta: { reasoning_content: '想' } }] })}\n\n`));
+        },
+      });
+      return new Response(stream, { status: 200, headers: { 'content-type': 'text/event-stream' } });
+    }
+    return new Response(sse(body.model, '分析結果'), { status: 200, headers: { 'content-type': 'text/event-stream' } });
+  }, async () => {
+    const text = await (await handleAnalyze(nvReq({ 'X-AI-Fallback-Models': 'answer/model' }), {}, USER)).text();
+    assert.match(text, /已自動改用模型 answer\/model）\n\n分析結果$/);
+  }));
+    await new Promise((r) => setTimeout(r, 50));
+  } finally {
+    process.off('unhandledRejection', onUnhandled);
+  }
+  assert.deepEqual(unhandled, [], '落敗請求不可留下未處理的 rejection');
 });

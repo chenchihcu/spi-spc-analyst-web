@@ -10329,7 +10329,7 @@ function saveAiLiveModels(provId,models){
   try{
     const all=JSON.parse(localStorage.getItem(AI_LIVE_MODELS_KEY)||"{}")||{};
     const good=all[provId]&&Array.isArray(all[provId].good)?all[provId].good:[];
-    all[provId]={at:Date.now(),models,good};
+    all[provId]={at:Date.now(),models,good,verified:null};
     localStorage.setItem(AI_LIVE_MODELS_KEY,JSON.stringify(all));
   }catch(e){}
 }
@@ -10357,12 +10357,32 @@ function saveAiGoodModel(provId,model){
     localStorage.setItem(AI_LIVE_MODELS_KEY,JSON.stringify(all));
   }catch(e){}
 }
+/* 可用性驗證結果：{at, models}（依開始回應快慢排序）；更新模型清單時重設 */
+function loadAiVerified(provId){
+  try{const row=(JSON.parse(localStorage.getItem(AI_LIVE_MODELS_KEY)||"{}")||{})[provId];const v=row&&row.verified;return v&&Array.isArray(v.models)?{at:Number(v.at)||0,models:v.models.filter(m=>typeof m==="string")}:null}catch(e){return null}
+}
+function saveAiVerified(provId,models){
+  try{
+    const all=JSON.parse(localStorage.getItem(AI_LIVE_MODELS_KEY)||"{}")||{};
+    const row=all[provId];if(!row||!Array.isArray(row.models))return;
+    row.verified={at:Date.now(),models};
+    localStorage.setItem(AI_LIVE_MODELS_KEY,JSON.stringify(all));
+  }catch(e){}
+}
+/* 要驗證的模型：所選模型、曾成功者、推薦模型、其餘；只取對話模型，最多 40 個 */
+function aiProbeCandidates(provId,selected){
+  const live=loadAiLiveModels(provId);
+  if(!live)return[];
+  const order=[selected,...loadAiGoodModels(provId),...aiModelOptions(provId).map(x=>x[0])];
+  return [...new Set(order)].filter(m=>m&&m!=="custom"&&live.models.includes(m)&&!AI_NON_CHAT_RE.test(m)).slice(0,40);
+}
 function aiFallbackModels(provId,selected){
   const meta=AI_PROVIDERS_META[provId];
   if(!meta||!meta.liveModels)return[];
   const live=loadAiLiveModels(provId);
   if(!live)return[];
-  const order=[...loadAiGoodModels(provId),...aiModelOptions(provId).map(x=>x[0])];
+  const ver=loadAiVerified(provId);
+  const order=[...loadAiGoodModels(provId),...(ver?ver.models:[]),...aiModelOptions(provId).map(x=>x[0])];
   return [...new Set(order)].filter(m=>m!=="custom"&&m!==selected&&live.models.includes(m)&&!AI_NON_CHAT_RE.test(m)).slice(0,40);
 }
 function aiEffortApplies(provId,modelId){
@@ -10567,7 +10587,7 @@ function updateAiStatusLabels(cfgArg){
   const listNote=$("#aiModelListNote");
   if(listNote){
     listNote.hidden=!meta.liveModels;
-    if(meta.liveModels){const lv=loadAiLiveModels(act);listNote.textContent=lv?`模型清單更新於 ${fmtAiListTime(lv.at)} · ${lv.models.length} 個模型`:"尚未更新模型清單"}
+    if(meta.liveModels){const lv=loadAiLiveModels(act),ver=loadAiVerified(act);listNote.textContent=lv?`模型清單更新於 ${fmtAiListTime(lv.at)} · ${lv.models.length} 個模型`+(ver?` · 驗證可用 ${ver.models.length} 個`:" · 尚未驗證"):"尚未更新模型清單"}
   }
   if($("#aiProviderLabel"))$("#aiProviderLabel").textContent=meta.label;
   if($("#aiQuickProv"))$("#aiQuickProv").textContent=meta.label;
@@ -10826,6 +10846,32 @@ if($("#btnAiSaveCfg"))$("#btnAiSaveCfg").onclick=async()=>{
     }catch(e){}
   }
 };
+/* 以極短請求實測清單中的對話模型，能開始產出 token 的才算可用；所選模型未通過時改選最快的可用模型 */
+async function probeAiModels(act,headers,sig){
+  const cur0=loadAiCfg(),sel=effectiveModelOf(cur0.providers[act],act);
+  const cands=aiProbeCandidates(act,sel);
+  if(!cands.length)return"沒有可驗證的對話模型";
+  let j={};
+  try{
+    const r=await fetch("/api/analyze?probe=1&provider="+encodeURIComponent(act),{headers:{...headers,"X-AI-Probe-Models":cands.join(",")}});
+    j=await r.json().catch(()=>({}));
+    if(!r.ok||!j.ok)return`模型驗證失敗：${j.error||"伺服器回應 "+r.status}`;
+  }catch(e){return`模型驗證失敗：${e&&e.message||e}`}
+  const avail=Array.isArray(j.available)?j.available.filter(m=>typeof m==="string"):[];
+  saveAiVerified(act,avail);
+  if(!avail.length)return`驗證 ${cands.length} 個模型，目前沒有可用模型（NVIDIA 免費帳號排隊或過載），分析可能失敗，請稍後再按「更新模型清單」`;
+  let note=`驗證 ${cands.length} 個模型，可用 ${avail.length} 個：${avail.slice(0,5).join("、")}${avail.length>5?" 等":""}`;
+  const cur=snapshotAiInputsToCfg(loadAiCfg()),curP=cur.providers[act];
+  if(cur.activeProvider!==act||aiModelSig(act,curP)!==sig)return note+"；設定在驗證期間已變更，未改選模型";
+  const now=effectiveModelOf(curP,act);
+  if(!avail.includes(now)){
+    const why=(j.results&&j.results[now])||"未通過驗證";
+    curP.model=avail[0];curP.customModel="";
+    note+=`；所選 ${now}（${why}）已改選 ${avail[0]}`;
+    saveAiCfg(cur);
+  }
+  return note;
+}
 async function refreshAiModels(opt){
   const silent=Boolean(opt&&opt.silent);
   const btn=$("#btnAiCheckModels"),msg=$("#aiCfgMsg");
@@ -10866,7 +10912,11 @@ async function refreshAiModels(opt){
       }
       saveAiCfg(cur);
       syncAiCfgInputs();
-      say(note);return;
+      say(note+"；驗證可用模型中…");
+      btn.textContent="驗證中…";
+      say(note+"；"+await probeAiModels(act,headers,sig));
+      syncAiCfgInputs();
+      return;
     }
     const presets=meta.models.map(x=>x[0]).filter(v=>v!=="custom");
     const ok=presets.filter(v=>j.models.includes(v)),bad=presets.filter(v=>!j.models.includes(v));
