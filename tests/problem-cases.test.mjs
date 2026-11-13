@@ -72,3 +72,21 @@ test('問題定義：CSV 末欄含 case_id／case_title', () => {
   const row = csv.split(/\r?\n/)[1].split(',');
   assert.equal(row[row.length - 2], String(F[0].case_id));
 });
+
+test('問題定義：依案計數與依卡計數各自加總一致，案的嚴重度篩選不漏卡', () => {
+  const st = baseState(core, { rows: core.sampleData() });
+  const F = core.detectIssues(st);
+  const { cards, cases } = core.issueCaseCounts(F);
+  const sum = o => o.ng + o.warn + o.info;
+  assert.equal(sum(cards), F.length, '卡片嚴重度加總應等於統計發現數');
+  assert.equal(sum(cases), F.meta.cases.length, '案嚴重度加總應等於問題定義數');
+  for (const lv of ['ng', 'warn', 'info']) {
+    const sel = F.meta.cases.filter(c => c.lv === lv);
+    assert.equal(sel.length, cases[lv], `${lv} 案數應等於篩選後顯示的案數`);
+    for (const c of sel) {
+      const lvs = c.card_ids.map(id => F.find(x => x.id === id).lv);
+      const rank = { ng: 0, warn: 1, info: 2 };
+      assert.equal(Math.min(...lvs.map(v => rank[v])), rank[lv], `案 ${c.id} 的嚴重度應等於成員最高嚴重度`);
+    }
+  }
+});
