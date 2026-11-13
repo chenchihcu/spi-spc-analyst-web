@@ -1,0 +1,80 @@
+{
+  "test": "tests/component-scope.test.mjs",
+  "mutations": [
+    {
+      "name": "分析快取鍵沒有元件",
+      "from": "st.group,st.comp||null,st.cusumCenter",
+      "to": "st.group,st.cusumCenter"
+    },
+    {
+      "name": "分析沒套用元件範圍",
+      "from": "const m=st.metric,sp=specOfGroup(st,scopeSpecGroup(st),m),inS=scopeFilter(st);",
+      "to": "const m=st.metric,sp=specOfGroup(st,scopeSpecGroup(st),m),inS=r=>isAllGrp(st.group)||r.group===st.group;"
+    },
+    {
+      "name": "問題清單沒篩元件",
+      "from": "&&(sc===null||sc.own.has(x.id))&&",
+      "to": "&&"
+    },
+    {
+      "name": "全板區塊少了提示",
+      "from": "id=\"cardT2\">\n    <h3>多變量 Hotelling T² 管制圖 <small id=\"t2Sub\"></small></h3>\n    <p class=\"note scope-board-note\" hidden>全板分析，不隨元件範圍變動</p>",
+      "to": "id=\"cardT2\">\n    <h3>多變量 Hotelling T² 管制圖 <small id=\"t2Sub\"></small></h3>"
+    },
+    {
+      "name": "報告用全板問題數",
+      "from": "## 二、問題偵測清單（共 ${scopedFindings().length} 項）",
+      "to": "## 二、問題偵測清單（共 ${S.F.length} 項）"
+    },
+    {
+      "name": "範圍失效不退回",
+      "from": "function normalizeScope(st){if(!st.comp)return false;",
+      "to": "function normalizeScope(st){return false;"
+    },
+    {
+      "name": "統計清單沒篩範圍",
+      "from": "const out=scAll&&!scC?s.stats.out.slice():",
+      "to": "const out=true?s.stats.out.slice():"
+    },
+    {
+      "name": "範圍提示列不顯示",
+      "from": "const bar=$(\"#scopeBar\");if(bar){bar.hidden=!p;",
+      "to": "const bar=$(\"#scopeBar\");if(bar){bar.hidden=true;"
+    },
+    {
+      "name": "分享連結沒存元件",
+      "from": "view:{tab:srcTab,metric:S.metric,group:S.group,comp:S.comp||null,",
+      "to": "view:{tab:srcTab,metric:S.metric,group:S.group,"
+    },
+    {
+      "name": "背景預算沒帶元件",
+      "from": "function preSet(m){return{metric:m,group:S.group,comp:S.comp||null,",
+      "to": "function preSet(m){return{metric:m,group:S.group,"
+    },
+    {
+      "name": "AI 摘要沒有範圍",
+      "from": "分析範圍:scopeLabel(S),",
+      "to": ""
+    },
+    {
+      "name": "匯出 Markdown 沒有範圍",
+      "from": "- 分析範圍：${typeof scopeLabel===\"function\"?scopeLabel(st):\"全部元件\"}\n",
+      "to": ""
+    },
+    {
+      "name": "搜尋分大小寫",
+      "from": "p.label.toLowerCase().includes(t)",
+      "to": "p.label.includes(String(q||\"\").trim())"
+    },
+    {
+      "name": "問題地圖少了一鍵縮範圍",
+      "from": "data-scope-comp=\"${esc(part.key)}\" data-map-focus=\"scope\">只分析此元件</button>",
+      "to": "data-map-focus=\"scope\" hidden></button>"
+    },
+    {
+      "name": "郵件摘要沒有範圍",
+      "from": "  if(s.rows&&scopeIsNarrow(s))lines.push(`• 分析範圍：${scopeLabel(s)}`);\n",
+      "to": ""
+    }
+  ]
+}
