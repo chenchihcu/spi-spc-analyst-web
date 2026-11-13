@@ -61,6 +61,8 @@ async function importCsv(dom) {
   await until(() => !$("#mapBox").hidden || $("#parseErr").textContent);
   assert.equal($("#parseErr").textContent, "", "CSV 需可解析");
   $("#inPart").value = "P-OFF"; $("#inImpStencil").value = "120";
+  if ($("#inSupplierWo")) $("#inSupplierWo").value = "SWO-1";
+  if ($("#inOutsourceWo")) $("#inOutsourceWo").value = "OWO-2";
   $("#inPart").dispatchEvent(new w.Event("input", { bubbles: true }));
 }
 
@@ -78,6 +80,8 @@ test("離線模式：匯入只在記憶體分析，規格套用到本回合後�
   const run = H.curRun();
   assert.equal(run.rows.length, 120);
   assert.equal(run.info.src.part, "P-OFF");
+  if ($("#inSupplierWo")) assert.equal(run.info.src.supplierWo, "SWO-1", "選填的廠商工單需保留");
+  if ($("#inOutsourceWo")) assert.equal(run.info.src.outsourceWo, "OWO-2", "選填的外包工單需保留");
   assert.equal(H.S.specSrc, "none", "尚未定義規格時分析鎖定");
   assert.equal($("#btnSpecSave").textContent, "套用到本回合");
   $("#btnSpecSave").click();
@@ -85,6 +89,12 @@ test("離線模式：匯入只在記憶體分析，規格套用到本回合後�
   assert.equal(H.S.partSpec.offline, true);
   assert.equal($("#specSaveModal").hidden, true, "離線不開存檔對話框");
   assert.equal(created, 0, "離線不可呼叫 RecDB.create");
+  // 離線不得寫入瀏覽器 IndexedDB（回合與偵測快取）
+  await tick(800);
+  const names = (await w.indexedDB.databases()).map((x) => x.name);
+  assert.ok(!names.includes("spi-spc"), "離線不可建立回合資料庫");
+  assert.ok(!names.includes("spi-spc-cache"), "離線不可建立偵測快取");
+  assert.match($("#runSaveNote")?.textContent || "離線版不保存", /離線版不保存/);
   assert.deepEqual(errs, []);
   w.close();
 });

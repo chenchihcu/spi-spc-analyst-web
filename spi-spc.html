@@ -6441,7 +6441,7 @@ function runBusy(msg,fn){busy(true,msg);return new Promise(ok=>setTimeout(()=>{t
 /* 偵測結果持久快取（IndexedDB「spi-spc-cache」，與回合資料庫分開）：同一份資料與設定重新開啟時直接取用。
    key＝程式版本與核心程式指紋＋資料指紋（每列全部欄位，不含衍生的 hpct）＋偵測設定（不含回合編號）；最多保留 10 筆；任何失敗都改回即時計算 */
 const DetCache={max:10,
-  open(){return this.db||(this.db=new Promise((ok,no)=>{if(!window.indexedDB)return no(new Error("no-idb"));const q=indexedDB.open("spi-spc-cache",1);q.onupgradeneeded=()=>q.result.createObjectStore("det");q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)}))},
+  open(){return this.db||(this.db=new Promise((ok,no)=>{if(OFFLINE)return no(new Error("offline"));if(!window.indexedDB)return no(new Error("no-idb"));const q=indexedDB.open("spi-spc-cache",1);q.onupgradeneeded=()=>q.result.createObjectStore("det");q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)}))},
   async get(k){const db=await this.open();return new Promise((ok,no)=>{const q=db.transaction("det").objectStore("det").get(k);q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)})},
   async put(k,v){const db=await this.open();return new Promise((ok,no)=>{const t=db.transaction("det","readwrite"),os=t.objectStore("det");os.put({...v,at:Date.now()},k);
     const ks=os.getAllKeys(),at=os.getAll();at.onsuccess=()=>{const all=at.result;if(all.length>this.max)all.map((x,i)=>[x.at,ks.result[i]]).sort((a,b)=>a[0]-b[0]).slice(0,all.length-this.max).forEach(([,kk])=>os.delete(kk))};
@@ -9324,17 +9324,18 @@ function switchRun(id){const c=curRun();if(c)c.cfg=snapCfg();const n=S.runs.find
 }
 /* ---------- 回合保存（IndexedDB）：資料留在這台電腦的瀏覽器，不上傳 ---------- */
 const RunDB={
-  open(){return new Promise((ok,no)=>{if(!window.indexedDB)return no(new Error("no-idb"));const q=indexedDB.open("spi-spc",1);q.onupgradeneeded=()=>q.result.createObjectStore("kv");q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)})},
+  open(){return new Promise((ok,no)=>{if(OFFLINE)return no(new Error("offline"));if(!window.indexedDB)return no(new Error("no-idb"));const q=indexedDB.open("spi-spc",1);q.onupgradeneeded=()=>q.result.createObjectStore("kv");q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)})},
   async get(k){const db=await this.open();return new Promise((ok,no)=>{const q=db.transaction("kv").objectStore("kv").get(k);q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)})},
   async set(k,v){const db=await this.open();return new Promise((ok,no)=>{const t=db.transaction("kv","readwrite");t.objectStore("kv").put(v,k);t.oncomplete=()=>ok();t.onerror=()=>no(t.error)})},
   async del(k){const db=await this.open();return new Promise((ok,no)=>{const t=db.transaction("kv","readwrite");t.objectStore("kv").delete(k);t.oncomplete=()=>ok();t.onerror=()=>no(t.error)})}};
 let saveT=0,saveGate=false;
-function saveRunsSoon(){if(!saveGate||!S.runs||!S.runs.length)return;clearTimeout(saveT);saveT=setTimeout(saveRunsNow,500)}
+/* 離線版不保存回合：資料只在記憶體，關閉分頁即消失 */
+function saveRunsSoon(){if(OFFLINE){const n=$("#runSaveNote");if(n)n.textContent="離線版不保存回合資料，關閉或重新整理分頁後資料即消失";return}if(!saveGate||!S.runs||!S.runs.length)return;clearTimeout(saveT);saveT=setTimeout(saveRunsNow,500)}
 async function saveRunsNow(){const c=curRun();if(c)c.cfg=snapCfg();let ok=true;
   try{await RunDB.set("runs",{v:1,savedAt:Date.now(),runId:S.runId,cmpA:S.cmpA,cmpB:S.cmpB,runs:S.runs.map(r=>({id:r.id,name:r.name,rows:r.rows,metrics:r.metrics,cfg:r.cfg,info:r.info,aoi:r.aoi,sample:!!r.sample}))})}
   catch(e){ok=false}
   const n=$("#runSaveNote");if(n)n.textContent=ok?`回合資料保存在這台電腦的瀏覽器（${new Date().toLocaleTimeString("zh-TW",{hour12:false})} 已保存），重新整理不會遺失`:"此瀏覽器無法保存回合資料（可能是私密瀏覽模式），重新整理後會還原範例";return ok}
-async function restoreRuns(){try{const d=await RunDB.get("runs");
+async function restoreRuns(){if(OFFLINE){saveGate=true;return false}try{const d=await RunDB.get("runs");
     if(!d||!Array.isArray(d.runs)||!d.runs.length)return false;
     /* 只有與預設範例完全相同（名稱、設定、AOI 都沒改）時才不還原；改過的範例回合照樣還原 */
     const sig=r=>JSON.stringify([r.name,r.cfg,r.aoi||null,r.rows.length]);
@@ -9938,7 +9939,7 @@ $("#btnApply").onclick=async()=>{if(!IMP||!IMP.res)return;const I0=IMP,demo=!!I0
     if(!part){showImportFieldError("inPart","請填寫產品料號。");$("#recNote").innerHTML='<span class="err">請填寫產品料號</span>';$("#inPart").focus();return}
     if(!thkOk(thk)){showImportFieldError("inImpStencil","請填寫鋼板厚度（30–300 µm）。");$("#recNote").innerHTML='<span class="err">請填寫鋼板厚度（30–300 µm）：高度 % 與高度規格都依此換算</span>';if(ti)ti.focus();return}
     if(IMP.conv&&IMP.conv.hPct&&IMP.conv.thk!==thk){try{convertImp(true);previewImport()}catch(e){$("#parseErr").textContent=e.message;return}if(!IMP.res)return}
-    src={id:"offline-"+Date.now(),lot:safeId($("#inLot").value),part,rev:safeId($("#inRev").value),workOrder:safeId($("#inWorkOrder").value),measuredDate:$("#inMeasuredDate").value,supplierWo:"",outsourceWo:"",side:["TOP","BOT"].includes(impSide)?impSide:"",name:safeId(I0.name)||"量測紀錄.csv",sha256:"",user:"離線",created:Date.now(),store:"offline",lifecycle:"offline",unmatchedRefs:[],placeId:"",placePart:"",placeRev:""}}
+    src={id:"offline-"+Date.now(),lot:safeId($("#inLot").value),part,rev:safeId($("#inRev").value),workOrder:safeId($("#inWorkOrder").value),measuredDate:$("#inMeasuredDate").value,supplierWo:safeId($("#inSupplierWo")?$("#inSupplierWo").value:""),outsourceWo:safeId($("#inOutsourceWo")?$("#inOutsourceWo").value:""),side:["TOP","BOT"].includes(impSide)?impSide:"",name:safeId(I0.name)||"量測紀錄.csv",sha256:"",user:"離線",created:Date.now(),store:"offline",lifecycle:"offline",unmatchedRefs:[],placeId:"",placePart:"",placeRev:""}}
   else if(!demo){const lot=safeId($("#inLot").value),part=safeId($("#inPart").value),rev=safeId($("#inRev").value),
     workOrder=safeId($("#inWorkOrder").value),measuredDate=$("#inMeasuredDate").value,
     supplierWo=safeId($("#inSupplierWo")?$("#inSupplierWo").value:""),outsourceWo=safeId($("#inOutsourceWo")?$("#inOutsourceWo").value:"");

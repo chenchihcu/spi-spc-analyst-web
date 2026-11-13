@@ -5,7 +5,7 @@
 ## v10.24.0 — 2026-11-13（離線版：單一 HTML 檔，不連網、不登入）
 
 - **離線打包**：新增 `npm run build:offline`（`tools/build-offline.mjs`），把主頁與 Chart.js、three.js、jsPDF、網頁字型、PDF 中文字型、製程規則 JSON 打包成 `dist-offline/spi-spc-offline-v<版本>.html`（約 7.8 MB）。可直接雙擊開啟，也可放到 claude.ai 頁面；打包時擋下任何外部 `<script src>` 或 `vendor/` 引用，超過 15 MB 即失敗。
-- **離線模式只由打包產物開啟**：產物在 `<head>` 最前面設 `window.SPI_OFFLINE=true`。此時匯入只在記憶體分析：只需產品料號與鋼板厚度，不需版次、工單或受控座標，不呼叫 `RecDB.create`，回合標示「離線・未存檔」。規格頁按鈕改為「套用到本回合」，規格只套用到目前回合、不存檔，報告與匯出的規格來源寫「離線規格 料號（未存檔，SHA-256 …）」。頁首顯示未存檔提示。
+- **離線模式只由打包產物開啟**：產物在 `<head>` 最前面設 `window.SPI_OFFLINE=true`。此時匯入只在記憶體分析：只需產品料號與鋼板厚度，不需版次、工單或受控座標，不呼叫 `RecDB.create`，回合標示「離線・未存檔」。規格頁按鈕改為「套用到本回合」，規格只套用到目前回合、不存檔，報告與匯出的規格來源寫「離線規格 料號（未存檔，SHA-256 …）」。頁首顯示未存檔提示。離線時也不寫入瀏覽器 IndexedDB（回合資料庫 `spi-spc` 與偵測快取 `spi-spc-cache` 一律停用、開啟時不還原舊回合），關閉或重新整理分頁後資料即消失；選填的廠商／外包工單會保留在回合與匯出。
 - **從網站下載**：`npm run build:cloudflare` 同時產生 `dist/offline/spi-spc-offline.html`。登入後在「更多」選單按「下載離線版」，經 Worker 的 `/download/offline`（需登入，`private, no-store`）下載 `spi-spc-offline-v<版本>.html`；產物路徑本身不對外開放。`formatBuilt` 移到 `tools/build-time.mjs`，避免兩個 build 腳本互相匯入。
 - **網站版不變**：沒有旗標時仍維持雲端受控匯入，未登入時拒絕正式新匯入；`RecDB.create` 仍 fail-closed。
 - **測試**：新增 `tests/offline-build.test.mjs`（打包產物無外部資源、離線匯入與套用規格不寫資料庫、網站版未登入仍拒絕新匯入）；`tests/cloudflare.test.mjs` 新增離線版下載需登入、檔名帶版本、產物路徑不可直接存取。
