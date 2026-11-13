@@ -6365,15 +6365,19 @@ const vlines={id:"vlines",afterDatasetsDraw(ch,_,o){if(!o||!o.lines)return;const
    窄圖（< LIMIT_NARROW px，手機）不保留右側留白，改印在繪圖區右緣、線的正上方，底下墊一層底色避免壓到資料點難讀 */
 const LIMIT_NARROW=480;
 const limitLabels={id:"limitLabels",afterDatasetsDraw(ch,_,o){const L0=o&&o.items;if(!L0||!L0.length)return;const{ctx,chartArea:a,scales:{y}}=ch;if(!y||!a)return;const fs=chartCaptionFontPx(),gap=fs+3,inside=ch.width<LIMIT_NARROW;
-  const L=L0.map(it=>({t:it.t,c:it.c,py:y.getPixelForValue(it.v)})).filter(it=>isFinite(it.py)&&it.py>=a.top-gap&&it.py<=a.bottom+gap).sort((p,q)=>p.py-q.py);
+  /* 先決定每個數值的文字中心（窄圖在線的正上方並不超出繪圖區頂端），再整組推開重疊，最後才整組往上移避免超出底端；
+     夾頂端必須在推開之前，否則會抵銷間距讓文字重疊 */
+  const L=L0.map(it=>({t:it.t,c:it.c,py:y.getPixelForValue(it.v)})).filter(it=>isFinite(it.py)&&it.py>=a.top-gap&&it.py<=a.bottom+gap)
+    .map(it=>({...it,py:inside?Math.max(a.top+fs/2,it.py-fs/2-2):it.py})).sort((p,q)=>p.py-q.py);
   for(let i=1;i<L.length;i++)if(L[i].py-L[i-1].py<gap)L[i].py=L[i-1].py+gap;
   const over=L.length?L[L.length-1].py-a.bottom:0;if(over>0)L.forEach(it=>{it.py-=over});
   ctx.save();ctx.font=fs+"px IBM Plex Mono";ctx.textBaseline="middle";ctx.textAlign=inside?"right":"left";
-  for(const it of L){const x=inside?a.right-4:a.right+6,yy=inside?Math.max(a.top+fs/2,it.py-fs/2-2):it.py;
+  for(const it of L){const x=inside?a.right-4:a.right+6,yy=it.py;
     if(inside){const w=ctx.measureText(it.t).width;ctx.globalAlpha=.85;ctx.fillStyle=css("--surface");ctx.fillRect(x-w-3,yy-fs/2-1,w+6,fs+2);ctx.globalAlpha=1}
     ctx.fillStyle=it.c;ctx.fillText(it.t,x,yy)}
   ctx.restore()}};
 if(window.Chart)Chart.register(vlines,limitLabels);
+if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{limitLabels,chartCaptionFontPx});
 /* items：[{n:"UCL",v,c}]；回傳加上右側留白與 limitLabels 設定的 Chart 選項 */
 function withLimits(extra,items,off){if(off)return extra;const it=items.filter(x=>x&&isFinite(x.v)).map(x=>({t:x.n+" "+f(x.v,2).replace(/^-/,"\u2212"),v:x.v,c:x.c}));if(!it.length)return extra;
   const pad=Math.ceil(Math.max(10,...it.map(x=>x.t.length))*chartCaptionFontPx()*0.62)+10;   /* 至少 10 字寬：上下兩張圖的繪圖區右緣對齊 */

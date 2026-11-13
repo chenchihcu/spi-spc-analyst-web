@@ -100,6 +100,17 @@ test("介面整理：空白狀態、範例資料、KPI 寫法、管制界限數�
     assert.equal(mini.options.plugins.limitLabels, undefined, "縮圖不標示界限數值");
   });
 
+  await t.test("窄圖界限數值：貼近頂端時仍保持間距，不互相重疊", () => {
+    const plugin = hook.limitLabels, ys = [];
+    const ctx = { save() {}, restore() {}, fillRect() {}, measureText: (s) => ({ width: s.length * 7 }), fillText: (s, x, y) => ys.push(y) };
+    const ch = { ctx, width: 300, chartArea: { top: 0, bottom: 200, left: 40, right: 290 }, scales: { y: { getPixelForValue: (v) => v } } };
+    plugin.afterDatasetsDraw(ch, {}, { items: [{ t: "UCL", v: 0, c: "r" }, { t: "CL", v: 3, c: "a" }, { t: "LCL", v: 6, c: "r" }] });
+    const fs = hook.chartCaptionFontPx();
+    assert.equal(ys.length, 3);
+    for (let i = 1; i < ys.length; i++) assert.ok(ys[i] - ys[i - 1] >= fs, `第 ${i} 與 ${i + 1} 個數值間距 ${ys[i] - ys[i - 1]} < 字高 ${fs}`);
+    assert.ok(ys[0] >= fs / 2, "第一個數值不超出繪圖區頂端");
+  });
+
   await t.test("匯出中心摘要：焊墊筆數取目前量測列，沒有版次時不補 V1", async () => {
     d.querySelector("#btnOpenExportModal").click();
     const el = d.querySelector("#exportCenterSummary");
