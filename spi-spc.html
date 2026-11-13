@@ -2759,6 +2759,7 @@ function overviewCpkSnapshotKey(st) {
   return JSON.stringify([
     st.metric,
     st.group,
+    st.comp || null,
     st.specs,
     st.specSrc,
     st.specsG,
@@ -4092,7 +4093,7 @@ function buildStatsData(st){
   const s=anStore(R),sig=clsSig(st);if(!(s.stats&&s.stats.sig===sig))s.stats={sig,out:statsRows(st,R)};
   /* 依分析範圍篩選（群組＋元件位號）；統計量本身仍以所屬群組為母體，不因範圍改變 */
   const scC=st.comp?compKeyParse(st.comp):null,scAll=isAllGrp(st.group);
-  const out=scAll&&!scC?s.stats.out.slice():s.stats.out.filter(d=>(scAll||d.group===st.group)&&(!scC||String(d.refdes)===String(scC.comp)));
+  const out=scAll&&!scC?s.stats.out.slice():s.stats.out.filter(d=>(scAll||d.group===st.group)&&(!scC||(String(d.refdes)===String(scC.comp)&&String(d.figure??"")===String(scC.figure))));
   if(st&&st.A&&st.A.nelX&&st.A.nelX.rules){
     for(const rule of st.A.nelX.rules){
       if(rule.id===1&&rule.idx&&rule.idx.length){
@@ -4142,9 +4143,9 @@ function statsRows(st,R){const out=[];
       // 規格內但 |z|≥4 先標「離群值」，其餘超規或 |z|>3 才標 OOC（舊順序下 |z|≥4 必先命中 |z|>3，離群值分支永遠到不了）
       const outSpec=Boolean(sp&&((hasLsl(sp)&&x<sp.lsl)||(hasUsl(sp)&&x>sp.usl)));
       if(!outSpec&&isFinite(z)&&Math.abs(z)>=4){
-        out.push({board:r.board,refdes:r.comp||r.refdes||"—",pad:r.pad,group:r.group,metric:k,value:x,mean:m,sd:sg,z,rule:"離群值 (|z|≥4)"});
+        out.push({board:r.board,refdes:r.comp||r.refdes||"—",figure:r.figure,pad:r.pad,group:r.group,metric:k,value:x,mean:m,sd:sg,z,rule:"離群值 (|z|≥4)"});
       }else if(outSpec||(isFinite(z)&&Math.abs(z)>3)){
-        out.push({board:r.board,refdes:r.comp||r.refdes||"—",pad:r.pad,group:r.group,metric:k,value:x,mean:m,sd:sg,z,rule:"OOC (超出規格或 |z|>3)"});
+        out.push({board:r.board,refdes:r.comp||r.refdes||"—",figure:r.figure,pad:r.pad,group:r.group,metric:k,value:x,mean:m,sd:sg,z,rule:"OOC (超出規格或 |z|>3)"});
       }
     }
   }
@@ -6637,7 +6638,22 @@ function issueScope(){
   const v={own,board,label:scopeLabel(S)};
   ISS_SCOPE={F:S.F,rows:S.rows,k,v};return v}
 /* 與範圍相關的發現（範圍內元件＋全板層級），供總覽判定、報告、匯出與 AI 使用 */
-function scopedFindings(F=S.F){const sc=issueScope();if(!sc||!F)return F||[];const out=F.filter(x=>sc.own.has(x.id)||sc.board.has(x.id));out.meta=F.meta;return out}
+/* 範圍判定：只用範圍內的問題卡與範圍內分析的 Cpk（目前量測項目）；不重跑偵測，也不沿用全板最差群組 */
+function scopeVerdict(F){const A=S.A,cap=A&&A.cap,cpk=cap&&isFinite(cap.cpk)?cap.cpk:null,lab=scopeLabel(S),m=A&&METRICS[A.m]?METRICS[A.m].short:"";
+  const ng=F.filter(x=>x.lv==="ng"),warn=F.filter(x=>x.lv==="warn"),reasons=[],list=a=>a.slice(0,3).map(x=>"#"+x.id+" "+x.title).join("、")+(a.length>3?"…":"");let lv="ok";
+  if(ng.length){lv="ng";reasons.push(`範圍內有 ${ng.length} 張嚴重問題卡（${list(ng)}）`)}
+  if(cpk!=null&&cpk<1){lv="ng";reasons.push(`${lab} ${m} Cpk = ${f(cpk)} < 1.00`)}
+  if(lv!=="ng"){
+    if(warn.length){lv="warn";reasons.push(`範圍內有 ${warn.length} 張警示問題卡（${list(warn)}）`)}
+    if(cpk!=null&&cpk>=1&&cpk<1.33){lv="warn";reasons.push(`${lab} ${m} Cpk = ${f(cpk)} ∈ [1.00, 1.33)`)}}
+  if(!reasons.length)reasons.push(cpk!=null?`範圍內無嚴重或警示問題卡，且 ${m} Cpk = ${f(cpk)} ≥ 1.33`:"範圍內無嚴重或警示問題卡");
+  return{level:lv,label:{ok:"正常",warn:"警示",ng:"異常"}[lv],worstCap:null,reasons}}
+function scopedFindings(F=S.F){const sc=issueScope();if(!sc||!F)return F||[];
+  if(sc.sfF===F&&sc.sfA===S.A)return sc.sf;
+  const out=F.filter(x=>sc.own.has(x.id)||sc.board.has(x.id)),keep=new Set(out.map(x=>x.id)),M=F.meta||{};
+  const cases=(M.cases||[]).filter(c=>c.card_ids.some(id=>keep.has(id))).map(c=>({...c,card_ids:c.card_ids.filter(id=>keep.has(id)),evidence_card_ids:(c.evidence_card_ids||[]).filter(id=>keep.has(id))}));
+  out.meta={...M,cases,verdict:scopeVerdict(out)};
+  sc.sfF=F;sc.sfA=S.A;sc.sf=out;return out}
 function issueBoardList(lv=S.issLv){const sc=issueScope();if(!sc)return[];return S.F.filter(x=>sc.board.has(x.id)&&(lv==="all"||x.lv===lv)&&(S.issCat==="all"||x.cat===S.issCat))}
 function issueList(lv=S.issLv){
   if (!S.rows.length || S.F.pending) return [];
@@ -6962,7 +6978,7 @@ function renderPmap() {
   }
   root.onclick = event => {
     const button=event.target.closest("button");
-    if (button?.dataset.scopeComp != null) { setComp(button.dataset.scopeComp || null); return; }
+    if (button?.dataset.scopeComp != null) { setCompFromShortcut(button.dataset.scopeComp || null); return; }
     if (button?.dataset.part != null) pick(Number(button.dataset.part));
     if (button?.dataset.pad != null) pmapSelect({...selection,pad:button.dataset.pad,mode:"pad"});
     if (button?.dataset.mode) pmapSelect({...selection,pad:null,mode:button.dataset.mode});
@@ -7082,7 +7098,7 @@ function renderIssues(){const F0=S.F||[],sc=issueScope(),F=sc?F0.filter(x=>sc.ow
       <div class="iss-case-body" style="padding:0 8px 10px;border-left:2px solid var(--line);margin:0 0 12px 12px">
         <p class="inf" style="margin:8px 0"><span class="lbl">建議動作</span>${esc(c.action)}</p>${hint}${c.members.map(card).join("")}</div></details>`;};
   /* 分批顯示：問題很多（上千項）時一次畫出全部卡片會讓頁面停住數十秒；先畫前 ISS_PAGE 項，其餘按「再顯示」或列印時才畫 */
-  const pgK=[S.issLv,S.issCat,S.issEnt,S.issGroup].join("|");if(ISS_PG.F!==F||ISS_PG.k!==pgK){ISS_PG.F=F;ISS_PG.k=pgK;ISS_PG.n=ISS_PAGE}
+  const pgK=[S.issLv,S.issCat,S.issEnt,S.issGroup,S.group,S.comp||""].join("|");if(ISS_PG.F!==F0||ISS_PG.k!==pgK){ISS_PG.F=F0;ISS_PG.k=pgK;ISS_PG.n=ISS_PAGE}
   const lim=ISS_PG.all?Infinity:ISS_PG.n;let listHtml="",more=0;
   if(S.issGroup==="cases"){
     const rows=issueCaseRows();
@@ -7191,6 +7207,10 @@ function compCandidates(){const P=scopeParts(S.rows),g=S.group,all=isAllGrp(g);r
 /* 讓測試可直接驗證篩選結果（不經 DOM） */
 function compSearch(q,list=compCandidates()){const t=String(q||"").trim().toLowerCase();return t?list.filter(p=>p.label.toLowerCase().includes(t)):list}
 function setComp(key){S.comp=key||null;normalizeScope(S);closeCompList();recompute();syncScopeUI()}
+/* 捷徑（問題地圖、焊墊 Cpk 排名）：元件不在目前群組時先改到相容的群組，否則會被範圍檢查清掉 */
+function setCompFromShortcut(key){const p=key?scopeParts(S.rows).byKey.get(key):null;
+  if(p&&!isAllGrp(S.group)&&!p.groups.includes(S.group)){S.group=p.groups.length===1?p.groups[0]:"ALL";const sg=$("#selGroup");if(sg)sg.value=S.group}
+  setComp(key)}
 function closeCompList(){const ul=$("#compList"),inp=$("#inComp");if(ul)ul.hidden=true;if(inp){inp.setAttribute("aria-expanded","false");inp.setAttribute("aria-activedescendant","")}COMP_ACT=-1}
 function renderCompList(q){const ul=$("#compList"),inp=$("#inComp");if(!ul||!inp)return;
   const hit=compSearch(q),show=hit.slice(0,COMP_MAX);
@@ -7626,7 +7646,7 @@ function renderPadCpkRank(){
   /* 最差焊墊所屬元件：一鍵把分析範圍縮到該元件（已在單一元件範圍時不顯示） */
   const box=$("#pcScope");if(box){const inS=inScopeS,worst=pc[0],r0=worst&&!S.comp?S.rows.find(r=>r.pad===worst.pad&&r.comp!=null&&r.comp!==""&&inS(r)):null,k=r0&&compKeyOf(r0);
     box.hidden=!k;box.innerHTML=k?`<button type="button" class="scope-only" data-scope-comp="${esc(k)}">只分析此元件：${esc(scopeParts(S.rows).byKey.get(k)?.label||r0.comp)}</button>`:"";
-    const b=box.querySelector("button");if(b)b.onclick=()=>setComp(b.dataset.scopeComp)}
+    const b=box.querySelector("button");if(b)b.onclick=()=>setCompFromShortcut(b.dataset.scopeComp)}
 }
 function renderSidedPpmBlock(){
   if(!$("#sidedPpmKpis")||!hasData())return;
@@ -14498,7 +14518,7 @@ function pdfFileName(){
 function specDownloadInfo(rec){const raw=rec&&rec.ver!=null?String(rec.ver).trim():"",hasVersion=!!raw&&!/^(?:undefined|null)$/i.test(raw),version=hasVersion?safeFn(raw):"",filename="料號規格_"+safeFn(rec&&rec.part)+"_"+(hasVersion?"v"+version:"版本未知")+".json";
   return{filename,warning:hasVersion?"":"這筆規格紀錄沒有版本號；匯出檔名已標示「版本未知」"}}
 if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")window.SPI_TEST_HOOK.specDownloadInfo=specDownloadInfo;
-if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{sharePack,issueScope,scopedFindings,issueBoardList,compSearch,compCandidates,setComp,syncScopeUI,scopeLabel,scopeParts,buildPrintHeadHtml,getPlace:()=>PLACE,S,RecDB,renderIssues,renderPmap,renderOverview,renderLISAUI,renderRelChartUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,aiFallbackModels,saveAiGoodModel,recompute,switchRun,setTab,setSub,updateSettingsUi,scrollSettingsAnchor,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,pick,drawHeat,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,calcShapeFactor,getSolderGrainTexture,getRealPasteMat,createSolderPasteGeometry,selectPadForProfile,highlightSelectedPad3D,focusPad3D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,getReportChapters,renderMailChapterSummary,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,setupRecPicker,renderRecPicker,openRecord,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus,setupExportCenter,openExportCenterModal,closeExportCenterModal,triggerExportByType,downloadDeliverablesQueue,applyPlacePreviewToRun,clearPlacePreviewFromRun,syncPlaceToCurrentRun,pos3DNote,usePlaceRec,loadStateModel,updateLoadStates});
+if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{setCompFromShortcut,overallVerdict,renderIssues,sharePack,issueScope,scopedFindings,issueBoardList,compSearch,compCandidates,setComp,syncScopeUI,scopeLabel,scopeParts,buildPrintHeadHtml,getPlace:()=>PLACE,S,RecDB,renderIssues,renderPmap,renderOverview,renderLISAUI,renderRelChartUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,aiFallbackModels,saveAiGoodModel,recompute,switchRun,setTab,setSub,updateSettingsUi,scrollSettingsAnchor,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,pick,drawHeat,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,calcShapeFactor,getSolderGrainTexture,getRealPasteMat,createSolderPasteGeometry,selectPadForProfile,highlightSelectedPad3D,focusPad3D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,getReportChapters,renderMailChapterSummary,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,setupRecPicker,renderRecPicker,openRecord,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus,setupExportCenter,openExportCenterModal,closeExportCenterModal,triggerExportByType,downloadDeliverablesQueue,applyPlacePreviewToRun,clearPlacePreviewFromRun,syncPlaceToCurrentRun,pos3DNote,usePlaceRec,loadStateModel,updateLoadStates});
 if($("#geomPadFile"))$("#geomPadFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{const p=parseGeometryPadListCsv(rd.result);if(!p.ok){toast("幾何焊墊清單："+p.error);e.target.value="";return}S.geometryPads=p.pads;persist();updatePadCoverageState();recompute();renderGeomPadStatus();toast(`已匯入 ${p.pads.length} 個幾何焊墊`);e.target.value=""};rd.readAsText(f)});
 if($("#geomPadClear"))$("#geomPadClear").onclick=()=>{S.geometryPads=null;S.padCoverage=null;S.pendingVerify=false;persist();updatePadCoverageState();recompute();renderGeomPadStatus()};
 const initHash=(location.hash||"").slice(1);

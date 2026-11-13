@@ -68,7 +68,7 @@
 
 ## 7. 驗證的有效性
 
-`node tools/mutation-check.mjs` 逐一套用 `tests/fixtures/mutations-component-scope.json` 的 15 項破壞（快取鍵漏元件、分析未篩元件、問題清單未篩、全板提示缺漏、報告用全板問題、範圍不退回、統計清單未篩、提示列不顯示、分享漏元件、背景預算漏元件、AI 漏範圍、Markdown 漏範圍、搜尋分大小寫、問題地圖缺捷徑、郵件漏範圍），每項都必須讓 `tests/component-scope.test.mjs` 變紅，跑完自動還原。
+`node tools/mutation-check.mjs` 逐一套用 `tests/fixtures/mutations-component-scope.json` 的 20 項破壞（快取鍵漏元件、分析未篩元件、問題清單未篩、全板提示缺漏、報告用全板問題、範圍不退回、統計清單未篩、提示列不顯示、分享漏元件、背景預算漏元件、AI 漏範圍、Markdown 漏範圍、搜尋分大小寫、問題地圖缺捷徑、郵件漏範圍，以及 PR #161 審查補上的子板鍵、範圍判定、Cpk 快照、分頁與捷徑群組），每項都必須讓 `tests/component-scope.test.mjs` 變紅，跑完自動還原。
 
 ## 8. 開放問題
 

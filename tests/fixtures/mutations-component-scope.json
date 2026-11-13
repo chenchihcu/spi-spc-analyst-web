@@ -75,6 +75,31 @@
       "name": "郵件摘要沒有範圍",
       "from": "  if(s.rows&&scopeIsNarrow(s))lines.push(`• 分析範圍：${scopeLabel(s)}`);\n",
       "to": ""
+    },
+    {
+      "name": "統計清單忽略子板",
+      "from": "&&String(d.figure??\"\")===String(scC.figure)",
+      "to": ""
+    },
+    {
+      "name": "範圍判定沿用全板 meta",
+      "from": "out.meta={...M,cases,verdict:scopeVerdict(out)};",
+      "to": "out.meta=M;"
+    },
+    {
+      "name": "Cpk 快照鍵漏元件",
+      "from": "    st.comp || null,\n",
+      "to": ""
+    },
+    {
+      "name": "分頁以每次新陣列判斷",
+      "from": "if(ISS_PG.F!==F0||ISS_PG.k!==pgK){ISS_PG.F=F0;",
+      "to": "if(ISS_PG.F!==F||ISS_PG.k!==pgK){ISS_PG.F=F;"
+    },
+    {
+      "name": "捷徑不調整群組",
+      "from": "if(p&&!isAllGrp(S.group)&&!p.groups.includes(S.group)){",
+      "to": "if(false){"
     }
   ]
 }

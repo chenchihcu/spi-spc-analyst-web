@@ -9,7 +9,7 @@
 - **對齊**：總覽、管制圖、製程能力、3D／2D、製程跡象、統計異常點清單只用範圍內資料，規格取元件所屬群組。問題偵測只列歸屬此範圍的發現，全板層級的發現收在「全板問題」，嚴重度計數與清單一致（不重跑偵測，不新增誤報）。報告、PDF、列印頁首、郵件、AI 摘要、問題 CSV／Markdown 寫明分析範圍並只含相關問題；分享連結保存元件。元件群組範圍也改用同一套規則，修正改版前問題清單與匯出不隨群組變動的問題。
 - **全板區塊標示**：問題地圖、多變量 T²、形貌指標、板號×群組矩陣與「比較與行動」仍以全板計算，範圍縮小時顯示「全板分析，不隨元件範圍變動」。
 - **修正**：問題清單 Markdown 匯出在瀏覽器中讀取版本時引用了另一段程式的 `$`，改用 `document.querySelector`。
-- **驗證**：新增 `tests/component-scope.test.mjs`（11 項）；新增 `tools/mutation-check.mjs`，15 項故意破壞（`tests/fixtures/mutations-component-scope.json`）全部讓測試變紅，證明測試有鑑別力。規則見 `AGENTS.md`「分析範圍」。
+- **驗證**：新增 `tests/component-scope.test.mjs`（16 項）；新增 `tools/mutation-check.mjs`，20 項故意破壞（`tests/fixtures/mutations-component-scope.json`）全部讓測試變紅，證明測試有鑑別力。規則見 `AGENTS.md`「分析範圍」。
 ## v10.25.2 — 2026-11-13（修正 AI 分析誤判的系統端根因）
 
 使用者核對一份 NVIDIA AI 分析（原選模型逾時、備援改用 `nvidia/nemotron-3.5-bolt-e4b`），結論多處錯誤。逐句追溯後，多數錯誤來自系統送給模型的內容，不只是模型本身：

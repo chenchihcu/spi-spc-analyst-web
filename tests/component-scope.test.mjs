@@ -249,3 +249,46 @@ test("樣本極少的元件：管制圖與能力頁不出現 NaN", { skip: !JSDO
   }
   assert.deepEqual(errs, []);
 });
+
+/* ---------- Codex 審查（PR #161）回歸 ---------- */
+test("統計清單以完整元件鍵（含子板）篩選", () => {
+  const base = core.sampleData();
+  const rows = [...base.map((r) => ({ ...r, figure: "1" })), ...base.map((r) => ({ ...r, figure: "2" }))];
+  const st = baseState(core, { rows, group: "ALL", comp: key("U2", "1") });
+  st.A = core.analyze(st);
+  const u2 = Array.from(core.buildStatsData(st)).filter((d) => d.refdes === "U2");
+  assert.ok(u2.length > 0, "需有 U2 的異常列（否則無鑑別力）");
+  assert.ok(u2.every((d) => String(d.figure) === "1"), "不可混入子板 2 的 U2");
+});
+
+test("分析概況 Cpk 快照鍵包含元件", () => {
+  const rows = core.sampleData();
+  assert.notEqual(core.overviewCpkSnapshotKey(baseState(core, { rows, comp: key("U1") })), core.overviewCpkSnapshotKey(baseState(core, { rows, comp: null })));
+});
+
+test("範圍內的判定與問題定義只引用範圍內的卡", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { H } = await openPage();
+  H.setComp(key("U2"));
+  const SF = H.scopedFindings(), keep = new Set(Array.from(SF, (x) => x.id));
+  assert.ok(H.S.F.length > SF.length, "需有被排除的發現（否則無鑑別力）");
+  for (const c of SF.meta.cases) for (const id of [...c.card_ids, ...(c.evidence_card_ids || [])]) assert.ok(keep.has(id), `案 ${c.id} 引用範圍外的 #${id}`);
+  const v = H.overallVerdict(H.S, SF);
+  for (const r of v.reasons) for (const m of r.matchAll(/#(\d+)/g)) assert.ok(keep.has(+m[1]), `判定理由引用範圍外的 #${m[1]}`);
+  assert.ok(v.reasons.every((r) => !r.includes("最差群組")), "判定理由不可沿用全板最差群組");
+  assert.equal(H.scopedFindings(), SF, "同一範圍重複呼叫回傳同一份結果");
+});
+
+test("問題清單分頁：同一範圍內「再顯示」不會被重設", () => {
+  assert.match(SRC, /ISS_PG\.F!==F0/);
+  assert.match(SRC, /const pgK=\[[^\]]*S\.comp/);
+});
+
+test("捷徑選到其他群組的元件時，先改到該元件的群組", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { w, d, H } = await openPage();
+  const sel = d.querySelector("#selGroup"); sel.value = "C 0402"; sel.dispatchEvent(new w.Event("change"));
+  assert.equal(H.S.group, "C 0402");
+  H.setCompFromShortcut(key("U2"));
+  assert.equal(H.S.comp, key("U2"));
+  assert.equal(H.S.group, "U2 BGA");
+  assert.equal(d.querySelector("#selGroup").value, "U2 BGA");
+});
