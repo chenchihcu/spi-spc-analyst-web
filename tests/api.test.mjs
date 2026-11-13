@@ -82,7 +82,8 @@ test("頁面送出的摘要可通過驗證，且不含原始 SPI 資料", { skip
   assert.ok(!/前15不良焊墊/.test(sent.o.body), "不應送出逐焊墊資料");
   const clean = validatePayload(sent.o.body);
   assert.ok(clean["系統偵測問題清單"].length > 0);
-  assert.ok(Buffer.byteLength(sent.o.body) < 20_000, `摘要大小 ${Buffer.byteLength(sent.o.body)} bytes`);
+  // v10.25.2 每項問題加「量測項目」與對位／面積比資料狀態（約 +0.6 KB），範例摘要約 20.5 KB；伺服器上限仍為 40 KB
+  assert.ok(Buffer.byteLength(sent.o.body) < 22_000, `摘要大小 ${Buffer.byteLength(sent.o.body)} bytes`);
   assert.match(d.querySelector("#aiOut").textContent, /測試回覆/, "狀態：" + d.querySelector("#aiState").textContent);
 });
 
