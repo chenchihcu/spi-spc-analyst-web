@@ -587,6 +587,27 @@ test('NVIDIA 選定模型排隊未回應：並行送出備援模型，第一個�
   assert.deepEqual(Object.keys(mm).slice(0, 2), ['model', 'reasoning_effort']);
 });
 
+test('NVIDIA 備援候選排除小型／邊緣模型：小模型回應快會搶先勝出但分析品質不足；使用者自選的小模型照常送出', async () => {
+  const { SMALL_MODEL_RE } = await import('../lib/ai-providers.mjs');
+  for (const m of ['nvidia/nemotron-3.5-bolt-e4b', 'meta/llama-3.2-3b-instruct', 'nvidia/nemotron-nano-9b-v2', 'microsoft/phi-4-mini-instruct', 'meta/llama-3.1-8b-instruct', 'google/gemma-3n-e4b-it']) assert.ok(SMALL_MODEL_RE.test(m), m);
+  for (const m of ['minimaxai/minimax-m3.1-flash', 'deepseek-ai/deepseek-v4.1-flash', 'openai/gpt-oss-20b', 'nvidia/nemotron-3.5-lightning-30b-a3b', 'google/gemma-4-31b-it', 'z-ai/glm-5.3-flash']) assert.ok(!SMALL_MODEL_RE.test(m), m);
+  const sent = [];
+  await withShortWatchdog(() => withFetch(async (url, init) => {
+    const body = JSON.parse(init.body);
+    sent.push(body.model);
+    if (body.model !== 'minimaxai/minimax-m3.1-flash') return hangingFetch(init.signal);
+    return new Response(sse(body.model, '分析結果'), { status: 200, headers: { 'content-type': 'text/event-stream' } });
+  }, async () => {
+    const text = await (await handleAnalyze(nvReq({ 'X-AI-Model': 'deepseek-ai/deepseek-v4.1-flash', 'X-AI-Fallback-Models': 'nvidia/nemotron-3.5-bolt-e4b,meta/llama-3.2-3b-instruct,minimaxai/minimax-m3.1-flash' }), {}, USER)).text();
+    assert.match(text, /已自動改用模型 minimaxai\/minimax-m3\.1-flash）/);
+  }));
+  assert.deepEqual(sent, ['deepseek-ai/deepseek-v4.1-flash', 'minimaxai/minimax-m3.1-flash'], '小模型不送出');
+  sent.length = 0;
+  await withFetch(async (url, init) => { const body = JSON.parse(init.body); sent.push(body.model); return new Response(sse(body.model, '分析結果'), { status: 200, headers: { 'content-type': 'text/event-stream' } }); },
+    async () => { await (await handleAnalyze(nvReq({ 'X-AI-Model': 'nvidia/nemotron-3.5-bolt-e4b' }), {}, USER)).text(); });
+  assert.deepEqual(sent, ['nvidia/nemotron-3.5-bolt-e4b'], '使用者自選的模型不被過濾');
+});
+
 test('NVIDIA 備援模型回應標頭但沒有任何 token：不算勝出，改由下一個有內容的模型勝出', async () => {
   await withShortWatchdog(() => withFetch(async (url, init) => {
     const body = JSON.parse(init.body);

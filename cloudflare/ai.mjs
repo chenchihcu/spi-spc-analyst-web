@@ -6,6 +6,7 @@ import {
   PROVIDERS,
   lookupModelPricing,
   sendsReasoningEffort,
+  SMALL_MODEL_RE,
 } from '../lib/ai-providers.mjs';
 
 // 預設模型為 OpenAI gpt-6.1-terra（可用環境變數 AI_MODEL 或請求標頭 X-AI-Model 覆寫），推理強度預設為 high。
@@ -994,7 +995,7 @@ export async function handleAnalyze(req, env = {}, userArg = '') {
   const estInputTokens = Math.max(100, Math.ceil((SYSTEM_PROMPT.length + JSON.stringify(userMessages).length) / 3.5));
 
   const candidates = provCfg.liveModels
-    ? [model, ...parseFallbackModels(req.headers.get('x-ai-fallback-models'), model)]
+    ? [model, ...parseFallbackModels(req.headers.get('x-ai-fallback-models'), model).filter((m) => !SMALL_MODEL_RE.test(m))]
     : [model];
 
   const upstreamCtrl = new AbortController();
