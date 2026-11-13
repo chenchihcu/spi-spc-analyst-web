@@ -5,11 +5,12 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
 
 ## 發布與部署
 
-- **GitHub main 觸發正式發布**：已核實連接的 repository 為 `chenchihcu/spi-spc-analyst-web`、production branch 為 `main`。經授權 commit／push 或 PR 合併到 main 後，由 Cloudflare Git integration 依序完成完整發布檢查、慢速模擬與 build，再部署正式 Worker；建置耗時不固定，不能以推送成功或等待固定秒數判定部署完成。推送／合併授權仍依本次使用者指示與 `website-ship.md`，本條不新增授權。PR 若新增 `cloudflare/migrations/*`，合併前先執行 `npx wrangler d1 migrations list spi-spc --remote`；未套用時先備份（放在 repo 外，release-check 的機密掃描會擋下 repo 內的備份）、在本機副本演練、經使用者核准套用，再合併。
+- **GitHub main 觸發正式發布**：已核實連接的 repository 為 `chenchihcu/spi-spc-analyst-web`、production branch 為 `main`。經授權 commit／push 或 PR 合併到 main 後，由 Cloudflare Git integration build 並部署正式 Worker；建置耗時不固定，不能以推送成功或等待固定秒數判定部署完成。測試關卡由 GitHub Actions `Test & Build`（`release-check`、`test:slow`、build、Worker dry-run）在 PR 與 main 上執行；Cloudflare 的 build command 只做 `npm ci && npm run build:cloudflare`，不重跑整套測試。推送／合併授權仍依本次使用者指示與 `website-ship.md`，本條不新增授權。PR 若新增 `cloudflare/migrations/*`，合併前先執行 `npx wrangler d1 migrations list spi-spc --remote`；未套用時先備份（放在 repo 外，release-check 的機密掃描會擋下 repo 內的備份）、在本機副本演練、經使用者核准套用，再合併。
   - 檢查：合併前遠端 migration 清單回報 `No migrations to apply`。
   - 發布讀回：記錄 Git commit、Cloudflare build 狀態、部署 version／流量、正式 URL／HTTP status；資料庫路徑依下一條驗證。多個提交並行建置時，逐一對應來源，不以較新的手動部署替另一個 Git build 作證。
   - 工具受阻：CLI 在啟動前被政策拒絕代表命令未執行，不是 build 失敗；檢查既有核准入口，或以 Chrome 讀取 Cloudflare 狀態。Chrome 安全檢查中止時停止該路徑，列明 not verified、風險及下一項讀回；不以空提交、改連線設定或手動部署繞過。Actions 因付款／額度未執行時記為無測試結果；依 `website-ship.md` 與實際 required checks 繼續處理。
-  - 出處：2026-10-24 migration 事故；2026-11-05 使用者確認 GitHub → Cloudflare 發布方式。#94 Git build 約 18 分鐘；#95 觸發後仍需完成 `release-check && test:slow && build:cloudflare`，更正舊「約 30 秒」說法。
+  - 建置時間：Cloudflare build 有時間上限。不要把整套測試加回 Cloudflare build command；新增測試時量測耗時，jsdom 頁面在同一測試檔內共用（每開一頁約 2.5–5 秒）。
+  - 出處：2026-10-24 migration 事故；2026-11-05 使用者確認 GitHub → Cloudflare 發布方式。#94 Git build 約 18 分鐘；#95 觸發後仍需完成 `release-check && test:slow && build:cloudflare`，更正舊「約 30 秒」說法。2026-11-13 #161：build command 仍含整套測試，原本約 19 分鐘，加上新測試後逾時，正式站停在 v10.25.2；使用者決定測試只在 GitHub Actions 跑，Cloudflare build 只建置部署。
 
 | 重複錯誤類別 | 檢查／執行入口 | 證據 |
 |---|---|---|
