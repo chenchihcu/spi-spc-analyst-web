@@ -5835,7 +5835,7 @@ function dfmTable0(st,R,clsF){const b0=R[0].board,groups=[...new Set(R.map(r=>r.
     if(isFinite(cv)&&cv>12)acts.push({act:"檢查開孔孔壁品質、擦拭頻率與 PCB 支撐",why:`錫量變異 CV ${f(cv,1)}%`,exp:"降低變異"});
     if(!acts.length)acts.push({act:"維持現有設計",why:"各項指標正常",exp:"—"});
     const padDim=noGeo?"未提供":gx[0].shape==="round"?"Ø"+f(gx[0].w,3):f(gx[0].w,3)+"×"+f(gx[0].d,3),apDim=noGeo?"未提供":ap.shape==="round"?"Ø"+f(ap.L,3):f(ap.L,3)+"×"+f(ap.W,3),stLvl=score>=4?"ng":score>=2?"warn":"ok";
-    return{g,group:g,padDim,apDim,geomAssumed:noGeo,st:stLvl,ap,thk,ar,asp,tmax,te,cv,cpk,ppm,brg,ins,score,sc,lvl:score>=4?"高":score>=2?"中":"低",acts,n:one.length}}).filter(Boolean).sort((a,b)=>b.score-a.score)}
+    return{g,group:g,padDim,apDim,st:stLvl,geomAssumed:noGeo,ap,thk,ar,asp,tmax,te,cv,cpk,ppm,brg,ins,score,sc,lvl:score>=4?"高":score>=2?"中":"低",acts,n:one.length}}).filter(Boolean).sort((a,b)=>b.score-a.score)}
 
 /* ============ SPI × 回焊後 AOI / X-ray 關聯 ============ */
 function normPadKey(k){
