@@ -2,6 +2,14 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.27.1 — 2026-11-13（修正正式站停在 v10.25.2：Cloudflare 建置逾時）
+
+- **現象**：v10.26.0（#161，`e78fbf2`）合併後 GitHub Actions 全部通過，但正式站一直停在 v10.25.2，Cloudflare Workers Build 顯示逾時。
+- **根因**：Cloudflare 的 build command 會再跑一次整套測試（`release-check && test:slow && build:cloudflare`）。這套流程原本約 19 分鐘（#160），已經貼近建置時間上限；#161 新增的 `tests/component-scope.test.mjs` 在本機約 19 秒，其中約 16 秒是開了 5 次 jsdom 頁面，加上去之後就超過上限。
+- **修正**：
+  - `tests/component-scope.test.mjs` 的介面測試改為共用同一個頁面，每個測試開始前還原到相同起點（原始量測列、全部元件、無元件範圍），只在狀態有變時才重算。所有斷言不變，本機 19 秒 → 12 秒。`node tools/mutation-check.mjs` 的 20 項故意破壞仍全部讓測試變紅。
+  - Cloudflare build command 改為只做 `npm ci && npm run build:cloudflare`（使用者在 Cloudflare 設定頁調整）。測試關卡留在 GitHub Actions（PR 與 main 都會跑 `release-check`、`test:slow`、build、Worker dry-run），不在部署時再跑一次。`AGENTS.md`「發布與部署」同步更新。
+
 ## v10.27.0 — 2026-11-13（開啟頁面一律空白：不自動載入範例、不還原上次的回合）
 
 - **改變**：登入後開啟或重新整理頁面，畫面一律空白（沒有回合、圖表、問題清單、報告），直到使用者匯入檔案、從資料庫開啟量測紀錄、開啟分享連結，或按「載入範例資料」。改版前每次開啟都會先載入兩個範例回合，再還原瀏覽器保存的上次回合。

@@ -114,7 +114,29 @@ test("不再有繞過 scopeFilter 的行內群組篩選", () => {
 });
 
 /* ---------- 介面：選單、提示列、問題清單、報告、匯出、AI、分享 ---------- */
+/* 所有介面測試共用同一個頁面：每開一次 jsdom 頁面約 2.5–5 秒，Cloudflare 建置有時間上限（v10.27.1）。
+   每個測試開始前 resetPage 還原到相同起點：原始量測列、全部元件、無元件範圍、問題頁、清空錯誤紀錄。 */
+let PAGE = null;
 async function openPage() {
+  if (!PAGE) PAGE = createPage();
+  const p = await PAGE;
+  resetPage(p);
+  return p;
+}
+function resetPage({ d, H, errs, rows0 }) {
+  errs.length = 0;
+  const dirty = H.S.rows !== rows0 || H.S.group !== "ALL" || H.S.comp != null;
+  if (H.S.rows !== rows0) H.S.rows = rows0;
+  H.S.group = "ALL";
+  const sel = d.querySelector("#selGroup");
+  if (sel) sel.value = "ALL";
+  if (dirty) H.setComp(null); // 只在偏離起點時重算
+  d.querySelector(".tab[data-tab=issues]").click();
+  const pd = d.querySelector("#pmapDetails");
+  if (pd) pd.open = false;
+  errs.length = 0;
+}
+async function createPage() {
   const html = SRC.replace(/<script src=[^>]+><\/script>/g, "");
   const errs = [];
   const vc = new VirtualConsole();
@@ -137,7 +159,7 @@ async function openPage() {
   const w = dom.window;
   const until = async (fn, ms = 5000) => { const t0 = Date.now(); while (!fn()) { if (Date.now() - t0 > ms) throw new Error("等待逾時"); await new Promise((r) => setTimeout(r, 10)); } };
   await until(() => w.SPI_TEST_HOOK.S && w.SPI_TEST_HOOK.S.A && w.SPI_TEST_HOOK.S.F && !w.SPI_TEST_HOOK.S.F.pending);
-  return { w, d: w.document, H: w.SPI_TEST_HOOK, errs, until };
+  return { w, d: w.document, H: w.SPI_TEST_HOOK, errs, until, rows0: w.SPI_TEST_HOOK.S.rows };
 }
 
 test("選元件 → 提示列、分析、問題清單、報告、AI、匯出與分享一致", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
