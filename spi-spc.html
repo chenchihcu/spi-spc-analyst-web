@@ -147,8 +147,8 @@ details[open].iss-card>summary{border-bottom:1px solid var(--line);border-radius
 #toTop[hidden]{display:none}
 /* 資料與規格子分頁 */
 .subtabs{display:flex;gap:6px;flex-wrap:wrap}
-.subtab{border-radius:999px;padding:6px 16px}
-.subtab[aria-selected="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.subtab{border-radius:999px;padding:6px 16px;font-size:var(--fs-ui)}
+.subtab[aria-selected="true"]{background:var(--accent-soft);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
 .recrow input{min-width:160px}
 .rec-act{display:flex;gap:6px;flex-wrap:wrap}.rec-act button{min-height:30px;padding:3px 10px;font-size:var(--fs-caption)}.rec-ok{color:var(--ok)}.rec-bad{color:var(--ng)}
 /* 資料庫對話框：操作鈕、版次與狀態膠囊、座標登錄表單、對應證明（RFC-SPI-PROOF-20261028） */
@@ -236,7 +236,7 @@ table.show-all tr.more-row{display:table-row}
 .scopebar #scopeText{flex:1 1 200px;min-width:0;overflow-wrap:anywhere;font-weight:700}
 .scopebar #scopeClear{font-size:var(--fs-ui);text-decoration:none;padding:0 6px}
 .comp-pick{position:relative;min-width:0;max-width:100%}
-#inComp{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:6px 9px;min-height:34px;width:12em;max-width:100%;box-sizing:border-box}
+#inComp{display:block;font:inherit;line-height:1.4;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:6px 9px;min-height:34px;width:12em;max-width:100%;box-sizing:border-box}
 #inComp:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .comp-list{position:absolute;z-index:40;left:0;top:calc(100% + 4px);min-width:100%;width:max-content;max-width:min(320px,calc(100vw - 32px));max-height:min(320px,50vh);overflow:auto;margin:0;padding:4px;list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
 .comp-list li{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:6px 8px;border-radius:6px;cursor:pointer;min-height:32px;color:var(--ink)}
@@ -525,7 +525,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   .rail-sheet-modal.open{display:flex!important;position:fixed;inset:calc(var(--navbar-h) + var(--safe-t)) 0 calc(var(--tabbar-h) + var(--safe-b)) 0;z-index:35;flex-direction:column;background:var(--bg);overflow-y:auto}
   .rail-sheet-modal .sheet-backdrop{display:none!important}
   .rail-sheet-modal .sheet-handle,.rail-sheet-modal .sheet-head{display:flex}
-  .rail-fields{display:flex;flex-direction:column;gap:14px}
+  .rail-fields{display:flex;flex-direction:column;gap:14px;align-items:stretch}
   .rail .rail-fields{align-items:stretch}
   .rail .rail-fields .field{flex-direction:column;align-items:stretch;gap:4px}
   .rail-states{margin-left:0;display:flex;flex-direction:column;align-items:stretch;gap:8px;width:100%}
@@ -894,7 +894,8 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 .export-items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
 .exp-item-card{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--surface2);border:1px solid var(--line);border-radius:6px;gap:8px}
 .exp-item-card:hover{background:var(--surface)}
-.exp-item-main{display:flex;align-items:flex-start;gap:8px;min-width:0;flex:1 1 auto}
+.exp-item-main{display:flex;align-items:flex-start;gap:8px;min-width:0;flex:1 1 auto;margin:0;cursor:pointer}
+@media (pointer:coarse){.exp-item-main,.exp-select-all{min-height:44px}.exp-item-main{align-items:center}}
 .exp-item-info{display:flex;flex-direction:column;gap:2px;min-width:0}
 .exp-item-title{font-size:var(--fs-ui);font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .exp-item-desc{font-size:var(--fs-caption);color:var(--muted);line-height:1.3}
@@ -943,7 +944,7 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
   font-weight:700;
 }
 .load-state{display:inline-flex;align-items:center;gap:6px;min-height:32px;max-width:100%;font-size:var(--fs-caption);white-space:normal;overflow-wrap:anywhere}
-button.load-state{border:none;font:inherit;cursor:default}
+button.load-state{border:none;font:inherit;font-size:var(--fs-caption);cursor:default}
 .load-state .light{width:10px;height:10px;border-radius:50%;background:var(--muted);flex:none}
 .load-state[data-state="ok"] .light{background:var(--ok)}
 .load-state[data-state="error"] .light{background:var(--ng)}
@@ -951,6 +952,33 @@ button.load-state{border:none;font:inherit;cursor:default}
 .load-state>span:last-child{min-width:0}
 .load-state.is-action{cursor:pointer}
 .load-state.is-action:hover{background:var(--surface)}
+/* v10.28 介面整理：核取方塊配色、更多鈕高度、標題斷行、KPI 排列、匯出鈕、報告章節、空白時隱藏分析設定 */
+input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:var(--accent)}
+#btnMore{min-height:32px;padding:0 12px;color:var(--ink)}
+@media (pointer:coarse){#btnMore{min-height:44px}}
+#issHead,#vTitle{word-break:keep-all;overflow-wrap:anywhere}
+@media (max-width:471px){.kpis>.kpi:last-child:nth-child(odd){grid-column:1/-1}}
+@media (min-width:472px){.kpis>.kpi.wide{grid-column:span 2}}
+.exp-item-card>.btn-sm{flex:none;white-space:nowrap}
+.rep-chapters{display:grid;gap:0 14px;margin:0;grid-template-columns:repeat(auto-fill,minmax(12em,1fr))}
+.rep-chapters label{min-width:0}
+@media (max-width:720px){.rep-chapters{grid-template-columns:repeat(auto-fill,minmax(min(100%,11em),1fr))}}
+.rail--empty .rail-fields>.field,.rail--empty #railSpecBtn{display:none!important}
+.specbtn .ui-ico{width:14px;height:14px}
+/* 寬螢幕：分析設定列固定一列，切換頁籤時頁籤列不跳動 */
+@media (min-width:1280px){
+  .rail .rail-fields{flex-wrap:nowrap}
+  .rail .rail-fields>.field,.rail .rail-fields>.specbtn{flex:0 1 auto;min-width:0}
+  .rail .rail-fields select{min-width:6.5em}
+  #selRun{min-width:8em;max-width:14em}
+  #selGroup{min-width:7.5em}
+  #inComp{width:8em}
+  .rail .rail-fields>.specbtn{white-space:nowrap;flex-shrink:0;max-width:24em}
+  #railSum{min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .rail-states{flex:0 0 auto;flex-wrap:nowrap}
+  .rail-states .load-state{max-width:15em}
+  .rail-states .load-state>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
 @media(max-width:720px){.load-state{max-width:100%;min-height:44px}}
 .db-capsule-group{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:var(--surface2);padding:2px;gap:2px;max-width:100%}
 .db-capsule-group>.chip.chipBtn{border:none;background:transparent;border-radius:999px;min-height:32px;padding:3px 10px}
@@ -972,7 +1000,8 @@ button.load-state{border:none;font:inherit;cursor:default}
 .ai-compact-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 12px!important}
 @media(pointer:coarse){.panel-subnav button,.panel-subnav--inline button,.iss-cat-sel,.db-capsule-group>.chip.chipBtn,.load-state.is-action,#btnGoAiCfg{min-height:44px}.iss-cat-sel{font-size:var(--fs-input)!important}}
 
-.menu .duo-toggle-btn{display:block;width:100%;text-align:left;padding:12px 14px;border:none;background:transparent;font:inherit;color:inherit;cursor:pointer}
+.menu .duo-toggle-btn{display:block;width:100%;text-align:left;padding:9px 12px;border:none;border-radius:7px;background:transparent;font:inherit;font-size:var(--fs-ui);color:inherit;cursor:pointer}
+@media (pointer:coarse){.menu .duo-toggle-btn{padding:12px 14px}}
 #p-issues{padding-top:12px;gap:10px}
 .pmap-details{min-width:0;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:2px 12px}
 .pmap-details[open]{padding-bottom:12px}
@@ -1000,7 +1029,7 @@ button.load-state{border:none;font:inherit;cursor:default}
     <svg class="mitcorp-logo" viewBox="0 0 248 45" width="143" height="26" fill="currentColor" fill-rule="evenodd" role="img" aria-label="Mitcorp"><path d="M13.8,-0.0L28.5,-0.1L29.2,0.0L30.6,1.0L31.5,2.9L34.7,29.0L35.0,29.8L36.2,30.2L37.5,29.8L38.3,28.2L46.9,3.5L48.0,1.5L48.8,0.8L50.5,-0.1L66.3,0.0L67.6,1.0L68.4,3.2L68.4,30.8L68.3,32.2L67.7,33.8L66.0,34.8L62.8,35.0L59.2,34.8L57.7,33.8L57.3,31.5L57.3,5.8L56.7,4.5L55.2,4.0L53.0,4.7L52.0,6.5L43.5,31.5L42.2,33.3L41.2,34.1L38.2,34.8L28.8,34.8L26.0,34.0L24.6,32.5L24.0,29.8L20.9,5.8L20.2,4.5L18.5,4.0L17.0,4.5L16.5,5.2L12.3,26.8L11.3,30.0L10.5,31.5L8.4,33.8L6.3,35.0L2.2,35.7L1.2,35.7L0.0,35.0L0.0,30.2L1.2,29.6L4.5,28.9L5.4,28.0L6.2,26.2L10.7,3.0L11.9,1.0L13.8,-0.0ZM73.2,-0.0L83.8,0.0L84.6,1.3L84.5,4.2L83.8,5.4L82.8,5.7L75.5,5.8L73.2,5.5L72.7,4.8L72.5,2.8L72.6,1.0L73.2,-0.0ZM90.0,1.7L95.5,1.6L97.2,2.1L97.8,2.8L98.2,4.0L98.3,8.5L98.6,9.2L99.3,9.7L109.8,9.8L110.9,10.2L111.4,12.0L110.9,13.2L110.2,13.6L99.8,13.7L98.8,14.1L98.2,15.5L98.3,27.0L99.0,29.8L100.5,30.9L104.2,31.1L112.5,30.9L113.1,31.5L113.2,33.0L113.0,33.8L112.2,34.6L110.5,35.0L104.5,35.3L95.8,35.1L92.0,33.9L89.9,32.2L88.9,30.5L88.4,27.5L88.4,5.5L88.6,3.0L89.2,2.1L90.0,1.7ZM130.5,9.2L135.5,9.3L144.3,10.0L145.5,10.4L146.1,11.0L146.2,13.2L145.7,14.0L145.0,14.3L140.3,13.8L133.0,13.6L129.5,13.9L127.0,14.9L125.1,17.0L124.3,20.0L124.3,24.0L125.1,27.8L127.0,29.8L130.0,30.9L137.5,31.1L145.2,30.4L146.0,31.0L146.3,32.0L146.2,33.5L145.5,34.3L142.5,35.0L135.2,35.4L129.5,35.4L124.0,34.9L120.5,33.9L118.2,32.8L116.1,30.8L115.1,29.2L114.0,25.5L113.9,20.0L115.0,15.8L116.1,14.0L118.2,12.0L120.5,10.8L124.2,9.8L130.5,9.2ZM161.8,9.5L168.5,9.3L174.8,9.9L178.2,10.8L180.2,11.8L182.8,14.0L183.9,15.8L184.7,18.8L184.9,24.5L184.7,26.2L183.8,29.2L181.8,32.0L178.8,33.9L175.5,34.9L166.0,35.7L156.8,34.8L153.8,33.8L152.0,32.9L150.4,31.5L149.2,30.0L148.3,28.0L147.9,25.5L148.0,18.2L149.1,15.0L151.0,12.8L154.0,11.0L158.0,9.8L161.8,9.5ZM203.0,9.5L209.8,9.4L210.7,10.5L210.8,11.8L210.5,12.8L209.5,13.6L201.8,13.9L200.2,14.2L199.2,14.8L198.7,16.0L198.7,31.0L198.3,33.5L197.5,34.5L196.2,34.9L190.5,34.8L189.1,33.8L188.8,32.0L188.7,15.2L189.2,12.5L190.0,11.7L191.9,10.8L197.2,9.8L203.0,9.5ZM224.0,9.5L230.5,9.3L237.9,9.8L242.2,10.9L244.2,12.0L246.2,14.0L247.0,15.2L247.8,17.3L247.8,27.8L246.9,30.0L245.9,31.5L244.8,32.6L242.8,33.8L240.0,34.8L232.2,35.5L223.2,35.4L222.6,36.0L222.4,36.8L222.2,43.5L221.3,44.8L213.5,44.8L212.6,43.5L212.4,41.8L212.6,13.0L213.2,11.7L214.6,10.8L218.5,9.9L224.0,9.5ZM75.5,9.9L79.0,9.8L81.5,10.0L82.8,10.8L83.4,12.0L83.5,32.2L83.0,33.8L81.5,34.8L75.5,34.8L74.1,34.0L73.7,33.2L73.6,12.0L74.0,10.8L75.5,9.9ZM163.2,13.0L160.8,14.0L159.4,15.2L158.3,18.8L158.1,22.5L158.3,26.5L159.2,29.2L160.5,30.8L162.8,31.8L166.0,32.1L169.8,31.8L172.0,30.8L173.0,29.8L173.9,28.2L174.4,25.0L174.4,21.8L173.9,16.5L173.0,15.0L171.9,14.0L168.5,12.9L163.2,13.0ZM226.0,13.0L223.5,13.5L222.7,14.0L222.4,14.5L222.5,30.5L224.0,31.6L227.5,31.9L232.5,31.9L235.0,31.0L236.0,30.1L237.0,28.7L237.7,25.5L237.8,20.8L237.0,16.2L235.3,14.0L233.0,13.1L230.2,12.8L226.0,13.0Z"/></svg>
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.27.1</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.28.0</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <div class="db-capsule-group" role="group" aria-label="記錄庫與匯出">
@@ -1008,7 +1037,7 @@ button.load-state{border:none;font:inherit;cursor:default}
       <button type="button" class="chip chipBtn chip-export-hub" id="btnOpenExportModal" title="開啟資料與報告匯出中心，支援依角色一覽下載與批次打包"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:16px;height:16px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>匯出 ▾</button>
     </div>
     <div class="menuwrap" id="moreWrap" hidden>
-      <button class="chip chipBtn" id="btnMore" aria-haspopup="menu" aria-expanded="false" aria-controls="moreMenu">更多 ▾</button>
+      <button class="chip chipBtn" id="btnMore" aria-haspopup="menu" aria-expanded="false" aria-controls="moreMenu"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:16px;height:16px"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>更多 ▾</button>
       <div class="menu" id="moreMenu" role="menu" hidden>
         <p class="menu-user" id="userChip" hidden>帳號 <b id="userName"></b></p>
         <button role="menuitem" type="button" id="btnOpenUiSettings">介面</button>
@@ -1041,7 +1070,7 @@ button.load-state{border:none;font:inherit;cursor:default}
         <div class="field" data-scope="a"><label for="selMetric">量測項目</label><select id="selMetric"></select></div>
         <div class="field" data-scope="a"><label for="selGroup">元件群組</label><select id="selGroup"></select></div>
         <div class="field comp-field" id="compField" hidden><label for="inComp">元件</label><div class="comp-pick"><input id="inComp" type="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="compList" autocomplete="off" spellcheck="false" placeholder="全部元件"><ul id="compList" class="comp-list" role="listbox" aria-label="元件清單" hidden></ul></div></div>
-        <button class="specbtn" id="railSpecBtn" title="鋼板厚度與規格在「資料與規格 → 規格」修改"><span class="lbl">鋼板／規格</span> <b id="railSum"></b> <span aria-hidden="true">✎</span></button>
+        <button class="specbtn" id="railSpecBtn" title="鋼板厚度與規格在「資料與規格 → 規格」修改"><span class="lbl">鋼板／規格</span> <b id="railSum"></b><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
         <div class="rail-states" role="group" aria-label="資料與座標狀態">
           <button type="button" class="chip load-state" id="stateSpi" data-state="idle" tabindex="-1" aria-disabled="true" title="量測紀錄狀態。載入請用記錄庫"><span class="light" aria-hidden="true"></span><span>量測紀錄：未套用</span></button>
           <span class="chip load-state" id="statePlace" data-state="idle" role="status" title="目前分析回合用到的座標檔。選取請用記錄庫"><span class="light" aria-hidden="true"></span><span>座標檔：未套用</span></span>
@@ -1134,7 +1163,7 @@ button.load-state{border:none;font:inherit;cursor:default}
   <div class="control-subviews" style="display:grid;gap:12px">
     <div data-control-sub="uni">
       <div class="card" style="margin-bottom:12px">
-        <div class="rail-fields" style="flex-wrap:wrap;gap:10px 16px;align-items:flex-end;display:flex">
+        <div class="rail-fields">
         <div class="field" data-scope="c"><label for="selChart">管制圖</label>
           <select id="selChart">
             <option value="xbars">X̄-S（每板為子群組）</option>
@@ -1458,9 +1487,9 @@ button.load-state{border:none;font:inherit;cursor:default}
 <section class="panel" id="p-report" role="tabpanel" hidden>
   <div class="card">
     <div class="toolbar" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
-      <div style="display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center">
+      <div style="display:grid;gap:4px;flex:1 1 100%;min-width:0">
         <b>匯出章節：</b>
-        <div id="repChapterChkRow" class="row" style="gap:8px 14px;align-items:center;display:inline-flex;flex-wrap:wrap;margin:0"></div>
+        <div id="repChapterChkRow" class="rep-chapters"></div>
       </div>
       <div class="row" style="gap:8px;flex-wrap:wrap">
         <button type="button" class="primary" id="btnRepPdf">匯出 PDF 報告</button>
@@ -1996,7 +2025,7 @@ button.load-state{border:none;font:inherit;cursor:default}
 
       <!-- 批次匯出操作列 -->
       <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;padding:6px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--line)">
-        <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;margin:0;font-size:var(--fs-ui);font-weight:700">
+        <label class="exp-select-all" style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;margin:0;font-size:var(--fs-ui);font-weight:700">
           <input type="checkbox" id="chkExportSelectAll" aria-label="全選所有匯出項目"> 全選所有項目
         </label>
         <div style="display:inline-flex;align-items:center;gap:10px">
@@ -2012,35 +2041,35 @@ button.load-state{border:none;font:inherit;cursor:default}
         </div>
         <div class="export-items-grid">
           <div class="exp-item-card">
-            <div class="exp-item-main">
+            <label class="exp-item-main" for="chkExpPdf">
               <input type="checkbox" class="exp-item-chk" data-type="rep-pdf" id="chkExpPdf" aria-label="勾選完整分析報告 PDF">
               <div class="exp-item-info">
-                <div class="exp-item-title"><label for="chkExpPdf" style="cursor:pointer;margin:0">完整 SPC 分析報告</label><span class="pill">.pdf</span></div>
+                <div class="exp-item-title"><span>完整 SPC 分析報告</span><span class="pill">.pdf</span></div>
                 <div class="exp-item-desc">包含圖表、製程能力與判定總結</div>
               </div>
-            </div>
+            </label>
             <button type="button" class="btn-sm" data-exp-act="rep-pdf" title="立即匯出完整 PDF 報告">匯出</button>
           </div>
 
           <div class="exp-item-card">
-            <div class="exp-item-main">
+            <label class="exp-item-main" for="chkExpPdfLite">
               <input type="checkbox" class="exp-item-chk" data-type="rep-pdf-lite" id="chkExpPdfLite" aria-label="勾選精簡版分析報告 PDF">
               <div class="exp-item-info">
-                <div class="exp-item-title"><label for="chkExpPdfLite" style="cursor:pointer;margin:0">精簡版分析報告</label><span class="pill">.pdf</span></div>
+                <div class="exp-item-title"><span>精簡版分析報告</span><span class="pill">.pdf</span></div>
                 <div class="exp-item-desc">壓縮圖檔小於 5MB，便於 Email 寄送</div>
               </div>
-            </div>
+            </label>
             <button type="button" class="btn-sm" data-exp-act="rep-pdf-lite" title="立即匯出精簡版 PDF 報告">匯出</button>
           </div>
 
           <div class="exp-item-card">
-            <div class="exp-item-main">
+            <label class="exp-item-main" for="chkExpRepMd">
               <input type="checkbox" class="exp-item-chk" data-type="rep-md" id="chkExpRepMd" aria-label="勾選完整分析報告 Markdown">
               <div class="exp-item-info">
-                <div class="exp-item-title"><label for="chkExpRepMd" style="cursor:pointer;margin:0">完整分析報告</label><span class="pill">.md</span></div>
+                <div class="exp-item-title"><span>完整分析報告</span><span class="pill">.md</span></div>
                 <div class="exp-item-desc">結構化純文字完整分析結論</div>
               </div>
-            </div>
+            </label>
             <button type="button" class="btn-sm" data-exp-act="rep-md" title="立即匯出分析報告 Markdown">匯出</button>
           </div>
         </div>
@@ -2053,13 +2082,13 @@ button.load-state{border:none;font:inherit;cursor:default}
         </div>
         <div class="export-items-grid">
           <div class="exp-item-card">
-            <div class="exp-item-main">
+            <label class="exp-item-main" for="chkExpAiMd">
               <input type="checkbox" class="exp-item-chk" data-type="ai-md" id="chkExpAiMd" aria-label="勾選 AI 智能診斷報告 Markdown">
               <div class="exp-item-info">
-                <div class="exp-item-title"><label for="chkExpAiMd" style="cursor:pointer;margin:0">AI 智能診斷報告</label><span class="pill">.md</span></div>
+                <div class="exp-item-title"><span>AI 智能診斷報告</span><span class="pill">.md</span></div>
                 <div class="exp-item-desc">LLM 製程根因推理與工程改進行動</div>
               </div>
-            </div>
+            </label>
             <button type="button" class="btn-sm" data-exp-act="ai-md" title="立即匯出 AI 報告 Markdown">匯出</button>
           </div>
         </div>
@@ -2072,57 +2101,57 @@ button.load-state{border:none;font:inherit;cursor:default}
         </div>
         <div class="export-items-grid">
           <div class="exp-item-card">
-            <div class="exp-item-main">
+            <label class="exp-item-main" for="chkExpIssXlsx">
               <input type="checkbox" class="exp-item-chk" data-type="iss-xlsx" id="chkExpIssXlsx" aria-label="勾選問題清單 Excel">
               <div class="exp-item-info">
-                <div class="exp-item-title"><label for="chkExpIssXlsx" style="cursor:pointer;margin:0">問題偵測缺陷清單</label><span class="pill">.xlsx</span></div>
+                <div class="exp-item-title"><span>問題偵測缺陷清單</span><span class="pill">.xlsx</span></div>
                 <div class="exp-item-desc">完整問題統計與 Excel 試算表</div>
               </div>
-            </div>
+            </label>
             <button type="button" class="btn-sm" data-exp-act="iss-xlsx" title="立即匯出問題清單 Excel">匯出</button>
           </div>
 
           <div class="exp-item-card">
-            <div class="exp-item-main">
+            <label class="exp-item-main" for="chkExpIssCsv">
               <input type="checkbox" class="exp-item-chk" data-type="iss-csv" id="chkExpIssCsv" aria-label="勾選問題清單 CSV">
               <div class="exp-item-info">
-                <div class="exp-item-title"><label for="chkExpIssCsv" style="cursor:pointer;margin:0">問題清單資料庫</label><span class="pill">.csv</span></div>
+                <div class="exp-item-title"><span>問題清單資料庫</span><span class="pill">.csv</span></div>
                 <div class="exp-item-desc">輕量化 CSV 缺陷數據與指標</div>
               </div>
-            </div>
+            </label>
             <button type="button" class="btn-sm" data-exp-act="iss-csv" title="立即匯出問題清單 CSV">匯出</button>
           </div>
 
           <div class="exp-item-card">
-            <div class="exp-item-main">
+            <label class="exp-item-main" for="chkExpStatsCsv">
               <input type="checkbox" class="exp-item-chk" data-type="stats-csv" id="chkExpStatsCsv" aria-label="勾選管制圖異常焊墊 CSV">
               <div class="exp-item-info">
-                <div class="exp-item-title"><label for="chkExpStatsCsv" style="cursor:pointer;margin:0">管制圖異常焊墊清單</label><span class="pill">.csv</span></div>
+                <div class="exp-item-title"><span>管制圖異常焊墊清單</span><span class="pill">.csv</span></div>
                 <div class="exp-item-desc">偏離 ±3σ 管制界限之焊墊統計清單</div>
               </div>
-            </div>
+            </label>
             <button type="button" class="btn-sm" data-exp-act="stats-csv" title="立即匯出管制圖 CSV">匯出</button>
           </div>
 
           <div class="exp-item-card">
-            <div class="exp-item-main">
+            <label class="exp-item-main" for="chkExpBoardCsv">
               <input type="checkbox" class="exp-item-chk" data-type="board-csv" id="chkExpBoardCsv" aria-label="勾選各板良率彙總 CSV">
               <div class="exp-item-info">
-                <div class="exp-item-title"><label for="chkExpBoardCsv" style="cursor:pointer;margin:0">各板統計彙總表</label><span class="pill">.csv</span></div>
+                <div class="exp-item-title"><span>各板統計彙總表</span><span class="pill">.csv</span></div>
                 <div class="exp-item-desc">每塊基板之均值、標準差與合格率</div>
               </div>
-            </div>
+            </label>
             <button type="button" class="btn-sm" data-exp-act="board-csv" title="立即匯出各板良率 CSV">匯出</button>
           </div>
 
           <div class="exp-item-card">
-            <div class="exp-item-main">
+            <label class="exp-item-main" for="chkExpDefCsv">
               <input type="checkbox" class="exp-item-chk" data-type="def-csv" id="chkExpDefCsv" aria-label="勾選不良焊墊明細 CSV">
               <div class="exp-item-info">
-                <div class="exp-item-title"><label for="chkExpDefCsv" style="cursor:pointer;margin:0">不良焊墊明細表</label><span class="pill">.csv</span></div>
+                <div class="exp-item-title"><span>不良焊墊明細表</span><span class="pill">.csv</span></div>
                 <div class="exp-item-desc">違反規格上下限之焊墊明細數值</div>
               </div>
-            </div>
+            </label>
             <button type="button" class="btn-sm" data-exp-act="def-csv" title="立即匯出不良焊墊 CSV">匯出</button>
           </div>
 
@@ -2136,46 +2165,46 @@ button.load-state{border:none;font:inherit;cursor:default}
         </div>
         <div class="export-items-grid">
           <div class="exp-item-card">
-            <div class="exp-item-main">
+            <label class="exp-item-main" for="chkExpDfmCsv">
               <input type="checkbox" class="exp-item-chk" data-type="dfm-csv" id="chkExpDfmCsv" aria-label="勾選 DFM 鋼板開孔建議表 CSV">
               <div class="exp-item-info">
-                <div class="exp-item-title"><label for="chkExpDfmCsv" style="cursor:pointer;margin:0">DFM 鋼板開孔建議表</label><span class="pill">.csv</span></div>
+                <div class="exp-item-title"><span>DFM 鋼板開孔建議表</span><span class="pill">.csv</span></div>
                 <div class="exp-item-desc">寬深比、面積比檢驗與開孔尺寸修正</div>
               </div>
-            </div>
+            </label>
             <button type="button" class="btn-sm" data-exp-act="dfm-csv" title="立即匯出 DFM 建議 CSV">匯出</button>
           </div>
 
           <div class="exp-item-card">
-            <div class="exp-item-main">
+            <label class="exp-item-main" for="chkExpDfmMd">
               <input type="checkbox" class="exp-item-chk" data-type="dfm-md" id="chkExpDfmMd" aria-label="勾選 DFM 改善建議說明書 Markdown">
               <div class="exp-item-info">
-                <div class="exp-item-title"><label for="chkExpDfmMd" style="cursor:pointer;margin:0">DFM 改善建議說明書</label><span class="pill">.md</span></div>
+                <div class="exp-item-title"><span>DFM 改善建議說明書</span><span class="pill">.md</span></div>
                 <div class="exp-item-desc">開孔設計修正說明與 IPC 建議</div>
               </div>
-            </div>
+            </label>
             <button type="button" class="btn-sm" data-exp-act="dfm-md" title="立即匯出 DFM 說明 Markdown">匯出</button>
           </div>
 
           <div class="exp-item-card">
-            <div class="exp-item-main">
+            <label class="exp-item-main" for="chkExpCmpMd">
               <input type="checkbox" class="exp-item-chk" data-type="cmp-md" id="chkExpCmpMd" aria-label="勾選試產回合比較報告 Markdown">
               <div class="exp-item-info">
-                <div class="exp-item-title"><label for="chkExpCmpMd" style="cursor:pointer;margin:0">試產回合比較報告</label><span class="pill">.md</span></div>
+                <div class="exp-item-title"><span>試產回合比較報告</span><span class="pill">.md</span></div>
                 <div class="exp-item-desc">跨回合前後對比與製程改善結論</div>
               </div>
-            </div>
+            </label>
             <button type="button" class="btn-sm" data-exp-act="cmp-md" title="立即匯出對比結論 Markdown">匯出</button>
           </div>
 
           <div class="exp-item-card">
-            <div class="exp-item-main">
+            <label class="exp-item-main" for="chkExpCorrJson">
               <input type="checkbox" class="exp-item-chk" data-type="correction-json" id="chkExpCorrJson" aria-label="勾選印刷機補償參數 JSON">
               <div class="exp-item-info">
-                <div class="exp-item-title"><label for="chkExpCorrJson" style="cursor:pointer;margin:0">印刷機補償參數</label><span class="pill">.json</span></div>
+                <div class="exp-item-title"><span>印刷機補償參數</span><span class="pill">.json</span></div>
                 <div class="exp-item-desc">錫膏印刷機自動閉環偏移修正參數</div>
               </div>
-            </div>
+            </label>
             <button type="button" class="btn-sm" data-exp-act="correction-json" title="立即匯出補償參數 JSON">匯出</button>
           </div>
         </div>
@@ -2188,13 +2217,13 @@ button.load-state{border:none;font:inherit;cursor:default}
         </div>
         <div class="export-items-grid">
           <div class="exp-item-card">
-            <div class="exp-item-main">
+            <label class="exp-item-main" for="chkExpSnap3d">
               <input type="checkbox" class="exp-item-chk" data-type="snap-3d" id="chkExpSnap3d" aria-label="勾選 3D 錫膏模擬快照 PNG">
               <div class="exp-item-info">
-                <div class="exp-item-title"><label for="chkExpSnap3d" style="cursor:pointer;margin:0">3D 錫膏模擬高解析快照</label><span class="pill">.png</span></div>
+                <div class="exp-item-title"><span>3D 錫膏模擬高解析快照</span><span class="pill">.png</span></div>
                 <div class="exp-item-desc">全板 3D 錫膏厚度分佈立體渲染截圖</div>
               </div>
-            </div>
+            </label>
             <button type="button" class="btn-sm" data-exp-act="snap-3d" title="立即匯出 3D 快照 PNG">匯出</button>
           </div>
         </div>
@@ -6332,7 +6361,18 @@ function baseOpts(extra={}){const ink=css("--muted"),grid=css("--grid"),coarse=t
   plugins:{legend:{display:false},tooltip:{titleFont:{family:"IBM Plex Mono"},bodyFont:{family:"IBM Plex Mono"}}},
   scales:{x:{ticks:{color:ink,font:{family:"IBM Plex Mono",size:chartCaptionFontPx()},maxRotation:0,autoSkipPadding:6},grid:{color:grid}},y:{ticks:{color:ink,font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{color:grid}}}},extra)}
 const vlines={id:"vlines",afterDatasetsDraw(ch,_,o){if(!o||!o.lines)return;const{ctx,chartArea:a,scales:{x}}=ch;ctx.save();for(const l of o.lines){if(!isFinite(l.v))continue;const px=x.getPixelForValue(l.v);if(px<a.left-1||px>a.right+1)continue;ctx.strokeStyle=l.c;ctx.setLineDash(l.dash||[5,4]);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(px,a.top);ctx.lineTo(px,a.bottom);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=l.c;ctx.font=chartCaptionFontPx()+"px IBM Plex Mono";ctx.fillText(l.t,Math.min(px+4,a.right-40),a.top+12)}ctx.restore()}};
-if(window.Chart)Chart.register(vlines);
+/* 管制界限數值：在 UCL／CL／LCL 線右端印出數值，只影響顯示。界限隨板變動時取最後一點 */
+const limitLabels={id:"limitLabels",afterDatasetsDraw(ch,_,o){const L0=o&&o.items;if(!L0||!L0.length)return;const{ctx,chartArea:a,scales:{y}}=ch;if(!y||!a)return;const fs=chartCaptionFontPx(),gap=fs+3;
+  const L=L0.map(it=>({t:it.t,c:it.c,py:y.getPixelForValue(it.v)})).filter(it=>isFinite(it.py)&&it.py>=a.top-gap&&it.py<=a.bottom+gap).sort((p,q)=>p.py-q.py);
+  for(let i=1;i<L.length;i++)if(L[i].py-L[i-1].py<gap)L[i].py=L[i-1].py+gap;
+  const over=L.length?L[L.length-1].py-a.bottom:0;if(over>0)L.forEach(it=>{it.py-=over});
+  ctx.save();ctx.font=fs+"px IBM Plex Mono";ctx.textBaseline="middle";ctx.textAlign="left";for(const it of L){ctx.fillStyle=it.c;ctx.fillText(it.t,a.right+6,it.py)}ctx.restore()}};
+if(window.Chart)Chart.register(vlines,limitLabels);
+/* items：[{n:"UCL",v,c}]；回傳加上右側留白與 limitLabels 設定的 Chart 選項 */
+function withLimits(extra,items,off){if(off)return extra;const it=items.filter(x=>x&&isFinite(x.v)).map(x=>({t:x.n+" "+f(x.v,2),v:x.v,c:x.c}));if(!it.length)return extra;
+  const pad=Math.ceil(Math.max(10,...it.map(x=>x.t.length))*chartCaptionFontPx()*0.62)+10;   /* 至少 10 字寬：上下兩張圖的繪圖區右緣對齊 */
+  const plugins=extra.plugins||baseOpts().plugins;
+  return{...extra,layout:{padding:{right:pad}},plugins:{...plugins,limitLabels:{items:it}}}}
 
 /* ---------- 控制項 ---------- */
 const REL_CHART_UI=new Set(["specScatter","parallel","radar"]);
@@ -7027,13 +7067,14 @@ function renderIssues(){const F0=S.F||[],sc=issueScope(),F=sc?F0.filter(x=>sc.ow
   const filterEl=$("#issFilter");
   if(!S.rows||!S.rows.length){
     $("#issHead").textContent="尚未匯入量測資料";
-    $("#issSub").textContent="請至「資料與規格」匯入 SPI 量測檔，或從資料庫開啟量測紀錄。";
+    $("#issSub").textContent="請至「資料與規格」匯入 SPI 量測檔，或從「記錄庫」開啟量測紀錄。";
     if($("#pmapSub"))$("#pmapSub").textContent="";
     $("#pmap").innerHTML='<p class="note" style="padding:16px 0">尚無焊墊分佈數據</p>';
-    filterEl.innerHTML="";filterEl.hidden=true;
-    $("#issList").innerHTML='<div class="note" style="text-align:center;padding:32px 16px"><p style="font-size:var(--fs-heading);margin-bottom:8px">尚無問題偵測結果</p><p>匯入資料後，系統將自動依十個面向進行統計檢定並列出異常問題。</p><div class="row" style="justify-content:center;margin-top:12px"><button type="button" class="primary" data-goto-import>前往匯入</button><button type="button" data-load-sample>載入範例資料</button></div></div>';
+    filterEl.innerHTML="";filterEl.hidden=true;if($("#pmapDetails"))$("#pmapDetails").hidden=true;
+    $("#issList").innerHTML='<div class="note" style="text-align:center;padding:32px 16px"><p>匯入資料後，系統將自動依十個面向進行統計檢定並列出異常問題。</p><div class="row" style="justify-content:center;margin-top:12px"><button type="button" class="primary" data-goto-import>前往匯入</button><button type="button" data-load-sample>載入範例資料</button></div></div>';
     return;
   }
+  if($("#pmapDetails"))$("#pmapDetails").hidden=false;
   if(F.pending){$("#issHead").textContent=`正在偵測問題（${S.rows.length.toLocaleString()} 筆）…`;$("#issSub").textContent="資料量大，於背景計算中，完成後會自動顯示結果。";if($("#pmapSub"))$("#pmapSub").textContent="計算中…";filterEl.hidden=true;$("#pmap").innerHTML="";$("#issList").innerHTML='<p class="note">計算中…</p>';return}
   const caseList=scCases;
   /* 計數單位跟著檢視：依問題定義數案、依統計規則數卡，標題與篩選鈕一致，點下去的數量等於鈕上的數字 */
@@ -7366,7 +7407,7 @@ function capCls(v){return!isFinite(v)?"":v>=1.33?"ok":v>=1?"warn":"ng"}
 function renderOverview(){
   if(!hasData()){
     $("#verdict").className="verdict na";$("#vTitle").textContent="尚未載入分析資料";
-    $("#vText").textContent="請至「資料與規格」匯入 SPI 量測檔，或從資料庫開啟量測紀錄。";
+    $("#vText").textContent="請至「資料與規格」匯入 SPI 量測檔，或從「記錄庫」開啟量測紀錄。";
     $("#kpis").innerHTML='<p class="note" style="grid-column:1/-1;padding:12px 0">尚無分析數據</p>';
     $("#ovChartSub").textContent="—";
     $("#acts").innerHTML='<li style="grid-column:1/-1"><div class="note">匯入資料後將自動產生處置建議。</div><div class="row" style="justify-content:center;margin-top:12px"><button type="button" class="primary" data-goto-import>前往匯入</button><button type="button" data-load-sample>載入範例資料</button></div></li>';
@@ -7386,11 +7427,11 @@ function renderOverview(){
   const capGroupLabel=A.cap&&A.cap.mixed?(isFinite(A.cap.cpk)?"最差群組":"Ppk 最差可估群組"):"最差群組";
   const defPpm=S.pendingVerify?PENDING_VERIFY_LABEL:fmtPpm(Math.round(defTot/padTot*1e6));
   $("#kpis").innerHTML=kpi("平均 "+METRICS[A.m].short,f(A.gMean,1)+`<small style="font-size:var(--fs-heading)"> ${u}</small>`,`σ 整體 ${f(A.overallSd,2)} · 組內 ${f(A.sigmaW,2)}`)
-    +kpi("CPK"+(A.cap&&A.cap.mixed&&isFinite(A.cap.cpk)?"（最差群組）":""),cpkVal,cpkSub,S.pendingVerify?"warn":(A.cap?capCls(A.cap.cpk):""))
-    +kpi("PPK"+(A.cap&&A.cap.mixed?`（${capGroupLabel}）`:""),A.cap&&isFinite(A.cap.ppk)?f(A.cap.ppk):"—",A.cap?(stabilityCaveat(A)+"長期 σ") :"",A.cap?capCls(A.cap.ppk):"")
+    +kpi("Cpk"+(A.cap&&A.cap.mixed&&isFinite(A.cap.cpk)?"（最差群組）":""),cpkVal,cpkSub,S.pendingVerify?"warn":(A.cap?capCls(A.cap.cpk):""))
+    +kpi("Ppk"+(A.cap&&A.cap.mixed?`（${capGroupLabel}）`:""),A.cap&&isFinite(A.cap.ppk)?f(A.cap.ppk):"—",A.cap?(stabilityCaveat(A)+"長期 σ") :"",A.cap?capCls(A.cap.ppk):"")
     +kpi("製程穩定性",stabilityText(A),A.stable===null?A.xs.reason:"X̄ 圖 Nelson 規則判定",A.stable===null?"warn":A.stable?"ok":"ng")
     +kpi("判異點數",A.stable===null?"—":(A.nelX||A.nel).flag.size,A.stable===null?"穩定性無法判定":`X̄ 圖 ${(A.nelX||A.nel).rules.filter(r=>r.idx.length&&r.id!==7).length} 條 Nelson 規則觸發`,A.stable===null?"warn":(A.nelX||A.nel).flag.size?"ng":"ok")
-    +kpi("不良 PPM（全部判定項目）",defPpm,`不良焊墊 ${defTot} 處（全部判定項目）`,S.pendingVerify?"warn":(defTot?"warn":"ok"))
+    +kpi("不良 PPM",defPpm,`不良焊墊 ${defTot} 處（全部判定項目）`,S.pendingVerify?"warn":(defTot?"warn":"ok"))
     +kpi("樣本",A.N.toLocaleString(),`${A.boards.length} 片板 · ${A.pads.length} 個焊墊位置`);
   $("#ovChartSub").textContent=chartName()+" · "+METRICS[A.m].short;
   /* 卡片等級以文字 pill 標示（不只靠色條）；跨板彙總卡的事實是單一子項，標「子項」並附子項數，避免把子項等級誤讀成卡片等級 */
@@ -7421,7 +7462,7 @@ function drawCtrl(id,mini){const A=S.A,c=S.chart,ng=css("--ng"),acc=css("--accen
       {label:"UCL",data:ucl,borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},
       {label:"LCL",data:lcl,borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},
       {label:"CL",data:pts.map(()=>cl),borderColor:acc,borderWidth:1.2,pointRadius:0},...zones]},
-      options:baseOpts({...clickOpts(pts.map(p=>p.lab)),plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex===0,callbacks:{label:i=>`${f(i.raw,2)} ${METRICS[A.m].unit} · z ${f(pts[i.dataIndex].z,2)}`}}}})});
+      options:baseOpts(withLimits({...clickOpts(pts.map(p=>p.lab)),plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex===0,callbacks:{label:i=>`${f(i.raw,2)} ${METRICS[A.m].unit} · z ${f(pts[i.dataIndex].z,2)}`}}}},[{n:"UCL",v:ucl.at(-1),c:ng},{n:"CL",v:cl,c:acc},{n:"LCL",v:lcl.at(-1),c:ng}],mini))});
     return;
   }
   if(c==="ewma"){const P=A.ewma,out=P.map(p=>p.v>p.ucl||p.v<p.lcl);
@@ -7430,13 +7471,13 @@ function drawCtrl(id,mini){const A=S.A,c=S.chart,ng=css("--ng"),acc=css("--accen
       {label:"每板平均",data:P.map(p=>p.raw),showLine:false,pointRadius:mini?1.5:2.5,pointBackgroundColor:ink,pointBorderColor:"transparent"},
       {label:"UCL",data:P.map(p=>p.ucl),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},{label:"LCL",data:P.map(p=>p.lcl),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},
       {label:"CL",data:P.map(()=>A.gMean),borderColor:acc,borderWidth:1.2,pointRadius:0}]},
-      options:baseOpts({...clickOpts(P.map(p=>p.lab)),plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex<2,callbacks:{label:i=>(i.datasetIndex?"板平均 ":"EWMA ")+f(i.raw,2)+" "+METRICS[A.m].unit}}}})});return}
+      options:baseOpts(withLimits({...clickOpts(P.map(p=>p.lab)),plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex<2,callbacks:{label:i=>(i.datasetIndex?"板平均 ":"EWMA ")+f(i.raw,2)+" "+METRICS[A.m].unit}}}},[{n:"UCL",v:P.at(-1)?.ucl,c:ng},{n:"CL",v:A.gMean,c:acc},{n:"LCL",v:P.at(-1)?.lcl,c:ng}],mini))});return}
   if(c==="cusum"){const P=A.cusum.pts,h=A.cusum.h,out=P.map(p=>p.cp>h||p.cm>h);
     mk(id,{type:"line",data:{labels:P.map(p=>p.lab),datasets:[
       {label:"C+",data:P.map(p=>p.cp),borderColor:s2,borderWidth:1.8,pointRadius:P.map((p,i)=>p.cp>h?(mini?4:5.5):(mini?2:3)),pointBackgroundColor:P.map(p=>p.cp>h?ng:s2),pointBorderColor:"transparent"},
       {label:"C−",data:P.map(p=>-p.cm),borderColor:acc,borderWidth:1.8,borderDash:[5,3],pointRadius:P.map((p,i)=>p.cm>h?(mini?4:5.5):(mini?2:3)),pointBackgroundColor:P.map(p=>p.cm>h?ng:acc),pointBorderColor:"transparent"},
       {label:"+h",data:P.map(()=>h),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},{label:"−h",data:P.map(()=>-h),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0}]},
-      options:baseOpts({...clickOpts(P.map(p=>p.lab)),plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex<2,callbacks:{label:i=>(i.datasetIndex?"C− ":"C+ ")+f(Math.abs(i.raw),2)+" σ"}}}})});return}
+      options:baseOpts(withLimits({...clickOpts(P.map(p=>p.lab)),plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex<2,callbacks:{label:i=>(i.datasetIndex?"C− ":"C+ ")+f(Math.abs(i.raw),2)+" σ"}}}},[{n:"+h",v:h,c:ng},{n:"−h",v:-h,c:ng}],mini))});return}
   const pts=c==="imr"?A.imr.pts:c==="p"?A.pc.pts:A.xs.pts;
   const ucl=c==="imr"?pts.map(()=>A.imr.ucl):pts.map(p=>p.ucl),lcl=c==="imr"?pts.map(()=>A.imr.lcl):pts.map(p=>p.lcl),cl=c==="imr"?A.imr.cl:c==="p"?A.pc.cl:A.xs.cl;
   const sig=c==="imr"?(A.imr.ucl-A.imr.cl)/3:null;
@@ -7447,7 +7488,7 @@ function drawCtrl(id,mini){const A=S.A,c=S.chart,ng=css("--ng"),acc=css("--accen
     {label:"UCL",data:ucl.map(v=>v*scale),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0,stepped:c==="p"?"middle":false},
     {label:"LCL",data:lcl.map(v=>v*scale),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0,stepped:c==="p"?"middle":false},
     {label:"CL",data:pts.map(()=>cl*scale),borderColor:acc,borderWidth:1.2,pointRadius:0},...zones]},
-    options:baseOpts({...clickOpts(pts.map(p=>p.lab)),plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex===0,callbacks:{label:i=>`${f(i.raw,c==="p"?2:2)}${c==="p"?" %":" "+METRICS[A.m].unit}  ·  z ${f(pts[i.dataIndex].z,2)}`}}}})});
+    options:baseOpts(withLimits({...clickOpts(pts.map(p=>p.lab)),plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex===0,callbacks:{label:i=>`${f(i.raw,c==="p"?2:2)}${c==="p"?" %":" "+METRICS[A.m].unit}  ·  z ${f(pts[i.dataIndex].z,2)}`}}}},[{n:"UCL",v:ucl.at(-1)*scale,c:ng},{n:"CL",v:cl*scale,c:acc},{n:"LCL",v:lcl.at(-1)*scale,c:ng}],mini))});
 }
 function renderControl(){
   if(!hasData()){
@@ -7494,14 +7535,14 @@ function renderControl(){
           {label:"UCL",data:r.map(()=>xr.uclR),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},
           {label:"LCL",data:r.map(()=>xr.lclR),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},
           {label:"CL",data:r.map(()=>xr.rbar),borderColor:css("--accent"),borderWidth:1.2,pointRadius:0}
-        ]},options:baseOpts({plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex===0,callbacks:{label:i=>`R: ${f(i.raw,2)} ${u}`}}}})});
+        ]},options:baseOpts(withLimits({plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex===0,callbacks:{label:i=>`R: ${f(i.raw,2)} ${u}`}}}},[{n:"UCL",v:xr.uclR,c:ng},{n:"CL",v:xr.rbar,c:css("--accent")},{n:"LCL",v:xr.lclR,c:ng}]))});
       }
     }else{
       const s=c==="imr"?A.imr.mr:A.xs.s,clv=c==="imr"?A.imr.mrbar:A.xs.s[0]?.cl,uv=c==="imr"?s.map(()=>A.imr.mrucl):s.map(x=>x.ucl),lv=c==="imr"?s.map(()=>0):s.map(x=>x.lcl);
       $("#ctrl2Sub").textContent=c==="imr"?`UCL ${f(A.imr.mrucl,2)}`:`中心線 c4(n)·σ̂組內（σ̂ ${f(A.sigmaW,2)}），依每板焊墊數調整`;
       const ng=css("--ng");
       mk("cCtrl2",{type:"line",data:{labels:s.map(x=>x.lab),datasets:[{data:s.map(x=>x.v),borderColor:css("--series2"),borderWidth:1.4,pointRadius:s.map((x,i)=>x.v>uv[i]||x.v<lv[i]?5:2.5),pointBackgroundColor:s.map((x,i)=>x.v>uv[i]||x.v<lv[i]?ng:css("--series2")),pointBorderColor:"transparent"},
-        {data:uv,borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},{data:lv,borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},{data:c==="imr"?s.map(()=>clv):s.map(x=>x.cl),borderColor:css("--accent"),borderWidth:1.2,pointRadius:0}]},options:baseOpts()})}
+        {data:uv,borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},{data:lv,borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},{data:c==="imr"?s.map(()=>clv):s.map(x=>x.cl),borderColor:css("--accent"),borderWidth:1.2,pointRadius:0}]},options:baseOpts(withLimits({},[{n:"UCL",v:uv.at(-1),c:ng},{n:"CL",v:c==="imr"?clv:s.at(-1)?.cl,c:css("--accent")},{n:"LCL",v:lv.at(-1),c:ng}]))})}
   }
   const pts=A.series;
   $("#nelsonTbl").innerHTML=`<thead><tr><th>規則</th><th>狀態</th><th>觸發點</th><th>錫膏印刷常見對應原因</th></tr></thead><tbody>`+A.nel.rules.map(r=>`<tr><td>${r.name}</td><td>${r.na?'<span class="pill na">不適用</span>':A.chartRejected?'<span class="pill na">無法判定</span>':r.idx.length?(r.id===7?'<span class="pill warn">觸發</span>':'<span class="pill ng">觸發</span>'):'<span class="pill ok">通過</span>'}</td><td class="mono" style="font-size:var(--fs-caption)">${r.idx.length?r.idx.map(i=>pts[i].lab).join(" "):"—"}</td><td class="note">${r.na?"此管制圖不適用此規則（僅 X̄ / I-MR 使用全部 8 條；P' 圖用 1–4；EWMA / CUSUM 僅用 1）":A.chartRejected?esc(A.chartReason):r.hint}</td></tr>`).join("")+"</tbody>";
@@ -7520,7 +7561,7 @@ function capPpmCards(cap,specTitle){
   const w=`${isFinite(cap.cpk)?"最差群組":"Ppk 最差可估群組"} ${esc(cap.worst)}`,excl=cap.ppmExpAllExcl>0?`；預估排除 ${cap.ppmExpAllExcl} 個無法計算的群組`:"";
   return kpi("預估 PPM",fmtPpm(cap.ppmExp),`${w} · 常態假設下超規`,ppmCls(cap.ppmExp))
     +kpi(`超規 PPM（${specTitle}）`,fmtPpm(cap.ppmObs),`${w} · 實際超規比例`,ppmCls(cap.ppmObs))
-    +kpi("全部群組 PPM",`${fmtPpm(cap.ppmExpAll)} / ${fmtPpm(cap.ppmObsAll)}`,`預估（依樣本數加權）/ 實際超規${excl}`,ppmCls(Math.max(isFinite(cap.ppmExpAll)?cap.ppmExpAll:0,cap.ppmObsAll||0)));
+    +kpi("全部群組 PPM",`${fmtPpm(cap.ppmExpAll)} / ${fmtPpm(cap.ppmObsAll)}`,`預估（依樣本數加權）/ 實際超規${excl}`,ppmCls(Math.max(isFinite(cap.ppmExpAll)?cap.ppmExpAll:0,cap.ppmObsAll||0))+" wide");
 }
 /* 直方圖分箱（Freedman–Diaconis，組數限 8–45）：能力頁與報告共用，兩邊的組距與頻數相同 */
 function histBins(A){const all=sortedVals(A.rows,A.m),n=all.length,iqr=quant(all,.75)-quant(all,.25);
@@ -7545,9 +7586,9 @@ function renderCap(){
   const cpNA=cap&&!hasTwoSpec(cap)?"單邊規格不定義 Cp":cap?.reason||"組內變異無法估計";
   const ppNA=cap&&!hasTwoSpec(cap)?"單邊規格不定義 Pp":"長期潛在能力";
   const capCards = cap && (S.pendingVerify||capHasValue) ? (
-    kpi("CP",S.pendingVerify?PENDING_VERIFY_LABEL:f(cap.cp),pre+(isFinite(cap.cp)?"短期潛在能力":cpNA),S.pendingVerify?"warn":capCls(cap.cp))+kpi("CPK",S.pendingVerify?PENDING_VERIFY_LABEL:f(cap.cpk),pre+(isFinite(cap.cpk)?`短期實際能力 · 95% 信賴區間 ${f(cap.ci[0])} – ${f(cap.ci[1])}（以 ${cap.nb} 片板計）`:cap.reason||"組內變異無法估計"),S.pendingVerify?"warn":capCls(cap.cpk))+kpi("PP",f(cap.pp),ppNA,capCls(cap.pp))+kpi("PPK",f(cap.ppk),"長期實際能力",capCls(cap.ppk))+(S.pendingVerify?kpi("預估 PPM",PENDING_VERIFY_LABEL,"開孔覆蓋率未滿","warn")+kpi(`超規 PPM（${specTitle}）`,PENDING_VERIFY_LABEL,"開孔覆蓋率未滿","warn"):capPpmCards(cap,specTitle))
+    kpi("Cp",S.pendingVerify?PENDING_VERIFY_LABEL:f(cap.cp),pre+(isFinite(cap.cp)?"短期潛在能力":cpNA),S.pendingVerify?"warn":capCls(cap.cp))+kpi("Cpk",S.pendingVerify?PENDING_VERIFY_LABEL:f(cap.cpk),pre+(isFinite(cap.cpk)?`短期實際能力 · 95% 信賴區間 ${f(cap.ci[0])} – ${f(cap.ci[1])}（以 ${cap.nb} 片板計）`:cap.reason||"組內變異無法估計"),S.pendingVerify?"warn":capCls(cap.cpk))+kpi("Pp",f(cap.pp),ppNA,capCls(cap.pp))+kpi("Ppk",f(cap.ppk),"長期實際能力",capCls(cap.ppk))+(S.pendingVerify?kpi("預估 PPM",PENDING_VERIFY_LABEL,"開孔覆蓋率未滿","warn")+kpi(`超規 PPM（${specTitle}）`,PENDING_VERIFY_LABEL,"開孔覆蓋率未滿","warn"):capPpmCards(cap,specTitle))
   ) : cap && cap.reason === "無規格" ? (
-    kpi("CP","無規格","未設定規格界限")+kpi("CPK","無規格","未設定規格界限")+kpi("PP","無規格","未設定規格界限")+kpi("PPK","無規格","未設定規格界限")+kpi("預估 PPM","無規格","未設定規格界限")+kpi(`超規 PPM（${specTitle}）`,"無規格","未設定規格界限")
+    kpi("Cp","無規格","未設定規格界限")+kpi("Cpk","無規格","未設定規格界限")+kpi("Pp","無規格","未設定規格界限")+kpi("Ppk","無規格","未設定規格界限")+kpi("預估 PPM","無規格","未設定規格界限")+kpi(`超規 PPM（${specTitle}）`,"無規格","未設定規格界限")
   ) : cap && cap.reason ? (
     kpi("製程能力", "無法定義", cap.reason, "warn") + (isFinite(cap.ppmObs) ? kpi(`超規 PPM（${specTitle}）`,fmtPpm(cap.ppmObs),"實際超規比例",cap.ppmObs>2700?"ng":cap.ppmObs>63?"warn":"ok") : "")
   ) : kpi("規格","未設定","請於上方輸入 LSL / USL");
@@ -7756,6 +7797,8 @@ function renderCross(){
   $("#overlap").innerHTML=`<div style="display:grid;gap:12px">${box("兩張圖皆抓到（高信心）",both,"ng")}${box("僅 X̄ 圖異常："+METRICS[A.m].short+" 平均偏移但未超規",xo.filter(b=>!A.pOut.has(b)),"warn")}${box("僅 P′ 圖越界：不良來自其他量測項目或局部焊墊",po.filter(b=>!A.xOut.has(b)),"warn")}
     </div>`;
 }
+/* 依底色亮度選黑或白字，對比取較高者（相對亮度門檻 0.179，任何底色都 ≥ 4.5）；相關係數無法計算（NaN）時底色無效，沿用一般字色 */
+function inkOn(rgb){const m=String(rgb).match(/\d+/g);if(!m||m.length<3)return"var(--ink)";const c=m.slice(0,3).map(v=>{v/=255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4)}),L=0.2126*c[0]+0.7152*c[1]+0.0722*c[2];return L>0.179?"#000000":"#FFFFFF"}
 function divColor(t){const lo=[61,110,143],mid=hex2rgb(css("--surface2")),hi=[200,90,40];const a=t<0?lo:hi,k=Math.min(1,Math.abs(t));return`rgb(${mid.map((m,i)=>Math.round(m+(a[i]-m)*k)).join(",")})`}
 function hex2rgb(h){h=h.replace("#","");if(h.length===3)h=h.split("").map(c=>c+c).join("");return[0,2,4].map(i=>parseInt(h.substr(i,2),16))}
 function drawHeat(){const A=S.A,cv=$("#heat"),ctx=cv.getContext("2d"),W=cv.width,H=cv.height,pad=24;
@@ -7850,7 +7893,7 @@ function renderAdv(){
     return`<tr><td>${g.g}</td><td class="num mono">${g.n}</td><td class="num mono">${g.shape==="round"?"Ø"+f(g.apL,3):f(g.apL,3)+"×"+f(g.apW,3)}<div class="note">${g.src}</div></td><td class="num mono">${g.thk}</td><td class="num mono">${f(g.ar,2)}</td><td class="num mono">${f(g.asp,2)}</td><td class="num mono">${f(g.vol,1)}</td><td class="num mono">${f(g.te,1)} %</td><td class="num mono">${f(g.cv,1)} %</td><td><span class="pill ${st}">${st==="ok"?"正常":st==="warn"?"注意":"風險"}</span> <span class="note">${txt}</span></td></tr>`}).join("")+"</tbody>";
   // 相關矩陣
   const C=V.corr;$("#corrSub").textContent=`皮爾森 r · n = ${C.n.toLocaleString()}`;
-  $("#corrTbl").innerHTML=`<thead><tr><th></th>${C.ms.map(k=>`<th style="text-align:center">${METRICS[k].short}</th>`).join("")}</tr></thead><tbody>`+C.ms.map((a,i)=>`<tr><th>${METRICS[a].short}</th>${C.m[i].map((v,j)=>`<td style="background:${i===j?css("--surface2"):divColor(v)};color:${Math.abs(v)>.6&&i!==j?"#fff":"var(--ink)"}">${f(v,2)}</td>`).join("")}</tr>`).join("")+"</tbody>";
+  $("#corrTbl").innerHTML=`<thead><tr><th></th>${C.ms.map(k=>`<th style="text-align:center">${METRICS[k].short}</th>`).join("")}</tr></thead><tbody>`+C.ms.map((a,i)=>`<tr><th>${METRICS[a].short}</th>${C.m[i].map((v,j)=>`<td style="background:${i===j?css("--surface2"):divColor(v)};color:${i===j?"var(--ink)":inkOn(divColor(v))}">${f(v,2)}</td>`).join("")}</tr>`).join("")+"</tbody>";
   // 對位
   fillSelect($("#selAlignBoard"),V.align.map(a=>[a.board,a.board]),S.board);
   const flag=a=>Math.max(Math.abs(a.tx),Math.abs(a.ty))>25||a.rotEdge>20||a.strEdge>20;
@@ -9549,7 +9592,7 @@ function initRuns(reset){S.runs=[];S.runId=null;
   const cb=sampleCfg();cb.aperture={groups:{"U2 BGA":{red:-8}}};cb.wipe=3;
   addRun("試產 2 · V2 BGA 加大＋奈米塗層",sampleData({variant:"B"}),["volume","height","area","offx","offy"],cb);S.runs[1].sample=true;
   S.cmpA=1;S.cmpB=2;switchRun(a)}
-function renderRuns(){if(!S.runs)return;fillSelect($("#selRun"),S.runs.map(r=>[String(r.id),r.name]),String(S.runId));
+function renderRuns(){if(!S.runs)return;const rail=$(".rail");if(rail)rail.classList.toggle("rail--empty",!S.runs.length);fillSelect($("#selRun"),S.runs.map(r=>[String(r.id),r.name]),String(S.runId));
   $("#runTbl").innerHTML=`<thead><tr><th>回合名稱</th><th>批號／產品料號</th><th class="num">板</th><th class="num">焊墊</th><th class="num">鋼板 µm</th><th></th></tr></thead><tbody>`+S.runs.map(r=>{const cfg=r.id===S.runId?snapCfg():r.cfg;
     return`<tr${r.id===S.runId?' style="background:var(--accent-soft)"':""}><td><input type="text" id="rn-${r.id}" data-rid="${r.id}" value="${esc(r.name)}" style="min-width:180px" aria-label="回合名稱"></td><td>${runSrc(r)?`<b>${esc(runSrc(r).lot||"未提供")}</b><br><span class="note">${esc(runSrc(r).part)}${runSrc(r).side?" · "+esc(runSrc(r).side):""}</span>${runSrc(r).lifecycle!=="active"?'<br><span class="pill warn">歷史／未驗證</span>':""}`:'<span class="note">'+(r.sample?"範例資料":"未連結資料庫")+"</span>"}</td><td class="num mono">${new Set(r.rows.map(x=>x.board)).size}</td><td class="num mono">${new Set(r.rows.map(x=>x.pad)).size}</td><td class="num mono">${cfg.stencil}${cfg.step&&cfg.step.on?"·階梯":""}${legacyHpct(r)?'<br><span class="pill warn" title="舊版匯入的高度 % 資料，換算厚度未記錄">高度需重新匯入</span>':""}</td>
     <td style="white-space:nowrap">${r.id===S.runId?'<span class="pill ok">目前</span>':`<button data-use="${r.id}">設為目前</button>`} <button data-delrun="${r.id}">刪除</button></td></tr>`}).join("")+"</tbody>";
@@ -10355,7 +10398,7 @@ function browserDownload(filename,data){const isXlsx=/\.xlsx$/i.test(filename);c
 /* 匯出鈕分散在各分頁，#expState 只在資料分頁；結果同時用 toast 顯示，避免在其他分頁按了沒反應 */
 const LIFECYCLE_TEXT={offline:"離線・未存檔",pending_review:"待管理者判定",superseded:"歷史修正前版本",legacy:"舊資料・未受控",unavailable:"狀態無法確認"};
 /* 沒有載入任何量測資料時，所有輸出（下載、列印、PDF、分享、AI）一律不產生 */
-const NO_DATA_MSG="目前沒有量測資料，請先匯入或從資料庫開啟量測紀錄";
+const NO_DATA_MSG="目前沒有量測資料，請先匯入或從「記錄庫」開啟量測紀錄";
 function needData(){if(S.rows&&S.rows.length)return true;toast(NO_DATA_MSG);return false}
 async function save(filename,data){if(!needData())return;const st=$("#expState"),src=runSrc(curRun()),say=m=>{if(st)st.textContent=m;toast(m)};
   if(src&&RecDB.mode==="cloud"){
@@ -11651,7 +11694,7 @@ function updateLoadStates(){const run=curRun(),src=runSrc(run),unmatched=src?.un
   const m=loadStateModel({src,err:LOAD_ERROR,link,preview:previewApplied,place:PLACE,placeReason:sync?sync.reason:""});
   set("#stateSpi",m.spi);
   const spiEl=$("#stateSpi");
-  if(spiEl){const openList=unmatched.length>0&&!LOAD_ERROR.spi;spiEl.classList.toggle("is-action",openList);spiEl.tabIndex=openList?0:-1;spiEl.setAttribute("aria-disabled",openList?"false":"true");spiEl.title=openList?"查看無座標位號":"目前分析回合的量測紀錄。載入請用記錄庫"}
+  if(spiEl){const openList=unmatched.length>0&&!LOAD_ERROR.spi;spiEl.classList.toggle("is-action",openList);spiEl.tabIndex=openList?0:-1;spiEl.setAttribute("aria-disabled",openList?"false":"true");spiEl.title=m.spi.text+"。"+(openList?"查看無座標位號":"目前分析回合的量測紀錄。載入請用記錄庫")}
   set("#statePlace",m.place);
   const placeEl=$("#statePlace");if(placeEl)placeEl.title=m.place.text+"。只描述目前分析回合用到的座標";
 }
@@ -12048,7 +12091,7 @@ function renderReport(){
   const p=$("#p-report");if(!p)return;
   const prev=$("#reportPreview");if(!prev)return;
   if(!hasData()){
-    prev.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--muted)"><h3 style="margin-bottom:8px">尚未載入分析資料</h3><p>請先至「資料與規格」匯入 SPI 量測檔，或從資料庫開啟量測紀錄。</p>'+(S.rows&&S.rows.length?"":'<div class="row" style="justify-content:center;margin-top:12px"><button type="button" class="primary" data-goto-import>前往匯入</button><button type="button" data-load-sample>載入範例資料</button></div>')+'</div>';
+    prev.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--muted)"><h3 style="margin-bottom:8px">尚未載入分析資料</h3><p>請先至「資料與規格」匯入 SPI 量測檔，或從「記錄庫」開啟量測紀錄。</p>'+(S.rows&&S.rows.length?"":'<div class="row" style="justify-content:center;margin-top:12px"><button type="button" class="primary" data-goto-import>前往匯入</button><button type="button" data-load-sample>載入範例資料</button></div>')+'</div>';
     return;
   }
   const A=S.A,ov=overallVerdict(S,scopedFindings()),F=scopedFindings();
@@ -14425,12 +14468,12 @@ function setupExportCenter() {
     const cur = typeof curRun === "function" ? curRun() : null;
     const src = cur && typeof runSrc === "function" ? runSrc(cur) : null;
     const part = (src && src.part) || (S && S.part) || "未指定料號";
-    const rev = (src && src.rev) || "V1";
+    const rev = (src && src.rev) || "";
     const lot = (src && src.lot) || (S && S.lot) || "未指定批號";
-    const rowCount = (S && S.R && S.R.length) ? S.R.length : 0;
+    const rowCount = (S && S.rows && S.rows.length) ? S.rows.length : 0;
     const summaryEl = $("#exportCenterSummary");
     if (summaryEl) {
-      summaryEl.textContent = `料號：${part} (${rev}) · 批號：${lot} · 焊墊筆數：${rowCount.toLocaleString()}`;
+      summaryEl.textContent = `料號：${part}${rev ? ` (${rev})` : ""} · 批號：${lot} · 焊墊筆數：${rowCount.toLocaleString()}`;
     }
     updateSelectedCount();
     const btnBundle = $("#btnDownloadStandardBundle");
