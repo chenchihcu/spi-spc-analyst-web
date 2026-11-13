@@ -282,7 +282,7 @@ async function localPage() {
     w.Chart = class { constructor() {} destroy() {} static register() {} };
     Object.assign(w, { Response, DecompressionStream });
     withIdb(w);
-    w.SPI_TEST_HOOK = {};
+    w.SPI_TEST_HOOK = { bootSample: true };
     w.addEventListener("error", (e) => errs.push(e.message));
   } });
   const w = dom.window;

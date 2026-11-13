@@ -24,7 +24,7 @@ function page(cloud) {
     Object.assign(w, { Response, DecompressionStream });
     withIdb(w);
     if (cloud) installBrowserCloud(w, cloud);
-    w.SPI_TEST_HOOK = {};
+    w.SPI_TEST_HOOK = { bootSample: true };
     w.addEventListener("error", (e) => errs.push(e.message));
   } });
   return { dom, errs };

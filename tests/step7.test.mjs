@@ -44,7 +44,7 @@ function createDom({ width = 1280, height = 800, coarse = false, threeRendererTh
     pretendToBeVisual: true,
     virtualConsole,
     beforeParse(window) {
-      window.SPI_TEST_HOOK = {};
+      window.SPI_TEST_HOOK = { bootSample: true };
       window.TextEncoder = TextEncoder;
       window.TextDecoder = TextDecoder;
       window.innerWidth = curWidth;

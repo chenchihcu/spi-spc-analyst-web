@@ -28,7 +28,7 @@ function page(saved, cloud, preloadPlace) {
     withIdb(w);
     if (cloud) installBrowserCloud(w, cloud);
     if (preloadPlace) w.localStorage.setItem('spi-place', preloadPlace);
-    w.SPI_TEST_HOOK = {};
+    w.SPI_TEST_HOOK = { bootSample: true };
     w.addEventListener("error", (e) => errs.push(e.message));
   } });
   return { dom, errs };

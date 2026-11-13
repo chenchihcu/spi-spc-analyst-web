@@ -31,7 +31,7 @@ function page() {
       w.scrollTo = () => {};
       w.Chart = class { constructor() {} destroy() {} static register() {} };
       Object.assign(w, { Response, DecompressionStream, TextDecoder });
-      w.SPI_TEST_HOOK = {};
+      w.SPI_TEST_HOOK = { bootSample: true };
       w.addEventListener('error', (e) => errs.push(e.message));
       withIdb(w);
     }

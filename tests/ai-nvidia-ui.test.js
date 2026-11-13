@@ -33,7 +33,7 @@ function open(store, fetchImpl) {
       withIdb(w);
       for (const [k, v] of Object.entries(store)) w.localStorage.setItem(k, v);
       w.fetch = fetchImpl;
-      w.SPI_TEST_HOOK = {};
+      w.SPI_TEST_HOOK = { bootSample: true };
     },
   });
   const w = dom.window, d = w.document;

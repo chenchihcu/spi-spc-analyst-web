@@ -21,7 +21,7 @@ function createTestContext(url = "https://spi.example/#data") {
       w.scrollTo = () => {};
       w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: () => () => {} });
       w.HTMLCanvasElement.prototype.toDataURL = () => "data:image/png;base64,mock";
-      w.SPI_TEST_HOOK = {};
+      w.SPI_TEST_HOOK = { bootSample: true };
     }
   });
   return { dom, hook: dom.window.SPI_TEST_HOOK };

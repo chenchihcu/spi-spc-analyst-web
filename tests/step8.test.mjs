@@ -97,7 +97,7 @@ function createPage(url = "https://spi.example/", extra = {}) {
         static get activeCount() { return chartCount; }
       };
 
-      w.SPI_TEST_HOOK = {};
+      w.SPI_TEST_HOOK = { bootSample: true };
       Object.assign(w, extra);
     }
   });

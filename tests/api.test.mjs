@@ -65,7 +65,7 @@ test("函式 HTTP 行為：GET 健康檢查、405、跨站 403、未啟用 503�
 test("頁面送出的摘要可通過驗證，且不含原始 SPI 資料", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const html = fs.readFileSync(HTML, "utf8").replace(/<script src=[^>]+><\/script>/g, "");
   let sent = null;
-  const dom = new JSDOM(html, { runScripts: "dangerously", url: "https://site.example/", beforeParse(w) {
+  const dom = new JSDOM(html, { runScripts: "dangerously", url: "https://site.example/", beforeParse(w) { w.SPI_TEST_HOOK = { bootSample: true };
     w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === "measureText" ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
     Object.defineProperty(w.HTMLElement.prototype, "offsetParent", { get() { let e = this; while (e) { if (e.hidden) return null; e = e.parentElement; } return w.document.body; } });
     w.Element.prototype.scrollIntoView = () => {}; w.matchMedia = () => ({ matches: false, addEventListener() {} }); w.ResizeObserver = class { observe() {} }; w.scrollTo = () => {};
@@ -94,7 +94,7 @@ test("AI 分析失敗訊息只在狀態列顯示一次", { skip: !JSDOM && "未�
     w.Element.prototype.scrollIntoView = () => {}; w.matchMedia = () => ({ matches: false, addEventListener() {} }); w.ResizeObserver = class { observe() {} }; w.scrollTo = () => {};
     w.Chart = class { constructor() {} destroy() {} static register() {} };
     if (!w.TextDecoder) w.TextDecoder = TextDecoder;
-    w.SPI_TEST_HOOK = {};
+    w.SPI_TEST_HOOK = { bootSample: true };
     w.fetch = async () => new Response("\n\n［AI 分析失敗：503 This model is currently experiencing high demand.。已自動重試仍失敗，請稍後再試或改選其他服務商。］", { status: 200 });
   } });
   const d = dom.window.document;

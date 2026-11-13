@@ -21,7 +21,7 @@ test('正式匯出以伺服器目前生命週期為準，讀取失敗時停止',
     w.scrollTo = () => {};
     w.Chart = class { constructor() {} destroy() {} static register() {} };
     withIdb(w);
-    w.SPI_TEST_HOOK = {};
+    w.SPI_TEST_HOOK = { bootSample: true };
   } });
   const w = dom.window;
   await new Promise(resolve => setTimeout(resolve, 50));

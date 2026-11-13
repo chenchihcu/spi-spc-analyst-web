@@ -38,7 +38,7 @@ test("整合資料上傳入口與下載出口介面結構與互動契約驗證",
       w.Chart = class { constructor(_c, cfg) { if (!cfg || !cfg.data) throw new Error("圖表設定錯誤"); } destroy() {} static register() {} };
       w.claude = { use: async (n) => (n === "downloads" ? { save: async () => {} } : null) };
       withIdb(w);
-      w.SPI_TEST_HOOK = {};
+      w.SPI_TEST_HOOK = { bootSample: true };
     }
   });
 

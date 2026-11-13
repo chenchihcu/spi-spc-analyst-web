@@ -47,7 +47,7 @@ function page(offline) {
     w.fetch = async () => { throw new Error("離線測試不應連網"); };
     withIdb(w);
     if (offline) w.SPI_OFFLINE = true;
-    w.SPI_TEST_HOOK = {};
+    w.SPI_TEST_HOOK = { bootSample: true };
     w.addEventListener("error", (e) => errs.push(e.message));
   } });
   return { dom, errs, creates };

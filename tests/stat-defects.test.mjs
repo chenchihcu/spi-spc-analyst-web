@@ -169,7 +169,7 @@ test("L3 X̄ 三向界限：板間無差異、各板 n 相同時 σ 即板平均
 test("L3 零組內變異的總覽、能力頁、報告與 AI payload 明確呈現未知及保留 Ppk", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const html = fs.readFileSync(HTML, "utf8").replace(/<script src=[^>]+><\/script>/g, "");
   const dom = new JSDOM(html, { runScripts: "dangerously", url: "https://spi.example/", beforeParse(w) {
-    w.SPI_TEST_HOOK = {};
+    w.SPI_TEST_HOOK = { bootSample: true };
     w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === "measureText" ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
     w.HTMLCanvasElement.prototype.toDataURL = () => "data:image/png;base64,AA==";
     Object.defineProperty(w.HTMLElement.prototype, "offsetParent", { get() { let e = this; while (e) { if (e.hidden) return null; e = e.parentElement; } return w.document.body; } });
@@ -297,7 +297,7 @@ test("A1–A3 報告：直方圖有資料、管制圖為 X̄ 界限、能力表�
     Object.defineProperty(w.HTMLElement.prototype, "offsetParent", { get() { let e = this; while (e) { if (e.hidden) return null; e = e.parentElement; } return w.document.body; } });
     w.Element.prototype.scrollIntoView = () => {}; w.matchMedia = () => ({ matches: false, addEventListener() {} }); w.ResizeObserver = class { observe() {} }; w.scrollTo = () => {};
     w.Chart = class { constructor(cv, cfg) { charts.push(cfg); } destroy() {} static register() {} };
-    w.SPI_TEST_HOOK = {};
+    w.SPI_TEST_HOOK = { bootSample: true };
   } });
   const w = dom.window;
   // 等頁面初始化完成（測試掛鉤與範例分析結果就緒），帶逾時的條件輪詢，不用固定休眠
@@ -327,7 +327,7 @@ test("D1 報告 X̄ 管制狀態表：當前量測項目正確提取 LCL/UCL，�
     Object.defineProperty(w.HTMLElement.prototype, "offsetParent", { get() { return w.document.body; } });
     w.Element.prototype.scrollIntoView = () => {}; w.matchMedia = () => ({ matches: false, addEventListener() {} }); w.ResizeObserver = class { observe() {} }; w.scrollTo = () => {};
     w.Chart = class { constructor() {} destroy() {} static register() {} };
-    w.SPI_TEST_HOOK = {};
+    w.SPI_TEST_HOOK = { bootSample: true };
   } });
   const w = dom.window;
   for (let i = 0; i < 200 && !(w.SPI_TEST_HOOK.renderReport && w.eval("typeof S!=='undefined'&&!!S.A")); i++) await tick(20);
