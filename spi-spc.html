@@ -7797,8 +7797,8 @@ function renderCross(){
   $("#overlap").innerHTML=`<div style="display:grid;gap:12px">${box("兩張圖皆抓到（高信心）",both,"ng")}${box("僅 X̄ 圖異常："+METRICS[A.m].short+" 平均偏移但未超規",xo.filter(b=>!A.pOut.has(b)),"warn")}${box("僅 P′ 圖越界：不良來自其他量測項目或局部焊墊",po.filter(b=>!A.xOut.has(b)),"warn")}
     </div>`;
 }
-/* 依底色亮度選黑或白字，對比取較高者（相對亮度門檻 0.179，任何底色都 ≥ 4.5） */
-function inkOn(rgb){const c=String(rgb).match(/\d+/g).slice(0,3).map(v=>{v/=255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4)}),L=0.2126*c[0]+0.7152*c[1]+0.0722*c[2];return L>0.179?"#000000":"#FFFFFF"}
+/* 依底色亮度選黑或白字，對比取較高者（相對亮度門檻 0.179，任何底色都 ≥ 4.5）；相關係數無法計算（NaN）時底色無效，沿用一般字色 */
+function inkOn(rgb){const m=String(rgb).match(/\d+/g);if(!m||m.length<3)return"var(--ink)";const c=m.slice(0,3).map(v=>{v/=255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4)}),L=0.2126*c[0]+0.7152*c[1]+0.0722*c[2];return L>0.179?"#000000":"#FFFFFF"}
 function divColor(t){const lo=[61,110,143],mid=hex2rgb(css("--surface2")),hi=[200,90,40];const a=t<0?lo:hi,k=Math.min(1,Math.abs(t));return`rgb(${mid.map((m,i)=>Math.round(m+(a[i]-m)*k)).join(",")})`}
 function hex2rgb(h){h=h.replace("#","");if(h.length===3)h=h.split("").map(c=>c+c).join("");return[0,2,4].map(i=>parseInt(h.substr(i,2),16))}
 function drawHeat(){const A=S.A,cv=$("#heat"),ctx=cv.getContext("2d"),W=cv.width,H=cv.height,pad=24;
