@@ -517,19 +517,37 @@ for (const [name, timeoutTimes, startEffort] of [
       const text = await (await handleAnalyze(req, {}, USER)).text();
       if (startEffort === 'low') {
         assert.deepEqual(efforts, ['low']);
-        assert.match(text, /［AI 分析失敗：524 error code: 524。上游超過 100 秒未開始回應；請在 AI 設定改選較快的模型/);
+        assert.match(text, /［AI 分析失敗：524 error code: 524。上游超過 100 秒未開始回應（OpenAI · gpt-6\.1-terra · 推理強度 low · 共等待 \d+ 秒）；請在 AI 設定改選較快的模型/);
       } else if (timeoutTimes === 1) {
         assert.deepEqual(efforts, ['high', 'low']);
         assert.equal(text, '（OpenAI 以推理強度 high 超過 100 秒未回應，已自動改用推理強度 low 重試）\n\n分析結果');
       } else {
         assert.deepEqual(efforts, ['high', 'low']);
-        assert.match(text, /［AI 分析失敗：524 error code: 524。已自動改用推理強度 low 重試仍逾時/);
+        assert.match(text, /［AI 分析失敗：524 error code: 524。已自動改用推理強度 low 重試仍逾時（OpenAI · gpt-6\.1-terra · 推理強度 low · 共等待 \d+ 秒）/);
       }
     } finally {
       globalThis.fetch = realFetch;
     }
   });
 }
+
+test('NVIDIA 524：未送推理強度的模型不重試，訊息寫明模型、推理強度「模型預設」與等待秒數', async () => {
+  const sent = [];
+  await withFetch(async (url, init) => {
+    sent.push(JSON.parse(init.body));
+    return new Response('error code: 524', { status: 524, headers: { 'content-type': 'text/plain' } });
+  }, async () => {
+    const req = new Request('https://spi.example/api/analyze', {
+      method: 'POST',
+      headers: { 'X-AI-Provider': 'nvidia', 'X-Nvidia-Key': 'nvapi-user-key', 'X-AI-Model': 'deepseek-ai/deepseek-r1', 'X-AI-Reasoning-Effort': 'high' },
+      body: BODY,
+    });
+    const text = await (await handleAnalyze(req, {}, USER)).text();
+    assert.match(text, /［AI 分析失敗：524 error code: 524。上游超過 100 秒未開始回應（NVIDIA · deepseek-ai\/deepseek-r1 · 推理強度 模型預設 · 共等待 \d+ 秒）；/);
+  });
+  assert.equal(sent.length, 1, '未送推理強度時 524 不重試');
+  assert.equal('reasoning_effort' in sent[0], false);
+});
 
 test('NVIDIA：使用者金鑰轉發到 NVIDIA 端點，用 max_tokens；推薦模型送 reasoning_effort，其他模型不送', async () => {
   const r = await postWithCapture({}, { headers: { 'X-AI-Provider': 'nvidia', 'X-Nvidia-Key': 'nvapi-user-key' } });

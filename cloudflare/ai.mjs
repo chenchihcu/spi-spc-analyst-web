@@ -289,9 +289,9 @@ export const UPSTREAM_RETRY_MAX_ATTEMPTS = 4;
 export const UPSTREAM_RETRY_MAX_DELAY_MS = 8000;
 const UPSTREAM_RETRY_BACKOFF_MS = [2000, 4000, 8000];
 
-// 上游前面是 Cloudflare（api.openai.com、AI Gateway）時，100 秒內沒送出回應標頭就回 524。
-// 高推理強度＋大份摘要可能在推理階段就超過 100 秒；同強度重試只會再等 100 秒後同樣失敗，
-// 因此只重試一次，並把推理強度降為 low（在結果開頭揭露），模型與服務商不變。
+// Worker 對上游的請求在 100 秒內沒收到回應標頭就得到 Cloudflare 的 524。
+// 原因可能是高推理強度（OpenAI），也可能是上游排隊或模型負載（NVIDIA 免費帳號），未經實測不能只歸因於推理；
+// 推理強度不是 low 時只重試一次並降為 low（在結果開頭揭露），失敗訊息附上服務商、模型、推理強度與實際等待秒數供判讀。
 export const UPSTREAM_TIMEOUT_STATUSES = [524];
 export const TIMEOUT_FALLBACK_EFFORT = 'low';
 
@@ -381,7 +381,17 @@ export function planUpstreamRetry({
   return { retry: true, waitMs, extracted };
 }
 
-export function formatUpstreamFailureMessage(provLabel, status, extracted, didRetry) {
+/** 524 診斷尾註：服務商、模型、推理強度與實際等待秒數（未送推理強度時寫「模型預設」）。 */
+export function formatTimeoutDiagnostics(provLabel, diag) {
+  if (!diag) return '';
+  const parts = [provLabel];
+  if (diag.model) parts.push(diag.model);
+  parts.push(`推理強度 ${diag.effort || '模型預設'}`);
+  if (Number.isFinite(diag.waitedMs)) parts.push(`共等待 ${Math.round(diag.waitedMs / 1000)} 秒`);
+  return `（${parts.join(' · ')}）`;
+}
+
+export function formatUpstreamFailureMessage(provLabel, status, extracted, didRetry, diag) {
   const base = extracted.message
     ? `${status} ${extracted.message}`
     : `${provLabel} 回應 HTTP ${status}`;
@@ -398,7 +408,7 @@ export function formatUpstreamFailureMessage(provLabel, status, extracted, didRe
   }
   if (UPSTREAM_TIMEOUT_STATUSES.includes(status)) {
     const tail = didRetry ? `已自動改用推理強度 ${TIMEOUT_FALLBACK_EFFORT} 重試仍逾時` : '上游超過 100 秒未開始回應';
-    return `${base}。${tail}；請在 AI 設定改選較快的模型，或稍後再試。`;
+    return `${base}。${tail}${formatTimeoutDiagnostics(provLabel, diag)}；請在 AI 設定改選較快的模型，或稍後再試。`;
   }
   if (status === 429 && PROVIDERS.nvidia?.free && provLabel === PROVIDERS.nvidia.label) {
     return `${base}。免費帳號速率或額度已達上限，請稍後再試或改用其他服務商。`;
@@ -429,6 +439,7 @@ function abortableDelay(ms, signal) {
 async function fetchUpstreamWithRetry(targetUrl, headers, bodyPayload, signal, provLabel, onEffortFallback) {
   let didRetry = false;
   let timeoutFallbackUsed = false;
+  const startedAt = Date.now();
   for (let attempt = 0; attempt < UPSTREAM_RETRY_MAX_ATTEMPTS; attempt++) {
     const res = await fetch(targetUrl, {
       method: 'POST',
@@ -452,7 +463,11 @@ async function fetchUpstreamWithRetry(targetUrl, headers, bodyPayload, signal, p
       }
       return {
         res: null,
-        error: formatUpstreamFailureMessage(provLabel, res.status, extractUpstreamError(bodyText), didRetry && timeoutFallbackUsed),
+        error: formatUpstreamFailureMessage(provLabel, res.status, extractUpstreamError(bodyText), didRetry && timeoutFallbackUsed, {
+          model: bodyPayload.model,
+          effort: bodyPayload.reasoning_effort,
+          waitedMs: Date.now() - startedAt,
+        }),
         didRetry,
       };
     }
