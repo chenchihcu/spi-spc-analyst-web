@@ -25,7 +25,7 @@ async function cloudPage() {
     Object.assign(w, { Response, DecompressionStream });
     withIdb(w);
     installBrowserCloud(w, cloud);
-    w.SPI_TEST_HOOK = {};
+    w.SPI_TEST_HOOK = { bootSample: true };
     w.addEventListener("error", (e) => errs.push(e.message));
   } });
   await dom.window.SPI_TEST_HOOK.RecDB.ready;

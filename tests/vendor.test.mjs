@@ -26,7 +26,7 @@ function page(cloud) {
     withIdb(w);
     if (cloud) installBrowserCloud(w, cloud);
     w.confirm = () => true;
-    w.SPI_TEST_HOOK = {};
+    w.SPI_TEST_HOOK = { bootSample: true };
   } });
   return { dom, errs };
 }

@@ -155,7 +155,7 @@ test('8. Duo 雙欄 Panel 顯示調度邏輯與切換', { skip: !JSDOM && '未�
     runScripts: 'dangerously',
     url: 'https://example.test/',
     beforeParse(w) {
-      w.SPI_TEST_HOOK = {};
+      w.SPI_TEST_HOOK = { bootSample: true };
       w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === 'measureText' ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
       w.HTMLCanvasElement.prototype.toDataURL = () => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
       w.matchMedia = (query) => ({ matches: false, addEventListener() {} });
@@ -208,7 +208,7 @@ test('9. PR 3 主從事件匯流排 spc:duo-pad-select 與跨欄聯動', { skip:
     runScripts: 'dangerously',
     url: 'https://example.test/',
     beforeParse(w) {
-      w.SPI_TEST_HOOK = {};
+      w.SPI_TEST_HOOK = { bootSample: true };
       w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === 'measureText' ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
       w.HTMLCanvasElement.prototype.toDataURL = () => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
       w.matchMedia = (query) => ({ matches: false, addEventListener() {} });
@@ -245,7 +245,7 @@ test('10. PR 3 WebGL 資源防護與 Web-Perf 記憶體凍結守衛', { skip: !J
     runScripts: 'dangerously',
     url: 'https://example.test/',
     beforeParse(w) {
-      w.SPI_TEST_HOOK = {};
+      w.SPI_TEST_HOOK = { bootSample: true };
       w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === 'measureText' ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
       w.HTMLCanvasElement.prototype.toDataURL = () => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
       w.matchMedia = (query) => ({ matches: false, addEventListener() {} });
@@ -281,7 +281,7 @@ test('11. PR 4 Tabletop 筆電懸停姿態 (DUO-GAP-08)', { skip: !JSDOM && '未
     runScripts: 'dangerously',
     url: 'https://example.test/',
     beforeParse(w) {
-      w.SPI_TEST_HOOK = {};
+      w.SPI_TEST_HOOK = { bootSample: true };
       w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === 'measureText' ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
       w.HTMLCanvasElement.prototype.toDataURL = () => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
       w.matchMedia = () => ({ matches: false, addEventListener() {} });
@@ -317,7 +317,7 @@ test('12. PR 4 雙頁對開書本報表排版 (Two-Page Spread, DUO-GAP-09)', { 
     runScripts: 'dangerously',
     url: 'https://example.test/',
     beforeParse(w) {
-      w.SPI_TEST_HOOK = {};
+      w.SPI_TEST_HOOK = { bootSample: true };
       w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === 'measureText' ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
       w.HTMLCanvasElement.prototype.toDataURL = () => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
       w.matchMedia = () => ({ matches: false, addEventListener() {} });
@@ -361,7 +361,7 @@ test('14. 一般手機高度不自動進入 Duo；硬體分割可進入並可退
       runScripts: 'dangerously',
       url: 'https://example.test/',
       beforeParse(w) {
-        w.SPI_TEST_HOOK = {};
+        w.SPI_TEST_HOOK = { bootSample: true };
         Object.defineProperty(w, 'innerWidth', { value: width, configurable: true });
         Object.defineProperty(w, 'innerHeight', { value: height, configurable: true });
         w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === 'measureText' ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });

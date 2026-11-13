@@ -366,6 +366,7 @@ button:disabled{opacity:.5;cursor:default}
 .card h3 small{font-weight:400;font-size:var(--fs-caption);color:var(--muted)}
 .chartbox{position:relative;height:280px}
 .chartbox.tall{height:340px}.chartbox.short{height:200px}
+.chartbox>canvas{max-width:100%} /* 尚未繪製的圖表保持預設 300px 寬，320px 螢幕會撐出橫向捲動 */
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:2px}
 .kpi .k{font-size:var(--fs-caption);color:var(--muted);letter-spacing:.06em}
@@ -999,7 +1000,7 @@ button.load-state{border:none;font:inherit;cursor:default}
     <svg class="mitcorp-logo" viewBox="0 0 248 45" width="143" height="26" fill="currentColor" fill-rule="evenodd" role="img" aria-label="Mitcorp"><path d="M13.8,-0.0L28.5,-0.1L29.2,0.0L30.6,1.0L31.5,2.9L34.7,29.0L35.0,29.8L36.2,30.2L37.5,29.8L38.3,28.2L46.9,3.5L48.0,1.5L48.8,0.8L50.5,-0.1L66.3,0.0L67.6,1.0L68.4,3.2L68.4,30.8L68.3,32.2L67.7,33.8L66.0,34.8L62.8,35.0L59.2,34.8L57.7,33.8L57.3,31.5L57.3,5.8L56.7,4.5L55.2,4.0L53.0,4.7L52.0,6.5L43.5,31.5L42.2,33.3L41.2,34.1L38.2,34.8L28.8,34.8L26.0,34.0L24.6,32.5L24.0,29.8L20.9,5.8L20.2,4.5L18.5,4.0L17.0,4.5L16.5,5.2L12.3,26.8L11.3,30.0L10.5,31.5L8.4,33.8L6.3,35.0L2.2,35.7L1.2,35.7L0.0,35.0L0.0,30.2L1.2,29.6L4.5,28.9L5.4,28.0L6.2,26.2L10.7,3.0L11.9,1.0L13.8,-0.0ZM73.2,-0.0L83.8,0.0L84.6,1.3L84.5,4.2L83.8,5.4L82.8,5.7L75.5,5.8L73.2,5.5L72.7,4.8L72.5,2.8L72.6,1.0L73.2,-0.0ZM90.0,1.7L95.5,1.6L97.2,2.1L97.8,2.8L98.2,4.0L98.3,8.5L98.6,9.2L99.3,9.7L109.8,9.8L110.9,10.2L111.4,12.0L110.9,13.2L110.2,13.6L99.8,13.7L98.8,14.1L98.2,15.5L98.3,27.0L99.0,29.8L100.5,30.9L104.2,31.1L112.5,30.9L113.1,31.5L113.2,33.0L113.0,33.8L112.2,34.6L110.5,35.0L104.5,35.3L95.8,35.1L92.0,33.9L89.9,32.2L88.9,30.5L88.4,27.5L88.4,5.5L88.6,3.0L89.2,2.1L90.0,1.7ZM130.5,9.2L135.5,9.3L144.3,10.0L145.5,10.4L146.1,11.0L146.2,13.2L145.7,14.0L145.0,14.3L140.3,13.8L133.0,13.6L129.5,13.9L127.0,14.9L125.1,17.0L124.3,20.0L124.3,24.0L125.1,27.8L127.0,29.8L130.0,30.9L137.5,31.1L145.2,30.4L146.0,31.0L146.3,32.0L146.2,33.5L145.5,34.3L142.5,35.0L135.2,35.4L129.5,35.4L124.0,34.9L120.5,33.9L118.2,32.8L116.1,30.8L115.1,29.2L114.0,25.5L113.9,20.0L115.0,15.8L116.1,14.0L118.2,12.0L120.5,10.8L124.2,9.8L130.5,9.2ZM161.8,9.5L168.5,9.3L174.8,9.9L178.2,10.8L180.2,11.8L182.8,14.0L183.9,15.8L184.7,18.8L184.9,24.5L184.7,26.2L183.8,29.2L181.8,32.0L178.8,33.9L175.5,34.9L166.0,35.7L156.8,34.8L153.8,33.8L152.0,32.9L150.4,31.5L149.2,30.0L148.3,28.0L147.9,25.5L148.0,18.2L149.1,15.0L151.0,12.8L154.0,11.0L158.0,9.8L161.8,9.5ZM203.0,9.5L209.8,9.4L210.7,10.5L210.8,11.8L210.5,12.8L209.5,13.6L201.8,13.9L200.2,14.2L199.2,14.8L198.7,16.0L198.7,31.0L198.3,33.5L197.5,34.5L196.2,34.9L190.5,34.8L189.1,33.8L188.8,32.0L188.7,15.2L189.2,12.5L190.0,11.7L191.9,10.8L197.2,9.8L203.0,9.5ZM224.0,9.5L230.5,9.3L237.9,9.8L242.2,10.9L244.2,12.0L246.2,14.0L247.0,15.2L247.8,17.3L247.8,27.8L246.9,30.0L245.9,31.5L244.8,32.6L242.8,33.8L240.0,34.8L232.2,35.5L223.2,35.4L222.6,36.0L222.4,36.8L222.2,43.5L221.3,44.8L213.5,44.8L212.6,43.5L212.4,41.8L212.6,13.0L213.2,11.7L214.6,10.8L218.5,9.9L224.0,9.5ZM75.5,9.9L79.0,9.8L81.5,10.0L82.8,10.8L83.4,12.0L83.5,32.2L83.0,33.8L81.5,34.8L75.5,34.8L74.1,34.0L73.7,33.2L73.6,12.0L74.0,10.8L75.5,9.9ZM163.2,13.0L160.8,14.0L159.4,15.2L158.3,18.8L158.1,22.5L158.3,26.5L159.2,29.2L160.5,30.8L162.8,31.8L166.0,32.1L169.8,31.8L172.0,30.8L173.0,29.8L173.9,28.2L174.4,25.0L174.4,21.8L173.9,16.5L173.0,15.0L171.9,14.0L168.5,12.9L163.2,13.0ZM226.0,13.0L223.5,13.5L222.7,14.0L222.4,14.5L222.5,30.5L224.0,31.6L227.5,31.9L232.5,31.9L235.0,31.0L236.0,30.1L237.0,28.7L237.7,25.5L237.8,20.8L237.0,16.2L235.3,14.0L233.0,13.1L230.2,12.8L226.0,13.0Z"/></svg>
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.26.0</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.27.0</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <div class="db-capsule-group" role="group" aria-label="記錄庫與匯出">
@@ -1605,7 +1606,7 @@ button.load-state{border:none;font:inherit;cursor:default}
     <div class="card"><h3>試產回合管理 <small id="runSaveNote"></small></h3>
       <div id="runLegacy" role="status" hidden></div>
       <div class="tbl"><table id="runTbl"></table></div>
-      <details class="how demo-tools" style="margin-top:8px"><summary>範例資料</summary><div class="row" style="margin-top:8px"><button id="btnAddB">新增範例：改版 B 回合</button><button id="btnSample">還原範例並清除已保存的回合</button></div></details></div>
+      <details class="how demo-tools" style="margin-top:8px"><summary>範例資料</summary><div class="row" style="margin-top:8px"><button id="btnAddB">新增範例：改版 B 回合</button><button id="btnSample">載入範例資料</button></div></details></div>
   </div>
   </section>
 
@@ -6368,7 +6369,8 @@ function syncControls(){
 $("#railSpecBtn").onclick=()=>{setTab("data");setSub("specs","spec");const el=$("#inStencil2");if(el)el.focus({preventScroll:true})};
 /* ---------- 階梯鋼板區域 ---------- */
 const ZCOL=["#3D6E8F","#B5652B","#7A5BA6","#2C7A4C","#B5487A","#8A7A2C"];
-function persist(){saveRunsSoon();try{localStorage.setItem("spi-stencil",JSON.stringify({t:S.stencil,lo:S.htol.lo,hi:S.htol.hi,step:S.step,aperture:S.aperture,geometryPads:S.geometryPads}))}catch(e){}}
+/* 鋼板與規格設定只留在這次開啟的頁面，不寫入瀏覽器（每次開啟都從預設開始） */
+function persist(){saveRunsSoon()}
 /* ---------- 開孔設定 ---------- */
 function renderAperture(){const groups=[...new Set(S.rows.map(r=>r.group))],b0=S.rows[0]&&S.rows[0].board,hasCsv=S.rows.some(r=>r.apL!=null);
   $("#apTbl").innerHTML=`<thead><tr><th>元件群組</th><th class="num">焊墊尺寸 mm</th><th>開孔形狀</th><th>線性縮減 %</th><th>指定 L × W mm</th><th class="num">實際開孔 mm</th><th class="num">鋼板 µm</th><th class="num">面積比 AR</th><th class="num">寬厚比</th><th class="num">AR≥0.66 最大厚度</th><th>判讀</th></tr></thead><tbody>`+groups.map(g=>{
@@ -6513,14 +6515,11 @@ function detectSync(sig){S.F=perfSpan("detect(同步)",()=>detectIssues(S));S.F.
 function busy(on,msg){const b=$("#busy");if(!b)return;if(on){$("#busyMsg").textContent=msg||"計算中…";b.hidden=false}else b.hidden=true}
 /* 先顯示「處理中」再做耗時的同步工作，讓提示有機會畫出來 */
 function runBusy(msg,fn){busy(true,msg);return new Promise(ok=>setTimeout(()=>{try{fn()}finally{if(!S.F||!S.F.pending)busy(false);ok()}},30))}
-/* 偵測結果持久快取（IndexedDB「spi-spc-cache」，與回合資料庫分開）：同一份資料與設定重新開啟時直接取用。
+/* 偵測結果快取：只存在這次開啟的頁面記憶體，不寫入瀏覽器（重新整理即清空）。同一份資料與設定再次切回時直接取用。
    key＝程式版本與核心程式指紋＋資料指紋（每列全部欄位，不含衍生的 hpct）＋偵測設定（不含回合編號）；最多保留 10 筆；任何失敗都改回即時計算 */
-const DetCache={max:10,
-  open(){return this.db||(this.db=new Promise((ok,no)=>{if(OFFLINE)return no(new Error("offline"));if(!window.indexedDB)return no(new Error("no-idb"));const q=indexedDB.open("spi-spc-cache",1);q.onupgradeneeded=()=>q.result.createObjectStore("det");q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)}))},
-  async get(k){const db=await this.open();return new Promise((ok,no)=>{const q=db.transaction("det").objectStore("det").get(k);q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)})},
-  async put(k,v){const db=await this.open();return new Promise((ok,no)=>{const t=db.transaction("det","readwrite"),os=t.objectStore("det");os.put({...v,at:Date.now()},k);
-    const ks=os.getAllKeys(),at=os.getAll();at.onsuccess=()=>{const all=at.result;if(all.length>this.max)all.map((x,i)=>[x.at,ks.result[i]]).sort((a,b)=>a[0]-b[0]).slice(0,all.length-this.max).forEach(([,kk])=>os.delete(kk))};
-    t.oncomplete=()=>ok();t.onerror=()=>no(t.error)})}};
+const DetCache={max:10,mem:new Map(),
+  async get(k){const v=this.mem.get(k);return v?structuredClone(v):v}, /* 回傳副本：與舊版 IndexedDB 讀出相同，不讓畫面修改到快取 */
+  async put(k,v){this.mem.delete(k);this.mem.set(k,{...v,at:Date.now()});while(this.mem.size>this.max)this.mem.delete(this.mem.keys().next().value)}};
 let CORE_FP=null;
 /* 快取 key：資料指紋由背景執行緒算好傳回（rowsFingerprint，不佔主執行緒）；設定不含回合編號，同一份資料換回合也能命中 */
 function detCacheKey(fp){if(CORE_FP===null){let h=2166136261;const t=document.getElementById("core").textContent;for(let i=0;i<t.length;i++)h=Math.imul(h^t.charCodeAt(i),16777619);CORE_FP=(h>>>0).toString(36)}
@@ -6534,7 +6533,7 @@ function applyF(F,meta,rowsRef){if(!specReady(S))return;S.F=F;S.F.meta=meta;S.F.
 function startWorkerDetect(w,sig){const seq=++detSeq,rowsRef=S.rows,gen=genOf(rowsRef),t0=performance.now();F_SIG=sig;
   S.F=[];S.F.rowsRef=rowsRef;S.F.pending=true;S.F.stage=null;const msg0=`正在偵測問題（${S.rows.length.toLocaleString()} 筆，背景計算）`;busy(true,msg0+"…");
   const done=()=>{busy(false);if(F_TABS.has(S.tab))renderTab();schedulePrecompute()};
-  let key=null;const useCache=!!window.indexedDB;
+  let key=null;const useCache=!OFFLINE;
   /* 快取命中就直接採用，並停掉正在跑的背景計算（之後再重建） */
   const tryCache=fp=>{try{key=detCacheKey(fp)}catch(e){return}
     DetCache.get(key).then(hit=>{if(!hit||!hit.F||seq!==detSeq||S.rows!==rowsRef||!S.F.pending)return;
@@ -7028,11 +7027,11 @@ function renderIssues(){const F0=S.F||[],sc=issueScope(),F=sc?F0.filter(x=>sc.ow
   const filterEl=$("#issFilter");
   if(!S.rows||!S.rows.length){
     $("#issHead").textContent="尚未匯入量測資料";
-    $("#issSub").textContent="請至「資料與規格」匯入 SPI 數據檔案，或點選頂部「載入範例資料」開始分析。";
+    $("#issSub").textContent="請至「資料與規格」匯入 SPI 量測檔，或從資料庫開啟量測紀錄。";
     if($("#pmapSub"))$("#pmapSub").textContent="";
     $("#pmap").innerHTML='<p class="note" style="padding:16px 0">尚無焊墊分佈數據</p>';
     filterEl.innerHTML="";filterEl.hidden=true;
-    $("#issList").innerHTML='<div class="note" style="text-align:center;padding:32px 16px"><p style="font-size:var(--fs-heading);margin-bottom:8px">尚無問題偵測結果</p><p>匯入資料後，系統將自動依十個面向進行統計檢定並列出異常問題。</p></div>';
+    $("#issList").innerHTML='<div class="note" style="text-align:center;padding:32px 16px"><p style="font-size:var(--fs-heading);margin-bottom:8px">尚無問題偵測結果</p><p>匯入資料後，系統將自動依十個面向進行統計檢定並列出異常問題。</p><div class="row" style="justify-content:center;margin-top:12px"><button type="button" class="primary" data-goto-import>前往匯入</button><button type="button" data-load-sample>載入範例資料</button></div></div>';
     return;
   }
   if(F.pending){$("#issHead").textContent=`正在偵測問題（${S.rows.length.toLocaleString()} 筆）…`;$("#issSub").textContent="資料量大，於背景計算中，完成後會自動顯示結果。";if($("#pmapSub"))$("#pmapSub").textContent="計算中…";filterEl.hidden=true;$("#pmap").innerHTML="";$("#issList").innerHTML='<p class="note">計算中…</p>';return}
@@ -7145,6 +7144,13 @@ function renderFM(){const Me=S.F&&S.F.meta,box=$("#fmCard");if(!box)return;box.h
 // issuesMd and fmMd defined in Block 1
 
 function renderStats(){
+  if(!(S.rows&&S.rows.length)){
+    if($("#statsSub"))$("#statsSub").textContent="";
+    if($("#statsTbl"))$("#statsTbl").innerHTML='<tbody><tr><td style="text-align:center;padding:24px;color:var(--muted)">尚未載入量測資料</td></tr></tbody>';
+    if($("#matrixSub"))$("#matrixSub").textContent="";
+    if($("#matrixTbl"))$("#matrixTbl").innerHTML='<tbody><tr><td style="text-align:center;padding:24px;color:var(--muted)">尚未載入量測資料</td></tr></tbody>';
+    return;
+  }
   const data=buildStatsData(S);
   if($("#statsSub"))$("#statsSub").textContent=`共 ${data.length} 個異常點`;
   if($("#statsTbl")){
@@ -7185,7 +7191,8 @@ function renderStats(){
 const nextFrame=f=>window.requestAnimationFrame?requestAnimationFrame(f):setTimeout(f,16);
 /* 分析鎖定：回合尚未套用使用者定義的料號規格（範例資料除外）時，只開放「資料與規格」與「我的分享」 */
 const GATE_OPEN=["data","shares"];
-const gateOn=t=>!specReady(S)&&!GATE_OPEN.includes(t);
+/* 沒有任何資料時不鎖定：各頁顯示自己的空白狀態（「尚未載入分析資料」），而不是「尚未套用料號規格」 */
+const gateOn=t=>!!(S.rows&&S.rows.length)&&!specReady(S)&&!GATE_OPEN.includes(t);
 function showPanels(t){const lock=gateOn(t);if(lock){$$(".panel").forEach(p=>p.hidden=p.id!=="p-gate");renderGate();return lock}if(S.duo&&S.duo.active){if(t==="report"||S.duo.leftTab==="report"){$$(".panel").forEach(p=>{const isRep=(p.id==="p-report");p.hidden=!isRep;p.classList.toggle("duo-pane-full",isRep);p.classList.remove("duo-pane-left","duo-pane-right")});return false}const lt=duoPanelId(S.duo.leftTab||t),rt=duoPanelId(S.duo.rightTab||"sim3d"),leftId="p-"+lt,rightId=rt===lt?"p-sim3d":"p-"+rt;$$(".panel").forEach(p=>{const isL=(p.id===leftId),isR=(p.id===rightId);p.hidden=!isL&&!isR;p.classList.toggle("duo-pane-left",isL);p.classList.toggle("duo-pane-right",isR);p.classList.remove("duo-pane-full")});return false}$$(".panel").forEach(p=>{p.hidden=p.id!==("p-"+t);p.classList.remove("duo-pane-left","duo-pane-right","duo-pane-full")});return false}
 function renderGate(){const part=runPart();$("#gateMsg").textContent=part
   ?`此回合（料號 ${part}）尚未套用你定義的料號規格。好壞判定、製程能力與所有分析都依你定義並存檔的規格計算；請先到「資料與規格 → 規格設定」確認規格並按「儲存為新版本」。`
@@ -7359,10 +7366,10 @@ function capCls(v){return!isFinite(v)?"":v>=1.33?"ok":v>=1?"warn":"ng"}
 function renderOverview(){
   if(!hasData()){
     $("#verdict").className="verdict na";$("#vTitle").textContent="尚未載入分析資料";
-    $("#vText").textContent="請至「資料與規格」匯入 SPI 數據檔案，或點選頂部「載入範例資料」開始分析。";
+    $("#vText").textContent="請至「資料與規格」匯入 SPI 量測檔，或從資料庫開啟量測紀錄。";
     $("#kpis").innerHTML='<p class="note" style="grid-column:1/-1;padding:12px 0">尚無分析數據</p>';
     $("#ovChartSub").textContent="—";
-    $("#acts").innerHTML='<li style="grid-column:1/-1"><div class="note">匯入資料後將自動產生處置建議。</div></li>';
+    $("#acts").innerHTML='<li style="grid-column:1/-1"><div class="note">匯入資料後將自動產生處置建議。</div><div class="row" style="justify-content:center;margin-top:12px"><button type="button" class="primary" data-goto-import>前往匯入</button><button type="button" data-load-sample>載入範例資料</button></div></li>';
     return;
   }
   const A=S.A,u=METRICS[A.m].unit,xv=A.xv,ov=overallVerdict(S,scopedFindings());
@@ -7998,6 +8005,12 @@ function renderMorphologyUI(){
   if (!kpisEl || !tblEl) return;
 
   const hasMorph = bmRows.length > 0 || pkRows.length > 0 || cpRows.length > 0 || cvRows.length > 0;
+  if (!(S.rows && S.rows.length)) {
+    if (subEl) subEl.textContent = "";
+    kpisEl.innerHTML = `<span class="note">尚未載入量測資料</span>`;
+    tblEl.innerHTML = "";
+    return;
+  }
   if (!hasMorph) {
     if (subEl) subEl.textContent = "此資料未包含 3D 形貌特徵欄位（橋接餘裕／脫模拉尖／共面性／覆蓋率）";
     kpisEl.innerHTML = `<span class="note">此匯入檔案未包含 3D 形貌特徵欄位；若 SPI 機台支援輸出焊墊間隙、表面平整度或拉尖高度，可於資料匯入時對應。</span>`;
@@ -8046,7 +8059,7 @@ function renderPauseDecayUI(){
 
   const notApplicable = !pauseRes || pauseRes.applicable === false || (!pauseRes.hasPause && Boolean(pauseRes.reason));
   if (notApplicable) {
-    if (subEl) subEl.textContent = "不適用（缺時間戳記）";
+    if (subEl) subEl.textContent = (S.rows && S.rows.length) ? "不適用（缺時間戳記）" : "";
     msgEl.innerHTML = `<span class="pill na">不適用</span> <span class="note">${esc(pauseRes && pauseRes.reason ? pauseRes.reason : "無足夠時間戳記資料")}</span>`;
     tblEl.innerHTML = "";
     if (tblWrap) tblWrap.hidden = true;
@@ -8089,8 +8102,9 @@ function renderLISAUI(){
   if (!A || !hasValidSpatialXY(A.rows, realXY)) {
     const na = spatialChartUnavailableText();
     const detail = na.long.replace(/^不適用[（(]([^）)]+)[）)]\s*[—-]?\s*/, "$1 — ");
-    if (subEl) subEl.textContent = na.short;
-    msgEl.innerHTML = `<span class="pill na">不適用</span> <span class="note">${esc(detail)}</span>`;
+    const noRows = !(S.rows && S.rows.length);
+    if (subEl) subEl.textContent = noRows ? "" : na.short;
+    msgEl.innerHTML = noRows ? `<span class="note">尚未載入量測資料</span>` : `<span class="pill na">不適用</span> <span class="note">${esc(detail)}</span>`;
     if (legEl) legEl.hidden = true;
     if (boxEl) boxEl.hidden = true;
     const ctx0 = cv.getContext("2d");
@@ -8546,7 +8560,8 @@ function exportCompareMd(){if(!CMP)return;const{ra,rb,R,FA,FB}=CMP;save("run-com
 
 /* ---------- DFM 建議 ---------- */
 let DFM=null;
-function renderDfm(){const D=dfmTable(S);DFM=D;const r=curRun();
+function renderDfm(){if(!(S.rows&&S.rows.length)){DFM=[];$("#dfmSub").textContent="";$("#dfmTbl").innerHTML='<tbody><tr><td style="text-align:center;padding:24px;color:var(--muted)">尚未載入量測資料</td></tr></tbody>';return}
+  const D=dfmTable(S);DFM=D;const r=curRun();
   $("#dfmSub").textContent=`${r?r.name:""} · 鋼板 ${S.stencil} µm${S.step.on?"（階梯）":""} · ${D.filter(x=>x.lvl==="高").length} 個高風險群組`;
   $("#dfmTbl").innerHTML=`<thead><tr><th class="num">#</th><th>元件群組</th><th class="num">開孔 mm</th><th class="num">鋼板 µm</th><th class="num">AR</th><th class="num">寬厚比</th><th class="num">轉移效率</th><th class="num">CV</th><th class="num">穩健 Cpk</th><th class="num">不良 PPM</th><th class="num">風險</th><th>建議動作（原因 → 預期效果）</th></tr></thead><tbody>`+D.map((x,i)=>`<tr>
     <td class="num mono">${i+1}</td><td>${x.g}</td><td class="num mono">${x.ap.shape==="round"?"Ø"+f(x.ap.L,3):f(x.ap.L,3)+"×"+f(x.ap.W,3)}<div class="note">${x.ap.src}</div></td><td class="num mono">${x.thk}</td>
@@ -8604,8 +8619,8 @@ function renderAOI(){const r=curRun(),ms=S.metrics.filter(k=>k!=="offx"&&k!=="of
         y:{beginAtZero:true,suggestedMax:Math.min(100,Math.max(...B.filter(b=>b.n>=20).map(b=>b.ci[1]*100),1)),ticks:{color:css("--muted"),callback:v=>v+"%",font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{color:css("--grid")},title:{display:true,text:"回焊不良率",color:css("--muted"),font:{size:chartCaptionFontPx()}}},
         y2:{position:"right",type:"logarithmic",ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{display:false},title:{display:true,text:"焊墊數（對數）",color:css("--muted"),font:{size:chartCaptionFontPx()}}}}})});
 }
-$("#aoiFile").onchange=e=>{const fl=e.target.files[0];if(!fl)return;fl.text().then(t=>{try{curRun().aoi=parseAOI(t);saveRunsSoon();renderAOI()}catch(er){$("#aoiState").textContent=er.message}})};
-$("#btnAoiSample").onclick=()=>{curRun().aoi=parseAOI(sampleAOI(S));saveRunsSoon();renderAOI()};
+$("#aoiFile").onchange=e=>{const fl=e.target.files[0];if(!fl)return;if(!curRun()){e.target.value="";toast(NO_DATA_MSG);return}fl.text().then(t=>{try{curRun().aoi=parseAOI(t);saveRunsSoon();renderAOI()}catch(er){$("#aoiState").textContent=er.message}})};
+$("#btnAoiSample").onclick=()=>{if(!curRun()){toast(NO_DATA_MSG);return}curRun().aoi=parseAOI(sampleAOI(S));saveRunsSoon();renderAOI()};
 $("#aoiM").onchange=e=>{S.aoiM=e.target.value;renderAOI()};$("#aoiBw").onchange=e=>{const v=+e.target.value;if(v>0){S.aoiBw=v;renderAOI()}};
 
 function renderDOE(){fillSelect($("#doeResp"),Object.entries(RESP).map(([k,v])=>[k,v.label]),S.doeResp||"vol");S.doeResp=$("#doeResp").value;
@@ -8623,7 +8638,7 @@ function renderDOE(){fillSelect($("#doeResp"),Object.entries(RESP).map(([k,v])=>
     options:baseOpts({plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`${RESP[S.doeResp].label} ${f(i.raw,2)}`}}},scales:{x:{ticks:{color:css("--muted"),font:{size:chartCaptionFontPx()}},grid:{display:false}},y:{min:lo-pad,max:hi+pad,ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{color:css("--grid")}}}})}));
 }
 $("#doeResp").onchange=e=>{S.doeResp=e.target.value;renderDOE()};
-$("#btnDoeSample").onclick=()=>{const ex=S.runs.find(r=>r.name.startsWith("DOE"));const id=ex?ex.id:addRun("DOE · 印刷參數 2³ 全因子",sampleData({variant:"DOE"}),["volume","height","area","offx","offy"],snapCfg());switchRun(id);setTab("improve/lab")};
+$("#btnDoeSample").onclick=()=>{const ex=S.runs.find(r=>r.name.startsWith("DOE"));const id=ex?ex.id:addRun("DOE · 印刷參數 2³ 全因子",sampleData({variant:"DOE"}),["volume","height","area","offx","offy"],sampleCfg());if(!ex)S.runs.find(r=>r.id===id).sample=true;switchRun(id);setTab("improve/lab")};
 
 function renderGRR(){const G=S.grr;const ms=G?G.metrics:["volume"];if(!ms.includes(S.grrM))S.grrM=ms[0];fillSelect($("#grrM"),ms.map(k=>[k,METRICS[k].label]),S.grrM);
   if(!G){$("#grrState").textContent="";$("#grrOut").innerHTML='<p class="note">尚未載入重複量測資料。</p>';return}
@@ -9339,7 +9354,13 @@ function loadScript(src){return new Promise((ok,no)=>{const s=document.createEle
 function ensureThree(){if(window.THREE)return Promise.resolve();return threeP||(threeP=loadScript("vendor/three-r128.min.js").catch(()=>loadScript("https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js")).catch(e=>{threeP=null;throw e}))}
 /* 側欄 2D（HUD、不良表、比較圖、剖面）出錯時只標示錯誤，不可擋住 3D 初始化 */
 function safeBoard2D(){try{renderBoard2D();return true}catch(e){console.error("3D 頁側欄更新失敗：",e);const h=$("#hud");if(h)h.insertAdjacentHTML("beforeend",`<br><span style="color:var(--ng)">側欄圖表更新失敗：${esc(e&&e.message||String(e))}</span>`);return false}}
-async function render3D(){safeBoard2D();updateGrid3dWarn(S.rows?pos3D(S.rows):null);if(!window.THREE){$("#hud").textContent="載入 3D 元件中…";try{await ensureThree()}catch(e){}if(S.tab!=="sim3d")return}if(!init3D()){safeBoard2D();return}size3();build3D()}
+/* 沒有資料：清掉舊的 3D 場景與側欄圖，只留提示（不載入 3D 元件） */
+function clear3DEmpty(){updateGrid3dWarn(null);
+  if(typeof T!=="undefined"&&T&&T.ok&&T.root&&T.root.children){while(T.root.children.length){const o=T.root.children.pop();o.geometry&&o.geometry.dispose();if(Array.isArray(o.material))o.material.forEach(m=>m&&m.dispose&&m.dispose());else if(o.material&&o.material.dispose)o.material.dispose()}T.meshes=[];try{draw3()}catch(e){}}
+  clear3DFallback();
+  $$("#p-sim3d canvas").forEach(c=>{const x=c.getContext&&c.getContext("2d");if(x)x.clearRect(0,0,c.width,c.height)});
+  const h=$("#hud");if(h)h.textContent="尚未載入量測資料"}
+async function render3D(){if(!(S.rows&&S.rows.length)){clear3DEmpty();return}safeBoard2D();updateGrid3dWarn(S.rows?pos3D(S.rows):null);if(!window.THREE){$("#hud").textContent="載入 3D 元件中…";try{await ensureThree()}catch(e){}if(S.tab!=="sim3d")return}if(!init3D()){safeBoard2D();return}size3();build3D()}
 $("#selBoard").onchange=e=>{S.board=e.target.value;if(!T.ok){renderBoard2D();return}build3D()};
 $("#btnWorst").onclick=()=>{if(S.A.worst){S.board=S.A.worst.board;$("#selBoard").value=S.board;if(!T.ok){renderBoard2D();return}build3D()}};
 let playT=0;function stopPlay(){clearInterval(playT);playT=0;$("#btnPlay").setAttribute("aria-pressed","false");$("#btnPlay").textContent="逐板播放"}
@@ -9498,41 +9519,30 @@ function switchRun(id){const c=curRun();if(c)c.cfg=snapCfg();const n=S.runs.find
   if(n.sample)S.specSrc="sample";else if(S.specSrc!=="part"||!S.partSpec||!S.partSpec.id){S.specSrc="none";S.partSpec=null;S.specsG=null}
   if(!S.metrics.includes(S.metric))S.metric=S.metrics[0];syncControls();recompute();saveRunsSoon();syncPlaceToCurrentRun({notify:false});updateLoadStates();
 }
-/* ---------- 回合保存（IndexedDB）：資料留在這台電腦的瀏覽器，不上傳 ---------- */
-const RunDB={
-  open(){return new Promise((ok,no)=>{if(OFFLINE)return no(new Error("offline"));if(!window.indexedDB)return no(new Error("no-idb"));const q=indexedDB.open("spi-spc",1);q.onupgradeneeded=()=>q.result.createObjectStore("kv");q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)})},
-  async get(k){const db=await this.open();return new Promise((ok,no)=>{const q=db.transaction("kv").objectStore("kv").get(k);q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)})},
-  async set(k,v){const db=await this.open();return new Promise((ok,no)=>{const t=db.transaction("kv","readwrite");t.objectStore("kv").put(v,k);t.oncomplete=()=>ok();t.onerror=()=>no(t.error)})},
-  async del(k){const db=await this.open();return new Promise((ok,no)=>{const t=db.transaction("kv","readwrite");t.objectStore("kv").delete(k);t.oncomplete=()=>ok();t.onerror=()=>no(t.error)})}};
-let saveT=0,saveGate=false;
-/* 離線版不保存回合：資料只在記憶體，關閉分頁即消失 */
-function saveRunsSoon(){if(OFFLINE){const n=$("#runSaveNote");if(n)n.textContent="離線版不保存回合資料，關閉或重新整理分頁後資料即消失";return}if(!saveGate||!S.runs||!S.runs.length)return;clearTimeout(saveT);saveT=setTimeout(saveRunsNow,500)}
-async function saveRunsNow(){const c=curRun();if(c)c.cfg=snapCfg();let ok=true;
-  try{await RunDB.set("runs",{v:1,savedAt:Date.now(),runId:S.runId,cmpA:S.cmpA,cmpB:S.cmpB,runs:S.runs.map(r=>({id:r.id,name:r.name,rows:r.rows,metrics:r.metrics,cfg:r.cfg,info:r.info,aoi:r.aoi,sample:!!r.sample}))})}
-  catch(e){ok=false}
-  const n=$("#runSaveNote");if(n)n.textContent=ok?`回合資料保存在這台電腦的瀏覽器（${new Date().toLocaleTimeString("zh-TW",{hour12:false})} 已保存），重新整理不會遺失`:"此瀏覽器無法保存回合資料（可能是私密瀏覽模式），重新整理後會還原範例";return ok}
-async function restoreRuns(){if(OFFLINE){saveGate=true;return false}try{const d=await RunDB.get("runs");
-    if(!d||!Array.isArray(d.runs)||!d.runs.length)return false;
-    /* 只有與預設範例完全相同（名稱、設定、AOI 都沒改）時才不還原；改過的範例回合照樣還原 */
-    const sig=r=>JSON.stringify([r.name,r.cfg,r.aoi||null,r.rows.length]);
-    if(d.runs.every(r=>r.sample)&&d.runs.length===S.runs.length&&d.runs.every((r,i)=>sig(r)===sig(S.runs[i])))return false;
-    S.runs=d.runs;S.cmpA=d.cmpA;S.cmpB=d.cmpB;S.runId=null;switchRun(S.runs.some(r=>r.id===d.runId)?d.runId:S.runs[0].id);
-    // Saved runs are snapshots. Resolve their current server lifecycle before
-    // treating a restored active run as part of the default analysis.
-    try{
-      await RecDB.ready;
-      const current=RecDB.mode==="cloud"?await RecDB.list():[];
-      const byId=new Map(current.filter(r=>r.kind==="spi").map(r=>[r.id,r]));
-      for(const run of S.runs){const src=runSrc(run);if(src)src.lifecycle=byId.get(src.id)?.lifecycle||"unavailable"}
-      if(runSrc(curRun())&&runSrc(curRun()).lifecycle!=="active"){
-        const next=S.runs.find(run=>!runSrc(run)||runSrc(run).lifecycle==="active");
-        if(next)switchRun(next.id);
-      }
-      updateLoadStates();saveGate=true;saveRunsSoon();
-    }catch(e){for(const run of S.runs){const src=runSrc(run);if(src)src.lifecycle="unavailable"}updateLoadStates()}
-    toast(`已還原上次的 ${d.runs.length} 個試產回合（${new Date(d.savedAt).toLocaleString("zh-TW",{hour12:false})} 保存）`);return true}
-  catch(e){return false}finally{saveGate=true}}
+/* ---------- 回合不保存：每次開啟頁面都從空白開始，已載入的資料只在這個分頁 ---------- */
+const RUN_NOTE=OFFLINE?"離線版不保存回合資料，關閉或重新整理分頁後資料即消失":"已載入的資料只在這個分頁，重新整理或重新登入後會清空";
+function saveRunsSoon(){const n=$("#runSaveNote");if(n)n.textContent=RUN_NOTE}
+/* 舊版留在瀏覽器的資料：回合資料庫 spi-spc、問題偵測快取 spi-spc-cache、鋼板設定、座標檔、上次料號。失敗一律略過，因為已不再讀取 */
+function purgeLegacyData(){
+  try{for(const k of["spi-stencil","spi-place","spi-last-part"])localStorage.removeItem(k)}catch(e){}
+  const jobs=[];
+  if(!OFFLINE&&typeof window!=="undefined"&&window.indexedDB){
+    for(const name of["spi-spc","spi-spc-cache"])jobs.push(new Promise(ok=>{try{const q=indexedDB.deleteDatabase(name);q.onsuccess=q.onerror=q.onblocked=()=>ok()}catch(e){ok()}}));
+  }
+  return Promise.all(jobs).then(()=>true);
+}
 function toast(msg,ms=3800){let t=$("#toast");if(!t){t=document.createElement("div");t.id="toast";t.setAttribute("role","status");document.body.appendChild(t)}t.innerHTML=`<span class="toast-msg">${esc(msg)}</span><button type="button" class="toast-close" aria-label="關閉提示">✕</button>`;const btn=t.querySelector(".toast-close");if(btn)btn.onclick=()=>{clearTimeout(t._h);t.classList.remove("on")};t.classList.add("on");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("on"),Math.min(4000,Math.max(1000,ms)))}
+/* 空白狀態：沒有回合、不分析；資料相關設定回到出廠預設（開啟頁面與刪除最後一個回合時） */
+function clearRuns(){S.runs=[];S.runId=null;S.cmpA=null;S.cmpB=null;
+  S.rows=[];S._rawRows=[];S.metrics=[];S.metric="volume";S.heightUnit="um";S.source="";S.A=null;S.F=[];F_SIG=null;S.issEnt=null;S.ctx=null;
+  S.specSrc="none";S.partSpec=null;S.specDraft=null;S.specsG=null;S.specs=clone(DEF_SPECS);S.stencil=120;S.htol={lo:75,hi:125};S.step=DEF_ZONES();S.selZone=1;S.aperture={groups:{}};S.geometryPads=null;S.wipe=5;
+  S.group=ALL_GRP;S.comp=null;S.board=null;S.pad=null;S.sqDir="Y";LOAD_ERROR.spi="";
+  /* 刪除最後一個回合時，已畫好的圖表不可留在空白頁上 */
+  for(const id of Object.keys(charts)){try{charts[id].destroy()}catch(e){}delete charts[id]}
+  $$(".panel canvas").forEach(c=>{if(c.closest("#view3d"))return;const x=c.getContext&&c.getContext("2d");if(x)x.clearRect(0,0,c.width,c.height)});
+  syncControls();recompute();saveRunsSoon();updateLoadStates()}
+/* 範例資料只在使用者按下「載入範例資料」時載入 */
+function loadSample(){initRuns(true);setTab("issues");toast("已載入範例資料")}
 function initRuns(reset){S.runs=[];S.runId=null;
   if(reset){S.specSrc="sample";S.partSpec=null;S.specDraft=null;S.specsG=null;S.specs=clone(DEF_SPECS);S.stencil=120;S.htol={lo:75,hi:125};S.step=DEF_ZONES();S.selZone=1;S.aperture={groups:{}};S.wipe=5;persist()}
   const a=addRun("試產 1 · 鋼板 V1",sampleData(),["volume","height","area","offx","offy"],sampleCfg());S.runs[0].sample=true;
@@ -9542,14 +9552,15 @@ function initRuns(reset){S.runs=[];S.runId=null;
 function renderRuns(){if(!S.runs)return;fillSelect($("#selRun"),S.runs.map(r=>[String(r.id),r.name]),String(S.runId));
   $("#runTbl").innerHTML=`<thead><tr><th>回合名稱</th><th>批號／產品料號</th><th class="num">板</th><th class="num">焊墊</th><th class="num">鋼板 µm</th><th></th></tr></thead><tbody>`+S.runs.map(r=>{const cfg=r.id===S.runId?snapCfg():r.cfg;
     return`<tr${r.id===S.runId?' style="background:var(--accent-soft)"':""}><td><input type="text" id="rn-${r.id}" data-rid="${r.id}" value="${esc(r.name)}" style="min-width:180px" aria-label="回合名稱"></td><td>${runSrc(r)?`<b>${esc(runSrc(r).lot||"未提供")}</b><br><span class="note">${esc(runSrc(r).part)}${runSrc(r).side?" · "+esc(runSrc(r).side):""}</span>${runSrc(r).lifecycle!=="active"?'<br><span class="pill warn">歷史／未驗證</span>':""}`:'<span class="note">'+(r.sample?"範例資料":"未連結資料庫")+"</span>"}</td><td class="num mono">${new Set(r.rows.map(x=>x.board)).size}</td><td class="num mono">${new Set(r.rows.map(x=>x.pad)).size}</td><td class="num mono">${cfg.stencil}${cfg.step&&cfg.step.on?"·階梯":""}${legacyHpct(r)?'<br><span class="pill warn" title="舊版匯入的高度 % 資料，換算厚度未記錄">高度需重新匯入</span>':""}</td>
-    <td style="white-space:nowrap">${r.id===S.runId?'<span class="pill ok">目前</span>':`<button data-use="${r.id}">設為目前</button>`} <button data-delrun="${r.id}" ${S.runs.length<2?"disabled":""}>刪除</button></td></tr>`}).join("")+"</tbody>";
+    <td style="white-space:nowrap">${r.id===S.runId?'<span class="pill ok">目前</span>':`<button data-use="${r.id}">設為目前</button>`} <button data-delrun="${r.id}">刪除</button></td></tr>`}).join("")+"</tbody>";
   $$("#runTbl [data-rid]").forEach(el=>el.onchange=()=>{const r=S.runs.find(x=>x.id===+el.dataset.rid);r.name=safeId(el.value)||r.name;saveRunsSoon();if(r.id===S.runId)S.source=r.name;syncControls();renderTab()});
   $$("#runTbl [data-use]").forEach(b=>b.onclick=()=>switchRun(+b.dataset.use));
   legacyHpctNote($("#runLegacy"),S.runs);probeLegacyHpct();
-  $$("#runTbl [data-delrun]").forEach(b=>b.onclick=()=>{const id=+b.dataset.delrun;if(S.runs.length<2)return;S.runs=S.runs.filter(r=>r.id!==id);saveRunsSoon();if(id===S.runId){S.runId=null;switchRun(S.runs[0].id)}else{syncControls();renderTab()}})}
+  $$("#runTbl [data-delrun]").forEach(b=>b.onclick=()=>{const id=+b.dataset.delrun;S.runs=S.runs.filter(r=>r.id!==id);saveRunsSoon();if(!S.runs.length){clearRuns();renderRuns();return}if(id===S.runId){S.runId=null;switchRun(S.runs[0].id)}else{syncControls();renderTab()}})}
 $("#selRun").onchange=e=>switchRun(+e.target.value);
 $("#btnAddB").onclick=()=>{const cb=sampleCfg();cb.aperture={groups:{"U2 BGA":{red:-8}}};cb.wipe=3;const id=addRun("改版 B 範例 "+(S.runs.length+1),sampleData({variant:"B",seed:20261020+S.runs.length}),["volume","height","area","offx","offy"],cb);S.runs.find(r=>r.id===id).sample=true;S.cmpB=id;switchRun(id)};
-$("#btnSample").onclick=()=>{RunDB.del("runs").catch(()=>{}).finally(()=>{initRuns(true);setTab("issues");toast("已還原範例，並清除這台電腦上保存的回合")})};
+$("#btnSample").onclick=loadSample;
+document.addEventListener("click",e=>{if(!e.target.closest)return;if(e.target.closest("[data-load-sample]")){e.preventDefault();loadSample()}else if(e.target.closest("[data-goto-import]")){e.preventDefault();setTab("data");setSub("import")}});
 /* ---------- 匯入：欄位對應與機台格式設定檔 ---------- */
 let IMP=null;
 function profiles(){try{return JSON.parse(localStorage.getItem("spi-profiles")||"[]")}catch(e){return[]}}
@@ -9712,8 +9723,9 @@ function unpivotWide(tab,o={}){const w=wideCols(tab.head),R={};
     place:P?{matched:matched.size,missing:[...missing].sort(),other:[...other].sort(),pending:!side}:null}}}
 /* 加工廠格式與座標檔設定（記在這台電腦，下次自動帶入） */
 let PLACE=null;
-function placeLoad(){try{const s=JSON.parse(localStorage.getItem("spi-place")||"null");if(s&&s.tab&&s.unit&&s.side){PLACE={recId:s.recId||null,part:s.part||"",rev:s.rev||"",name:s.name,tab:s.tab,side:s.side,unit:s.unit,res:parsePlacement(s.tab,s.unit,s.side)}}}catch(e){PLACE=null}}
-function placeSave(){try{if(PLACE)localStorage.setItem("spi-place",JSON.stringify({recId:PLACE.recId,part:PLACE.part,rev:PLACE.rev,name:PLACE.name,tab:PLACE.tab,unit:PLACE.unit,side:PLACE.side}));else localStorage.removeItem("spi-place")}catch(e){}}
+/* 座標檔不寫入瀏覽器：每次開啟頁面都要重新從資料庫選取 */
+function placeLoad(){PLACE=null}
+function placeSave(){}
 function placeShow(){const st=$("#placeState");$("#placeClear").hidden=!PLACE;if(!PLACE){st.textContent="未套用受控座標檔";return}
   const r=PLACE.res,declared=headerPlaceUnit(PLACE.tab.head),declaredText=declared==="conflict"?"（欄名單位互相衝突）":declared?`（欄名標示 ${declared}）`:"（登錄時選擇）";st.textContent=`料號 ${PLACE.part} 版次 ${PLACE.rev} · ${PLACE.name}：${r.items.length} 個元件（TOP ${r.top}、BOT ${r.bot}），單位 ${r.unit}${declaredText}；無焊墊座標${r.warn?`；⚠️ ${r.warn}`:""}`}
 /* ---------- 舊資料／未綁定回合的受控座標檢視套用 ---------- */
@@ -9949,7 +9961,7 @@ function startImport(text,name,tab0,bytes){IMPORT_FLOW_COMPLETE=false;IMPORT_FLO
 function recFields(){if(!IMP)return;const rec=IMP.rec,demo=IMP.demo;$("#recRow").hidden=!!demo;["inLot","inPart","inRev","inWorkOrder","inMeasuredDate","inSupplierWo","inOutsourceWo"].forEach(id=>{const el=$("#"+id);if(el)el.readOnly=!!rec});
   if(rec){$("#inLot").value=rec.lot||"";$("#inPart").value=rec.part;$("#inRev").value=rec.rev||"";$("#inWorkOrder").value=rec.work_order||rec.workOrder||"";$("#inMeasuredDate").value=rec.measured_date||rec.measuredDate||"";if($("#inSupplierWo"))$("#inSupplierWo").value=rec.supplierWo||"";if($("#inOutsourceWo"))$("#inOutsourceWo").value=rec.outsourceWo||""}
   else if(IMP.reimportOf){const o=IMP.reimportOf;$("#inLot").value=o.lot||"";$("#inPart").value=o.part||"";$("#inRev").value="";$("#inWorkOrder").value="";$("#inMeasuredDate").value="";if($("#inSupplierWo"))$("#inSupplierWo").value=o.supplierWo||"";if($("#inOutsourceWo"))$("#inOutsourceWo").value=o.outsourceWo||""}
-  else{$("#inLot").value="";$("#inRev").value=PLACE?.rev||"";$("#inWorkOrder").value="";$("#inMeasuredDate").value="";if($("#inSupplierWo"))$("#inSupplierWo").value="";if($("#inOutsourceWo"))$("#inOutsourceWo").value="";if(!$("#inPart").value){let lp="";try{lp=localStorage.getItem("spi-last-part")||""}catch(e){}$("#inPart").value=(PLACE&&PLACE.part)||lp}}
+  else{$("#inLot").value="";$("#inRev").value=PLACE?.rev||"";$("#inWorkOrder").value="";$("#inMeasuredDate").value="";if($("#inSupplierWo"))$("#inSupplierWo").value="";if($("#inOutsourceWo"))$("#inOutsourceWo").value="";if(!$("#inPart").value){$("#inPart").value=(PLACE&&PLACE.part)||""}}
   const thkSrc=rec||IMP.reimportOf;$("#inImpStencil").removeAttribute("aria-invalid");$("#inImpStencil").value=thkSrc&&thkOk(+thkSrc.stencil)?thkSrc.stencil:"";if(!demo)prefillImpThk();
   recPartNote()}
 /* 料號已有預設規格時，以規格存檔時的鋼板厚度預填（仍可修改；不覆蓋使用者已填的值） */
@@ -10151,12 +10163,12 @@ $("#btnApply").onclick=async()=>{if(!IMP||!IMP.res)return;const I0=IMP,demo=!!I0
       busy(false);if(IMP!==I0)return;
       if(src.lifecycle==="pending_review"){$("#recNote").textContent="量測檔已保存為待管理者判定；尚未套用正式分析";toast("已保存待管理者判定的量測紀錄");await renderRecords(true);return}
       if(I0.reimportOf&&src.sourceLegacyId===I0.reimportOf.id)toast("已建立受控紀錄，可在資料庫按「驗證」查看對應證明")}
-    try{localStorage.setItem("spi-last-part",part)}catch(e){}}
+    }
   const cfg=demo?sampleCfg():newRunCfg(thk,ps),locked=cfg.specSrc==="none",partNo=src?src.part:"";
   const{rows,metrics}=IMP.res,info={...IMP.res.info,heightUnit:IMP.conv&&IMP.conv.hPct?"um":IMP.res.info.heightUnit,src:src?(src.store==="offline"?src:srcInfo(src)):null,...(IMP.conv&&IMP.conv.hPct?{hPctThk:IMP.conv.thk}:{})},mode=(document.querySelector("input[name=impMode]:checked")||{}).value,name=safeId($("#inRunName").value)||safeId(IMP.name);
   IMPORT_FLOW_RESULT=demo?"範例資料已載入並開始分析。":OFFLINE?(locked?"資料已載入記憶體（未存檔）；請設定規格後開始分析。":"資料已載入記憶體（未存檔）並開始分析。"):locked?"資料已保存；請完成規格設定後開始分析。":"資料已保存並開始分析。";
   runBusy(`正在分析 ${rows.length.toLocaleString()} 筆資料…`,()=>{
-  holdRender(()=>{if(mode==="replace"){const c=curRun();c.rows=rows;c.metrics=runMetrics(metrics,info.heightUnit);c.name=name;c.info=info;c.aoi=null;c.sample=demo;c.cfg=cfg;S.runId=null;switchRun(c.id)}
+  holdRender(()=>{if(mode==="replace"&&curRun()){const c=curRun();c.rows=rows;c.metrics=runMetrics(metrics,info.heightUnit);c.name=name;c.info=info;c.aoi=null;c.sample=demo;c.cfg=cfg;S.runId=null;switchRun(c.id)}
     else{const id=addRun(name,rows,metrics,cfg,info);if(demo)S.runs.find(r=>r.id===id).sample=true;switchRun(id)}});
   $("#mapBox").hidden=true;IMP=null;IMPORT_FLOW_COMPLETE=true;IMPORT_FLOW_PHASE="";updateImportWorkflow();
   if(locked){setTab("data");setSub("specs","spec");gotoSpecCard();toast(`料號 ${partNo} 尚無料號規格：請確認規格表後按「儲存為新版本」，分析才會開始`)}
@@ -10342,7 +10354,10 @@ ${(dfmData||[]).map(d=>`| ${d.group} | ${d.padDim} | ${d.apDim} | ${d.thk} | ${f
 function browserDownload(filename,data){const isXlsx=/\.xlsx$/i.test(filename);const type=isXlsx?"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":(/\.csv$/.test(filename)?"text/csv;charset=utf-8":"text/markdown;charset=utf-8"),url=URL.createObjectURL(new Blob(isXlsx?[data]:["\uFEFF"+data],{type})),a=document.createElement("a");a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 /* 匯出鈕分散在各分頁，#expState 只在資料分頁；結果同時用 toast 顯示，避免在其他分頁按了沒反應 */
 const LIFECYCLE_TEXT={offline:"離線・未存檔",pending_review:"待管理者判定",superseded:"歷史修正前版本",legacy:"舊資料・未受控",unavailable:"狀態無法確認"};
-async function save(filename,data){const st=$("#expState"),src=runSrc(curRun()),say=m=>{st.textContent=m;toast(m)};
+/* 沒有載入任何量測資料時，所有輸出（下載、列印、PDF、分享、AI）一律不產生 */
+const NO_DATA_MSG="目前沒有量測資料，請先匯入或從資料庫開啟量測紀錄";
+function needData(){if(S.rows&&S.rows.length)return true;toast(NO_DATA_MSG);return false}
+async function save(filename,data){if(!needData())return;const st=$("#expState"),src=runSrc(curRun()),say=m=>{if(st)st.textContent=m;toast(m)};
   if(src&&RecDB.mode==="cloud"){
     try{const j=await RecDB.jfetch("/api/records?id="+encodeURIComponent(src.id)+"&meta=1");src.lifecycle=j.record?.lifecycle||"unavailable"}
     catch(e){src.lifecycle="unavailable";say("無法確認來源紀錄目前狀態，已停止匯出："+e.message);updateLoadStates();renderRuns();return}
@@ -10354,7 +10369,7 @@ async function save(filename,data){const st=$("#expState"),src=runSrc(curRun()),
     filename=filename.replace(/(\.[^.]+)$/,`-${lc}$1`);
   }
   try{const d=window.claude&&await window.claude.use("downloads");if(!d){browserDownload(filename,data);say("已下載 "+filename);return}await d.save({filename,data});say("已儲存 "+filename)}catch(e){say(e&&e.code==="declined"?"已取消":"下載失敗："+(e&&e.message||e))}}
-const needSpec=()=>{if(specReady(S)&&S.A)return true;toast("此回合尚未套用料號規格，沒有分析結果可匯出");return false};
+const needSpec=()=>{if(!needData())return false;if(specReady(S)&&S.A)return true;toast("此回合尚未套用料號規格，沒有分析結果可匯出");return false};
 function exportReportMd(){if(needSpec()){const md=reportMd();save("spi-spc-report.md",PLACE?md.replace("已套用座標檔：","已套用元件中心座標檔：").replace(/(焊墊座標狀態：[^\n]+)/, "$1；無焊墊座標"):md)}}
 function exportBoardStatsCsv(){if(!needSpec())return;const src=runSrc(curRun()),swo=src&&src.supplierWo?src.supplierWo:"",owo=src&&src.outsourceWo?src.outsourceWo:"";save("board-stats.csv",toCSV([["board","supplier_wo","outsource_wo","n","mean","sd","min","q1","median","q3","max","defect_pads","defect_rate","spec_source"],...S.A.byBoard.map(b=>[b.board,swo,owo,b.n,f(b.mean,3),f(b.sd,3),b.min,f(b.q1,2),f(b.med,2),f(b.q3,2),b.max,b.defects,f(b.p,4),specSrcText()])]));}
 function exportDefectPadsCsv(){if(!needSpec())return;save("defect-pads.csv",toCSV([["board","pad","component","group","volume","height","area","offset_x","offset_y","defects","spec_source"],...S.A.defRows.map(r=>[r.board,r.pad,r.comp,r.group,r.volume,r.height,r.area,r.offx,r.offy,r.codes.map(c=>DEFECTS[c]).join(" / "),specSrcText()])]));}
@@ -10414,6 +10429,7 @@ function advSummary(A){const W=advAnalyze(S,A);return{EWMA越界:A.ewma.filter(p
   對位異常板:W.align.filter(a=>Math.max(Math.abs(a.tx),Math.abs(a.ty))>25||a.rotEdge>20||a.strEdge>20).map(a=>({板:a.board,平移X:+f(a.tx,1),平移Y:+f(a.ty,1),旋轉度:+f(a.thDeg,3),伸縮ppm:[+f(a.ex*1000,0),+f(a.ey*1000,0)]})),
   刮刀前後:W.stroke&&{差值:+f(W.stroke.ma-W.stroke.mb,2),p:+f(W.stroke.p,4)},擦拭週期:{每幾片:W.wipe.N,每片斜率:+f(W.wipe.slope,3),r:+f(W.wipe.r,2),p:+f(W.wipe.p,4)}}}
 $("#btnAI").onclick=async()=>{const out=$("#aiOut"),st=$("#aiState");
+  if(!(S.rows&&S.rows.length)){st.textContent=NO_DATA_MSG;return}
   let sample=null;try{sample=window.claude&&await window.claude.use("sample")}catch(e){}
   if(!sample)return analyzeViaApi(out,st);
   aiAbort=new AbortController();$("#btnAI").disabled=true;$("#btnAIStop").hidden=false;st.textContent="分析中…";out.innerHTML="";
@@ -11913,6 +11929,7 @@ async function updatePrint3D(){
 }
 
 async function triggerAppPrint(){
+  if(!needData())return;
   busy(true,"準備列印中…");
   try{
     if(S.tab==="sim3d")await updatePrint3D();
@@ -11922,6 +11939,7 @@ async function triggerAppPrint(){
   window.print();
 }
 async function export3dSnapshot(){
+  if(!needData())return;
   busy(true,"產生 3D 快照中…");
   try{
     const res=await capture3DImage();
@@ -12030,7 +12048,7 @@ function renderReport(){
   const p=$("#p-report");if(!p)return;
   const prev=$("#reportPreview");if(!prev)return;
   if(!hasData()){
-    prev.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--muted)"><h3 style="margin-bottom:8px">尚未載入分析資料</h3><p>請先至「資料與規格」匯入 SPI 量測資料，或點選頂部「載入範例資料」以產生完整分析報告。</p></div>';
+    prev.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--muted)"><h3 style="margin-bottom:8px">尚未載入分析資料</h3><p>請先至「資料與規格」匯入 SPI 量測檔，或從資料庫開啟量測紀錄。</p>'+(S.rows&&S.rows.length?"":'<div class="row" style="justify-content:center;margin-top:12px"><button type="button" class="primary" data-goto-import>前往匯入</button><button type="button" data-load-sample>載入範例資料</button></div>')+'</div>';
     return;
   }
   const A=S.A,ov=overallVerdict(S,scopedFindings()),F=scopedFindings();
@@ -12525,6 +12543,7 @@ async function generateReportPdfBlob(opts={}){
 
 if($("#btnRepPdf")){
   $("#btnRepPdf").onclick=async()=>{
+    if(!needData())return;
     busy(true,"產生 PDF 報告中…");
     try{
       const res=await generateReportPdfBlob();
@@ -12643,6 +12662,7 @@ function getMailChapters(){
 let mailBlob=null, mailFile=null, mailIsGenerating=false;
 async function updateMailPdf(){
   if(mailIsGenerating)return;
+  if(!(S.rows&&S.rows.length)){mailBlob=null;mailFile=null;for(const id of["#btnSharePdf","#btnSharePdfWithSummary","#btnMailDlPdf"])if($(id))$(id).disabled=true;const st0=$("#mailStatusText");if(st0)st0.textContent=NO_DATA_MSG;return}
   mailIsGenerating=true;
   if($("#btnSharePdf"))$("#btnSharePdf").disabled=true;
   if($("#btnSharePdfWithSummary"))$("#btnSharePdfWithSummary").disabled=true;
@@ -12758,7 +12778,7 @@ if($("#btnMailCopySummary")){
 }
 if($("#btnSharePdf")){
   $("#btnSharePdf").onclick=()=>{
-    if(!mailFile)return;
+    if(!mailFile||!needData())return;
     const isApple=isAppleDevice();
     const shareData=isApple?{files:[mailFile]}:{
       files:[mailFile],
@@ -12776,7 +12796,7 @@ if($("#btnSharePdf")){
 }
 if($("#btnSharePdfWithSummary")){
   $("#btnSharePdfWithSummary").onclick=()=>{
-    if(!mailFile)return;
+    if(!mailFile||!needData())return;
     const shareData={
       files:[mailFile],
       title:$("#mailSubject")?$("#mailSubject").value:"",
@@ -12793,7 +12813,7 @@ if($("#btnSharePdfWithSummary")){
 }
 if($("#btnMailDlPdf")){
   $("#btnMailDlPdf").onclick=()=>{
-    if(!mailBlob)return;
+    if(!mailBlob||!needData())return;
     const fn=pdfFileName();
     const url=URL.createObjectURL(mailBlob);
     const a=document.createElement("a");
@@ -12846,11 +12866,10 @@ const anonCheck=$("#aiAnon");if(anonCheck)anonCheck.onchange=updateAiPreview;
 window.addEventListener("popstate",e=>{
   const target=e.state?.tab||(location.hash||"").slice(1);if(target)setTab(target,true);
 });
-S.runs=[];S.cmpA=1;S.cmpB=2;S.aoiBw=10;S.grr=null;
-try{const sv=JSON.parse(localStorage.getItem("spi-stencil")||"null");if(sv&&sv.t){S.stencil=sv.t;const lo=sv.lo===undefined?75:sv.lo,hi=sv.hi===undefined?125:sv.hi;S.htol={lo,hi};S.specs.hpct={lsl:lo,usl:hi,tgt:100};S.specs.height=hpctToH(S.specs.hpct,S.stencil);
-  if(sv.step&&Array.isArray(sv.step.zones)){S.step=sv.step;S.selZone=(sv.step.zones[0]||{}).id}if(sv.aperture&&sv.aperture.groups)S.aperture=sv.aperture;if(Array.isArray(sv.geometryPads))S.geometryPads=sv.geometryPads}}catch(e){}
-initRuns(false);
-restoreRuns().then(()=>meP).then(j=>{if((j||HAS_API)&&window.DecompressionStream)return openShareFromUrl()});
+S.runs=[];S.cmpA=null;S.cmpB=null;S.aoiBw=10;S.grr=null;
+/* 開啟頁面一律從空白開始：不自動載入範例、不還原上次的回合。bootSample 只供自動測試沿用範例開局 */
+if(window.SPI_TEST_HOOK&&window.SPI_TEST_HOOK.bootSample===true)initRuns(false);else clearRuns();
+purgeLegacyData().then(()=>meP).then(j=>{if((j||HAS_API)&&window.DecompressionStream)return openShareFromUrl()});
 const PHONE_MQ = "(max-width:600px), (pointer:coarse) and (max-height:500px)";
 const TABLET_MQ = "(max-width:1279.98px), (pointer:coarse)";
 function updateLayout() {
@@ -12870,6 +12889,7 @@ try {
 } catch(e) {}
 function updateRailSummary(){
   const chip=$("#railChipSummary");if(!chip)return;
+  if(!(S.runs&&S.runs.length)){chip.textContent="尚未載入資料 ▾";return}
   const runOpt=$("#selRun");
   const runText=(runOpt&&runOpt.selectedIndex>=0&&runOpt.options[runOpt.selectedIndex])?runOpt.options[runOpt.selectedIndex].text:(S.runs?.find(r=>String(r.id)===String(S.runId))?.name||"範例資料");
   const metricText=(METRICS&&METRICS[S.metric])?(METRICS[S.metric].short||METRICS[S.metric].label):"體積";
@@ -13000,6 +13020,7 @@ let openExportCenterModal = null;
 let closeExportCenterModal = null;
 
 async function exportRepPdfLite() {
+  if(!needData())return;
   if (typeof generateReportPdfBlob !== "function") {
     toast("PDF 報告產生器尚未就緒");
     return;
@@ -13049,6 +13070,7 @@ async function triggerExportByType(type){
 
 async function downloadDeliverablesQueue(types) {
   if (!types || !types.length) return;
+  if (!needData()) return;
   const statusEl = $("#exportQueueStatus");
   let idx = 0;
   for (const t of types) {
@@ -14483,6 +14505,7 @@ function setupExportCenter() {
   const btnStandard = $("#btnDownloadStandardBundle");
   if (btnStandard) {
     btnStandard.onclick = () => {
+      if (!needData()) return;
       toast("開始匯出標準試產交付包（PDF + XLSX + DFM CSV）");
       downloadDeliverablesQueue(["rep-pdf", "iss-xlsx", "dfm-csv"]);
     };
@@ -14497,6 +14520,7 @@ function setupExportCenter() {
         return;
       }
       const types = Array.from(checked).map(c => c.dataset.type).filter(Boolean);
+      if (!needData()) return;
       toast(`開始批次匯出 ${types.length} 項交付物`);
       downloadDeliverablesQueue(types);
     };
@@ -14518,7 +14542,7 @@ function pdfFileName(){
 function specDownloadInfo(rec){const raw=rec&&rec.ver!=null?String(rec.ver).trim():"",hasVersion=!!raw&&!/^(?:undefined|null)$/i.test(raw),version=hasVersion?safeFn(raw):"",filename="料號規格_"+safeFn(rec&&rec.part)+"_"+(hasVersion?"v"+version:"版本未知")+".json";
   return{filename,warning:hasVersion?"":"這筆規格紀錄沒有版本號；匯出檔名已標示「版本未知」"}}
 if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")window.SPI_TEST_HOOK.specDownloadInfo=specDownloadInfo;
-if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{setCompFromShortcut,overallVerdict,renderIssues,sharePack,issueScope,scopedFindings,issueBoardList,compSearch,compCandidates,setComp,syncScopeUI,scopeLabel,scopeParts,buildPrintHeadHtml,getPlace:()=>PLACE,S,RecDB,renderIssues,renderPmap,renderOverview,renderLISAUI,renderRelChartUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,aiFallbackModels,saveAiGoodModel,recompute,switchRun,setTab,setSub,updateSettingsUi,scrollSettingsAnchor,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,pick,drawHeat,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,calcShapeFactor,getSolderGrainTexture,getRealPasteMat,createSolderPasteGeometry,selectPadForProfile,highlightSelectedPad3D,focusPad3D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,getReportChapters,renderMailChapterSummary,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,setupRecPicker,renderRecPicker,openRecord,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus,setupExportCenter,openExportCenterModal,closeExportCenterModal,triggerExportByType,downloadDeliverablesQueue,applyPlacePreviewToRun,clearPlacePreviewFromRun,syncPlaceToCurrentRun,pos3DNote,usePlaceRec,loadStateModel,updateLoadStates});
+if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{setCompFromShortcut,overallVerdict,renderIssues,sharePack,issueScope,scopedFindings,issueBoardList,compSearch,compCandidates,setComp,syncScopeUI,scopeLabel,scopeParts,buildPrintHeadHtml,getPlace:()=>PLACE,setPlace:s=>{PLACE={recId:s.recId||null,part:s.part||"",rev:s.rev||"",name:s.name,tab:s.tab,side:s.side,unit:s.unit,res:parsePlacement(s.tab,s.unit,s.side)};placeShow()},S,RecDB,loadSample,clearRuns,purgeLegacyData,renderIssues,renderPmap,renderOverview,renderLISAUI,renderRelChartUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,aiFallbackModels,saveAiGoodModel,recompute,switchRun,setTab,setSub,updateSettingsUi,scrollSettingsAnchor,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,pick,drawHeat,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,calcShapeFactor,getSolderGrainTexture,getRealPasteMat,createSolderPasteGeometry,selectPadForProfile,highlightSelectedPad3D,focusPad3D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,getReportChapters,renderMailChapterSummary,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,setupRecPicker,renderRecPicker,openRecord,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus,setupExportCenter,openExportCenterModal,closeExportCenterModal,triggerExportByType,downloadDeliverablesQueue,applyPlacePreviewToRun,clearPlacePreviewFromRun,syncPlaceToCurrentRun,pos3DNote,usePlaceRec,loadStateModel,updateLoadStates});
 if($("#geomPadFile"))$("#geomPadFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{const p=parseGeometryPadListCsv(rd.result);if(!p.ok){toast("幾何焊墊清單："+p.error);e.target.value="";return}S.geometryPads=p.pads;persist();updatePadCoverageState();recompute();renderGeomPadStatus();toast(`已匯入 ${p.pads.length} 個幾何焊墊`);e.target.value=""};rd.readAsText(f)});
 if($("#geomPadClear"))$("#geomPadClear").onclick=()=>{S.geometryPads=null;S.padCoverage=null;S.pendingVerify=false;persist();updatePadCoverageState();recompute();renderGeomPadStatus()};
 const initHash=(location.hash||"").slice(1);

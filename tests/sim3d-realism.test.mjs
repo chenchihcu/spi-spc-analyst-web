@@ -26,7 +26,7 @@ function createPage() {
     url: "https://spi.example/",
     beforeParse(w) {
       w.eval(threeCode);
-      w.SPI_TEST_HOOK = {};
+      w.SPI_TEST_HOOK = { bootSample: true };
       w.matchMedia = () => ({ matches: false, addEventListener() {} });
       w.ResizeObserver = class { observe() {} };
       w.scrollTo = () => {};

@@ -131,7 +131,7 @@ async function openPage() {
       w.scrollTo = () => {};
       w.Chart = class { constructor(_c, cfg) { if (!cfg || !cfg.data) throw new Error("圖表設定錯誤"); } destroy() {} static register() {} };
       withIdb(w);
-      w.SPI_TEST_HOOK = {};
+      w.SPI_TEST_HOOK = { bootSample: true };
     },
   });
   const w = dom.window;

@@ -43,7 +43,7 @@ function open() {
         static register() {}
       };
       withIdb(w);
-      w.SPI_TEST_HOOK = {};
+      w.SPI_TEST_HOOK = { bootSample: true };
     },
   });
   return { w: dom.window, errs, charts };

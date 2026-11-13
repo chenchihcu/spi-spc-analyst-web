@@ -134,7 +134,7 @@ test('reportMd 包含一至九完整標準章節，且與 renderReport 標題完
       w.scrollTo = () => {};
       w.Chart = class { constructor() {} destroy() {} static register() {} };
       Object.assign(w, { Response, DecompressionStream, TextDecoder });
-      w.SPI_TEST_HOOK = {};
+      w.SPI_TEST_HOOK = { bootSample: true };
       withIdb(w);
     }
   });

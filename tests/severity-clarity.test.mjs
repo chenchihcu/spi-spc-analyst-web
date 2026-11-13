@@ -24,7 +24,7 @@ function page(cloud) {
     w.addEventListener("error", (e) => errs.push(e.message));
     withIdb(w);
     if (cloud) installBrowserCloud(w, cloud);
-    w.SPI_TEST_HOOK = {};
+    w.SPI_TEST_HOOK = { bootSample: true };
   } });
   return { dom, errs };
 }

@@ -11,7 +11,7 @@ const tick = (ms) => new Promise((r) => setTimeout(r, ms));
 const html = () => fs.readFileSync(HTML, "utf8").replace(/<script src=[^>]+><\/script>/g, "");
 
 function page(url, extra = {}) {
-  return new JSDOM(html(), { runScripts: "dangerously", url, beforeParse(w) {
+  return new JSDOM(html(), { runScripts: "dangerously", url, beforeParse(w) { w.SPI_TEST_HOOK = w.SPI_TEST_HOOK || { bootSample: true };
     w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === "measureText" ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
     Object.defineProperty(w.HTMLElement.prototype, "offsetParent", { get() { let e = this; while (e) { if (e.hidden) return null; e = e.parentElement; } return w.document.body; } });
     w.Element.prototype.scrollIntoView = () => {}; w.matchMedia = () => ({ matches: false, addEventListener() {} }); w.ResizeObserver = class { observe() {} }; w.scrollTo = () => {};

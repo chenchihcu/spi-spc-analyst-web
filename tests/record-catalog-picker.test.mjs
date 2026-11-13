@@ -26,7 +26,7 @@ function page(saved = [], { fetch: fetchStub, cloud } = {}) {
     if (fetchStub) w.fetch = fetchStub;
     withIdb(w);
     if (cloud) installBrowserCloud(w, cloud);
-    w.SPI_TEST_HOOK = {};
+    w.SPI_TEST_HOOK = { bootSample: true };
     w.addEventListener("error", (e) => errs.push(e.message));
   } });
   return { dom, errs };

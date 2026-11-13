@@ -94,7 +94,7 @@ function createPage(url = "https://spi.example/#mail", extra = {}, mockNav = nul
         static register() {}
       };
 
-      w.SPI_TEST_HOOK = {};
+      w.SPI_TEST_HOOK = { bootSample: true };
       Object.assign(w, extra);
     }
   });

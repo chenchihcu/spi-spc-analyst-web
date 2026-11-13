@@ -19,7 +19,7 @@ function open() {
       w.matchMedia = () => ({ matches: false, addEventListener() {} });
       w.ResizeObserver = class { observe() {} }; w.scrollTo = () => {}; w.Element.prototype.scrollIntoView = () => {};
       w.Chart = class { constructor(_c, cfg) { charts.push(cfg); } destroy() {} static register() {} };
-      withIdb(w); w.SPI_TEST_HOOK = {};
+      withIdb(w); w.SPI_TEST_HOOK = { bootSample: true };
     } });
   return { w: dom.window, errs, charts };
 }

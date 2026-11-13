@@ -25,7 +25,7 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
       w.Chart = class { constructor(_c, cfg) { if (!cfg || !cfg.data) throw new Error("圖表設定錯誤"); } destroy() {} static register() {} };
       w.claude = { use: async (n) => (n === "downloads" ? { save: async () => {} } : null) };
       withIdb(w);
-      w.SPI_TEST_HOOK = {};
+      w.SPI_TEST_HOOK = { bootSample: true };
     },
   });
   const w = dom.window, d = w.document, $ = (s) => d.querySelector(s);
@@ -203,7 +203,7 @@ test("匯入資料中的 HTML 不會被執行（XSS）", { skip: !JSDOM && "未�
     w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === "measureText" ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
     Object.defineProperty(w.HTMLElement.prototype, "offsetParent", { get() { let e = this; while (e) { if (e.hidden) return null; e = e.parentElement; } return w.document.body; } });
     w.Element.prototype.scrollIntoView = () => {}; w.matchMedia = () => ({ matches: false, addEventListener() {} }); w.ResizeObserver = class { observe() {} }; w.scrollTo = () => {}; w.scrollBy = () => {};
-    w.Chart = class { constructor() {} destroy() {} static register() {} }; withIdb(w); installBrowserCloud(w, cloud); w.SPI_TEST_HOOK = {}; } });
+    w.Chart = class { constructor() {} destroy() {} static register() {} }; withIdb(w); installBrowserCloud(w, cloud); w.SPI_TEST_HOOK = { bootSample: true }; } });
   const w = dom.window, d = w.document, $ = (s) => d.querySelector(s);
   await new Promise((r) => setTimeout(r, 50));
   const csv = "Board,Pad,Component,Result,Volume,Height(um),Area\n" + Array.from({ length: 60 }, (_, i) => `"B${Math.floor(i / 6) + 1}<img src=x onerror=1>",P${i % 6}<b>x</b>,U1,"NG<img src=y>",${i === 13 ? 40 : 100 + (i % 5)},120,${i === 13 ? 40 : 100}`).join("\n");
