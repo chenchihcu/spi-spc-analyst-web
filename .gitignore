@@ -3,6 +3,7 @@ node_modules/
 .DS_Store
 .netlify/
 dist/
+dist-offline/
 .wrangler/
 .wrangler-dry-run/
 spi-spc-analyst-spec-*.md
