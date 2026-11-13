@@ -8479,7 +8479,7 @@ function renderDOE(){fillSelect($("#doeResp"),Object.entries(RESP).map(([k,v])=>
     options:baseOpts({plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`${RESP[S.doeResp].label} ${f(i.raw,2)}`}}},scales:{x:{ticks:{color:css("--muted"),font:{size:chartCaptionFontPx()}},grid:{display:false}},y:{min:lo-pad,max:hi+pad,ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{color:css("--grid")}}}})}));
 }
 $("#doeResp").onchange=e=>{S.doeResp=e.target.value;renderDOE()};
-$("#btnDoeSample").onclick=()=>{const ex=S.runs.find(r=>r.name.startsWith("DOE"));const id=ex?ex.id:addRun("DOE · 印刷參數 2³ 全因子",sampleData({variant:"DOE"}),["volume","height","area","offx","offy"],snapCfg());switchRun(id);setTab("improve/lab")};
+$("#btnDoeSample").onclick=()=>{const ex=S.runs.find(r=>r.name.startsWith("DOE"));const id=ex?ex.id:addRun("DOE · 印刷參數 2³ 全因子",sampleData({variant:"DOE"}),["volume","height","area","offx","offy"],sampleCfg());if(!ex)S.runs.find(r=>r.id===id).sample=true;switchRun(id);setTab("improve/lab")};
 
 function renderGRR(){const G=S.grr;const ms=G?G.metrics:["volume"];if(!ms.includes(S.grrM))S.grrM=ms[0];fillSelect($("#grrM"),ms.map(k=>[k,METRICS[k].label]),S.grrM);
   if(!G){$("#grrState").textContent="";$("#grrOut").innerHTML='<p class="note">尚未載入重複量測資料。</p>';return}
@@ -9378,6 +9378,9 @@ function clearRuns(){S.runs=[];S.runId=null;S.cmpA=null;S.cmpB=null;
   S.rows=[];S._rawRows=[];S.metrics=[];S.metric="volume";S.heightUnit="um";S.source="";S.A=null;S.F=[];F_SIG=null;S.issEnt=null;S.ctx=null;
   S.specSrc="none";S.partSpec=null;S.specDraft=null;S.specsG=null;S.specs=clone(DEF_SPECS);S.stencil=120;S.htol={lo:75,hi:125};S.step=DEF_ZONES();S.selZone=1;S.aperture={groups:{}};S.geometryPads=null;S.wipe=5;
   S.group=ALL_GRP;S.board=null;S.pad=null;S.sqDir="Y";LOAD_ERROR.spi="";
+  /* 刪除最後一個回合時，已畫好的圖表不可留在空白頁上 */
+  for(const id of Object.keys(charts)){try{charts[id].destroy()}catch(e){}delete charts[id]}
+  $$(".panel canvas").forEach(c=>{if(c.closest("#view3d"))return;const x=c.getContext&&c.getContext("2d");if(x)x.clearRect(0,0,c.width,c.height)});
   syncControls();recompute();saveRunsSoon();updateLoadStates()}
 /* 範例資料只在使用者按下「載入範例資料」時載入 */
 function loadSample(){initRuns(true);setTab("issues");toast("已載入範例資料")}
@@ -10006,7 +10009,7 @@ $("#btnApply").onclick=async()=>{if(!IMP||!IMP.res)return;const I0=IMP,demo=!!I0
   const{rows,metrics}=IMP.res,info={...IMP.res.info,heightUnit:IMP.conv&&IMP.conv.hPct?"um":IMP.res.info.heightUnit,src:src?(src.store==="offline"?src:srcInfo(src)):null,...(IMP.conv&&IMP.conv.hPct?{hPctThk:IMP.conv.thk}:{})},mode=(document.querySelector("input[name=impMode]:checked")||{}).value,name=safeId($("#inRunName").value)||safeId(IMP.name);
   IMPORT_FLOW_RESULT=demo?"範例資料已載入並開始分析。":OFFLINE?(locked?"資料已載入記憶體（未存檔）；請設定規格後開始分析。":"資料已載入記憶體（未存檔）並開始分析。"):locked?"資料已保存；請完成規格設定後開始分析。":"資料已保存並開始分析。";
   runBusy(`正在分析 ${rows.length.toLocaleString()} 筆資料…`,()=>{
-  holdRender(()=>{if(mode==="replace"){const c=curRun();c.rows=rows;c.metrics=runMetrics(metrics,info.heightUnit);c.name=name;c.info=info;c.aoi=null;c.sample=demo;c.cfg=cfg;S.runId=null;switchRun(c.id)}
+  holdRender(()=>{if(mode==="replace"&&curRun()){const c=curRun();c.rows=rows;c.metrics=runMetrics(metrics,info.heightUnit);c.name=name;c.info=info;c.aoi=null;c.sample=demo;c.cfg=cfg;S.runId=null;switchRun(c.id)}
     else{const id=addRun(name,rows,metrics,cfg,info);if(demo)S.runs.find(r=>r.id===id).sample=true;switchRun(id)}});
   $("#mapBox").hidden=true;IMP=null;IMPORT_FLOW_COMPLETE=true;IMPORT_FLOW_PHASE="";updateImportWorkflow();
   if(locked){setTab("data");setSub("specs","spec");gotoSpecCard();toast(`料號 ${partNo} 尚無料號規格：請確認規格表後按「儲存為新版本」，分析才會開始`)}
@@ -12494,7 +12497,7 @@ function getMailChapters(){
 let mailBlob=null, mailFile=null, mailIsGenerating=false;
 async function updateMailPdf(){
   if(mailIsGenerating)return;
-  if(!(S.rows&&S.rows.length)){const st0=$("#mailStatusText");if(st0)st0.textContent=NO_DATA_MSG;return}
+  if(!(S.rows&&S.rows.length)){mailBlob=null;mailFile=null;for(const id of["#btnSharePdf","#btnSharePdfWithSummary","#btnMailDlPdf"])if($(id))$(id).disabled=true;const st0=$("#mailStatusText");if(st0)st0.textContent=NO_DATA_MSG;return}
   mailIsGenerating=true;
   if($("#btnSharePdf"))$("#btnSharePdf").disabled=true;
   if($("#btnSharePdfWithSummary"))$("#btnSharePdfWithSummary").disabled=true;
@@ -12610,7 +12613,7 @@ if($("#btnMailCopySummary")){
 }
 if($("#btnSharePdf")){
   $("#btnSharePdf").onclick=()=>{
-    if(!mailFile)return;
+    if(!mailFile||!needData())return;
     const isApple=isAppleDevice();
     const shareData=isApple?{files:[mailFile]}:{
       files:[mailFile],
@@ -12628,7 +12631,7 @@ if($("#btnSharePdf")){
 }
 if($("#btnSharePdfWithSummary")){
   $("#btnSharePdfWithSummary").onclick=()=>{
-    if(!mailFile)return;
+    if(!mailFile||!needData())return;
     const shareData={
       files:[mailFile],
       title:$("#mailSubject")?$("#mailSubject").value:"",
@@ -12645,7 +12648,7 @@ if($("#btnSharePdfWithSummary")){
 }
 if($("#btnMailDlPdf")){
   $("#btnMailDlPdf").onclick=()=>{
-    if(!mailBlob)return;
+    if(!mailBlob||!needData())return;
     const fn=pdfFileName();
     const url=URL.createObjectURL(mailBlob);
     const a=document.createElement("a");

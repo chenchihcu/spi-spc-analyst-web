@@ -26,17 +26,18 @@ async function idbPut(idb, name, store, key, val) {
   db.close();
 }
 
-function open({ idb = new IDBFactory(), storage = {} } = {}) {
+function open({ idb = new IDBFactory(), storage = {}, offline = false } = {}) {
   const html = fs.readFileSync(HTML, "utf8").replace(/<script src=[^>]+><\/script>/g, "");
-  const errs = [], calls = { print: 0, blob: 0, fetch: [] };
+  const errs = [], calls = { print: 0, blob: 0, fetch: [], charts: [] };
   const vc = new VirtualConsole(); vc.on("jsdomError", (e) => errs.push(e.message));
   const dom = new JSDOM(html, { runScripts: "dangerously", virtualConsole: vc, url: "https://example.test/",
     beforeParse(w) {
       w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === "measureText" ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
       Object.defineProperty(w.HTMLElement.prototype, "offsetParent", { get() { let e = this; while (e) { if (e.hidden) return null; e = e.parentElement; } return w.document.body; } });
       w.matchMedia = () => ({ matches: false, addEventListener() {} });
-      w.ResizeObserver = class { observe() {} }; w.scrollTo = () => {}; w.Element.prototype.scrollIntoView = () => {};
-      w.Chart = class { constructor() {} destroy() {} static register() {} };
+      w.ResizeObserver = class { observe() {} }; w.scrollTo = () => {}; w.scrollBy = () => {}; w.Element.prototype.scrollIntoView = () => {};
+      w.Chart = class { constructor() { this.alive = true; calls.charts.push(this); } destroy() { this.alive = false; } static register() {} };
+      if (offline) w.SPI_OFFLINE = true;
       w.print = () => { calls.print++; };
       w.URL.createObjectURL = () => { calls.blob++; return "blob:x"; };
       w.fetch = async (u, o = {}) => { calls.fetch.push([String(u), (o.method || "GET").toUpperCase()]); return { ok: false, status: 404, json: async () => ({}), text: async () => "" }; };
@@ -151,4 +152,58 @@ test("FR-6：沒有資料時列印、PDF、交付包、AI 都不產生輸出", {
   await d.querySelector("#btnAI").onclick();
   assert.match(d.querySelector("#aiState").textContent, /目前沒有量測資料/);
   assert.equal(calls.fetch.filter(([u, m]) => m === "POST" && /\/api\/(analyze|share)/.test(u)).length, before, "不可送出 AI 或分享請求");
+});
+
+test("刪除最後一個回合：已畫好的圖表一併銷毀；郵件 PDF 的分享與下載停用", { skip }, async () => {
+  const { w, d, calls, errs } = open();
+  await ready(w);
+  const H = w.SPI_TEST_HOOK, S = H.S;
+  H.loadSample();
+  await until(() => S.F && S.F.length > 0 && !S.F.pending, "範例偵測完成");
+  for (const t of ["overview", "control", "capability"]) H.setTab(t);
+  assert.ok(calls.charts.some((c) => c.alive), "前提：已有圖表");
+  H.setTab("data"); H.setSub("runs");
+  while (S.runs.length) d.querySelector("#runTbl [data-delrun]").click();
+  assert.equal(calls.charts.filter((c) => c.alive).length, 0, "空白狀態不可留下舊回合的圖表");
+  H.setTab("mail");
+  await until(() => /目前沒有量測資料/.test(d.querySelector("#mailStatusText")?.textContent || ""), "郵件頁提示");
+  for (const id of ["#btnMailDlPdf", "#btnSharePdf", "#btnSharePdfWithSummary"]) {
+    const b = d.querySelector(id);
+    if (b) assert.ok(b.disabled, id + " 沒有資料時需停用");
+  }
+  assert.deepEqual(errs, []);
+});
+
+test("空白狀態載入實驗範例：使用示範規格，不被規格鎖定", { skip }, async () => {
+  const { w, d, errs } = open();
+  await ready(w);
+  const H = w.SPI_TEST_HOOK;
+  H.setTab("improve/lab");
+  d.querySelector("#btnDoeSample").click();
+  const run = H.S.runs.find((r) => r.name.startsWith("DOE"));
+  assert.ok(run, "建立實驗範例回合");
+  assert.equal(run.sample, true);
+  assert.equal(H.S.specSrc, "sample");
+  assert.ok(d.querySelector("#p-gate").hidden, "實驗範例不顯示規格鎖定頁");
+  assert.deepEqual(errs, []);
+});
+
+test("空白狀態選「取代目前回合」匯入：沒有目前回合時改為建立新回合", { skip }, async () => {
+  const { w, d, errs } = open({ offline: true });
+  await ready(w);
+  const H = w.SPI_TEST_HOOK, $ = (s) => d.querySelector(s);
+  const CSV = "Board,Pad,Component,Volume,Height(um),Area\n" + Array.from({ length: 60 }, (_, i) => `B${Math.floor(i / 6) + 1},P${i % 6},U1,${100 + (i % 5)},120,100`).join("\n");
+  const inp = $("#fileIn");
+  Object.defineProperty(inp, "files", { configurable: true, value: [new w.File([Buffer.from(CSV)], "line.csv")] });
+  inp.dispatchEvent(new w.Event("change"));
+  await until(() => !$("#mapBox").hidden || $("#parseErr").textContent, "讀取欄位");
+  assert.equal($("#parseErr").textContent, "");
+  $("#inPart").value = "P-EMPTY"; $("#inImpStencil").value = "120";
+  $("#inPart").dispatchEvent(new w.Event("input", { bubbles: true }));
+  d.querySelector('input[name=impMode][value=replace]').checked = true;
+  $("#btnApply").click();
+  await until(() => H.S.runs.length === 1, "建立回合");
+  assert.equal(H.curRun().rows.length, 60);
+  assert.equal(H.curRun().info.src.part, "P-EMPTY");
+  assert.deepEqual(errs, []);
 });
