@@ -91,6 +91,32 @@ test("claude.ai 內的 AI 提示詞與伺服器端使用相同的證據規則", 
   assert.match(html, /\$\{AI_EVIDENCE_RULE\}/, "頁面內提示詞有使用");
 });
 
+test("AI 提示詞限定 SPI 製程範圍與名詞定義，兩邊一致；小模型正則兩邊一致", async () => {
+  const { SYSTEM_PROMPT } = await import("../lib/analyze-core.mjs");
+  const { SMALL_MODEL_RE } = await import("../lib/ai-providers.mjs");
+  const html = fs.readFileSync(HTML, "utf8");
+  for (const re of [/吸嘴、供料器、貼片與回焊不在此資料可解釋範圍/, /「開孔」指鋼板開孔，不是 PCB/, /「焊墊位置」指同一焊墊編號跨板統計，不是 X\/Y 偏移/, /不算兩個獨立面向/, /空陣列或「無異常」代表已檢查且未觸發/]) assert.match(SYSTEM_PROMPT, re);
+  const m = html.match(/const AI_SMALL_MODEL_RE=(\/.+\/i);/);
+  assert.ok(m, "頁面定義小模型正則");
+  assert.equal(m[1], String(SMALL_MODEL_RE), "頁面與伺服器的小模型正則相同");
+  assert.ok(!/吸嘴|供料/.test(html.replace(/與吸嘴、供料器無關|吸嘴、供料器、貼片與回焊不在此資料可解釋範圍/g, "")), "頁面其他地方不再把吸嘴／供料器列為 SPI 原因");
+});
+
+test("AI 摘要：每項問題附量測項目、對位與面積比尺寸揭露資料狀態；重複犯焊墊卡不歸因吸嘴／供料且信心為中", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { dom } = page(); const w = dom.window; await ready(w);
+  const p = w.SPI_TEST_HOOK.aiPayload();
+  const iss = p["系統偵測問題清單"];
+  assert.ok(iss.length && iss.every((x) => typeof x["量測項目"] === "string" && x["量測項目"]), "每項問題都有量測項目");
+  const sys = iss.find((x) => x["面向"] === "系統性能力");
+  assert.ok(sys && /：焊墊位置穩健 Cpk/.test(sys["問題"]), "系統性能力標題以「：」分隔量測項目與焊墊位置");
+  assert.match(p["進階"]["對位資料"], /^(有偏移量測（\d+ 板），|無偏移量測或座標資料)/);
+  assert.match(p["進階"]["面積比尺寸"], /資料提供|0\.7 mm 方形估算/);
+  const rep = w.eval("S.F").find((x) => x.sig && x.sig.t === "repeated");
+  assert.ok(rep, "範例資料有重複犯焊墊卡");
+  assert.ok(!/吸嘴|供料/.test(rep.title + rep.action + rep.cause.replace("與吸嘴、供料器無關", "")), "標題與建議動作不提吸嘴／供料器");
+  assert.equal(rep.conf, "中", "單一面向的重複不良不得標高信心");
+});
+
 test("舊版回合（機台推估／自訂／工單／AOI 規格）還原後鎖定，直到套用料號規格；範例資料不受影響", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const { dom } = page(); const w = dom.window, d = w.document; await ready(w);
   for (const src of ["machine", "custom", "workorder", "aoi"]) {

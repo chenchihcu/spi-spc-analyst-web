@@ -47,6 +47,13 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
   - 檢查：`node --test tests/step8.test.mjs`「3D 座標優先順序與虛擬格狀警示」通過。
   - 出處：PR #98（2026-11-05，缺少焊墊座標時 `pos3D` 誤將 49×49 網格覆蓋 CAD 元件座標致 3D 佈局失真，且無任何示意警語）。
 
+## 分析範圍
+
+- **分析範圍一致（全部元件 → 元件群組 → 單一元件）**：讀取量測列的頁面、圖表、報告、匯出與 AI 摘要，一律經 `scopeFilter(st)`（介面端 `inScopeS(r)`）篩選，或使用已篩選的 `S.A`；問題清單與報告的問題用 `scopedFindings()`／`issueScope()`。不寫行內 `r.group===S.group`。新分頁登記在 `SCOPE_PANELS`；仍以全板計算的區塊登記在 `SCOPE_BOARD_CARDS`，並放 `.scope-board-note`「全板分析，不隨元件範圍變動」。影響分析結果的範圍欄位要進 `anKey` 與 `preSet`。不對元件子集重跑偵測規則（小樣本誤報未經 `test:slow` 校準）。
+  - 檢查：`node --test tests/component-scope.test.mjs` 通過；改動範圍相關程式後跑 `node tools/mutation-check.mjs`，fixture 裡每項破壞都要讓測試變紅。新增讀取端時在 `tests/fixtures/mutations-component-scope.json` 加一項對應破壞。
+  - 規格：`docs/spec-component-scope-rfc.md`。
+  - 出處：v10.26.0（2026-11-13）。改版前元件群組只影響部分頁面：問題清單、多變量 T²、形貌、統計清單與匯出仍是全板資料，卻顯示在群組標示下。
+
 ## 統計與問題偵測
 
 | 重複錯誤類別 | 強制檢查 | 歷史證據 |
