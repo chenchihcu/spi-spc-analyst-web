@@ -108,9 +108,22 @@ test("不再有繞過 scopeFilter 的行內群組篩選", () => {
     if (/S\.rows\.filter\(/.test(s)) assert.match(s, /inScopeS/, `${fn} 直接讀 S.rows 卻沒有套用範圍`);
   }
   assert.match(body("preSet"), /comp:S\.comp/, "背景預算的設定需帶元件，否則快取鍵與結果不一致");
-  for (const fn of ["reportMd", "aiPayload", "renderReport", "generateReportPdfBlob", "initMailPage"]) {
-    assert.doesNotMatch(body(fn), /S\.F\.(slice|filter|map|length)|overallVerdict\(S,S\.F\)/, `${fn} 需用 scopedFindings()`);
+  for (const fn of ["reportMd", "aiPayload", "renderReport", "generateReportPdfBlob", "initMailPage", "exportIssuesXlsx"]) {
+    assert.doesNotMatch(body(fn), /S\.F\.(slice|filter|map|length)|overallVerdict\(S,S\.F\)|issuesXlsx\(S\.F\)/, `${fn} 需用 scopedFindings()`);
   }
+});
+
+test("scopedDfmTable 與 statsDataCsv 在窄範圍下只保留範圍內群組與標示分析範圍", () => {
+  const rows = core.sampleData();
+  const stAll = baseState(core, { rows, group: "ALL" });
+  const stU2 = baseState(core, { rows, group: "ALL", comp: key("U2") });
+  stU2.A = core.analyze(stU2);
+  const allDfm = core.scopedDfmTable(stAll);
+  const u2Dfm = core.scopedDfmTable(stU2);
+  assert.ok(allDfm.length > 1, "全板應有多個群組");
+  assert.deepEqual(Array.from(u2Dfm, (d) => d.group), ["U2 BGA"], "窄範圍 DFM 表只留範圍內元件群組");
+  const csvU2 = core.statsDataCsv(stU2);
+  assert.match(csvU2, /^分析範圍,"?元件 U2（群組 U2 BGA）"?/, "窄範圍統計異常 CSV 首列需標示分析範圍");
 });
 
 /* ---------- 介面：選單、提示列、問題清單、報告、匯出、AI、分享 ---------- */
@@ -214,7 +227,19 @@ test("選元件 → 提示列、分析、問題清單、報告、AI、匯出與�
   assert.ok(SF.every((x) => sc.own.has(x.id) || sc.board.has(x.id)));
 
   // 報告、列印頁首、AI、匯出
-  assert.match(H.reportMd(), /分析範圍：元件 U2（群組 U2 BGA）/);
+  const repMdU2 = H.reportMd();
+  assert.match(repMdU2, /分析範圍：元件 U2（群組 U2 BGA）/);
+  assert.match(repMdU2, new RegExp(`納入分析筆數：${nU2} 筆`));
+  const sec7 = repMdU2.slice(repMdU2.indexOf("## 七、DFM 開孔建議"), repMdU2.indexOf("## 八、資料範圍揭露"));
+  assert.match(sec7, /U2 BGA/);
+  assert.doesNotMatch(sec7, /C 0402|R 0603/, "報告第七章 DFM 不可包含範圍外群組");
+  H.renderReport();
+  const sec2 = d.querySelector("#repSec2").textContent;
+  assert.doesNotMatch(sec2, /NaN/);
+  const muCell = d.querySelector("#repSec2 table tbody tr td.num.mono")?.textContent?.trim();
+  const u2VolMean = S.rows.filter((r) => r.comp === "U2" && r.volume != null).reduce((a, r, _, arr) => a + r.volume / arr.length, 0);
+  assert.equal(muCell, u2VolMean.toFixed(1), "報告預覽五大項目 μ 需為當前分析範圍平均值");
+  assert.match(d.querySelector("#repSec9").textContent, new RegExp(`範圍內|${nU2}`));
   assert.match(H.buildPrintHeadHtml("分析報告"), /分析範圍：元件 U2/);
   assert.match(H.buildMailSummary(S), /• 分析範圍：元件 U2（群組 U2 BGA）/);
   const ai = H.aiPayload();

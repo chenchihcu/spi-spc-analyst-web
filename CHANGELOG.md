@@ -2,6 +2,16 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.33.0 — 2026-11-15（跨鏈路 5,000 向量可重現反驗證與 10 項資料溯源／範圍／統計／3D 缺陷修復）
+
+不改變既有 API 契約、統計檢定公式或 DFM 面積比門檻；全面修補「統計分析 ↔ 圖表 3D ↔ 座標／量測紀錄 ↔ 報告匯出」跨鏈路一致與逆向溯源缺口，並建立 5,000 個固定種子可重現反驗證測試向量。
+
+- **3D／DFM 狀態隔離（BUG-01）**：`pos3D()` 不再原地覆寫 `rows` 的 `r.w`、`r.d`、`r.shape`、`r.dimAssumed`，僅於 3D 位置物件以非枚舉屬性供 `build3D()` 與 `capture3DRaw()` 繪製，確保先跑 3D 再跑 DFM 仍嚴格維持 `dimAssumed` 隔離。
+- **子板與座標對齊（BUG-02、BUG-07、BUG-10）**：伺服器 `validateGenericMeasurement` 納入 `Figure` 組合子板（`${panel}-${figure}` / `${panel}/${figure}`）；問題地圖 `buildPartProblemIndex` 補讀 `row.placePkg`，`applyPlacePreviewToRun`／`clearPlacePreviewFromRun` 清除 `pmapCache` 並於 `syncPlaceToCurrentRun` 即時重繪；`unpivotWide` 振順豐 `(mm)` 換算支援以座標檔封裝 `it.pkg` 查找開孔設定。
+- **報告、PDF 與匯出範圍一致（BUG-03、BUG-04、BUG-05、BUG-08、BUG-09）**：補齊 `generateReportPdfBlob` 的 `zCnt`／`stepCovered` 階梯鋼板變數；新增 `scopedDfmTable` 與 `withScopeCsv` 供第七章 DFM 表與 `statsDataCsv`／`board-stats.csv`／`defect-pads.csv` 窄範圍標示 `分析範圍`；報告五大判定項目表改採 `scopeFilter` 與 `scopeSpecGroup`，修補 `r.boardAssumed` 不存在屬性為 `boardInferred` 且移除 Markdown `reportMd()` 誤用 `esc()`；匯出函式補齊 `needSpec()` 守衛與 `exportIssuesXlsx(scopedFindings())`。
+- **完整 Nelson 異常溯源（BUG-06）**：`buildStatsData()` 完整收錄適用之 Nelson 規則 1、2、3、4、5、6、8，並在窄範圍時保留對應 `refdes`、`figure` 與 `group`。
+- **測試與守衛**：新增 `tests/reverse-traceability-5000.test.mjs`（`VEC-0001`～`VEC-5000` 固定種子四軸反驗證）；擴充 `tests/component-scope.test.mjs` 與 `tests/fixtures/mutations-component-scope.json`（24 項變異皆抓到紅燈），並修復 `tools/mutation-check.mjs` 於 Windows CRLF 與 Node 24 TAP 輸出的解析。
+
 ## v10.32.0 — 2026-11-14（3D 印刷模擬：零件極度擬真形狀與真實尺寸模擬）
 
 不改面積比公式門檻、問題偵測規則或量測列；推算尺寸鎖定 dimAssumed 維持 DFM 統計隔離。

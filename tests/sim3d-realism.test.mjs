@@ -443,19 +443,22 @@ test("pos3D 焊墊展開與 DFM 統計隔離邊界：dimAssumed 嚴格維持 tru
   const P = pos3D(rows);
   assert.equal(P.size, 4);
 
-  // 0402 焊墊長寬比對
-  assert.equal(rows[0].w, 0.55);
-  assert.equal(rows[0].d, 0.60);
+  // 0402 焊墊長寬比對（存於 3D 位置 Map，嚴禁原地改寫原始量測列 rows）
+  assert.equal(P.get(rows[0]).w, 0.55);
+  assert.equal(P.get(rows[0]).d, 0.60);
+  assert.equal(rows[0].w, undefined, "pos3D 不可原地改寫 rows[0].w 污染統計或 DFM");
+  assert.equal(rows[0].d, undefined, "pos3D 不可原地改寫 rows[0].d 污染統計或 DFM");
   assert.equal(rows[0].dimAssumed, true, "0402 焊墊需維持 dimAssumed=true 隔離 DFM 統計");
 
   // 0603 焊墊長寬比對
-  assert.equal(rows[2].w, 0.85);
-  assert.equal(rows[2].d, 0.90);
+  assert.equal(P.get(rows[2]).w, 0.85);
+  assert.equal(P.get(rows[2]).d, 0.90);
+  assert.equal(rows[2].w, undefined, "pos3D 不可原地改寫 rows[2].w 污染統計或 DFM");
   assert.equal(rows[2].dimAssumed, true, "0603 焊墊需維持 dimAssumed=true 隔離 DFM 統計");
 
   // 兩者焊墊尺寸確實不同
-  assert.ok(rows[2].w > rows[0].w, "0603 焊墊長度應大於 0402");
-  assert.ok(rows[2].d > rows[0].d, "0603 焊墊寬度應大於 0402");
+  assert.ok(P.get(rows[2]).w > P.get(rows[0]).w, "0603 焊墊長度應大於 0402");
+  assert.ok(P.get(rows[2]).d > P.get(rows[0]).d, "0603 焊墊寬度應大於 0402");
 });
 
 test("極度擬真 3D 零件模型生成：buildComponent3DObject 結構與半透明/實心材質切換", () => {

@@ -100,6 +100,26 @@
       "name": "捷徑不調整群組",
       "from": "if(p&&!isAllGrp(S.group)&&!p.groups.includes(S.group)){",
       "to": "if(false){"
+    },
+    {
+      "name": "匯出 XLSX 沒篩元件範圍",
+      "from": "async function exportIssuesXlsx(){if(!needSpec())return;save(\"spi-issues.xlsx\",await issuesXlsx(scopedFindings()))}",
+      "to": "async function exportIssuesXlsx(){if(!needSpec())return;save(\"spi-issues.xlsx\",await issuesXlsx(S.F))}"
+    },
+    {
+      "name": "統計異常 CSV 窄範圍沒標分析範圍",
+      "from": "return withScopeCsv(st,toCSV([head,...rows]));",
+      "to": "return toCSV([head,...rows]);"
+    },
+    {
+      "name": "報告 DFM 表沒篩元件範圍",
+      "from": "function scopedDfmTable(st=S){const D=dfmTable(st);if(!scopeIsNarrow(st))return D;",
+      "to": "function scopedDfmTable(st=S){const D=dfmTable(st);if(true)return D;"
+    },
+    {
+      "name": "報告預覽五大項目沒篩元件範圍",
+      "from": "const scRows=S.rows.filter(inScopeS),spGrp=scopeSpecGroup(S);return [\"volume\"",
+      "to": "const scRows=S.rows,spGrp=scopeSpecGroup(S);return [\"volume\""
     }
   ]
 }

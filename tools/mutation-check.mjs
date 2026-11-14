@@ -18,15 +18,18 @@ let bad = 0;
 
 const restore = () => writeFileSync(HTML, orig);
 process.on("SIGINT", () => { restore(); process.exit(130); });
+const eol = orig.includes("\r\n") ? "\r\n" : "\n";
 try {
   for (const m of mutations) {
-    const hits = orig.split(m.from).length - 1;
+    const from = eol === "\r\n" ? m.from.replace(/\r?\n/g, "\r\n") : m.from;
+    const to = eol === "\r\n" ? m.to.replace(/\r?\n/g, "\r\n") : m.to;
+    const hits = orig.split(from).length - 1;
     if (hits !== 1) { bad++; console.log(`✗ ${m.name}: 樣式出現 ${hits} 次（需恰好 1 次）`); continue; }
-    writeFileSync(HTML, orig.replace(m.from, m.to));
-    const r = spawnSync(process.execPath, ["--test", test], { cwd: ROOT, encoding: "utf8", maxBuffer: 1 << 30 });
+    writeFileSync(HTML, orig.replace(from, to));
+    const r = spawnSync(process.execPath, ["--test", "--test-reporter=tap", test], { cwd: ROOT, encoding: "utf8", maxBuffer: 1 << 30 });
     if (r.error) { bad++; console.log(`✗ ${m.name}: 執行錯誤 ${r.error.message}`); continue; }
-    const failed = Number((r.stdout.match(/^# fail (\d+)/m) || [])[1] || 0);
-    const which = [...r.stdout.matchAll(/^not ok \d+ - (.+)$/gm)].map((x) => x[1]);
+    const failed = Number((r.stdout.match(/^(?:#|ℹ) fail (\d+)/m) || [])[1] || 0);
+    const which = [...r.stdout.matchAll(/^(?:not ok \d+ - |✖ )(.+)$/gm)].map((x) => x[1]);
     if (failed > 0) console.log(`✓ ${m.name}: 紅燈（${failed}）${which.join(" | ")}`);
     else { bad++; console.log(`✗ ${m.name}: 仍是綠燈，測試沒有抓到`); }
   }
