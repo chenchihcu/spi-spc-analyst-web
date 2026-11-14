@@ -433,3 +433,15 @@ test("11. 主頁精簡：狀態移入 rail、問題地圖預設收合、子視�
   assert.match(htmlSource, /<select id="selIssCat" class="iss-cat-sel"/, '面向篩選應使用 #selIssCat 下拉選單');
   assert.match(htmlSource, /@media\(pointer:coarse\)\{[^}]*\.panel-subnav--inline button,\.iss-cat-sel[^}]*min-height:44px/, '觸控下子視圖切換與面向下拉需有 44px 熱區');
 });
+
+test('8h. 問題地圖板面焊墊圖：固定 CSS 尺寸、點陣依顯示尺寸 × dpr、縮放鍵 44px（v10.30.0）', () => {
+  // 自繪 canvas 沒有固定 CSS 尺寸時，每次重畫依 getBoundingClientRect 放大 dpr 倍（v10.3.3 LISA 事故）
+  assert.match(htmlSource, /\.pmap-canvas\{display:block;width:100%;height:clamp\([^)]*\)[^}]*touch-action:none/, '.pmap-canvas 需固定 CSS 寬高並關閉瀏覽器觸控手勢');
+  assert.match(htmlSource, /\.pmap \.pmap-zoom button\{min-width:44px;min-height:44px/, '縮放鍵觸控熱區需 ≥ 44px');
+  const start = htmlSource.indexOf('function pmapBoardWire(');
+  const draw = htmlSource.slice(start, htmlSource.indexOf('\n', htmlSource.indexOf('function draw()', start) + 400));
+  assert.ok(start > 0, '需有 pmapBoardWire');
+  assert.match(draw, /getBoundingClientRect\(\)/, '需依實際顯示尺寸設定點陣');
+  assert.match(draw, /devicePixelRatio/, '需依 devicePixelRatio 設定點陣');
+  assert.match(draw, /setTransform\(dpr,0,0,dpr,0,0\)/, '需以 setTransform 換算（不可累積 scale）');
+});

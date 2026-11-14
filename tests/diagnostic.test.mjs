@@ -57,6 +57,18 @@ test('診斷互動：雙向分頁、來源焦點、完整板序、界限不變�
     for(const [k,v]of Object.entries(before))assert.equal(S[k],v,`不修改 S.${k}`);
     d.querySelector('#diagBack').click();assert.equal(d.activeElement.dataset.diagIssue,String(issue.id));
     d.querySelector('[data-subnav-issues=diagnostic]').click();assert.equal(H.DIAG.source,null);
+    S.chart='ewma';H.renderDiagnostic();
+    assert.equal(configs.get('diagControl').data.datasets[0].label,'EWMA','手動診斷沿用目前管制圖');
+    H.openDiagnostic({...issue,go:{...issue.go,tab:'control',chart:'cusum'}});
+    const cusum=configs.get('diagControl').data;
+    assert.deepEqual(Array.from(cusum.datasets,d=>d.label),['C+','C−','+h','−h']);
+    assert.match(d.querySelector('#diagControlData').textContent,/C−/);
+    assert.equal(S.chart,'ewma','來源問題圖種不改寫主管制圖');
+    const decisions=JSON.stringify(cusum.datasets.slice(2).map(d=>d.data));
+    d.querySelector('#diagMatrix [data-dboard]').click();
+    assert.equal(JSON.stringify(configs.get('diagControl').data.datasets.slice(2).map(d=>d.data)),decisions);
+    S.chart=before.chart;
+    d.querySelector('[data-subnav-issues=diagnostic]').click();
     S.rows=Array.from({length:41},(_,b)=>Array.from({length:26},(_,c)=>row({board:'B'+b,comp:'U'+c,pad:'P'+c,volume:100+b%3+c%2}))).flat();H.renderDiagnostic();
     assert.match(d.querySelector('#diagEntityPages').textContent,/1 \/ 2/);assert.match(d.querySelector('#diagBoardPages').textContent,/1 \/ 2/);
     d.querySelector('[data-diag-page=page][data-step="1"]').click();d.querySelector('[data-diag-page=boardPage][data-step="1"]').click();

@@ -10,6 +10,7 @@ import { createHash, randomBytes } from 'node:crypto';
 import { gunzipSync } from 'node:zlib';
 import { parseCsv, validatePlacement, validateMeasurement, placementSizeError } from '../lib/controlled-import.mjs';
 import { parseXlsx } from '../lib/xlsx-table.mjs';
+import { quickCheckGerber, GERBER_LIMITS } from '../lib/gerber-pads.mjs';
 
 const sourceTable = (bytes, name) => /\.xlsx$/i.test(name || '') ? parseXlsx(bytes) : parseCsv(bytes);
 
@@ -185,6 +186,12 @@ async function handleRecordsApi(req, repo, user, env) {
       const result = await repo.getPlacementsForPart(placesFor, side, url.searchParams.get('rev') || '', cursorCreated, cursorId, limit);
       return json({ ...result, part: placesFor });
     }
+    // 依料號、版次、面別查有效板面圖檔
+    const layoutsFor = url.searchParams.get('layouts_for');
+    if (layoutsFor) {
+      const layouts = await repo.getLayoutsForPart(clean(layoutsFor, 64), clean(url.searchParams.get('rev'), 32), clean(url.searchParams.get('side'), 4));
+      return json({ layouts, part: layoutsFor, me: user, isAdmin: admin });
+    }
     // 依料號查料號規格版本清單
     const specsFor = url.searchParams.get('specs_for');
     if (specsFor) {
@@ -213,6 +220,7 @@ async function handleRecordsApi(req, repo, user, env) {
     const chk = checkMeta(m, { controlled: true });
     if (chk.error) return json({ error: chk.error }, 400);
     if (chk.meta.kind === 'place' && !admin) return json({ error: '只有管理者可以上傳座標檔' }, 403);
+    if (chk.meta.kind === 'layout' && !admin) return json({ error: '只有管理者可以登錄板面圖檔' }, 403);
     if (chk.meta.kind === 'place') chk.meta.isDefault = false;
 
     const len = +req.headers.get('content-length') || 0;
@@ -231,7 +239,7 @@ async function handleRecordsApi(req, repo, user, env) {
     }
 
     let bytes = rawBytes || bodyBuf.length, sha256 = clientSha, specNote = null;
-    let verified = null, related = [], proof = null;
+    let verified = null, related = [], proof = null, layoutProof = null, layoutMeta = null;
     // 料號規格：伺服器解壓並驗證本體（格式、數值、標準化、料號一致），指紋由伺服器計算
     if (chk.meta.kind === 'spec') {
       let raw;
@@ -244,15 +252,27 @@ async function handleRecordsApi(req, repo, user, env) {
       specNote = sc.spec.note; // 索引的備註一律取自已驗證的規格檔，不採用標頭欄位，避免同一版本有兩種說法
     } else {
       let raw;
-      try { raw = gunzipSync(bodyBuf, { maxOutputLength: MAX_RAW }); }
-      catch { return json({ error: '檔案解壓失敗或解壓後超過 100 MB' }, 400); }
+      const rawLimit = chk.meta.kind === 'layout' ? GERBER_LIMITS.maxRawBytes : MAX_RAW;
+      if (chk.meta.kind === 'layout' && rawBytes > rawLimit) return json({ error: `板面圖檔超過 ${rawLimit / 1048576} MB：請只輸出單一圖層` }, 413);
+      try { raw = gunzipSync(bodyBuf, { maxOutputLength: rawLimit }); }
+      catch { return json({ error: `檔案解壓失敗或解壓後超過 ${rawLimit / 1048576} MB` }, 400); }
       if (!raw.length) return json({ error: '檔案是空的' }, 400);
       bytes = raw.length;
       sha256 = createHash('sha256').update(raw).digest('hex');
       if (sha256 !== clientSha || (rawBytes && rawBytes !== bytes)) return json({ error: '原始檔指紋或大小與標頭不符' }, 422);
+      if (chk.meta.kind === 'layout') {
+        // 板面圖檔：只做輕量檢查（免費方案 CPU 10 ms）；完整解析與尺寸檢查由瀏覽器登錄前完成
+        const q = quickCheckGerber(raw);
+        if (q.error) return json(q, 422);
+        const occupied = await repo.layoutScope(chk.meta.part, chk.meta.rev, chk.meta.side, chk.meta.layer);
+        if (occupied) return occupied.sha256 === sha256 ? json({ record: occupied, existing: occupied.id }, 200)
+          : json({ error: '同料號、版次、面別與圖層已有板面圖檔；內容不同請用新版次，或由管理者刪除舊檔', code: 'version_conflict', existing: occupied.id }, 409);
+        layoutMeta = { layer: chk.meta.layer, flashes: q.flashes, regions: q.regions, draws: q.draws, parser: q.parser, fileFunction: q.fileFunction, unit: q.unit };
+      }
       let table;
-      try { table = sourceTable(raw, chk.meta.name); } catch (e) { return json({ error: e.message, code: 'source_parse' }, 422); }
-      if (chk.meta.kind === 'place') {
+      if (chk.meta.kind !== 'layout') try { table = sourceTable(raw, chk.meta.name); } catch (e) { return json({ error: e.message, code: 'source_parse' }, 422); }
+      if (chk.meta.kind === 'layout') { /* 已於上方檢查 */ }
+      else if (chk.meta.kind === 'place') {
         if (!chk.meta.side || !chk.meta.unit) return json({ error: '請選擇面別與單位' }, 422);
         verified = validatePlacement(table, chk.meta);
         if (verified.error) return json(verified, 422);
@@ -282,6 +302,14 @@ async function handleRecordsApi(req, repo, user, env) {
         const supplied = [...new Set(chk.meta.unmatchedRefs)].sort();
         if (verified.missing.length && (!chk.meta.unmatchedConfirmed || JSON.stringify(supplied) !== JSON.stringify(verified.missing)))
           return json({ error: '請確認全部無座標位號', code: 'unmatched_confirmation', missing: verified.missing, wrongSide: verified.wrongSide }, 422);
+        if (chk.meta.layoutIds.length) {
+          // 板面圖檔引用：同料號、版次、面別的有效檔，每個圖層最多一份；指紋取自資料庫，不採用用戶端
+          const layouts = await Promise.all(chk.meta.layoutIds.map(id => repo.getRecord(id)));
+          const bad = layouts.find(l => !l || l.kind !== 'layout' || l.lifecycle !== 'active' || l.part !== chk.meta.part || l.rev !== chk.meta.rev || l.side !== chk.meta.side);
+          if (bad !== undefined) return json({ error: '板面圖檔與量測的料號、版次或面別不符，或已失效', code: 'layout_mismatch' }, 409);
+          layoutProof = layouts.map(l => ({ id: l.id, sha256: l.sha256, layer: parseMeta(l).layer || '' }));
+          if (new Set(layoutProof.map(l => l.layer)).size !== layoutProof.length) return json({ error: '同一圖層只能引用一份板面圖檔', code: 'layout_mismatch' }, 409);
+        }
         const duplicate = await repo.measurementFingerprint(chk.meta.part, chk.meta.rev, chk.meta.side, sha256);
         if (duplicate) return json({ error: '這個量測檔已匯入', code: 'duplicate_file', existing: duplicate.id }, 409);
         related = await repo.relatedMeasurements(chk.meta.part, chk.meta.rev, chk.meta.side, chk.meta.workOrder, chk.meta.measuredDate);
@@ -289,19 +317,21 @@ async function handleRecordsApi(req, repo, user, env) {
     }
 
     const now = Date.now();
+    const { layoutIds, layer, ...metaFields } = chk.meta;
     const rec = {
       id: randomBytes(16).toString('base64url'),
-      ...chk.meta,
+      ...metaFields,
       ...(specNote != null ? { note: specNote } : {}),
       bytes,
       gz_bytes: bodyBuf.length,
       sha256,
       user,
       created: now,
-      ...(proof ? { meta: { placeProof: { ...proof, at: now }, ...(chk.meta.sourceLegacyId ? { sourceLegacyId: chk.meta.sourceLegacyId } : {}) } } : {}),
+      ...(proof ? { meta: { placeProof: { ...proof, at: now }, ...(layoutProof ? { layoutProof } : {}), ...(chk.meta.sourceLegacyId ? { sourceLegacyId: chk.meta.sourceLegacyId } : {}) } } : {}),
+      ...(layoutMeta ? { meta: layoutMeta } : {}),
       ...(chk.meta.kind === 'spec' ? {} : {
         validationSource: 'server_verified', lifecycle: related.length ? 'pending_review' : 'active',
-        ...(chk.meta.kind === 'place' ? { comps: verified.items.length, sides: verified.sides, factor: verified.factor, formatVersion: verified.formatVersion }
+        ...(chk.meta.kind === 'layout' ? {} : chk.meta.kind === 'place' ? { comps: verified.items.length, sides: verified.sides, factor: verified.factor, formatVersion: verified.formatVersion }
           : { boards: verified.boards, rows: verified.points, pads: verified.pads,
             unmatchedRefs: verified.missing, unmatchedConfirmed: !!verified.missing.length, formatVersion: verified.formatVersion }),
       }),
@@ -309,6 +339,16 @@ async function handleRecordsApi(req, repo, user, env) {
 
     const res = await repo.createRecord(rec, bodyBuf);
     if (res.error) return json(res, res.status || 500);
+    if (chk.meta.kind === 'layout' && res.record) {
+      // 同時上傳同一範圍：寫入前檢查都看到空範圍時，寫入後以最早寫入者為準，較晚者刪除自己（留稽核）並回傳衝突
+      const owners = await repo.layoutScopeOwners(chk.meta.part, chk.meta.rev, chk.meta.side, chk.meta.layer);
+      const first = owners[0];
+      if (first && first.id !== res.record.id) {
+        await repo.deleteRecord(res.record.id, user);
+        return first.sha256 === sha256 ? json({ record: first, existing: first.id }, 200)
+          : json({ error: '同料號、版次、面別與圖層已有板面圖檔；內容不同請用新版次，或由管理者刪除舊檔', code: 'version_conflict', existing: first.id }, 409);
+      }
+    }
     const pending = res.record?.lifecycle === 'pending_review';
     return json({ ...res, ...(related.length ? { related } : {}) }, res.status || (pending ? 202 : 201));
   }
@@ -385,7 +425,7 @@ async function handleRecordsApi(req, repo, user, env) {
     }
     const id = url.searchParams.get('id') || '';
     const rec = await repo.getRecord(id);
-    const adminOnly = !rec || rec.kind === 'spi' || rec.kind === 'place';
+    const adminOnly = !rec || rec.kind === 'spi' || rec.kind === 'place' || rec.kind === 'layout';
     if (adminOnly && !admin) return json({ error: '需要管理者權限' }, 403);
     const res = await repo.deleteRecord(id, user);
     if (res.error) {
