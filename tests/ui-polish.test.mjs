@@ -86,7 +86,10 @@ test("介面整理：空白狀態、範例資料、KPI 寫法、管制界限數�
     assert.equal(items[1].v, A.xs.cl);
     assert.equal(items[2].v, A.xs.pts.at(-1).lcl);
     assert.equal(items[0].t, "UCL " + A.xs.pts.at(-1).ucl.toFixed(2));
-    assert.ok(c1.options.layout.padding.right > 0, "右側留白放數值");
+    assert.ok(!/ -\d/.test(items.map((x) => x.t).join(" ")), "負值用 − 而非連字號");
+    const padFor = (width) => c1.options.layout.padding({ chart: { width } }).right;
+    assert.ok(padFor(1000) > 0, "寬圖保留右側留白放數值");
+    assert.equal(padFor(300), 0, "手機寬度不保留右側留白，數值改印在繪圖區內");
     const c2 = lastChart(charts, "cCtrl2");
     assert.ok(c2 && c2.options.plugins.limitLabels.items.length === 3, "S 圖也標示界限");
     assert.equal(c2.options.plugins.legend.display, false, "S 圖不可出現預設圖例（undefined 標籤）");
@@ -95,6 +98,17 @@ test("介面整理：空白狀態、範例資料、KPI 寫法、管制界限數�
     const mini = lastChart(charts, "cOvCtrl");
     assert.ok(mini, "總覽縮圖有建立");
     assert.equal(mini.options.plugins.limitLabels, undefined, "縮圖不標示界限數值");
+  });
+
+  await t.test("窄圖界限數值：貼近頂端時仍保持間距，不互相重疊", () => {
+    const plugin = hook.limitLabels, ys = [];
+    const ctx = { save() {}, restore() {}, fillRect() {}, measureText: (s) => ({ width: s.length * 7 }), fillText: (s, x, y) => ys.push(y) };
+    const ch = { ctx, width: 300, chartArea: { top: 0, bottom: 200, left: 40, right: 290 }, scales: { y: { getPixelForValue: (v) => v } } };
+    plugin.afterDatasetsDraw(ch, {}, { items: [{ t: "UCL", v: 0, c: "r" }, { t: "CL", v: 3, c: "a" }, { t: "LCL", v: 6, c: "r" }] });
+    const fs = hook.chartCaptionFontPx();
+    assert.equal(ys.length, 3);
+    for (let i = 1; i < ys.length; i++) assert.ok(ys[i] - ys[i - 1] >= fs, `第 ${i} 與 ${i + 1} 個數值間距 ${ys[i] - ys[i - 1]} < 字高 ${fs}`);
+    assert.ok(ys[0] >= fs / 2, "第一個數值不超出繪圖區頂端");
   });
 
   await t.test("匯出中心摘要：焊墊筆數取目前量測列，沒有版次時不補 V1", async () => {
