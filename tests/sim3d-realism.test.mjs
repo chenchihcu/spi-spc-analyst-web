@@ -269,3 +269,55 @@ test("3D InstancedMesh 批次渲染、高密度降階、pick 反查與不良密�
     S.sim3dMode = "real"; S.colorMode = "volume";
   }
 });
+
+test("真實外觀：不良焊墊以判定色標出、不良元件畫位置環、圖例與畫面一致", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const dom = createPage();
+  const w = dom.window, H = await waitFor(() => w.SPI_TEST_HOOK?.build3D && w.SPI_TEST_HOOK.S?.A?.defRows?.length && w.SPI_TEST_HOOK);
+  const T = H.T, S = H.S, THREE = w.THREE;
+  T.ok = true; T.root = new THREE.Group(); T.cam = new THREE.PerspectiveCamera(45, 1, 0.1, 500); T.fitSpan = null;
+  const saved = { rows: S.rows, board: S.board, group: S.group, mode: S.sim3dMode, color: S.colorMode, ghost: S.ghost, brg: S.bridgeWarn };
+  const ng = w.getComputedStyle(w.document.documentElement).getPropertyValue("--ng").trim();
+  try {
+    // 圖例：真實外觀下列出規格內灰與判定色，本板有不良時列出「不良元件位置」
+    S.sim3dMode = "real"; S.colorMode = "height";
+    const defBoard = S.A.defRows[0].board; S.board = defBoard; H.renderBoard2D();
+    const leg = w.document.getElementById("leg3d").textContent;
+    assert.match(leg, /規格內/); assert.match(leg, /少錫・多錫・連錫風險/); assert.match(leg, /不良元件位置/);
+    assert.doesNotMatch(leg, /LSL ➔ USL/, "真實外觀不顯示熱圖色階");
+    S.board = "B01"; S.group = "ALL"; S.ghost = false; S.bridgeWarn = false; S.sim3dMode = "real"; S.colorMode = "status";
+    S.rows = [
+      { board: "B01", pad: "C1.1", comp: "C1", group: "C1", componentX: 10, componentY: 10, w: 0.6, d: 0.6, volume: 100, area: 100, height: 120 },
+      { board: "B01", pad: "C1.2", comp: "C1", group: "C1", componentX: 10, componentY: 10, w: 0.6, d: 0.6, volume: 100, area: 100, height: 120 },
+      { board: "B01", pad: "U2.1", comp: "U2", group: "U2", componentX: 40, componentY: 30, w: 0.6, d: 0.6, volume: 5, area: 100, height: 120 },
+    ];
+    const bad = S.rows[2];
+    H.build3D();
+    const meshes = T.meshes;
+    const okMesh = meshes.find((m) => m.userData === S.rows[0]), badMesh = meshes.find((m) => m.userData === bad);
+    assert.equal(okMesh.material, H.getRealPasteMat(), "規格內焊墊維持真實外觀金屬灰");
+    assert.notEqual(badMesh.material, H.getRealPasteMat(), "不良焊墊不可與規格內同為灰色");
+    assert.equal(badMesh.material.color.getHexString(), new THREE.Color(ng).getHexString(), "少錫焊墊以 --ng 標出");
+    const rings = T.root.children.filter((c) => c.name === "defectCompRing");
+    assert.equal(rings.length, 1, "只有含不良的元件（U2）畫位置環");
+    assert.equal(rings[0].material.color.getHexString(), new THREE.Color(ng).getHexString());
+
+    // 高密度（InstancedMesh）路徑：不良焊墊另成一批並帶顏色，pick 可反查
+    const big = Array.from({ length: H.HIGH_DENSITY_3D_THRESHOLD + 10 }, (_, i) => ({
+      board: "B01", pad: `P${i}`, comp: `R${i}`, group: "G1", x: (i % 60) * 1.2, y: Math.floor(i / 60) * 1.2,
+      w: 0.6, d: 0.6, volume: i === 7 ? 5 : 100, area: 100, height: 120,
+    }));
+    S.rows = big; H.build3D();
+    const badInst = T.root.children.find((c) => c.name === "pasteRectInstBad");
+    assert.ok(badInst && badInst.count === 1 && badInst.instanceColor, "高密度真實外觀：不良焊墊另一批且帶判定色");
+    assert.equal(badInst.userData.rows[0], big[7]);
+    assert.equal(T.root.children.find((c) => c.name === "pasteRectInst").count, big.length - 1);
+    assert.equal(T.root.children.filter((c) => c.name === "defectCompRing").length, 1);
+
+    // 無不良的板不畫環
+    S.rows = big.map((r) => ({ ...r, volume: 100 })); H.build3D();
+    assert.ok(!T.root.children.some((c) => c.name === "defectCompRing"), "無不良不畫位置環");
+  } finally {
+    T.ok = false; T.root = null;
+    S.rows = saved.rows; S.board = saved.board; S.group = saved.group; S.sim3dMode = saved.mode; S.colorMode = saved.color; S.ghost = saved.ghost; S.bridgeWarn = saved.brg;
+  }
+});
