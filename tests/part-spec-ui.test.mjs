@@ -99,7 +99,7 @@ test("流程：鋼板厚度必填 → 未定義規格時鎖定 → 驗證與草�
   assert.ok(await until(() => w.eval("S.runs.length") === 3));
   assert.equal(w.eval("S.specSrc"), "none"); assert.equal(w.eval("S.A"), null, "未定義規格不計算");
   assert.equal(w.eval("S.tab"), "data", "未定義規格時打開資料與規格");
-  assert.equal(w.eval("S.sub"), "settings", "未定義規格時打開規格子頁");
+  assert.equal(w.eval("S.sub"), "paste-spec", "未定義規格時打開錫膏印刷規格設定");
   assert.equal(w.eval("S.stencil"), 100);
   assert.equal($("#inStencil2").value, "100", "套用匯入後，厚度帶入本回合設定欄");
   assert.equal($("label[for=inStencil2]").textContent, "本回合鋼板厚度 µm");
@@ -110,7 +110,8 @@ test("流程：鋼板厚度必填 → 未定義規格時鎖定 → 驗證與草�
   assert.match($("#gateMsg").textContent, /NEW-1.*儲存為新版本/);
   $("#btnGateSpec").click();
   assert.equal(w.eval("S.tab"), "data", "閘門前往資料與規格");
-  assert.equal(w.eval("S.sub"), "settings", "閘門前往規格子頁");
+  assert.equal(w.eval("S.sub"), "paste-spec", "閘門前往錫膏印刷規格設定");
+  assert.equal($('#p-data div[data-sub="paste-spec"]').hidden, false, "錫膏印刷規格設定應顯示");
 
   // 3. 欄位驗證：LSL ≥ USL 不寫入，並以紅框＋行內說明提示
   change(w, $("#sp-volume-lsl"), 140);
@@ -123,6 +124,11 @@ test("流程：鋼板厚度必填 → 未定義規格時鎖定 → 驗證與草�
   change(w, $("#sp-volume-lsl"), 75);
   assert.equal(w.eval("S.specDraft.dirty"), true);
   assert.match($("#partSpecBar").textContent, /已修改，尚未存成新版本/);
+  // 切到鋼板規格設定再切回，未儲存的修改仍在
+  $('#p-data .subtab[data-sub="stencil-spec"]').click();
+  $('#p-data .subtab[data-sub="paste-spec"]').click();
+  assert.equal($("#sp-volume-lsl").value, "75", "切換子分頁後草稿值保留");
+  assert.match($("#partSpecBar").textContent, /已修改，尚未存成新版本/, "切換子分頁後仍標示未儲存");
   assert.equal(w.eval("S.A"), null, "存檔前仍鎖定");
 
   // 4. 儲存為新版本（預設）→ 解鎖並套用

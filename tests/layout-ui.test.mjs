@@ -97,7 +97,7 @@ test("鋼板檔開孔：開啟紀錄後寫入回合設定，面積比表標示�
   const { w, hook, d } = await page();
   assert.ok(await until(() => w.eval("S.aperture&&S.aperture.file&&Object.keys(S.aperture.file).length") === 15), "15 顆零件開孔尺寸一致，應全部套用");
   assert.ok(hook.curRun().cfg.aperture.file, "回合設定應保存鋼板檔開孔");
-  hook.setTab("data"); hook.setSub("settings");
+  hook.setTab("data"); hook.setSub("stencil-spec");
   assert.ok(await until(() => /鋼板檔開孔已套用 15 顆零件/.test(d.querySelector("#apNote")?.textContent || "")), d.querySelector("#apNote")?.textContent);
   assert.ok([...d.querySelectorAll("#apTbl td .note")].some(n => n.textContent === "鋼板檔"), "實際開孔欄應標示來源「鋼板檔」");
   hook.setTab("issues");
