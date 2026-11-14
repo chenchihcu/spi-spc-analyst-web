@@ -107,7 +107,7 @@ function loginPage(nextPath, error = "", user = "", status = 200) {
 <meta name="theme-color" content="#0F1311" media="(prefers-color-scheme: dark)">
 <title>SPI·SPC 分析台 · 登入</title><meta name="robots" content="noindex">
 <style>
-@font-face{font-family:"Barlow Condensed";font-weight:600;font-display:swap;src:url(/vendor/fonts/barlow-condensed-latin-600-normal.woff2) format("woff2")}
+@font-face{font-family:"Barlow Condensed";font-weight:700;font-display:swap;src:url(/vendor/fonts/barlow-condensed-latin-700-normal.woff2) format("woff2")}
 @font-face{font-family:"IBM Plex Mono";font-weight:400;font-display:swap;src:url(/vendor/fonts/ibm-plex-mono-latin-400-normal.woff2) format("woff2")}
 /* 與分析台同一套色票：預設明亮主題；左側品牌區亦採用明亮清爽配色 */
 :root{--bg:#F2F4F0;--surface:#FFFFFF;--ink:#18201B;--muted:#58625B;--line:#D2D8D1;--accent:#A3521D;--on-accent:#FFFFFF;--ng:#B83A2C;--ng-soft:#F7DDD9;--warn:#A86E12;
