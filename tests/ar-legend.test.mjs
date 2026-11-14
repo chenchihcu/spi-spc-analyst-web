@@ -67,3 +67,96 @@ test("群組數 > 色盤（以 refdes 分群）：圖例只列判讀等級，不
   assert.equal(pts.reduce((n, d) => n + d.data.length, 0), new Set(S.rows.filter((r) => r.volume != null).map((r) => r.pad)).size, "每個焊墊仍各有一點");
   assert.deepEqual(errs, []);
 });
+
+// 0.7 mm 估算幾何不可畫成面積比：曾讓所有焊墊疊在同一個 AR（如 1.92）成一條直線，並以估算值判定風險
+const ptsOf = (c) => c.data.datasets.filter((d) => d.type !== "line").flatMap((d) => d.data);
+
+test("全部焊墊尺寸未提供：不畫估算的面積比，表格不判定風險", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { w, errs, charts } = open();
+  await ready(w);
+  const S = w.SPI_TEST_HOOK.S;
+  for (const r of S.rows) { r.w = 0.7; r.d = 0.7; r.apL = undefined; r.apW = undefined; r.dimAssumed = true; }
+  const before = charts.length;
+  w.SPI_TEST_HOOK.setTab("deep/adv");
+  assert.equal(charts.slice(before).filter((c) => c?.options?.scales?.x?.title?.text === "面積比 AR").length, 0, "不應建立面積比散佈圖");
+  const doc = w.document;
+  assert.equal(doc.querySelector("#cAR").parentElement.hidden, true);
+  assert.equal(doc.querySelector("#arNote").hidden, false);
+  assert.match(doc.querySelector("#arNote").textContent, /面積比無法計算/);
+  const tbl = doc.querySelector("#arTbl").textContent;
+  assert.ok(!tbl.includes("風險"), "估算幾何不可判定風險");
+  assert.match(tbl, /面積比無法判定/);
+  w.SPI_TEST_HOOK.setTab("dfm");
+  assert.ok(!/\d\.\d{3}×\d\.\d{3}/.test(doc.querySelector("#dfmTbl").textContent), "DFM 表不可列出 0.7 mm 估算開孔");
+  assert.deepEqual(errs, []);
+});
+
+test("部分焊墊尺寸未提供：只畫有真實幾何的焊墊", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { w, errs, charts } = open();
+  await ready(w);
+  const S = w.SPI_TEST_HOOK.S;
+  const groups = [...new Set(S.rows.map((r) => r.group))];
+  const est = groups[0];
+  for (const r of S.rows) if (r.group === est) { r.w = 0.7; r.d = 0.7; r.apL = undefined; r.apW = undefined; r.dimAssumed = true; }
+  w.SPI_TEST_HOOK.setTab("deep/adv");
+  const pts = ptsOf(arChart(charts));
+  const realPads = new Set(S.rows.filter((r) => r.volume != null && r.group !== est).map((r) => r.pad));
+  assert.equal(pts.length, realPads.size);
+  assert.ok(pts.every((p) => p.p.group !== est));
+  assert.match(w.document.querySelector("#arSub").textContent, /\d+ 個焊墊缺焊墊／開孔尺寸，未納入/);
+  assert.deepEqual(errs, []);
+});
+
+test("所有焊墊 AR 相同：顯示說明，x 軸涵蓋資料與 0.66", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { w, errs, charts } = open();
+  await ready(w);
+  const S = w.SPI_TEST_HOOK.S;
+  for (const r of S.rows) { r.apL = 0.8; r.apW = 0.8; r.dimAssumed = false; r.shape = "rect"; }
+  w.SPI_TEST_HOOK.setTab("deep/adv");
+  const c = arChart(charts), pts = ptsOf(c), xs = pts.map((p) => p.x);
+  assert.equal(new Set(xs.map((x) => x.toFixed(2))).size, 1);
+  const { min, max } = c.options.scales.x;
+  assert.ok(min < 0.66 && max > Math.max(...xs), `x 範圍 ${min}–${max}`);
+  const note = w.document.querySelector("#arNote");
+  assert.equal(note.hidden, false);
+  assert.match(note.textContent, /所有焊墊開孔與鋼板厚度相同（AR \d\.\d\d）/);
+  assert.deepEqual(errs, []);
+});
+
+// 圖表編碼：長條長度代表數值時軸要從 0 開始；截斷的軸改用點；平均標記不可寬過所屬區間
+const byCanvasLabel = (charts, pred) => charts.filter(pred).at(-1);
+test("轉移效率 A vs B 長條從 0 開始；擦拭週期平均改用點；群組多時平均標記縮小", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { w, errs, charts } = open();
+  await ready(w);
+  const H = w.SPI_TEST_HOOK;
+  H.setTab("deep");
+  const wipe = byCanvasLabel(charts, (c) => c?.options?.scales?.y2?.title?.text === "不良率");
+  assert.ok(wipe, "擦拭週期圖");
+  assert.equal(wipe.data.datasets[0].type, "line");
+  assert.equal(wipe.data.datasets[0].showLine, false, "平均以點呈現（y 軸未從 0 開始）");
+  H.setTab("improve/compare");
+  const te = byCanvasLabel(charts, (c) => c?.type === "bar" && c?.options?.plugins?.tooltip?.callbacks?.label?.toString().includes("f(i.raw,1)}%"));
+  assert.ok(te, "轉移效率 A vs B 圖");
+  assert.equal(te.options.scales.y.beginAtZero, true);
+  const S = H.S;
+  S.rows = S.rows.map((r) => ({ ...r, group: "X" + r.pad }));
+  H.recompute(); H.setTab("issues/cross");
+  const g = byCanvasLabel(charts, (c) => c?.type === "bar" && c?.data?.datasets?.[1]?.pointStyle === "line");
+  assert.ok(g && g.data.labels.length > 50, "元件群組比較");
+  assert.ok(g.data.datasets[1].pointRadius <= 3, `平均標記半徑 ${g.data.datasets[1].pointRadius}`);
+  assert.deepEqual(errs, []);
+});
+
+test("回合比較：A 缺尺寸、B 有尺寸時面積比欄仍顯示 B 的值", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { w, errs } = open();
+  await ready(w);
+  const H = w.SPI_TEST_HOOK, S = H.S;
+  assert.ok(S.runs.length >= 2, "範例有兩個回合");
+  const a = S.runs.find((r) => r.id !== S.runId), b = S.runs.find((r) => r.id === S.runId);   // 目前回合讀 S.rows，改用非目前回合當 A
+  a.rows = a.rows.map((r) => ({ ...r, w: 0.7, d: 0.7, apL: undefined, apW: undefined, dimAssumed: true }));
+  S.cmpA = a.id; S.cmpB = b.id;
+  H.setTab("improve/compare");
+  const cells = [...w.document.querySelectorAll("#cmpTbl tbody tr")].map((tr) => tr.children[1].textContent);
+  assert.ok(cells.some((c) => /^— → \d\.\d\d$/.test(c)), `面積比欄：${cells.join(" | ")}`);
+  assert.deepEqual(errs, []);
+});
