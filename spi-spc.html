@@ -270,6 +270,11 @@ table.show-all tr.more-row{display:table-row}
 .part-map-all summary{cursor:pointer;min-height:44px;display:flex;align-items:center}
 .part-map-detail{overflow-wrap:anywhere;padding:8px;border:1px solid var(--line)}
 .part-map-detail p{margin:0}
+.pmap-board{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;min-width:0}
+.pmap-canvas{display:block;width:100%;height:clamp(240px,52vh,520px);touch-action:none;background:var(--surface2);border:1px solid var(--line);border-radius:var(--r);cursor:grab}
+.pmap-canvas:active{cursor:grabbing}
+.pmap-zoom{display:flex;justify-content:flex-end;gap:4px}
+.pmap .pmap-zoom button{min-width:44px;min-height:44px;padding:0 10px;text-align:center;background:var(--surface)}
 .pmap-lab{font-size:var(--fs-caption);color:var(--muted)}
 .sevhead{display:flex;align-items:baseline;gap:8px;margin:6px 0 -2px;font-size:var(--fs-heading)}
 .ev-wrap{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:6px;margin-top:6px;font:var(--fs-chart)/1.2 var(--f-mono);color:var(--muted)}
@@ -1043,7 +1048,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
     <svg class="mitcorp-logo" viewBox="0 0 248 45" width="143" height="26" fill="currentColor" fill-rule="evenodd" role="img" aria-label="Mitcorp"><path d="M13.8,-0.0L28.5,-0.1L29.2,0.0L30.6,1.0L31.5,2.9L34.7,29.0L35.0,29.8L36.2,30.2L37.5,29.8L38.3,28.2L46.9,3.5L48.0,1.5L48.8,0.8L50.5,-0.1L66.3,0.0L67.6,1.0L68.4,3.2L68.4,30.8L68.3,32.2L67.7,33.8L66.0,34.8L62.8,35.0L59.2,34.8L57.7,33.8L57.3,31.5L57.3,5.8L56.7,4.5L55.2,4.0L53.0,4.7L52.0,6.5L43.5,31.5L42.2,33.3L41.2,34.1L38.2,34.8L28.8,34.8L26.0,34.0L24.6,32.5L24.0,29.8L20.9,5.8L20.2,4.5L18.5,4.0L17.0,4.5L16.5,5.2L12.3,26.8L11.3,30.0L10.5,31.5L8.4,33.8L6.3,35.0L2.2,35.7L1.2,35.7L0.0,35.0L0.0,30.2L1.2,29.6L4.5,28.9L5.4,28.0L6.2,26.2L10.7,3.0L11.9,1.0L13.8,-0.0ZM73.2,-0.0L83.8,0.0L84.6,1.3L84.5,4.2L83.8,5.4L82.8,5.7L75.5,5.8L73.2,5.5L72.7,4.8L72.5,2.8L72.6,1.0L73.2,-0.0ZM90.0,1.7L95.5,1.6L97.2,2.1L97.8,2.8L98.2,4.0L98.3,8.5L98.6,9.2L99.3,9.7L109.8,9.8L110.9,10.2L111.4,12.0L110.9,13.2L110.2,13.6L99.8,13.7L98.8,14.1L98.2,15.5L98.3,27.0L99.0,29.8L100.5,30.9L104.2,31.1L112.5,30.9L113.1,31.5L113.2,33.0L113.0,33.8L112.2,34.6L110.5,35.0L104.5,35.3L95.8,35.1L92.0,33.9L89.9,32.2L88.9,30.5L88.4,27.5L88.4,5.5L88.6,3.0L89.2,2.1L90.0,1.7ZM130.5,9.2L135.5,9.3L144.3,10.0L145.5,10.4L146.1,11.0L146.2,13.2L145.7,14.0L145.0,14.3L140.3,13.8L133.0,13.6L129.5,13.9L127.0,14.9L125.1,17.0L124.3,20.0L124.3,24.0L125.1,27.8L127.0,29.8L130.0,30.9L137.5,31.1L145.2,30.4L146.0,31.0L146.3,32.0L146.2,33.5L145.5,34.3L142.5,35.0L135.2,35.4L129.5,35.4L124.0,34.9L120.5,33.9L118.2,32.8L116.1,30.8L115.1,29.2L114.0,25.5L113.9,20.0L115.0,15.8L116.1,14.0L118.2,12.0L120.5,10.8L124.2,9.8L130.5,9.2ZM161.8,9.5L168.5,9.3L174.8,9.9L178.2,10.8L180.2,11.8L182.8,14.0L183.9,15.8L184.7,18.8L184.9,24.5L184.7,26.2L183.8,29.2L181.8,32.0L178.8,33.9L175.5,34.9L166.0,35.7L156.8,34.8L153.8,33.8L152.0,32.9L150.4,31.5L149.2,30.0L148.3,28.0L147.9,25.5L148.0,18.2L149.1,15.0L151.0,12.8L154.0,11.0L158.0,9.8L161.8,9.5ZM203.0,9.5L209.8,9.4L210.7,10.5L210.8,11.8L210.5,12.8L209.5,13.6L201.8,13.9L200.2,14.2L199.2,14.8L198.7,16.0L198.7,31.0L198.3,33.5L197.5,34.5L196.2,34.9L190.5,34.8L189.1,33.8L188.8,32.0L188.7,15.2L189.2,12.5L190.0,11.7L191.9,10.8L197.2,9.8L203.0,9.5ZM224.0,9.5L230.5,9.3L237.9,9.8L242.2,10.9L244.2,12.0L246.2,14.0L247.0,15.2L247.8,17.3L247.8,27.8L246.9,30.0L245.9,31.5L244.8,32.6L242.8,33.8L240.0,34.8L232.2,35.5L223.2,35.4L222.6,36.0L222.4,36.8L222.2,43.5L221.3,44.8L213.5,44.8L212.6,43.5L212.4,41.8L212.6,13.0L213.2,11.7L214.6,10.8L218.5,9.9L224.0,9.5ZM75.5,9.9L79.0,9.8L81.5,10.0L82.8,10.8L83.4,12.0L83.5,32.2L83.0,33.8L81.5,34.8L75.5,34.8L74.1,34.0L73.7,33.2L73.6,12.0L74.0,10.8L75.5,9.9ZM163.2,13.0L160.8,14.0L159.4,15.2L158.3,18.8L158.1,22.5L158.3,26.5L159.2,29.2L160.5,30.8L162.8,31.8L166.0,32.1L169.8,31.8L172.0,30.8L173.0,29.8L173.9,28.2L174.4,25.0L174.4,21.8L173.9,16.5L173.0,15.0L171.9,14.0L168.5,12.9L163.2,13.0ZM226.0,13.0L223.5,13.5L222.7,14.0L222.4,14.5L222.5,30.5L224.0,31.6L227.5,31.9L232.5,31.9L235.0,31.0L236.0,30.1L237.0,28.7L237.7,25.5L237.8,20.8L237.0,16.2L235.3,14.0L233.0,13.1L230.2,12.8L226.0,13.0Z"/></svg>
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.29.4</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.30.0</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <div class="db-capsule-group" role="group" aria-label="記錄庫與匯出">
@@ -1562,6 +1567,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
           <span class="note" id="placeState" role="status" aria-live="polite"></span>
         </div>
         <div id="placeChoices" role="group" aria-label="符合的座標檔"></div>
+        <div class="row" id="layoutRow" hidden><span class="lbl" style="align-self:center">板面圖檔</span><span class="note" id="layoutState" role="status" aria-live="polite"></span></div>
         <p class="note" id="placeChoiceNote" style="margin:0">位號與原檔指紋於套用時由伺服器確認。</p>
         <p class="note" id="vendorNote" hidden style="margin:0">立榮格式每列一焊墊（各板橫排），TOP／BOT 分別匯入；高度 % 依<b>鋼板厚度（必填）</b>換算 µm，並由座標檔對應位置與封裝群組。</p>
       </div>
@@ -1988,6 +1994,25 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
           </div>
           <div id="upPlacePartHint" class="note" aria-live="polite" style="margin-top:4px"></div>
           <div id="upPlaceState" class="note" style="margin-top:4px"></div>
+        </div>
+        <div id="boxUploadLayoutForm" class="card" hidden style="padding:10px 14px;background:var(--surface2);border:1px dashed var(--line);border-radius:8px">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+            <b style="font-size:var(--fs-ui)">登錄板面圖檔</b>
+            <span class="note" style="font-size:var(--fs-caption)">Gerber 檔，一次一個圖層</span>
+          </div>
+          <div class="up-place-row">
+            <div class="field"><label for="upLayPart">產品料號（必填）</label><input type="text" id="upLayPart" class="mono" list="partList" autocomplete="off" maxlength="64"></div>
+            <div class="field"><label for="upLayRev">版次（必填）</label><input type="text" id="upLayRev" maxlength="32"></div>
+            <div class="field"><label for="upLaySide">面別（必填）</label><select id="upLaySide"><option value="">請選擇面別</option><option value="TOP">TOP</option><option value="BOT">BOT</option></select></div>
+            <div class="field"><label for="upLayLayer">圖層（必填）</label><select id="upLayLayer"><option value="">請選擇圖層</option><option value="paste">錫膏層（鋼板）</option><option value="copper">銅箔層</option><option value="outline">板框</option></select></div>
+            <div class="field"><span class="up-place-lab">原始檔（必填）</span>
+              <label class="row" for="upLayFile" style="cursor:pointer;margin:0"><input type="file" id="upLayFile" accept=".gtp,.gbp,.gtl,.gbl,.gko,.gm1,.gml,.gbr,.ger,.art,.pho,.cmp,.sol,.crc,.crs" class="sr" aria-label="選取 Gerber 原始檔"><span class="chipbtn" style="border:1px solid var(--line);padding:4px 10px;font-size:var(--fs-caption)">選取 Gerber</span></label></div>
+            <span id="upLayFileName" class="note" style="font-size:var(--fs-caption);align-self:flex-end;overflow-wrap:anywhere"></span>
+            <button type="button" class="primary btn-sm" id="btnSubmitLayout" style="align-self:flex-end">存入資料庫</button>
+          </div>
+          <div id="upLayInfo" class="note" style="margin-top:4px"></div>
+          <div id="upLayState" class="note" role="status" aria-live="polite" style="margin-top:4px"></div>
+          <div id="upLayList" style="margin-top:6px"></div>
         </div>
 
         <div class="rec-desktop-view tbl">
@@ -3052,6 +3077,716 @@ function formatSidedPpmBlock(block, fmt = (v) => String(Math.round(v))) {
   };
 }
 /* @windows-parity END */
+/* @gerber-pads START */
+const GERBER=(()=>{
+/** Gerber RS-274X（含 X2 屬性）焊墊解析 — 單一正本。
+ *  瀏覽器端由 tools/sync-gerber-pads.mjs 包成 `GERBER` 物件嵌入 spi-spc.html；Worker 直接 import。
+ *  只取「焊墊」：閃光（D03）與區域（G36/G37）；走線（D01 畫線）只在 keepDraws 時保留為線段（板框用）。
+ *  單位一律換算成 mm。規格：docs/spec-gerber-layout-rfc.md。 */
+
+const GERBER_PARSER_VERSION = "gerber-pads/1";
+const GERBER_LIMITS = Object.freeze({ maxPads: 60000, maxSpanMm: 1000, minSpanMm: 5, maxPadMm: 25, maxDraws: 50000, maxRawBytes: 30 * 1024 * 1024, maxRepeat: 2500, maxPolyVertices: 64 });
+/* 不是錫膏印刷焊墊的 X2 物件功能：對應時排除 */
+const GERBER_NON_PAD_FN = Object.freeze(["ViaPad", "Conductor", "NonConductor", "CopperBalancing", "FiducialPad", "Profile", "NonMaterial", "Other"]);
+
+const CIRCLE_SEG = 96;
+const EPS = 1e-9;
+
+/** 位元組或字串 → 字串（Gerber 為 ASCII；不依賴 TextDecoder） */
+function gerberText(input) {
+  if (typeof input === "string") return input;
+  if (!input || typeof input.length !== "number") return "";
+  const u8 = input instanceof Uint8Array ? input : new Uint8Array(input);
+  if (typeof TextDecoder !== "undefined") return new TextDecoder("latin1").decode(u8);
+  let s = "";
+  for (let i = 0; i < u8.length; i += 8192) s += String.fromCharCode.apply(null, u8.subarray(i, i + 8192));
+  return s;
+}
+
+/* ---------- 幾何工具 ---------- */
+function polyArea(p) { let a = 0; for (let i = 0, n = p.length; i < n; i++) { const q = p[i], r = p[(i + 1) % n]; a += q[0] * r[1] - r[0] * q[1]; } return a / 2; }
+function polyPerim(p) { let s = 0; for (let i = 0, n = p.length; i < n; i++) { const q = p[i], r = p[(i + 1) % n]; s += Math.hypot(r[0] - q[0], r[1] - q[1]); } return s; }
+function polyBox(p) { let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity; for (const [x, y] of p) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; } return [x0, y0, x1, y1]; }
+function circlePoly(cx, cy, d, n = CIRCLE_SEG) { const r = d / 2, out = []; for (let i = 0; i < n; i++) { const t = (2 * Math.PI * i) / n; out.push([cx + r * Math.cos(t), cy + r * Math.sin(t)]); } return out; }
+function rectPoly(cx, cy, w, h) { const a = w / 2, b = h / 2; return [[cx - a, cy - b], [cx + a, cy - b], [cx + a, cy + b], [cx - a, cy + b]]; }
+function obroundPoly(cx, cy, w, h, n = CIRCLE_SEG) {
+  const r = Math.min(w, h) / 2, out = [], k = Math.max(4, n / 2);
+  const ax = w >= h ? w / 2 - r : 0, ay = w >= h ? 0 : h / 2 - r;
+  const ends = [[cx + ax, cy + ay, -Math.PI / 2], [cx - ax, cy - ay, Math.PI / 2]];
+  if (w < h) { ends[0][2] = 0; ends[1][2] = Math.PI; }
+  for (const [ex, ey, a0] of ends) for (let i = 0; i <= k; i++) { const t = a0 + (Math.PI * i) / k; out.push([ex + r * Math.cos(t), ey + r * Math.sin(t)]); }
+  return out;
+}
+function rot(p, deg) { if (!deg) return p; const t = (deg * Math.PI) / 180, c = Math.cos(t), s = Math.sin(t); return p.map(([x, y]) => [x * c - y * s, x * s + y * c]); }
+function ccw(p) { return polyArea(p) < 0 ? p.slice().reverse() : p; }
+function inside(pt, p) { // 偶奇規則；邊上視為不確定（呼叫端用 ε 偏移避開）
+  let c = false; const [x, y] = pt;
+  for (let i = 0, j = p.length - 1; i < p.length; j = i++) {
+    const [xi, yi] = p[i], [xj, yj] = p[j];
+    if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) c = !c;
+  }
+  return c;
+}
+
+/** 多個多邊形聯集的面積與周長（邊界裁切法；同側重疊邊只計一次） */
+function unionAreaPerim(polys) {
+  const P = polys.filter(p => p.length >= 3 && Math.abs(polyArea(p)) > EPS).map(ccw);
+  if (!P.length) return { area: 0, perim: 0 };
+  if (P.length === 1) return { area: polyArea(P[0]), perim: polyPerim(P[0]) };
+  const all = P.flat(), bb = polyBox(all), eps = Math.max(1e-7, Math.hypot(bb[2] - bb[0], bb[3] - bb[1]) * 1e-7);
+  let area = 0, perim = 0;
+  for (let i = 0; i < P.length; i++) {
+    const p = P[i];
+    for (let e = 0; e < p.length; e++) {
+      const a = p[e], b = p[(e + 1) % p.length], dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy);
+      if (len < EPS) continue;
+      const ts = [0, 1];
+      for (let j = 0; j < P.length; j++) {
+        if (j === i) continue;
+        const q = P[j];
+        for (let f = 0; f < q.length; f++) {
+          const c = q[f], d = q[(f + 1) % q.length], ex = d[0] - c[0], ey = d[1] - c[1];
+          const den = dx * ey - dy * ex, wx = c[0] - a[0], wy = c[1] - a[1];
+          if (Math.abs(den) > EPS * len * Math.hypot(ex, ey)) {
+            const t = (wx * ey - wy * ex) / den, u = (wx * dy - wy * dx) / den;
+            if (t > 0 && t < 1 && u >= -1e-9 && u <= 1 + 1e-9) ts.push(t);
+          } else if (Math.abs(wx * dy - wy * dx) <= EPS * len * Math.max(1, Math.hypot(wx, wy))) {
+            for (const [px, py] of [c, d]) { const t = ((px - a[0]) * dx + (py - a[1]) * dy) / (len * len); if (t > 0 && t < 1) ts.push(t); }
+          }
+        }
+      }
+      ts.sort((m, n) => m - n);
+      const nx = dy / len, ny = -dx / len; // ccw 多邊形的外法向
+      for (let k = 0; k + 1 < ts.length; k++) {
+        const t0 = ts[k], t1 = ts[k + 1];
+        if (t1 - t0 < 1e-12) continue;
+        const tm = (t0 + t1) / 2, mx = a[0] + dx * tm, my = a[1] + dy * tm;
+        const out = [mx + nx * eps, my + ny * eps], inn = [mx - nx * eps, my - ny * eps];
+        let drop = false;
+        for (let j = 0; j < P.length && !drop; j++) {
+          if (j === i) continue;
+          if (inside(out, P[j])) drop = true;
+          else if (j < i && inside(inn, P[j])) drop = true; // 與較早的多邊形同側共邊：已計入
+        }
+        if (drop) continue;
+        const x0 = a[0] + dx * t0, y0 = a[1] + dy * t0, x1 = a[0] + dx * t1, y1 = a[1] + dy * t1;
+        area += (x0 * y1 - x1 * y0) / 2;
+        perim += Math.hypot(x1 - x0, y1 - y0);
+      }
+    }
+  }
+  return { area, perim };
+}
+
+/* ---------- 巨集運算式 ---------- */
+function macroEval(expr, vars) {
+  const s = String(expr).replace(/\s+/g, "");
+  let i = 0;
+  const peek = () => s[i];
+  function num() {
+    if (peek() === "(") { i++; const v = add(); if (peek() === ")") i++; return v; }
+    if (peek() === "-") { i++; return -num(); }
+    if (peek() === "+") { i++; return num(); }
+    if (peek() === "$") { i++; let k = ""; while (/\d/.test(peek() || "")) k += s[i++]; return vars[+k] ?? 0; }
+    let k = ""; while (/[0-9.]/.test(peek() || "")) k += s[i++];
+    if (!k) throw new Error("巨集運算式格式不正確：" + s);
+    return parseFloat(k);
+  }
+  function mul() { let v = num(); while (peek() === "x" || peek() === "X" || peek() === "/") { const op = s[i++], r = num(); v = op === "/" ? v / r : v * r; } return v; }
+  function add() { let v = mul(); while (peek() === "+" || peek() === "-") { const op = s[i++], r = mul(); v = op === "+" ? v + r : v - r; } return v; }
+  const v = add();
+  if (i !== s.length) throw new Error("巨集運算式格式不正確：" + s);
+  return v;
+}
+
+/** 巨集 → 以巨集原點為準的多邊形清單 {poly, on} */
+function macroPolys(body, params) {
+  const vars = [];
+  params.forEach((v, k) => { vars[k + 1] = v; });
+  const out = [], warn = [];
+  for (const raw of body) {
+    const st = raw.trim();
+    if (!st || st[0] === "0") continue;
+    const asg = st.match(/^\$(\d+)=(.+)$/);
+    if (asg) { vars[+asg[1]] = macroEval(asg[2], vars); continue; }
+    const f = st.split(",").map(x => macroEval(x, vars)), code = f[0];
+    if (code === 1) out.push({ on: f[1] !== 0, poly: rot(circlePoly(f[3], f[4], f[2]), f[5] || 0) });
+    else if (code === 20 || code === 2) {
+      const [, e, w, sx, sy, ex, ey, r] = f, L = Math.hypot(ex - sx, ey - sy);
+      if (L < EPS) continue;
+      const ux = (ex - sx) / L, uy = (ey - sy) / L, h = w / 2, nx = -uy * h, ny = ux * h;
+      out.push({ on: e !== 0, poly: rot([[sx + nx, sy + ny], [sx - nx, sy - ny], [ex - nx, ey - ny], [ex + nx, ey + ny]], r || 0) });
+    } else if (code === 21) out.push({ on: f[1] !== 0, poly: rot(rectPoly(f[4], f[5], f[2], f[3]), f[6] || 0) });
+    else if (code === 22) out.push({ on: f[1] !== 0, poly: rot(rectPoly(f[4] + f[2] / 2, f[5] + f[3] / 2, f[2], f[3]), f[6] || 0) });
+    else if (code === 4) {
+      const n = Math.round(f[2]), pts = [];
+      if (!(n >= 1 && n <= 10000) || f.length < 6 + 2 * n) { warn.push("巨集外框點數不正確，已略過"); continue; }
+      for (let k = 0; k <= n; k++) pts.push([f[3 + 2 * k], f[4 + 2 * k]]);
+      if (pts.length > 1 && Math.hypot(pts[0][0] - pts[pts.length - 1][0], pts[0][1] - pts[pts.length - 1][1]) < 1e-9) pts.pop();
+      out.push({ on: f[1] !== 0, poly: rot(pts, f[5 + 2 * n] || 0) });
+    } else if (code === 5) {
+      const [, e, n0, cx, cy, d, r] = f, n = Math.min(GERBER_LIMITS.maxPolyVertices, Math.max(3, Math.round(n0 || 3))), pts = [];
+      for (let k = 0; k < n; k++) { const t = (2 * Math.PI * k) / n; pts.push([cx + (d / 2) * Math.cos(t), cy + (d / 2) * Math.sin(t)]); }
+      out.push({ on: e !== 0, poly: rot(pts, r || 0) });
+    } else if (code === 7) {
+      out.push({ on: true, poly: rot(circlePoly(f[1], f[2], f[3]), f[6] || 0), complex: true });
+    } else warn.push("巨集基本形 " + code + " 不支援，已略過");
+  }
+  return { list: out, warn };
+}
+
+/* ---------- 光圈形狀（以光圈中心為原點） ---------- */
+function apertureShape(ap, macros) {
+  if (ap.shape) return ap.shape;
+  const p = ap.params;
+  let s;
+  if (ap.tpl === "C") { const d = p[0] || 0; s = { kind: "c", L: d, W: d, area: (Math.PI * d * d) / 4, perim: Math.PI * d, complex: p.length > 1 }; }
+  else if (ap.tpl === "R") { const w = p[0] || 0, h = p[1] || 0; s = { kind: "r", L: w, W: h, area: w * h, perim: 2 * (w + h), complex: p.length > 2 }; }
+  else if (ap.tpl === "O") {
+    const w = p[0] || 0, h = p[1] || 0, r = Math.min(w, h) / 2;
+    s = { kind: "o", L: w, W: h, area: w * h - (4 - Math.PI) * r * r, perim: 2 * Math.abs(w - h) + 2 * Math.PI * r, complex: p.length > 2 };
+  } else if (ap.tpl === "P") {
+    const d = p[0] || 0, n = Math.min(GERBER_LIMITS.maxPolyVertices, Math.max(3, Math.round(p[1] || 3))), poly = rot(circlePoly(0, 0, d, n), p[2] || 0);
+    s = { kind: "p", poly, area: Math.abs(polyArea(poly)), perim: polyPerim(poly), complex: p.length > 3 };
+  } else {
+    const m = macros.get(ap.tpl);
+    if (!m) return null;
+    const { list, warn } = macroPolys(m, p);
+    const on = list.filter(x => x.on);
+    if (!on.length) return null;
+    const u = unionAreaPerim(on.map(x => x.poly));
+    s = { kind: "m", polys: on.map(x => x.poly), area: Math.abs(u.area), perim: u.perim,
+      complex: on.length !== list.length || list.some(x => x.complex), warn };
+  }
+  if (!s.polys && s.kind !== "p") s.polys = null;
+  const box = s.kind === "c" || s.kind === "r" || s.kind === "o" ? [-s.L / 2, -s.W / 2, s.L / 2, s.W / 2] : polyBox(s.polys ? s.polys.flat() : s.poly);
+  s.box = box;
+  ap.shape = s;
+  return s;
+}
+
+/** 解析 Gerber（瀏覽器登錄與套用時用）。opts.keepDraws 保留畫線線段（板框）。
+ *  回傳 { ok:true, unit, fileFunction, layerGuess, sideGuess, bbox, pads, draws, stats, warnings } 或 { error, code } */
+function parseGerber(input, opts = {}) {
+  const keepDraws = !!opts.keepDraws;
+  const text = gerberText(input);
+  if (!text || !/[*%]/.test(text) || /\u0000/.test(text.slice(0, 4096))) return { error: "不是 Gerber 檔：請選錫膏層、銅箔層或板框的 Gerber（.gtp、.gbr 等）", code: "not_gerber" };
+  const warnings = new Set(), macros = new Map(), apertures = new Map();
+  let fs = null, k = null, unitName = "", fileFunction = "", ipNeg = false;
+  let x = 0, y = 0, interp = 1, quadrant = 75, curAp = null, lastOp = 0, dark = true, inRegion = false;
+  let mir = "N", rotDeg = 0, scale = 1, offA = 0, offB = 0;
+  const attr = { fn: "", ref: "", pin: "" };
+  const pads = [], draws = [], stats = { flashes: 0, regions: 0, draws: 0, clear: 0, skippedLarge: 0, skippedFn: 0, unknownAperture: 0 };
+  const clears = []; // 清除極性（LPC）的外框與當時已有的焊墊數：只影響之前畫的物件
+  let contour = null, srStart = -1, sr = null, bx0 = Infinity, by0 = Infinity, bx1 = -Infinity, by1 = -Infinity, sawCode = false;
+  const grow = (px, py) => { if (px < bx0) bx0 = px; if (px > bx1) bx1 = px; if (py < by0) by0 = py; if (py > by1) by1 = py; };
+
+  function coord(str, axis) {
+    if (str == null) return null;
+    if (!fs) throw Object.assign(new Error("缺少 FS 格式宣告"), { code: "no_format" });
+    if (str.includes(".")) return parseFloat(str) * k;
+    let neg = false, d = str;
+    if (d[0] === "+" || d[0] === "-") { neg = d[0] === "-"; d = d.slice(1); }
+    const ni = axis === "x" ? fs.xi : fs.yi, nd = axis === "x" ? fs.xd : fs.yd;
+    if (fs.zero === "T") d = d.padEnd(ni + nd, "0");
+    const v = (parseInt(d || "0", 10) / Math.pow(10, nd)) * k;
+    return neg ? -v : v;
+  }
+  function unitK(name) { unitName = name; k = name === "IN" ? 25.4 : 1; }
+
+  function addPad(p) {
+    if (srStart < 0 && sr) srStart = pads.length;
+    pads.push(p);
+    if (pads.length > GERBER_LIMITS.maxPads) throw Object.assign(new Error(`焊墊超過上限 ${GERBER_LIMITS.maxPads}：請只輸出單一圖層，不要用整個拼板`), { code: "too_many_pads" });
+  }
+  function flash(px, py) {
+    stats.flashes++;
+    const ap = apertures.get(curAp);
+    if (!ap) { stats.unknownAperture++; return; }
+    const s = apertureShape(ap, macros);
+    if (!s) { stats.unknownAperture++; return; }
+    if (s.warn) for (const w of s.warn) warnings.add(w);
+    const fn = ap.fn || "";
+    const sc = scale * k, mx = mir.includes("X") ? -1 : 1, my = mir.includes("Y") ? -1 : 1;
+    const simple = (s.kind === "c" || s.kind === "r" || s.kind === "o") && Math.abs(rotDeg / 90 - Math.round(rotDeg / 90)) < 1e-9;
+    let pad;
+    if (simple) {
+      const swap = Math.round(rotDeg / 90) % 2 !== 0, L = s.L * sc, W = s.W * sc;
+      pad = { x: px, y: py, w: swap ? W : L, h: swap ? L : W, shape: s.kind, L: Math.max(L, W), W: Math.min(L, W), area: s.area * sc * sc, perim: s.perim * sc };
+    } else {
+      const base = s.polys || [s.kind === "p" ? s.poly : s.kind === "o" ? obroundPoly(0, 0, s.L, s.W) : s.kind === "r" ? rectPoly(0, 0, s.L, s.W) : circlePoly(0, 0, s.L)];
+      const tf = base.map(poly => rot(poly.map(([a, b]) => [a * mx, b * my]), rotDeg).map(([a, b]) => [a * sc + px, b * sc + py]));
+      const bb = polyBox(tf.flat());
+      pad = { x: (bb[0] + bb[2]) / 2, y: (bb[1] + bb[3]) / 2, w: bb[2] - bb[0], h: bb[3] - bb[1], shape: "p",
+        area: s.area * sc * sc, perim: s.perim * sc, poly: tf.length === 1 ? tf[0] : null, rr: tf.length > 1 ? tf : null };
+      const dims = s.kind === "r" || s.kind === "o" ? [s.L * sc, s.W * sc] : [pad.w, pad.h];
+      pad.L = Math.max(...dims); pad.W = Math.min(...dims);
+    }
+    if (!dark) { stats.clear++; clears.push({ box: [pad.x - pad.w / 2, pad.y - pad.h / 2, pad.x + pad.w / 2, pad.y + pad.h / 2], before: pads.length }); return; }
+    if (s.complex) pad.complex = true;
+    if (fn) pad.fn = fn;
+    if (attr.ref) pad.ref = attr.ref;
+    if (attr.pin) pad.pin = attr.pin;
+    if (Math.max(pad.w, pad.h) > GERBER_LIMITS.maxPadMm) { stats.skippedLarge++; return; }
+    grow(pad.x - pad.w / 2, pad.y - pad.h / 2); grow(pad.x + pad.w / 2, pad.y + pad.h / 2);
+    addPad(pad);
+  }
+  function arcPoints(x0, y0, x1, y1, i, j, cw) {
+    let cx, cy;
+    if (quadrant === 74) {
+      let best = null;
+      for (const [si, sj] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) {
+        const ccx = x0 + si * Math.abs(i), ccy = y0 + sj * Math.abs(j);
+        let a0 = Math.atan2(y0 - ccy, x0 - ccx), a1 = Math.atan2(y1 - ccy, x1 - ccx), sw = cw ? a0 - a1 : a1 - a0;
+        while (sw < 0) sw += 2 * Math.PI;
+        if (sw > Math.PI / 2 + 1e-6) continue;
+        const err = Math.abs(Math.hypot(x0 - ccx, y0 - ccy) - Math.hypot(x1 - ccx, y1 - ccy));
+        if (!best || err < best.err) best = { ccx, ccy, err };
+      }
+      if (!best) return [[x1, y1]];
+      cx = best.ccx; cy = best.ccy;
+    } else { cx = x0 + i; cy = y0 + j; }
+    const r = Math.hypot(x0 - cx, y0 - cy), a0 = Math.atan2(y0 - cy, x0 - cx);
+    let a1 = Math.atan2(y1 - cy, x1 - cx), sw = cw ? a0 - a1 : a1 - a0;
+    while (sw <= 1e-12) sw += 2 * Math.PI;
+    if (quadrant === 74 && sw > 2 * Math.PI - 1e-9) sw = 0;
+    const n = Math.max(1, Math.ceil(sw / (Math.PI / 36))), out = [];
+    for (let q = 1; q <= n; q++) { const t = a0 + (cw ? -1 : 1) * (sw * q) / n; out.push([cx + r * Math.cos(t), cy + r * Math.sin(t)]); }
+    out[out.length - 1] = [x1, y1];
+    return out;
+  }
+  function closeContour() {
+    if (!contour) return;
+    const pts = contour;
+    contour = null;
+    if (pts.length < 3) return;
+    stats.regions++;
+    if (!dark) { stats.clear++; clears.push({ box: polyBox(pts), before: pads.length }); return; }
+    if (Math.hypot(pts[0][0] - pts[pts.length - 1][0], pts[0][1] - pts[pts.length - 1][1]) < 1e-9) pts.pop();
+    if (pts.length < 3) return;
+    const bb = polyBox(pts), w = bb[2] - bb[0], h = bb[3] - bb[1];
+    if (Math.max(w, h) > GERBER_LIMITS.maxPadMm) { stats.skippedLarge++; return; }
+    const pad = { x: (bb[0] + bb[2]) / 2, y: (bb[1] + bb[3]) / 2, w, h, shape: "p", L: Math.max(w, h), W: Math.min(w, h),
+      area: Math.abs(polyArea(pts)), perim: polyPerim(pts), poly: pts, region: true };
+    if (attr.fn) pad.fn = attr.fn;
+    if (attr.ref) pad.ref = attr.ref;
+    if (attr.pin) pad.pin = attr.pin;
+    grow(bb[0], bb[1]); grow(bb[2], bb[3]);
+    addPad(pad);
+  }
+  function closeSR() {
+    if (!sr) return;
+    const start = srStart < 0 ? pads.length : srStart, base = pads.slice(start), baseD = draws.slice(sr.d0);
+    for (let a = 0; a < sr.nx; a++) for (let b = 0; b < sr.ny; b++) {
+      if (!a && !b) continue;
+      const ox = a * sr.dx, oy = b * sr.dy;
+      for (const p of base) {
+        const q = { ...p, x: p.x + ox, y: p.y + oy };
+        if (p.poly) q.poly = p.poly.map(([u, v]) => [u + ox, v + oy]);
+        if (p.rr) q.rr = p.rr.map(poly => poly.map(([u, v]) => [u + ox, v + oy]));
+        pads.push(q);
+        if (pads.length > GERBER_LIMITS.maxPads) throw Object.assign(new Error(`焊墊超過上限 ${GERBER_LIMITS.maxPads}：請只輸出單一圖層，不要用整個拼板`), { code: "too_many_pads" });
+        grow(q.x - q.w / 2, q.y - q.h / 2); grow(q.x + q.w / 2, q.y + q.h / 2);
+      }
+      for (const s of baseD) if (draws.length < GERBER_LIMITS.maxDraws) draws.push([s[0] + ox, s[1] + oy, s[2] + ox, s[3] + oy]);
+    }
+    sr = null; srStart = -1;
+  }
+
+  function extended(cmd, blockRest) {
+    const c2 = cmd.slice(0, 2);
+    if (c2 === "FS") {
+      const m = cmd.match(/^FS([LTD]?)([AI]?)(?:N\d+)?(?:G\d+)?X(\d)(\d)Y(\d)(\d)/);
+      if (!m) throw Object.assign(new Error("FS 格式宣告無法辨識：" + cmd), { code: "no_format" });
+      fs = { zero: m[1] === "T" ? "T" : "L", inc: m[2] === "I", xi: +m[3], xd: +m[4], yi: +m[5], yd: +m[6] };
+      if (fs.inc) warnings.add("增量座標（已過時格式）");
+    } else if (c2 === "MO") unitK(cmd.slice(2, 4) === "IN" ? "IN" : "MM");
+    else if (c2 === "AD") {
+      const m = cmd.match(/^ADD(\d+)([A-Za-z_$.][\w.$-]*)(?:,(.*))?$/);
+      if (!m) { warnings.add("光圈定義無法辨識：" + cmd.slice(0, 40)); return; }
+      apertures.set(+m[1], { tpl: m[2], params: m[3] ? m[3].split(/[xX]/).map(Number) : [], fn: attr.fn });
+    } else if (c2 === "AM") macros.set(cmd.slice(2), blockRest);
+    else if (c2 === "LP") dark = cmd[2] !== "C";
+    else if (c2 === "LM") mir = cmd.slice(2) || "N";
+    else if (c2 === "LR") rotDeg = parseFloat(cmd.slice(2)) || 0;
+    else if (c2 === "LS") scale = parseFloat(cmd.slice(2)) || 1;
+    else if (c2 === "SR") {
+      closeSR();
+      const m = cmd.match(/^SRX(\d+)Y(\d+)I([-\d.]+)J([-\d.]+)/);
+      if (m && +m[1] * +m[2] > GERBER_LIMITS.maxRepeat) throw Object.assign(new Error(`步進重複 ${m[1]}×${m[2]} 次，超過上限 ${GERBER_LIMITS.maxRepeat}：請輸出單片板的圖層`), { code: "too_many_pads" });
+      if (m && (+m[1] > 1 || +m[2] > 1)) sr = { nx: +m[1], ny: +m[2], dx: parseFloat(m[3]) * (k || 1), dy: parseFloat(m[4]) * (k || 1), d0: draws.length };
+    } else if (c2 === "OF") {
+      const a = cmd.match(/A([-\d.]+)/), b = cmd.match(/B([-\d.]+)/);
+      offA = a ? parseFloat(a[1]) * (k || 1) : 0; offB = b ? parseFloat(b[1]) * (k || 1) : 0;
+    } else if (c2 === "IP") ipNeg = cmd.slice(2, 5) === "NEG";
+    else if (c2 === "TF") { const m = cmd.match(/^TF\.FileFunction,(.*)$/); if (m) fileFunction = m[1]; }
+    else if (c2 === "TA") { const m = cmd.match(/^TA\.AperFunction,([^,]*)/); if (m) attr.fn = m[1]; }
+    else if (c2 === "TO") {
+      const c = cmd.match(/^TO\.C,(.*)$/), p = cmd.match(/^TO\.P,([^,]*),([^,]*)/);
+      if (c) attr.ref = c[1].trim();
+      if (p) { attr.ref = p[1].trim(); attr.pin = p[2].trim(); }
+    } else if (c2 === "TD") {
+      const n = cmd.slice(2);
+      if (!n) { attr.ref = ""; attr.pin = ""; attr.fn = ""; }
+      else if (n === ".C") attr.ref = "";
+      else if (n === ".P") attr.pin = "";
+      else if (n === ".AperFunction") attr.fn = "";
+    } else if (c2 === "MI" || c2 === "SF" || c2 === "IR") warnings.add("已過時的影像轉換 " + c2 + " 未套用");
+  }
+
+  function word(w) {
+    if (!w) return;
+    if (w.charCodeAt(0) === 71 && (w.startsWith("G04") || w.startsWith("G4") && !/^G4\d/.test(w))) return;
+    let nx = null, ny = null, ni = null, nj = null, d = null;
+    for (let p = 0, n = w.length; p < n;) {
+      const L = w[p++];
+      if ("GDMXYIJ".indexOf(L) < 0) continue;
+      let q = p;
+      if (w[q] === "+" || w[q] === "-") q++;
+      while (q < n) { const ch = w.charCodeAt(q); if ((ch >= 48 && ch <= 57) || ch === 46) q++; else break; }
+      const v = w.slice(p, q);
+      p = q;
+      if (L === "G") {
+        const g = parseInt(v, 10);
+        sawCode = true;
+        if (g === 1 || g === 2 || g === 3) interp = g;
+        else if (g === 36) { inRegion = true; contour = null; }
+        else if (g === 37) { closeContour(); inRegion = false; }
+        else if (g === 74 || g === 75) quadrant = g;
+        else if (g === 70) unitK("IN");
+        else if (g === 71) unitK("MM");
+        else if (g === 90 && fs) fs.inc = false;
+        else if (g === 91 && fs) fs.inc = true;
+      } else if (L === "D") { d = parseInt(v, 10); sawCode = true; }
+      else if (L === "M") { if (parseInt(v, 10) === 2 || parseInt(v, 10) === 0) closeSR(); }
+      else if (L === "X") nx = v; else if (L === "Y") ny = v; else if (L === "I") ni = v; else if (L === "J") nj = v;
+    }
+    if (d != null && d >= 10) { curAp = d; return; }
+    const hasXY = nx != null || ny != null || ni != null || nj != null;
+    if (!hasXY && d == null) return;
+    if (!k) throw Object.assign(new Error("缺少單位宣告（MO）"), { code: "no_unit" });
+    const op = d != null ? d : lastOp;
+    if (d != null) lastOp = d;
+    let tx = nx != null ? coord(nx, "x") + offA : null, ty = ny != null ? coord(ny, "y") + offB : null;
+    if (fs.inc) { tx = x + (tx == null ? 0 : tx - offA); ty = y + (ty == null ? 0 : ty - offB); }
+    else { if (tx == null) tx = x; if (ty == null) ty = y; }
+    const ii = ni != null ? coord(ni, "x") : 0, jj = nj != null ? coord(nj, "y") : 0;
+    if (op === 1) {
+      const pts = interp === 1 ? [[tx, ty]] : arcPoints(x, y, tx, ty, ii, jj, interp === 2);
+      if (inRegion) { if (!contour) contour = [[x, y]]; contour.push(...pts); }
+      else {
+        stats.draws++;
+        if (keepDraws && dark) {
+          let px = x, py = y;
+          grow(x, y);
+          for (const [qx, qy] of pts) { if (draws.length < GERBER_LIMITS.maxDraws) draws.push([px, py, qx, qy]); grow(qx, qy); px = qx; py = qy; }
+        }
+      }
+    } else if (op === 2) { if (inRegion) { closeContour(); contour = [[tx, ty]]; } }
+    else if (op === 3) { if (!inRegion) flash(tx, ty); }
+    x = tx; y = ty;
+  }
+
+  try {
+    let i = 0;
+    const n = text.length;
+    while (i < n) {
+      const c = text[i];
+      if (c === "%") {
+        const end = text.indexOf("%", i + 1);
+        if (end < 0) break;
+        const block = text.slice(i + 1, end).replace(/[\r\n]/g, "");
+        i = end + 1;
+        const parts = block.split("*").filter(s => s.length);
+        if (!parts.length) continue;
+        if (parts[0].startsWith("AM")) { extended(parts[0], parts.slice(1)); continue; }
+        for (const p of parts) extended(p.trim(), null);
+        sawCode = true;
+      } else if (c === "\r" || c === "\n" || c === " " || c === "\t") i++;
+      else {
+        const end = text.indexOf("*", i);
+        if (end < 0) break;
+        let w = text.slice(i, end);
+        if (/\s/.test(w)) w = w.replace(/\s+/g, "");
+        i = end + 1;
+        word(w);
+      }
+    }
+    closeContour();
+    closeSR();
+  } catch (e) {
+    return { error: e.message, code: e.code || "parse_error" };
+  }
+  if (!fs && !sawCode) return { error: "不是 Gerber 檔：找不到 Gerber 指令，請確認選的是錫膏層、銅箔層或板框檔", code: "not_gerber" };
+  if (!fs) return { error: "缺少 FS 格式宣告：請由 CAD 重新輸出 RS-274X（Extended Gerber）", code: "no_format" };
+  if (!k) return { error: "缺少單位宣告（MO）：請由 CAD 重新輸出 RS-274X（Extended Gerber）", code: "no_unit" };
+  if (ipNeg) warnings.add("負片影像（IPNEG）：焊墊可能為反相，請確認");
+  if (clears.length && pads.length) {
+    // 清除圖形蓋住焊墊外框 ≥ 90%：視為已移除；部分重疊：保留位置但面積不採用（complex）
+    const cell = 2, grid = new Map(), key = (i, j) => i * 1000003 + j;
+    pads.forEach((p, k) => { for (let i = Math.floor((p.x - p.w / 2) / cell); i <= Math.floor((p.x + p.w / 2) / cell); i++) for (let j = Math.floor((p.y - p.h / 2) / cell); j <= Math.floor((p.y + p.h / 2) / cell); j++) { const id = key(i, j); let a = grid.get(id); if (!a) grid.set(id, a = []); a.push(k); } });
+    const gone = new Set();
+    let cut = 0;
+    for (const c of clears) {
+      const [x0, y0, x1, y1] = c.box, i0 = Math.floor(x0 / cell), i1 = Math.floor(x1 / cell), j0 = Math.floor(y0 / cell), j1 = Math.floor(y1 / cell);
+      const seen = new Set(), cand = (i1 - i0 + 1) * (j1 - j0 + 1) > pads.length ? pads.map((_, k) => k) : null;
+      const visit = k => {
+        if (seen.has(k) || k >= c.before || gone.has(k)) return;
+        seen.add(k);
+        const p = pads[k], ox = Math.min(x1, p.x + p.w / 2) - Math.max(x0, p.x - p.w / 2), oy = Math.min(y1, p.y + p.h / 2) - Math.max(y0, p.y - p.h / 2);
+        if (ox <= 1e-9 || oy <= 1e-9) return;
+        if (ox * oy >= 0.9 * p.w * p.h) gone.add(k);
+        else if (!p.cut) { p.cut = true; p.complex = true; cut++; }
+      };
+      if (cand) cand.forEach(visit);
+      else for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) for (const k of grid.get(key(i, j)) || []) visit(k);
+    }
+    if (gone.size) { warnings.add(`${gone.size} 個焊墊被清除圖形覆蓋，已移除`); for (const k of [...gone].sort((a, b) => b - a)) pads.splice(k, 1); }
+    if (cut) warnings.add(`${cut} 個焊墊被清除圖形部分切除，面積不採用`);
+    stats.clearedPads = gone.size; stats.cutPads = cut;
+  }
+  const kept = pads.length;
+  const ff = fileFunction.toLowerCase();
+  const layerGuess = /^paste/.test(ff) ? "paste" : /^copper/.test(ff) ? "copper" : /^profile/.test(ff) ? "outline" : "";
+  const sideGuess = /,top\b/.test(ff) ? "TOP" : /,bot/.test(ff) ? "BOT" : "";
+  const hasBox = Number.isFinite(bx0);
+  const bbox = hasBox ? [bx0, by0, bx1, by1] : null;
+  if (kept > GERBER_LIMITS.maxPads) return { error: `焊墊 ${kept} 個，超過上限 ${GERBER_LIMITS.maxPads}：請只輸出單一圖層，不要用整個拼板`, code: "too_many_pads" };
+  if (!kept && !(keepDraws && draws.length)) return { error: "檔案中沒有焊墊（閃光或區域）：請確認選的是錫膏層或銅箔層；板框請選圖層「板框」", code: "no_pads" };
+  if (bbox) {
+    const span = Math.max(bbox[2] - bbox[0], bbox[3] - bbox[1]);
+    if (span > GERBER_LIMITS.maxSpanMm) return { error: `圖面範圍 ${span.toFixed(0)} mm，超過 ${GERBER_LIMITS.maxSpanMm} mm：請確認單位（mm／inch）`, code: "too_large" };
+    if (span < GERBER_LIMITS.minSpanMm) return { error: `圖面範圍只有 ${span.toFixed(2)} mm，小於 ${GERBER_LIMITS.minSpanMm} mm：請確認單位或選整片板的圖層`, code: "too_small" };
+  }
+  return { ok: true, parser: GERBER_PARSER_VERSION, unit: unitName === "IN" ? "inch" : "mm", fileFunction, layerGuess, sideGuess, bbox,
+    pads, draws: keepDraws ? draws : [], padCount: kept, stats, warnings: [...warnings] };
+}
+
+/** Worker 用的輕量檢查（免費方案 CPU 10 ms）：只做原生字串搜尋，不逐指令解析。
+ *  確認格式與單位宣告、計數閃光與區域；外框尺寸等完整檢查在瀏覽器登錄前以 parseGerber 完成。 */
+function quickCheckGerber(input) {
+  if (input && input.length > GERBER_LIMITS.maxRawBytes) return { error: `檔案 ${(input.length / 1048576).toFixed(1)} MB，超過板面圖檔上限 ${GERBER_LIMITS.maxRawBytes / 1048576} MB：請只輸出單一圖層`, code: "too_large_file" };
+  const text = gerberText(input);
+  const head = text.slice(0, 65536);
+  if (!text || /\u0000/.test(head.slice(0, 4096)) || !/[*%]/.test(head)) return { error: "不是 Gerber 檔：請選錫膏層、銅箔層或板框的 Gerber（.gtp、.gbr 等）", code: "not_gerber" };
+  if (!/%FS[LTD]?[AI]?(?:N\d+)?(?:G\d+)?X\d\dY\d\d/.test(head)) return { error: "缺少 FS 格式宣告：請由 CAD 重新輸出 RS-274X（Extended Gerber）", code: "no_format" };
+  if (!/%MO(?:MM|IN)\*/.test(head) && !/(?:^|[*\s])G7[01]\*/.test(head)) return { error: "缺少單位宣告（MO）：請由 CAD 重新輸出 RS-274X（Extended Gerber）", code: "no_unit" };
+  // D 碼可寫成 D03* 或 D3*（與完整解析一致）；只計數不建陣列
+  const count = re => { let n = 0; while (re.exec(text)) n++; return n; };
+  const flashes = count(/D0*3\*/g), regions = count(/G36\*/g), draws = count(/D0*1\*/g);
+  if (flashes + regions > GERBER_LIMITS.maxPads) return { error: `焊墊 ${flashes + regions} 個，超過上限 ${GERBER_LIMITS.maxPads}：請只輸出單一圖層，不要用整個拼板`, code: "too_many_pads" };
+  if (!flashes && !regions && !draws) return { error: "檔案中沒有焊墊或線段：請確認選的是錫膏層、銅箔層或板框檔", code: "no_pads" };
+  const ff = ((head.match(/%TF\.FileFunction,([^*]*)\*%/) || [])[1] || "").replace(/[^\w ,.+-]/g, "").slice(0, 64);
+  return { ok: true, parser: GERBER_PARSER_VERSION, flashes, regions, draws, fileFunction: ff, unit: /%MOIN\*/.test(head) || /G70\*/.test(head) ? "inch" : "mm" };
+}
+
+/** 依副檔名推定圖層（使用者仍須確認） */
+function gerberLayerFromName(name) {
+  const n = String(name || "").toLowerCase();
+  if (/\.(gtp|gbp|crc|crs)$/.test(n) || /paste|smd|stencil|鋼板|錫膏/.test(n)) return "paste";
+  if (/\.(gko|gm1|gml|gm)$/.test(n) || /outline|profile|edge|板框/.test(n)) return "outline";
+  if (/\.(gtl|gbl|cmp|sol)$/.test(n) || /copper|_cu|\.cu|銅/.test(n)) return "copper";
+  return "";
+}
+
+/* ---------- 零件 ↔ 焊墊對應（docs/spec-gerber-layout-rfc.md §4） ---------- */
+const LAYOUT_MATCH = Object.freeze({ acceptRate: 0.6, asIsRate: 0.8, pinRate: 0.8, refRate: 0.5, cell: 2, maxSearch: 15, samples: 30 });
+const ORIENT = [0, 1, 2, 3, 4, 5, 6, 7];
+/** 方位 o：0–3 旋轉 0/90/180/270°，4–7 先將 x 取負再旋轉 */
+function layoutTransform(tf, x, y) {
+  const o = tf ? tf.o : 0, mx = o >= 4 ? -x : x, r = o % 4;
+  const px = r === 0 ? mx : r === 1 ? -y : r === 2 ? -mx : y, py = r === 0 ? y : r === 1 ? mx : r === 2 ? -y : -mx;
+  return [px + (tf ? tf.tx : 0), py + (tf ? tf.ty : 0)];
+}
+
+function padIndex(pads, cell) {
+  const grid = new Map(), key = (i, j) => i * 1000003 + j;
+  pads.forEach((p, k) => { const id = key(Math.floor(p.x / cell), Math.floor(p.y / cell)); let a = grid.get(id); if (!a) grid.set(id, a = []); a.push(k); });
+  /* 離 (x,y) 最近的 n 個焊墊；超過 maxR 仍不足時回傳 null */
+  return function nearest(x, y, n, maxR) {
+    const ci = Math.floor(x / cell), cj = Math.floor(y / cell), cand = [];
+    for (let ring = 0; ring * cell <= maxR + cell; ring++) {
+      for (let i = ci - ring; i <= ci + ring; i++) for (let j = cj - ring; j <= cj + ring; j++) {
+        if (Math.max(Math.abs(i - ci), Math.abs(j - cj)) !== ring) continue;
+        const a = grid.get(key(i, j));
+        if (a) for (const k of a) cand.push([Math.hypot(pads[k].x - x, pads[k].y - y), k]);
+      }
+      if (cand.length >= n) {
+        cand.sort((a, b) => a[0] - b[0]);
+        if (cand[n - 1][0] <= ring * cell) return cand[n - 1][0] <= maxR ? cand.slice(0, n).map(c => c[1]) : null;
+      }
+    }
+    if (cand.length < n) return null;
+    cand.sort((a, b) => a[0] - b[0]);
+    return cand[n - 1][0] <= maxR ? cand.slice(0, n).map(c => c[1]) : null;
+  };
+}
+
+/** 依零件中心與焊墊數評估一個轉換：接受條件＝焊墊群中心與零件中心距離在容差內，且沒有焊墊被兩顆零件取用 */
+function evalTransform(parts, pads, nearest, tf, loose) {
+  const got = [], claim = new Map(), resid = [];
+  for (const part of parts) {
+    const [cx, cy] = layoutTransform(tf, part.x, part.y);
+    const idx = nearest(cx, cy, part.n, loose ? LAYOUT_MATCH.maxSearch / 2 : LAYOUT_MATCH.maxSearch);
+    if (!idx) { got.push(null); continue; }
+    let mx = 0, my = 0;
+    for (const k of idx) { mx += pads[k].x; my += pads[k].y; }
+    mx /= idx.length; my /= idx.length;
+    let rms = 0;
+    for (const k of idx) rms += (pads[k].x - mx) ** 2 + (pads[k].y - my) ** 2;
+    rms = Math.sqrt(rms / idx.length);
+    const d = Math.hypot(mx - cx, my - cy), tol = Math.max(0.3, 0.35 * rms);
+    resid.push([mx - cx, my - cy]);
+    if (d > tol) { got.push({ idx, bad: "center" }); continue; }
+    got.push({ idx });
+    for (const k of idx) claim.set(k, (claim.get(k) || 0) + 1);
+  }
+  let acc = 0;
+  for (const g of got) if (g && !g.bad) { if (g.idx.some(k => claim.get(k) > 1)) g.bad = "shared"; else acc++; }
+  return { got, acc, resid };
+}
+const median = a => { const s = [...a].sort((p, q) => p - q), m = s.length >> 1; return s.length ? (s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2) : 0; };
+
+/** 錨點候選：取焊墊最多的零件為錨點，從焊墊出發反覆取最近 n 個焊墊的中心（收斂到同尺寸的焊墊群中心），
+ *  每個不同的群中心 × 8 種方位為一個候選轉換；以抽樣零件快速評分後取最好的幾個。週期性排列（LED 陣列等）也能分辨。 */
+function anchorCandidates(parts, pads, nearest) {
+  const anchor = parts.reduce((a, p) => (p.n > a.n ? p : a), parts[0]), n = anchor.n;
+  const stride = Math.max(1, Math.floor(pads.length / 4000)), centres = new Map();
+  for (let k = 0; k < pads.length; k += stride) {
+    let x = pads[k].x, y = pads[k].y, idx = null;
+    for (let it = 0; it < 4; it++) {
+      idx = nearest(x, y, n, LAYOUT_MATCH.maxSearch);
+      if (!idx) break;
+      let mx = 0, my = 0;
+      for (const q of idx) { mx += pads[q].x; my += pads[q].y; }
+      mx /= n; my /= n;
+      if (Math.hypot(mx - x, my - y) < 1e-6) break;
+      x = mx; y = my;
+    }
+    if (!idx) continue;
+    const key = Math.round(x * 20) + "," + Math.round(y * 20);
+    if (!centres.has(key)) centres.set(key, [x, y]);
+  }
+  const spread = m => { const st = Math.max(1, Math.floor(parts.length / m)); return parts.filter((_, i) => i % st === 0).slice(0, m); };
+  const quick = spread(6), sample = spread(LAYOUT_MATCH.samples), first = [];
+  for (const [gx, gy] of centres.values()) for (const o of ORIENT) {
+    const [ax, ay] = layoutTransform({ o, tx: 0, ty: 0 }, anchor.x, anchor.y), tf = { o, tx: gx - ax, ty: gy - ay };
+    const e = evalTransform(quick, pads, nearest, tf, false);
+    if (e.acc) first.push({ ...tf, score: e.acc });
+  }
+  first.sort((p, q) => q.score - p.score);
+  return first.slice(0, 40).map(tf => ({ ...tf, score: evalTransform(sample, pads, nearest, tf, false).acc })).sort((p, q) => q.score - p.score);
+}
+
+/** 對應零件與焊墊。parts：[{id?, ref, x?, y?, n, pins?}]（id 為零件唯一鍵，例如含子板的鍵，預設為 ref；x/y 為座標檔中心；pins 為量測的腳位名）；
+ *  pads：用來對應的焊墊（已排除非印刷物件）。X2 分群依 ref，結果一律以 id 為鍵。
+ *  回傳 { level: "pad"|"ref"|"near"|"none", tf, rate, matched:{id:[padIdx]}, pinPad:{id:{pin:padIdx}}, unresolved:[{id, ref, reason}] } */
+function matchLayoutParts(parts, pads) {
+  const res = { level: "none", tf: null, rate: 0, matched: {}, pinPad: {}, unresolved: [], total: parts.length };
+  if (!parts.length || !pads.length) return res;
+  const withRef = pads.filter(p => p.ref).length;
+  if (withRef >= LAYOUT_MATCH.refRate * pads.length) {
+    const byRef = new Map();
+    pads.forEach((p, k) => { if (p.ref) { let a = byRef.get(p.ref); if (!a) byRef.set(p.ref, a = []); a.push(k); } });
+    let pins = 0, hit = 0;
+    for (const part of parts) {
+      const idx = byRef.get(part.ref);
+      const id = part.id ?? part.ref;
+      if (!idx) { res.unresolved.push({ id, ref: part.ref, reason: "圖檔沒有此位號" }); continue; }
+      res.matched[id] = idx;
+      const byPin = new Map(idx.filter(k => pads[k].pin).map(k => [pads[k].pin, k])), pp = {};
+      for (const pin of part.pins || []) { pins++; if (byPin.has(pin)) { pp[pin] = byPin.get(pin); hit++; } }
+      res.pinPad[id] = pp;
+    }
+    res.level = pins && hit >= LAYOUT_MATCH.pinRate * pins ? "pad" : "ref";
+    if (res.level !== "pad") res.pinPad = {};
+    res.rate = Object.keys(res.matched).length / parts.length;
+    return res;
+  }
+  const located = parts.filter(p => Number.isFinite(p.x) && Number.isFinite(p.y) && p.n > 0);
+  for (const p of parts) if (!located.includes(p)) res.unresolved.push({ id: p.id ?? p.ref, ref: p.ref, reason: "沒有零件中心座標" });
+  if (!located.length) return res;
+  const nearest = padIndex(pads, LAYOUT_MATCH.cell);
+  const score = tf => evalTransform(located, pads, nearest, tf, false);
+  let bestTf = { o: 0, tx: 0, ty: 0 }, best = score(bestTf);
+  if (best.acc < LAYOUT_MATCH.asIsRate * located.length) {
+    for (const cand of anchorCandidates(located, pads, nearest).slice(0, 8)) {
+      let tf = { o: cand.o, tx: cand.tx, ty: cand.ty };
+      for (let it = 0; it < 6; it++) {
+        const e = evalTransform(located, pads, nearest, tf, true);
+        if (!e.resid.length) break;
+        const dx = median(e.resid.map(r => r[0])), dy = median(e.resid.map(r => r[1]));
+        tf = { o: tf.o, tx: tf.tx + dx, ty: tf.ty + dy };
+        if (Math.hypot(dx, dy) < 1e-4) break;
+      }
+      const e = score(tf);
+      if (e.acc > best.acc) { best = e; bestTf = tf; }
+    }
+  }
+  res.rate = best.acc / located.length;
+  if (res.rate < LAYOUT_MATCH.acceptRate) {
+    res.level = "none";
+    res.tried = { rate: res.rate, accepted: best.acc, parts: located.length };
+    return res;
+  }
+  res.level = "near";
+  res.tf = { o: bestTf.o, tx: Math.round(bestTf.tx * 1e4) / 1e4, ty: Math.round(bestTf.ty * 1e4) / 1e4 };
+  located.forEach((part, i) => {
+    const g = best.got[i];
+    if (g && !g.bad) res.matched[part.id ?? part.ref] = g.idx;
+    else res.unresolved.push({ id: part.id ?? part.ref, ref: part.ref, reason: !g ? "附近沒有足夠的焊墊" : g.bad === "shared" ? "焊墊與其他零件重疊" : "焊墊群中心偏離零件中心" });
+  });
+  return res;
+}
+return {GERBER_PARSER_VERSION,GERBER_LIMITS,GERBER_NON_PAD_FN,gerberText,unionAreaPerim,parseGerber,quickCheckGerber,gerberLayerFromName,LAYOUT_MATCH,layoutTransform,matchLayoutParts};
+})();
+/* @gerber-pads END */
+/* ---------- 板面圖檔（Gerber）套用到回合：docs/spec-gerber-layout-rfc.md ----------
+   只把「零件 → 焊墊索引」與精簡幾何存在 run.info.layout；不改量測列（腳位順序未知，不寫入 x／y） */
+const LAYOUT_LAYER_NAME={paste:"錫膏層",copper:"銅箔層",outline:"板框"};
+/** 由量測列整理零件：鍵與問題地圖 partMapKey 相同（含子板），座標檔中心（沒有時取該子板實測焊墊座標平均）、焊墊數、腳位名 */
+function layoutPartsFromRows(rows){const by=new Map();
+  for(const r of rows){if(r.comp==null||r.comp==="")continue;const key=JSON.stringify([r.figure??"","comp",r.comp]);let p=by.get(key);
+    if(!p){p={key,ref:String(r.comp),x:NaN,y:NaN,pads:new Set(),real:new Map()};by.set(key,p)}
+    if(r.pad!=null)p.pads.add(String(r.pad));
+    if(!Number.isFinite(p.x)&&Number.isFinite(r.componentX)&&Number.isFinite(r.componentY)){p.x=r.componentX;p.y=r.componentY}
+    if(realXY(r)&&!p.real.has(r.pad))p.real.set(r.pad,[r.x,r.y])}
+  return[...by.values()].map(p=>{let{x,y}=p;
+    if(!Number.isFinite(x)&&p.real.size){x=0;y=0;for(const[a,b]of p.real.values()){x+=a;y+=b}x/=p.real.size;y/=p.real.size}
+    const pre=p.ref+"-",pins=[...p.pads].map(s=>s.startsWith(pre)?s.slice(pre.length):s);
+    return{key:p.key,ref:p.ref,x,y,n:Math.max(1,p.pads.size),pins}})}
+/** 對應用的焊墊：有錫膏層用錫膏層，否則用銅箔層；排除 X2 標為導通孔、導體等非印刷物件 */
+function layoutPadSet(layers){const src=layers.paste?"paste":layers.copper?"copper":"";if(!src)return{src,pads:[]};
+  const bad=new Set(GERBER.GERBER_NON_PAD_FN);return{src,pads:layers[src].pads.filter(p=>!bad.has(p.fn))}}
+const r3=v=>Math.round(v*1000)/1000;
+function layoutGeomPads(pads){return pads.map(p=>{const o={x:r3(p.x),y:r3(p.y),w:r3(p.w),h:r3(p.h),s:p.shape};
+  if(p.shape==="p"&&p.poly){const st=Math.max(1,Math.ceil(p.poly.length/48));o.poly=p.poly.filter((_,i)=>i%st===0).map(([a,b])=>[r3(a),r3(b)])}
+  return o})}
+/** 依量測列與已解析圖層建立 run.info.layout；layers：{paste?,copper?,outline?}（parseGerber 結果），ids：[{id,sha256,layer,name}] */
+function buildLayoutInfo(rows,layers,ids,source){const{src,pads}=layoutPadSet(layers),parts=layoutPartsFromRows(rows);
+  const info={ids,source,src,level:"none",tf:null,rate:0,total:parts.length,matched:{},pinPad:{},unresolved:[],at:{},geom:null};
+  if(!src){info.error="需要錫膏層或銅箔層才能標示焊墊";return info}
+  /* 座標檔不分子板：各子板同一位號中心相同，只對應一次再展開到各子板，避免被判為焊墊重疊 */
+  const groups=new Map();for(const p of parts){const g=`${p.ref}\u0000${p.x}\u0000${p.y}\u0000${p.n}`;let a=groups.get(g);if(!a)groups.set(g,a=[]);a.push(p)}
+  const uniq=[...groups.values()].map(a=>({...a[0],id:a[0].key})),members=new Map([...groups.values()].map(a=>[a[0].key,a]));
+  const m=GERBER.matchLayoutParts(uniq,pads),matched={},pinPad={},unresolved=[];
+  for(const[id,idx]of Object.entries(m.matched))for(const p of members.get(id)){matched[p.key]=idx;if(m.pinPad[id])pinPad[p.key]=m.pinPad[id]}
+  for(const u of m.unresolved)for(const p of members.get(u.id)||[])unresolved.push({key:p.key,ref:p.ref,reason:u.reason});
+  Object.assign(info,{level:m.level,tf:m.tf,rate:m.rate,matched,pinPad,unresolved,tried:m.tried||null,shared:[...groups.values()].some(a=>a.length>1)});
+  if(m.tf)for(const u of unresolved){const p=parts.find(q=>q.key===u.key);if(p&&Number.isFinite(p.x))info.at[u.key]=GERBER.layoutTransform(m.tf,p.x,p.y).map(r3)}
+  const outline=layers.outline?layers.outline.draws.map(s=>s.map(r3)):[];
+  const bg=src==="paste"&&layers.copper?layoutGeomPads(layers.copper.pads):[];
+  const all=[...pads.map(p=>[p.x-p.w/2,p.y-p.h/2,p.x+p.w/2,p.y+p.h/2]),...outline.map(s=>[Math.min(s[0],s[2]),Math.min(s[1],s[3]),Math.max(s[0],s[2]),Math.max(s[1],s[3])])];
+  let box=null;for(const b of all)box=box?[Math.min(box[0],b[0]),Math.min(box[1],b[1]),Math.max(box[2],b[2]),Math.max(box[3],b[3])]:b.slice();
+  info.geom={pads:layoutGeomPads(pads),bg,outline,box:box&&box.map(r3)};
+  return info}
+/** 對應結果的一行說明（地圖狀態列、匯入提示共用） */
+function layoutStatusText(L){if(!L)return"";const n=Object.keys(L.matched||{}).length,u=(L.unresolved||[]).length,src=LAYOUT_LAYER_NAME[L.src]||"";
+  if(L.error)return L.error;
+  if(L.level==="none")return`板面圖檔與座標檔對不上（${L.tried?`${L.tried.accepted}／${L.tried.parts} 顆零件對上`:"沒有可對應的零件"}），未套用`;
+  const how=L.level==="pad"?"逐焊墊標示":L.level==="ref"?"依圖檔位號標示零件":"依零件標示；無法對應到單一焊墊";
+  const tf=L.tf&&(L.tf.o||L.tf.tx||L.tf.ty)?`；已${L.tf.o>=4?"鏡像、":""}${L.tf.o%4?`旋轉 ${(L.tf.o%4)*90}°、`:""}平移 ${L.tf.tx}, ${L.tf.ty} mm`:"";
+  return`${src} · ${how} · ${n} 顆零件對上${u?`，${u} 顆對不上`:""}${tf}${L.shared?" · 座標檔不分子板，各子板標在同一份焊墊":""}${L.source==="lookup"?" · 依料號版次套用":""}`}
 /* Number.isFinite：空白座標欄解析為 null，全域 isFinite(null) 會當成 0 */
 const realXY=r=>Boolean(r&&!r.gridPos&&Number.isFinite(r.x)&&Number.isFinite(r.y));
 const S={rows:[],metrics:[],metric:"volume",group:ALL_GRP,comp:null,chart:"xbars",relChart:"specScatter",pad:null,board:null,specSrc:"sample",partSpec:null,specDraft:null,specsG:null,sqDir:"Y",specs:JSON.parse(JSON.stringify(DEF_SPECS)),stencil:120,heightUnit:"um",htol:{lo:75,hi:125},step:{on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]},selZone:1,wipe:5,aperture:{groups:{}},geometryPads:null,padCoverage:null,pendingVerify:false,runVendor:"generic",ovCapSnap:null,ovCapSnapKey:"",source:"範例資料",tab:"issues",sub:"import",issuesSub:"list",controlSub:"uni",improveSub:"compare",F:[],issLv:"all",issCat:"all",issEnt:null,pmapSelection:null,issGroup:"cases",ctx:null,colorMode:"status",heatMode:"avg",sim3dMode:"real",exag:20,ghost:true,bridgeWarn:true,csAxis:"X",selectedPad:null,A:null,ai:"",aiModel:"",duo:{active:false,posture:"folded",mode:"master-detail",leftTab:"issues",rightTab:"sim3d",thumbSide:"right",pinnedPad:null,dockOpen:false}};
@@ -6357,7 +7092,7 @@ function computeLocalOosDensity(rows,coordGetter,clsFn){
   }
   return out;
 }
-if(typeof module!=="undefined")module.exports={compKeyOf,compKeyParse,scopeFilter,scopeParts,scopePart,scopeSpecGroup,scopeLabel,normalizeScope,scopeIsNarrow,SCOPE_PANELS,SCOPE_BOARD_CARDS,SCOPE_BOARD_NOTE,issuesMd,fmMd,rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,adSample,adSampleHash,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,areaRatio,maxThkForAR,detectIssues,buildProblemCases,issueCaseCounts,overallVerdict,compareRuns,dfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,groupBasisOfRow,groupBasisForRows,groupBasisLabel,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor};
+if(typeof module!=="undefined")module.exports={compKeyOf,compKeyParse,scopeFilter,scopeParts,scopePart,scopeSpecGroup,scopeLabel,normalizeScope,scopeIsNarrow,SCOPE_PANELS,SCOPE_BOARD_CARDS,SCOPE_BOARD_NOTE,issuesMd,fmMd,rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,adSample,adSampleHash,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,areaRatio,maxThkForAR,detectIssues,buildProblemCases,issueCaseCounts,overallVerdict,compareRuns,dfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,groupBasisOfRow,groupBasisForRows,groupBasisLabel,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,GERBER,layoutPartsFromRows,layoutPadSet,buildLayoutInfo,layoutStatusText};
 </script>
 <script>
 
@@ -7002,8 +7737,14 @@ function renderPmap() {
     `<button type="button" data-part="${item.i}" data-map-focus="${source}-${item.i}" aria-pressed="${selection.part===item.part.key}"><b>${esc(item.label)}</b><span>${esc(stateText(item))}</span></button>`).join("")}</div>`;
   const section = (title,entries,source) => entries.length ? `<h4>${title}</h4>${list(entries,source)}` : "";
   let chart = "";
+  const L = pmapLayout(), Lall = curRun()?.info?.layout;
   const drawn = [];
-  if (points.length) {
+  if (L) {
+    const unmatched = sorted.filter(item => !L.matched[item.part.key]);
+    chart = `<div class="pmap-board"><div class="pmap-zoom" role="group" aria-label="縮放"><button type="button" data-zoom="in" aria-label="放大">＋</button><button type="button" data-zoom="out" aria-label="縮小">－</button><button type="button" data-zoom="fit">全板</button></div><canvas class="pmap-canvas" tabindex="0" data-map-focus="board" role="img" aria-label="板面焊墊圖：方向鍵移動、＋－縮放；以零件清單選取零件"></canvas></div>
+      <p class="note" role="status">${esc(layoutStatusText(L))}</p>${section("對不上板面圖檔的零件",unmatched,"unmatched")}
+      <details class="part-map-all"${listOpen?" open":""}><summary data-map-focus="all-parts">零件清單</summary>${list(sorted,"list")}</details>`;
+  } else if (points.length) {
     const [minX,minY,maxX,maxY] = index.bounds;
     const w=640,h=360,dx=maxX-minX,dy=maxY-minY;
     const scale=Math.min(dx ? (w-120)/dx : Infinity,dy ? (h-60)/dy : Infinity);
@@ -7060,7 +7801,7 @@ function renderPmap() {
   const change=(target,disabled,caption)=>`<button type="button" data-map-move="${target}" data-map-focus="${target}" ${disabled?"disabled":""}>${caption}</button>`;
   root.innerHTML=`<div class="part-map-nav">${change("prev",pos===0,"上一片")}${change("next",pos===index.order.length-1,"下一片")}${change("worst",!index.hasBoardHits || selection.board===index.worstBoard,"最嚴重的一片")}</div>
     <p role="status">${esc(selection.board)} · 第 ${pos+1}／${index.order.length} 片${index.hasBoardHits&&selection.board===index.worstBoard?" · 最嚴重的一片":""} · ${hitPartCount} 顆零件有相關問題${S.boardInferred?" · 推定子群組":""}</p>
-    ${chart}${detail}<div class="part-map-nav"><button type="button" data-mode="batch" data-map-focus="batch" ${batchCount?"":"disabled"}>整批問題 ${batchCount} 項</button>${index.unresolved.size?`<button type="button" data-mode="unresolved" data-map-focus="unresolved">位置待確認 ${index.unresolved.size} 項</button>`:""}<button type="button" id="pmapClear" data-mode="all" data-map-focus="all">顯示全部問題</button></div>`;
+    ${Lall&&!L?`<p class="note" role="status">${esc(layoutStatusText(Lall))}</p>`:""}${chart}${detail}<div class="part-map-nav"><button type="button" data-mode="batch" data-map-focus="batch" ${batchCount?"":"disabled"}>整批問題 ${batchCount} 項</button>${index.unresolved.size?`<button type="button" data-mode="unresolved" data-map-focus="unresolved">位置待確認 ${index.unresolved.size} 項</button>`:""}<button type="button" id="pmapClear" data-mode="all" data-map-focus="all">顯示全部問題</button></div>`;
   const focus = key => [...root.querySelectorAll("[data-map-focus]")].find(el=>el.dataset.mapFocus===key);
   function pick(i) {
     pmapSelect({board:selection.board,part:items[i].part.key,mode:"overview"});
@@ -7077,6 +7818,8 @@ function renderPmap() {
     }
   };
   const svg=root.querySelector("svg"), plot=root.querySelector(".part-map-plot");
+  const boardCv=root.querySelector(".pmap-canvas");
+  if (boardCv && L) pmapBoardWire(boardCv,L,items,selection,pick);
   if (svg) {
     const candidates=root.querySelector(".part-map-candidates");
     svg.onclick=event=>{
@@ -9887,7 +10630,7 @@ let PLACE=null;
 /* 座標檔不寫入瀏覽器：每次開啟頁面都要重新從資料庫選取 */
 function placeLoad(){PLACE=null}
 function placeSave(){}
-function placeShow(){const st=$("#placeState");$("#placeClear").hidden=!PLACE;if(!PLACE){st.textContent="未套用受控座標檔";return}
+function placeShow(){const st=$("#placeState");$("#placeClear").hidden=!PLACE;refreshLayoutRow();if(!PLACE){st.textContent="未套用受控座標檔";return}
   const r=PLACE.res,declared=headerPlaceUnit(PLACE.tab.head),declaredText=declared==="conflict"?"（欄名單位互相衝突）":declared?`（欄名標示 ${declared}）`:"（登錄時選擇）";st.textContent=`料號 ${PLACE.part} 版次 ${PLACE.rev} · ${PLACE.name}：${r.items.length} 個元件（TOP ${r.top}、BOT ${r.bot}），單位 ${r.unit}${declaredText}；無焊墊座標${r.warn?`；⚠️ ${r.warn}`:""}`}
 /* ---------- 舊資料／未綁定回合的受控座標檢視套用 ---------- */
 function runHasGridPos(run){
@@ -10314,7 +11057,7 @@ $("#btnApply").onclick=async()=>{if(!IMP||!IMP.res)return;const I0=IMP,demo=!!I0
       const qSnap=computeQualitySnapshot(I0.res,ps?{...S,...newRunCfg(thk,ps)}:null);
       const unmatched=[...new Set([...(I0.conv?.place?.missing||[]),...(I0.res?.info?.place?.missing||[])])].sort();
       if(unmatched.length&&!window.confirm(`以下 ${unmatched.length} 個位號在 ${impSide} 座標中找不到：\n${unmatched.join("、")}\n\n確認仍要匯入？這些量測保留在非位置統計，沒有座標。`)){busy(false);return}
-      try{src=await RecDB.create({kind:"spi",lot,part,rev,workOrder,measuredDate,supplierWo,outsourceWo,side:impSide,vendor:$("#selVendor").value,name:safeId(I0.name)||"量測紀錄.csv",rows:I0.res.rows.length,boards:I0.res.info.boards,pads:I0.res.info.pads,placeId:PLACE.recId,unmatchedRefs:unmatched,unmatchedConfirmed:!!unmatched.length,stencil:thk,...(qSnap?{qualitySnapshot:qSnap}:{}),...(I0.reimportOf?{sourceLegacyId:I0.reimportOf.id}:{})},I0.bytes)}
+      try{src=await RecDB.create({kind:"spi",lot,part,rev,workOrder,measuredDate,supplierWo,outsourceWo,side:impSide,vendor:$("#selVendor").value,name:safeId(I0.name)||"量測紀錄.csv",rows:I0.res.rows.length,boards:I0.res.info.boards,pads:I0.res.info.pads,placeId:PLACE.recId,layoutIds:layoutIdsFor(part,rev,impSide),unmatchedRefs:unmatched,unmatchedConfirmed:!!unmatched.length,stencil:thk,...(qSnap?{qualitySnapshot:qSnap}:{}),...(I0.reimportOf?{sourceLegacyId:I0.reimportOf.id}:{})},I0.bytes)}
       catch(e){if(e.code==="unmatched_confirmation"&&e.missing?.length){busy(false);$("#recNote").textContent=`伺服器查出 ${e.missing.length} 個無座標位號：${e.missing.join("、")}。請核對座標檔與面別後重新套用。`;return}
         if(/^legacy_source_/.test(e.code||"")){busy(false);$("#recNote").innerHTML=`<span class="err">${esc(e.code==="legacy_source_mismatch"?"原始檔與舊紀錄不同，已停止":e.code==="legacy_source_missing"?"找不到要重新匯入的舊紀錄，請重新整理資料庫":"這筆紀錄不是舊量測紀錄，不能重新受控匯入")}；未建立回合</span>`;return}
         if(e.existing){src=await recFind(e.existing).catch(()=>null);if(src){const changed=[["製令工單",workOrder,src.workOrder],["量測日期",measuredDate,src.measuredDate],["批號",lot,src.lot],["廠商工單",supplierWo,src.supplierWo],["外包工單",outsourceWo,src.outsourceWo]].filter(([,a,b])=>(a||"")!==(b||""));
@@ -10332,6 +11075,7 @@ $("#btnApply").onclick=async()=>{if(!IMP||!IMP.res)return;const I0=IMP,demo=!!I0
   holdRender(()=>{if(mode==="replace"&&curRun()){const c=curRun();c.rows=rows;c.metrics=runMetrics(metrics,info.heightUnit);c.name=name;c.info=info;c.aoi=null;c.sample=demo;c.cfg=cfg;S.runId=null;switchRun(c.id)}
     else{const id=addRun(name,rows,metrics,cfg,info);if(demo)S.runs.find(r=>r.id===id).sample=true;switchRun(id)}});
   $("#mapBox").hidden=true;IMP=null;IMPORT_FLOW_COMPLETE=true;IMPORT_FLOW_PHASE="";updateImportWorkflow();
+  if(src&&!demo)attachLayoutToRun(curRun(),src);
   if(locked){setTab("data");setSub("specs","spec");gotoSpecCard();toast(`料號 ${partNo} 尚無料號規格：請確認規格表後按「儲存為新版本」，分析才會開始`)}
   else{setTab("issues");if(ps)toast(`已套用料號 ${ps.rec.part} 的預設規格 v${ps.rec.ver}`)}})};
 const applyImportHandler=$("#btnApply").onclick;
@@ -11560,7 +12304,7 @@ function sharePack(){const c=curRun();if(c)c.cfg=snapCfg();
   const srcTab=(S.tab==="share"||S.tab==="shares")?SHARE_FROM_TAB:S.tab;
   const cmp=srcTab==="improve"&&(S.improveSub||"compare")==="compare";
   const pick=cmp?[S.cmpA,S.cmpB].map(id=>S.runs.find(r=>r.id===id)).filter(Boolean):[c];
-  const runs=[...new Set(pick)].map(r=>({name:r.name,rows:r.rows,metrics:r.metrics,cfg:r.cfg,info:r.info,aoi:r.aoi}));
+  const runs=[...new Set(pick)].map(r=>({name:r.name,rows:r.rows,metrics:r.metrics,cfg:r.cfg,info:r.info&&r.info.layout?(({layout,...rest})=>rest)(r.info):r.info,aoi:r.aoi})); /* 板面圖檔幾何不隨分享連結外流 */
   return{kind:"spi-share",v:1,created:Date.now(),app:$("#appVer").textContent,runs,view:{tab:srcTab,metric:S.metric,group:S.group,comp:S.comp||null,board:S.board,cur:pick.indexOf(c),cmp}}}
 function initSharePage(){
   const c=curRun(),rName=c?c.name:"未命名回合",cnt=S.rows.length,kb=Math.max(1,Math.round(cnt*0.045));
@@ -11681,6 +12425,10 @@ function recCheck(m){const c=(v,n)=>String(v??"").replace(/[<>"'`&\u0000-\u001f\
     if(/^[A-Za-z0-9_-]{22}$/.test(m.sourceLegacyId||""))o.sourceLegacyId=m.sourceLegacyId;
   }else if(m.kind==="spec"){
     o.name=o.name||"料號規格.json";o.note=c(m.note,200);o.basedOn=/^[A-Za-z0-9_-]{22}$/.test(m.basedOn||"")?m.basedOn:"";o.makeDefault=Boolean(m.makeDefault);
+  }else if(m.kind==="layout"){
+    o.rev=c(m.rev,32);if(!o.rev)return{error:"請填寫版次"};
+    o.side=m.side==="TOP"||m.side==="BOT"?m.side:"";if(!o.side)return{error:"請選擇面別（TOP 或 BOT）"};
+    o.layer=["paste","copper","outline"].includes(m.layer)?m.layer:"";if(!o.layer)return{error:"請選擇圖層"};
   }else{
     o.rev=c(m.rev,32);if(!o.rev)return{error:"請填寫座標檔版本"};
     o.side=["TOP","BOT","BOTH"].includes(m.side)?m.side:"";
@@ -11778,6 +12526,10 @@ var RecDB={mode:"local",me:"本機",isAdmin:false,cache:null,ready:null,
     }
     throw new Error("本機舊資料僅供查閱");
   },
+  /* 板面圖檔：依料號、版次、面別列出有效檔（新到舊）；本機舊資料沒有板面圖檔 */
+  async layoutsFor(part,rev,side){await this.ready;if(this.mode!=="cloud"||!part)return[];
+    const j=await this.jfetch(`/api/records?layouts_for=${encodeURIComponent(part)}&rev=${encodeURIComponent(rev||"")}&side=${encodeURIComponent(side||"")}`);this.isAdmin=!!j.isAdmin;
+    return(j.layouts||[]).map(r=>deepClean(recordView(r)))},
   /* 料號規格：依料號列出版本（新到舊；欄位 ver、isDefault、note、basedOn） */
   async specsFor(part){await this.ready;if(!part)return[];
     if(this.mode==="cloud"){const j=await this.jfetch("/api/records?specs_for="+encodeURIComponent(part));this.me=j.me||this.me;return(j.specs||[]).map(r=>deepClean(r))}
@@ -11863,7 +12615,7 @@ function auditSwitch(e){const from=Array.isArray(e.from)?(e.from.length?e.from.m
 let AUDIT_ROWS=new Map(),DELETING_AUDIT_SEQ=null;
 const auditActName=a=>a==="delete"?"刪除":a==="migrate_exclude"?"遷移時排除":a==="set_default_spec"||a==="set_default_place"?"設為預設":a==="update_meta"?"修改":a==="audit_delete"?"刪除稽核":"新增";
 const auditKind=(e)=>e.kind||(e.action==="set_default_place"?"place":e.action==="set_default_spec"?"spec":"");
-const auditKindName=k=>k==="place"?"座標檔":k==="spec"?"料號規格":"量測紀錄";
+const auditKindName=k=>k==="place"?"座標檔":k==="spec"?"料號規格":k==="layout"?"板面圖檔":"量測紀錄";
 async function renderAudit(){const box=$("#recAudit");try{const es=await RecDB.audit(),canDel=RecDB.mode==="cloud"&&!!RecDB.isAdmin;AUDIT_ROWS=new Map();box.innerHTML=es.length?`<table><thead><tr><th>時間</th><th>動作</th><th>類型</th><th>批號</th><th>產品料號</th><th>版本</th><th>原始檔</th><th>執行者</th><th>檔案指紋</th>${canDel?"<th>操作</th>":""}</tr></thead><tbody>`+es.map(e=>{const tomb=e.action==="audit_delete",src=tomb?(e.deleted||{}):e,isDef=src.action==="set_default_spec"||src.action==="set_default_place",kind=auditKind(src);
     let act=tomb?`<span class="pill na">刪除稽核</span><div class="note">已刪除：${esc(auditActName(src.action))} · ${esc(fmtTime(src.at))} · ${esc(src.by||"—")}</div>`:e.action==="delete"?'<span class="pill ng">刪除</span>':e.action==="migrate_exclude"?'<span class="pill warn">遷移時排除</span>':isDef?'<span class="pill na">設為預設</span>'+auditSwitch(e):e.action==="update_meta"?'<span class="pill na">修改</span>':'<span class="pill ok">新增</span>';let st="";if(!tomb&&(e.ok===false||(e.detail&&e.detail.done===false)||e.done===false)){st=' <span class="pill warn" title="動作前已記錄，但未完成（已撤回）">未完成</span>'}else if(e.target_type==="record"&&e.status&&e.status.includes("目標已不在本站")){st=' <span class="note" style="color:var(--muted)">目標已不在本站</span>'}
     let op="";if(canDel){if(!tomb&&e.seq!=null){AUDIT_ROWS.set(String(e.seq),e);op=`<td><button type="button" data-audit-del="${esc(String(e.seq))}">刪除</button></td>`}else op="<td></td>"}
@@ -11884,6 +12636,151 @@ async function recFind(id,fresh){
   return REC_SPECS[id]||((!fresh&&RecDB.cache)||await RecDB.list()).find(r=>r.id===id);
 }
 /* 從資料庫載入座標檔（不重新存檔） */
+/* ---------- 板面圖檔（Gerber）：登錄、匯入時查詢、套用到回合（docs/spec-gerber-layout-rfc.md） ---------- */
+/* var：placeShow() 可能在本段執行前呼叫 refreshLayoutRow，避免 let／const 暫時死區 */
+var LAYOUT_SEL=null,LAYOUT_SEL_GEN=0,UP_LAY_FILE=null,UP_LAY_PARSED=null,UP_LAY_BYTES=null,LAYOUT_PARSED=new Map();
+function layoutKey(part,rev,side){return`${part}\u0000${rev}\u0000${side}`}
+/* 匯入步驟 ①：所選受控座標（料號、版次）與量測面別已登錄的板面圖檔 */
+async function refreshLayoutRow(){const row=$("#layoutRow"),st=$("#layoutState");if(!row||!st)return;
+  const side=$("#selSide")?.value||"",want=PLACE&&RecDB.mode==="cloud"&&(side==="TOP"||side==="BOT")?{part:PLACE.part,rev:PLACE.rev,side}:null;
+  row.hidden=!want;if(!want){LAYOUT_SEL=null;return}
+  const key=layoutKey(want.part,want.rev,want.side);
+  if(LAYOUT_SEL&&LAYOUT_SEL.key===key){st.textContent=layoutRowText(LAYOUT_SEL.recs);return}
+  const gen=LAYOUT_SEL_GEN=(LAYOUT_SEL_GEN||0)+1;st.textContent="正在查詢板面圖檔…";
+  try{const recs=await RecDB.layoutsFor(want.part,want.rev,want.side);if(gen!==LAYOUT_SEL_GEN)return;LAYOUT_SEL={key,...want,recs};st.textContent=layoutRowText(recs)}
+  catch(e){if(gen!==LAYOUT_SEL_GEN)return;LAYOUT_SEL=null;st.textContent="無法查詢板面圖檔："+e.message}}
+function layoutRowText(recs){if(!recs.length)return"未登錄板面圖檔";
+  const names=["paste","copper","outline"].filter(l=>recs.some(r=>r.meta.layer===l)).map(l=>LAYOUT_LAYER_NAME[l]);
+  return`已登錄：${names.join("、")}`+(recs.some(r=>r.meta.layer!=="outline")?"":"；標示焊墊需要錫膏層或銅箔層")}
+/* 新量測上傳時引用的板面圖檔（伺服器核對後寫入 layoutProof） */
+function layoutIdsFor(part,rev,side){return LAYOUT_SEL&&LAYOUT_SEL.key===layoutKey(part,rev,side)?LAYOUT_SEL.recs.map(r=>r.id):[]}
+/* 下載並解析圖層（同一筆紀錄只解析一次）；同一圖層只取第一份 */
+async function loadLayoutLayers(recs){const layers={},ids=[];
+  for(const rec of recs){const layer=rec.meta&&rec.meta.layer;if(!LAYOUT_LAYER_NAME[layer]||layers[layer])continue;
+    let parsed=LAYOUT_PARSED.get(rec.id);
+    if(!parsed){const g=await RecDB.get(rec);if(!g.ok)throw new Error(`${LAYOUT_LAYER_NAME[layer]}指紋與登錄時不同`);
+      parsed=GERBER.parseGerber(g.bytes,{keepDraws:layer==="outline"});if(parsed.error)throw new Error(`${LAYOUT_LAYER_NAME[layer]}：${parsed.error}`);LAYOUT_PARSED.set(rec.id,parsed)}
+    layers[layer]=parsed;ids.push({id:rec.id,sha256:rec.sha256,layer,name:rec.name})}
+  return{layers,ids}}
+/* 套用到回合：有 layoutProof 用當時的檔；沒有時依料號、版次、面別查有效檔（標示「依料號版次套用」）。不改量測列 */
+async function attachLayoutToRun(run,src){if(!run||!src||RecDB.mode!=="cloud"||!src.part||!src.rev||!(src.side==="TOP"||src.side==="BOT"))return;
+  let L=null;
+  try{const proof=Array.isArray(src.meta&&src.meta.layoutProof)?src.meta.layoutProof:null;let recs,source;
+    if(proof&&proof.length){source="proof";recs=(await Promise.all(proof.map(p=>recFind(p.id,true)))).filter(Boolean);
+      const same=recs.length===proof.length&&recs.every(r=>{const p=proof.find(q=>q.id===r.id);return p&&p.sha256===r.sha256});
+      if(!same)L={level:"none",source,ids:proof,error:"當時使用的板面圖檔已刪除或內容不同，未套用"}}
+    else{source="lookup";recs=await RecDB.layoutsFor(src.part,src.rev,src.side)}
+    if(!L){if(!recs.length){if(run.info)delete run.info.layout;return}
+      const{layers,ids}=await loadLayoutLayers(recs);L=buildLayoutInfo(run.rows,layers,ids,source)}}
+  catch(e){L={level:"none",source:"error",ids:[],error:"板面圖檔無法套用："+e.message}}
+  run.info=run.info||{};run.info.layout=L;
+  if(run===curRun()){S.pmapView=null;if(S.tab==="issues")renderIssues();toast("板面圖檔："+layoutStatusText(L))}}
+
+/* 紀錄庫「座標檔庫」：登錄板面圖檔（管理者） */
+function upLayInfoText(p){if(!p)return"";if(p.error)return"";
+  const b=p.bbox,size=b?`範圍 ${(b[2]-b[0]).toFixed(1)} × ${(b[3]-b[1]).toFixed(1)} mm`:"";
+  const n=p.padCount?`${p.padCount.toLocaleString()} 個焊墊`:`${p.draws.length.toLocaleString()} 條線段`;
+  return[n,size,`單位 ${p.unit}`,...p.warnings].filter(Boolean).join("，")}
+async function renderLayoutList(){const box=$("#upLayList");if(!box)return;
+  const part=($("#upLayPart")?.value||"").trim(),rev=($("#upLayRev")?.value||"").trim();
+  if(!part||RecDB.mode!=="cloud"){box.innerHTML="";return}
+  let recs;try{recs=await RecDB.layoutsFor(part,rev,"")}catch(e){box.innerHTML=`<p class="note"><span class="err">無法讀取板面圖檔：${esc(e.message)}</span></p>`;return}
+  if(!recs.length){box.innerHTML=`<p class="note">料號 <span class="mono">${esc(part)}</span>${rev?" "+esc(rev):""} 尚未登錄板面圖檔</p>`;return}
+  box.innerHTML=`<div class="tbl"><table><thead><tr><th>版次</th><th>面別</th><th>圖層</th><th>原始檔</th><th>登錄</th>${RecDB.isAdmin?"<th></th>":""}</tr></thead><tbody>${recs.map(r=>`<tr><td>${esc(r.rev)}</td><td>${esc(r.side)}</td><td>${esc(LAYOUT_LAYER_NAME[r.meta.layer]||"—")}</td><td class="mono" style="overflow-wrap:anywhere">${esc(r.name)}</td><td>${esc(r.user)}<br><span class="note">${esc(fmtTime(r.created))}</span></td>${RecDB.isAdmin?`<td><button type="button" class="btn-sm" data-del-layout="${esc(r.id)}" aria-label="刪除 ${esc(r.rev)} ${esc(r.side)} ${esc(LAYOUT_LAYER_NAME[r.meta.layer]||"")}">刪除</button></td>`:""}</tr>`).join("")}</tbody></table></div>`;
+  box.onclick=async e=>{const b=e.target.closest("[data-del-layout]");if(!b)return;const r=recs.find(x=>x.id===b.dataset.delLayout);if(!r)return;
+    if(!window.confirm(`刪除板面圖檔 ${r.part} ${r.rev} ${r.side} ${LAYOUT_LAYER_NAME[r.meta.layer]||""}（${r.name}）？\n刪除後無法復原，會留下一筆刪除紀錄；已引用此檔的量測重新開啟時不再標示焊墊。`))return;
+    b.disabled=true;try{await RecDB.del(r.id);LAYOUT_PARSED.delete(r.id);LAYOUT_SEL=null;refreshLayoutRow();$("#upLayState").innerHTML=`<span class="ok">✓ 已刪除 ${esc(r.name)}</span>`;renderLayoutList()}
+    catch(er){b.disabled=false;$("#upLayState").innerHTML=`<span class="err">刪除失敗：${esc(er.message)}</span>`}}}
+function initLayoutForm(){const file=$("#upLayFile");if(!file)return;
+  const state=$("#upLayState"),info=$("#upLayInfo");
+  file.onchange=async()=>{const f=file.files&&file.files[0];if(!f)return;UP_LAY_FILE=f;UP_LAY_PARSED=null;UP_LAY_BYTES=null;$("#upLayFileName").textContent=f.name;state.textContent="正在解析…";info.textContent="";
+    if(f.size>GERBER.GERBER_LIMITS.maxRawBytes){state.innerHTML=`<span class="err">檔案 ${(f.size/1048576).toFixed(1)} MB，超過上限 ${GERBER.GERBER_LIMITS.maxRawBytes/1048576} MB：請只輸出單一圖層</span>`;return}
+    try{const u8=new Uint8Array(await readBuf(f)),p=GERBER.parseGerber(u8,{keepDraws:true});
+      if(p.error){state.innerHTML=`<span class="err">${esc(p.error)}</span>`;return}
+      UP_LAY_PARSED=p;UP_LAY_BYTES=u8;
+      const guess=p.layerGuess||GERBER.gerberLayerFromName(f.name);if(guess&&!$("#upLayLayer").value)$("#upLayLayer").value=guess;
+      if(p.sideGuess&&!$("#upLaySide").value)$("#upLaySide").value=p.sideGuess;
+      info.textContent=upLayInfoText(p);state.textContent=guess||p.sideGuess?"已依檔案預選圖層與面別；請確認後存入":""}
+    catch(e){state.innerHTML=`<span class="err">無法讀取檔案：${esc(e.message)}</span>`}};
+  for(const id of["#upLayPart","#upLayRev"]){const el=$(id);if(el)el.addEventListener("change",renderLayoutList)}
+  $("#btnSubmitLayout").onclick=async()=>{const part=($("#upLayPart").value||"").trim(),rev=($("#upLayRev").value||"").trim(),side=$("#upLaySide").value,layer=$("#upLayLayer").value;
+    if(!UP_LAY_PARSED){state.innerHTML='<span class="err">請先選取 Gerber 檔</span>';return}
+    if(!part||!rev||!side||!layer){state.innerHTML='<span class="err">請填寫料號、版次，並選擇面別與圖層</span>';return}
+    if(layer!=="outline"&&!UP_LAY_PARSED.padCount){state.innerHTML='<span class="err">這個檔案沒有焊墊；只有線段時請選圖層「板框」</span>';return}
+    if(layer==="outline"&&!UP_LAY_PARSED.draws.length){state.innerHTML='<span class="err">這個檔案沒有板框線段；請改選錫膏層或銅箔層</span>';return}
+    const btn=$("#btnSubmitLayout");btn.disabled=true;state.textContent="正在存入資料庫…";
+    try{const rec=await RecDB.create({kind:"layout",part,rev,side,layer,name:safeId(UP_LAY_FILE.name)||"板面圖檔.gbr"},UP_LAY_BYTES);
+      LAYOUT_PARSED.set(rec.id,UP_LAY_PARSED);
+      state.innerHTML=`<span class="ok">✓ 已存入板面圖檔 <span class="mono">${esc(rec.part)}</span> ${esc(rec.rev)}（${esc(rec.side)}，${esc(LAYOUT_LAYER_NAME[layer])}）</span>`;
+      UP_LAY_FILE=UP_LAY_PARSED=UP_LAY_BYTES=null;file.value="";$("#upLayFileName").textContent="";info.textContent="";$("#upLayLayer").value="";
+      LAYOUT_SEL=null;refreshLayoutRow();renderLayoutList()}
+    catch(e){state.innerHTML=`<span class="err">上傳失敗：${esc(e.message)}</span>`}
+    finally{btn.disabled=false}}}
+
+/* ---------- 問題地圖：板面焊墊圖（canvas，可縮放、拖曳） ---------- */
+function pmapLayout(){const L=curRun()&&curRun().info&&curRun().info.layout;return L&&L.geom&&L.geom.box&&L.level!=="none"&&!L.error?L:null}
+function pmapPadPath(g,p,X,Y,k){const w=Math.max(p.w*k,1.5),h=Math.max(p.h*k,1.5),cx=X(p.x),cy=Y(p.y);g.beginPath();
+  if(p.s==="c")g.arc(cx,cy,Math.max(w,h)/2,0,Math.PI*2);
+  else if(p.poly&&p.w*k>=3){p.poly.forEach(([a,b],i)=>i?g.lineTo(X(a),Y(b)):g.moveTo(X(a),Y(b)));g.closePath()}
+  else g.rect(cx-w/2,cy-h/2,w,h)}
+function pmapFit(L,W,H){const b=L.geom.box,bw=Math.max(b[2]-b[0],1),bh=Math.max(b[3]-b[1],1),k=Math.min((W-16)/bw,(H-16)/bh);return{k,cx:(b[0]+b[2])/2,cy:(b[1]+b[3])/2,fit:k}}
+function pmapPartCentre(L,key){const idx=L.matched[key];if(!idx||!idx.length){const a=L.at&&L.at[key];return a?{x:a[0],y:a[1],est:true}:null}
+  let x=0,y=0;for(const k of idx){x+=L.geom.pads[k].x;y+=L.geom.pads[k].y}return{x:x/idx.length,y:y/idx.length}}
+function pmapBoardWire(cv,L,items,selection,pick){
+  const key=L.ids.map(x=>x.id).join(",");
+  const view=()=>{const r=cv.getBoundingClientRect(),W=Math.max(1,r.width),H=Math.max(1,r.height),f=pmapFit(L,W,H);
+    if(!S.pmapView||S.pmapView.key!==key)S.pmapView={key,...f};S.pmapView.fit=f.k;return{W,H,v:S.pmapView}};
+  const symbols={ng:"✕",warn:"!",info:"ℹ"};
+  function draw(){const{W,H,v}=view(),dpr=window.devicePixelRatio||1;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
+    const g=cv.getContext("2d");if(!g)return;g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
+    const X=x=>W/2+(x-v.cx)*v.k,Y=y=>H/2-(y-v.cy)*v.k,css=getComputedStyle(document.documentElement),tok=n=>css.getPropertyValue(n).trim()||"#888";
+    const col={ng:tok("--ng"),warn:tok("--warn"),info:tok("--series2")};
+    if(L.geom.outline.length){g.strokeStyle=tok("--muted");g.lineWidth=1;g.beginPath();for(const s of L.geom.outline){g.moveTo(X(s[0]),Y(s[1]));g.lineTo(X(s[2]),Y(s[3]))}g.stroke()}
+    g.fillStyle=tok("--line");for(const p of L.geom.bg){pmapPadPath(g,p,X,Y,v.k);g.fill()}
+    g.globalAlpha=.55;g.fillStyle=tok("--muted");for(const p of L.geom.pads){pmapPadPath(g,p,X,Y,v.k);g.fill()}g.globalAlpha=1;
+    const marks=[];
+    for(const it of items){const key=it.part.key,c=pmapPartCentre(L,key);if(!c)continue;
+      const sel=selection.part===key,idx=L.matched[key];
+      if(it.level&&idx){g.fillStyle=col[it.level];for(const k of idx){pmapPadPath(g,L.geom.pads[k],X,Y,v.k);g.fill()}}
+      if(sel&&idx){let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;for(const k of idx){const p=L.geom.pads[k];x0=Math.min(x0,X(p.x-p.w/2));x1=Math.max(x1,X(p.x+p.w/2));y0=Math.min(y0,Y(p.y+p.h/2));y1=Math.max(y1,Y(p.y-p.h/2))}
+        g.strokeStyle=tok("--ink");g.lineWidth=2;g.setLineDash([]);g.strokeRect(x0-4,y0-4,x1-x0+8,y1-y0+8)}
+      if(it.level||sel)marks.push({it,c,sel})}
+    g.font=`700 12px ${tok("--f-mono")||"monospace"}`;g.textAlign="center";g.textBaseline="middle";
+    for(const{it,c,sel}of marks){const x=X(c.x),y=Y(c.y);if(x<-20||y<-20||x>W+20||y>H+20)continue;
+      if(it.level){g.beginPath();g.arc(x,y,9,0,Math.PI*2);g.fillStyle=col[it.level];g.fill();g.lineWidth=sel?3:1.5;g.strokeStyle=sel?tok("--ink"):tok("--surface");if(c.est||it.crossOnly)g.setLineDash([3,2]);g.stroke();g.setLineDash([]);g.fillStyle=tok("--on-strong");g.fillText(symbols[it.level],x,y)}
+      if(sel){g.textAlign="left";g.fillStyle=tok("--ink");g.fillText(it.label,x+13,y-12);g.textAlign="center"}}}
+  let raf=0;const redraw=()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;draw()})};
+  draw();
+  const toBoard=(px,py)=>{const{W,H,v}=view();return[v.cx+(px-W/2)/v.k,v.cy-(py-H/2)/v.k]};
+  const zoomAt=(f,px,py)=>{const{W,H,v}=view(),k=Math.min(v.fit*80,Math.max(v.fit*.8,v.k*f));if(px==null){px=W/2;py=H/2}
+    const[bx,by]=toBoard(px,py);v.k=k;v.cx=bx-(px-W/2)/k;v.cy=by+(py-H/2)/k;redraw()};
+  const pts=new Map();let moved=0,pinch=null;
+  cv.onpointerdown=e=>{cv.setPointerCapture&&cv.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY]);moved=0;
+    if(pts.size===2){const[a,b]=[...pts.values()];pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1]),k:view().v.k}}};
+  cv.onpointermove=e=>{const p=pts.get(e.pointerId);if(!p)return;const dx=e.clientX-p[0],dy=e.clientY-p[1];pts.set(e.pointerId,[e.clientX,e.clientY]);moved+=Math.abs(dx)+Math.abs(dy);
+    if(pts.size===2&&pinch){const[a,b]=[...pts.values()],r=cv.getBoundingClientRect();zoomAt(pinch.k*Math.hypot(a[0]-b[0],a[1]-b[1])/pinch.d/view().v.k,(a[0]+b[0])/2-r.left,(a[1]+b[1])/2-r.top);return}
+    const v=view().v;v.cx-=dx/v.k;v.cy+=dy/v.k;redraw()};
+  cv.onpointerup=cv.onpointercancel=e=>{const single=pts.size===1;pts.delete(e.pointerId);if(pts.size<2)pinch=null;
+    if(e.type!=="pointerup"||!single||moved>6)return;
+    const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top,[bx,by]=toBoard(px,py),v=view().v,tol=8/v.k;let best=null;
+    for(const it of items){const idx=L.matched[it.part.key];if(!idx)continue;
+      for(const k of idx){const p=L.geom.pads[k];if(Math.abs(bx-p.x)<=p.w/2+tol&&Math.abs(by-p.y)<=p.h/2+tol){const d=Math.hypot(bx-p.x,by-p.y);if(!best||d<best.d)best={it,d}}}}
+    if(!best)for(const it of items){const c=pmapPartCentre(L,it.part.key);if(!c)continue;const d=Math.hypot(bx-c.x,by-c.y)*v.k;if(d<=16&&(!best||d<best.d))best={it,d}}
+    if(best)pick(best.it.i)};
+  cv.onwheel=e=>{if(!e.ctrlKey&&!e.metaKey)return;e.preventDefault();const r=cv.getBoundingClientRect();zoomAt(e.deltaY<0?1.2:1/1.2,e.clientX-r.left,e.clientY-r.top)};
+  cv.onkeydown=e=>{const v=view().v,step=40/v.k,map={ArrowLeft:[-step,0],ArrowRight:[step,0],ArrowUp:[0,step],ArrowDown:[0,-step]};
+    if(map[e.key]){e.preventDefault();v.cx+=map[e.key][0];v.cy+=map[e.key][1];redraw()}
+    else if(e.key==="+"||e.key==="="){e.preventDefault();zoomAt(1.4)}else if(e.key==="-"){e.preventDefault();zoomAt(1/1.4)}
+    else if(e.key==="0"){e.preventDefault();S.pmapView=null;redraw()}};
+  const root=cv.closest(".pmap-board");
+  for(const b of root.querySelectorAll("[data-zoom]"))b.onclick=()=>{const z=b.dataset.zoom;if(z==="fit"){S.pmapView=null;redraw()}else zoomAt(z==="in"?1.5:1/1.5)};
+  /* 選取的零件在畫面外時移到中央 */
+  const selItem=items.find(it=>it.part.key===selection.part),sc=selItem&&pmapPartCentre(L,selItem.part.key);
+  if(sc){const{W,H,v}=view(),x=W/2+(sc.x-v.cx)*v.k,y=H/2-(sc.y-v.cy)*v.k;if(x<0||y<0||x>W||y>H){v.cx=sc.x;v.cy=sc.y;redraw()}}
+  const host=cv.closest("#pmap")||cv;if(host._ro)host._ro.disconnect();if(window.ResizeObserver){host._ro=new ResizeObserver(()=>redraw());host._ro.observe(cv)}}
+
+initLayoutForm();
+if($("#selSide"))$("#selSide").addEventListener("change",()=>refreshLayoutRow());
 async function usePlaceRec(rec){const g=await RecDB.get(rec);if(!g.ok)throw new Error("座標檔指紋與上傳時不同，已停止使用");
   const tab=/\.xlsx$/i.test(rec.name)?(await xlsxTable(g.bytes.buffer.slice(g.bytes.byteOffset,g.bytes.byteOffset+g.bytes.length))).tab:csvTable(decodeBytes(g.bytes));
   const unit=rec.unit||rec.meta?.unit,side=rec.side;
@@ -13621,6 +14518,7 @@ async function renderRecPicker(force) {
     return;
   }
   if($("#boxUploadPlaceForm"))$("#boxUploadPlaceForm").hidden=!RecDB.isAdmin||RecDB.mode!=="cloud";
+  if($("#boxUploadLayoutForm"))$("#boxUploadLayoutForm").hidden=!RecDB.isAdmin||RecDB.mode!=="cloud";
   parkPlaceForm();
 
   if (PICKER_AUTO_PART_FILTER) {
@@ -14643,7 +15541,7 @@ function pdfFileName(){
 function specDownloadInfo(rec){const raw=rec&&rec.ver!=null?String(rec.ver).trim():"",hasVersion=!!raw&&!/^(?:undefined|null)$/i.test(raw),version=hasVersion?safeFn(raw):"",filename="料號規格_"+safeFn(rec&&rec.part)+"_"+(hasVersion?"v"+version:"版本未知")+".json";
   return{filename,warning:hasVersion?"":"這筆規格紀錄沒有版本號；匯出檔名已標示「版本未知」"}}
 if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")window.SPI_TEST_HOOK.specDownloadInfo=specDownloadInfo;
-if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{setCompFromShortcut,evSvg,overallVerdict,renderIssues,sharePack,issueScope,scopedFindings,issueBoardList,compSearch,compCandidates,setComp,syncScopeUI,scopeLabel,scopeParts,buildPrintHeadHtml,getPlace:()=>PLACE,setPlace:s=>{PLACE={recId:s.recId||null,part:s.part||"",rev:s.rev||"",name:s.name,tab:s.tab,side:s.side,unit:s.unit,res:parsePlacement(s.tab,s.unit,s.side)};placeShow()},S,RecDB,loadSample,clearRuns,purgeLegacyData,renderIssues,renderPmap,renderOverview,renderLISAUI,renderRelChartUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,aiFallbackModels,saveAiGoodModel,recompute,switchRun,setTab,setSub,updateSettingsUi,scrollSettingsAnchor,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,pick,drawHeat,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,calcShapeFactor,getSolderGrainTexture,getRealPasteMat,createSolderPasteGeometry,selectPadForProfile,highlightSelectedPad3D,focusPad3D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,getReportChapters,renderMailChapterSummary,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,setupRecPicker,renderRecPicker,openRecord,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus,setupExportCenter,openExportCenterModal,closeExportCenterModal,triggerExportByType,downloadDeliverablesQueue,applyPlacePreviewToRun,clearPlacePreviewFromRun,syncPlaceToCurrentRun,pos3DNote,usePlaceRec,loadStateModel,updateLoadStates});
+if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{setCompFromShortcut,attachLayoutToRun,refreshLayoutRow,pmapLayout,layoutIdsFor,evSvg,overallVerdict,renderIssues,sharePack,issueScope,scopedFindings,issueBoardList,compSearch,compCandidates,setComp,syncScopeUI,scopeLabel,scopeParts,buildPrintHeadHtml,getPlace:()=>PLACE,setPlace:s=>{PLACE={recId:s.recId||null,part:s.part||"",rev:s.rev||"",name:s.name,tab:s.tab,side:s.side,unit:s.unit,res:parsePlacement(s.tab,s.unit,s.side)};placeShow()},S,RecDB,loadSample,clearRuns,purgeLegacyData,renderIssues,renderPmap,renderOverview,renderLISAUI,renderRelChartUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,aiFallbackModels,saveAiGoodModel,recompute,switchRun,setTab,setSub,updateSettingsUi,scrollSettingsAnchor,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,pick,drawHeat,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,calcShapeFactor,getSolderGrainTexture,getRealPasteMat,createSolderPasteGeometry,selectPadForProfile,highlightSelectedPad3D,focusPad3D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,getReportChapters,renderMailChapterSummary,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,setupRecPicker,renderRecPicker,openRecord,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus,setupExportCenter,openExportCenterModal,closeExportCenterModal,triggerExportByType,downloadDeliverablesQueue,applyPlacePreviewToRun,clearPlacePreviewFromRun,syncPlaceToCurrentRun,pos3DNote,usePlaceRec,loadStateModel,updateLoadStates});
 if($("#geomPadFile"))$("#geomPadFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{const p=parseGeometryPadListCsv(rd.result);if(!p.ok){toast("幾何焊墊清單："+p.error);e.target.value="";return}S.geometryPads=p.pads;persist();updatePadCoverageState();recompute();renderGeomPadStatus();toast(`已匯入 ${p.pads.length} 個幾何焊墊`);e.target.value=""};rd.readAsText(f)});
 if($("#geomPadClear"))$("#geomPadClear").onclick=()=>{S.geometryPads=null;S.padCoverage=null;S.pendingVerify=false;persist();updatePadCoverageState();recompute();renderGeomPadStatus()};
 const initHash=(location.hash||"").slice(1);

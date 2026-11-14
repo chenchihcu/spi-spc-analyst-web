@@ -8,6 +8,7 @@ import { Repo } from '../lib/repo.mjs';
 
 const ORIGIN = 'https://example.test';
 const USER = 'admin@example.test';
+export const VIEWER = 'viewer@example.test';
 
 export async function createCloudHarness() {
   const db = new DatabaseSync(':memory:');
@@ -32,28 +33,34 @@ export async function createCloudHarness() {
     } : null,
     delete: async key => { objects.delete(key); } };
   const env = { DB, BLOBS, ASSETS: { fetch: async () => new Response('ok') },
-    AUTH_USERS: JSON.stringify({ [USER]: `pepper-hmac-sha256$600000$${'a'.repeat(64)}` }),
+    AUTH_USERS: JSON.stringify({ [USER]: `pepper-hmac-sha256$600000$${'a'.repeat(64)}`, [VIEWER]: `pepper-hmac-sha256$600000$${'b'.repeat(64)}` }),
     AUTH_PEPPER: 'p'.repeat(40), AUTH_SECRET: 's'.repeat(40), AUTH_KDF_ITER: '600000',
     INITIAL_ADMIN_USER: USER };
   const cookie = `${COOKIE}=${await issueToken(env, USER)}`;
-  const fetch = (input, options = {}) => {
+  const viewerCookie = `${COOKIE}=${await issueToken(env, VIEWER)}`;
+  // asViewer：以非管理者帳號送出（權限測試用）
+  const fetch = (input, options = {}, asViewer = false) => {
     const url = new URL(String(input), ORIGIN);
     const headers = new Headers(options.headers);
-    headers.set('cookie', cookie);
+    headers.set('cookie', asViewer ? viewerCookie : cookie);
     if (options.method && !['GET', 'HEAD'].includes(options.method.toUpperCase())) headers.set('origin', ORIGIN);
     return handleRequest(new Request(url, { ...options, headers }), env);
   };
-  const upload = async (meta, source) => {
+  // post：回傳原始 Response（錯誤路徑測試用）；upload：成功才回傳紀錄
+  const post = (meta, source, asViewer = false) => {
     const raw = Buffer.from(source);
-    const response = await fetch('/api/records', { method: 'POST', headers: {
+    return fetch('/api/records', { method: 'POST', headers: {
       'content-type': 'application/gzip', 'x-rec-meta': encodeURIComponent(JSON.stringify(meta)),
       'x-raw-bytes': String(raw.length), 'x-raw-sha256': createHash('sha256').update(raw).digest('hex'),
-    }, body: gzipSync(raw) });
+    }, body: gzipSync(raw) }, asViewer);
+  };
+  const upload = async (meta, source) => {
+    const response = await post(meta, source);
     if (!response.ok) throw new Error(`fixture upload ${response.status}: ${await response.text()}`);
     return (await response.json()).record;
   };
   // repo：直接寫入歷史（legacy）紀錄，模擬受控匯入前已存在的資料
-  return { fetch, upload, db, objects, repo: new Repo(DB, BLOBS), close: () => db.close() };
+  return { fetch, post, upload, db, objects, repo: new Repo(DB, BLOBS), close: () => db.close() };
 }
 
 export function installBrowserCloud(window, harness) {
