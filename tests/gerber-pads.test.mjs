@@ -158,6 +158,37 @@ test("惡意或錯誤檔案的上限：步進重複次數、多邊形頂點、�
   assert.equal(ff.fileFunction, "Pastescript,Top");
 });
 
+test("清除極性：整個蓋住的焊墊移除、部分切除的標為面積不採用；之後畫的焊墊不受影響", () => {
+  const g = head() + `%ADD10R,1.0X0.5*%\n%ADD11R,0.3X0.3*%\nD10*\n${at(0, 0)}D03*\n${at(10, 0)}D03*\n${at(20, 0)}D03*\n` +
+    `%LPC*%\n${at(0, 0)}D03*\nD11*\n${at(10.4, 0)}D03*\n%LPD*%\nD10*\n${at(0, 0)}D03*\nM02*`;
+  const r = parseGerber(g);
+  assert.equal(r.pads.length, 3, "0 mm 的焊墊被清除後又重畫一次");
+  assert.deepEqual(r.pads.map(p => p.x), [10, 20, 0]);
+  assert.equal(r.pads[0].cut, true);
+  assert.equal(r.pads[0].complex, true);
+  assert.equal(r.pads[1].cut, undefined);
+  assert.ok(r.warnings.some(w => /1 個焊墊被清除圖形覆蓋，已移除/.test(w)));
+  assert.ok(r.warnings.some(w => /1 個焊墊被清除圖形部分切除/.test(w)));
+});
+
+test("板框整圓（G75 全圓）以弧線點計算範圍", () => {
+  const g = head() + `%TF.FileFunction,Profile,NP*%\n%ADD10C,0.1*%\nD10*\nG75*\n${at(20, 10)}D02*\nG03*\n${at(20, 10)}I-10000000J0D01*\nM02*`;
+  const r = parseGerber(g, { keepDraws: true });
+  assert.equal(r.ok, true, r.error);
+  assert.ok(Math.abs(r.bbox[2] - r.bbox[0] - 20) < 1e-6 && Math.abs(r.bbox[3] - r.bbox[1] - 20) < 1e-6, JSON.stringify(r.bbox));
+});
+
+test("Worker 輕量檢查接受 D3*／D1* 寫法，與完整解析一致", () => {
+  const g = head() + `%ADD10C,0.5*%\nD10*\n${at(0, 0)}D3*\n${at(10, 0)}D3*\nM02*`;
+  assert.equal(parseGerber(g).pads.length, 2);
+  const q = quickCheckGerber(g);
+  assert.equal(q.ok, true);
+  assert.equal(q.flashes, 2);
+  const outline = head() + `%ADD10C,0.1*%\nD10*\n${at(0, 0)}D2*\nG01*\n${at(20, 0)}D1*\n${at(20, 20)}D1*\nM02*`;
+  assert.equal(quickCheckGerber(outline).draws, 2);
+  assert.equal(quickCheckGerber(head() + `%ADD13C,0.5*%\nD13*\nM02*`).code, "no_pads", "D13* 是選光圈，不是閃光");
+});
+
 test("鋪銅等大區域不當焊墊；未定義光圈計數", () => {
   const g = head() + `%ADD10C,0.5*%\nG36*\n${at(0, 0)}D02*\nG01*\n${at(40, 0)}D01*\n${at(40, 40)}D01*\n${at(0, 40)}D01*\n${at(0, 0)}D01*\nG37*\n` +
     `D10*\n${at(1, 1)}D03*\n${at(9, 1)}D03*\nD99*\n${at(5, 5)}D03*\nM02*`;

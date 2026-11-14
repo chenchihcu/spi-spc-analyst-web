@@ -91,7 +91,7 @@ test("沒有中心座標的零件列出原因，其餘照常對應", () => {
   const { parts, pads } = board();
   const r = matchLayoutParts([...parts, { ref: "X1", n: 2 }], pads);
   assert.equal(r.level, "near");
-  assert.deepEqual(r.unresolved, [{ ref: "X1", reason: "沒有零件中心座標" }]);
+  assert.deepEqual(r.unresolved, [{ id: "X1", ref: "X1", reason: "沒有零件中心座標" }]);
 });
 
 test("X2 位號＋腳位：逐焊墊；只有位號：依位號分群，不需定位", () => {
@@ -106,7 +106,18 @@ test("X2 位號＋腳位：逐焊墊；只有位號：依位號分群，不需�
   assert.deepEqual(noPin.pinPad, {});
   owns(noPin, parts, pads);
   const missing = matchLayoutParts([...parts, { ref: "ZZ9", n: 2 }], pads);
-  assert.deepEqual(missing.unresolved, [{ ref: "ZZ9", reason: "圖檔沒有此位號" }]);
+  assert.deepEqual(missing.unresolved, [{ id: "ZZ9", ref: "ZZ9", reason: "圖檔沒有此位號" }]);
+});
+
+test("同位號不同子板（不同中心）：以 id 分開對應到各自的焊墊", () => {
+  const parts = [{ id: "f1-R1", ref: "R1", x: 10, y: 10, n: 2 }, { id: "f2-R1", ref: "R1", x: 60, y: 10, n: 2 },
+    ...Array.from({ length: 6 }, (_, i) => ({ id: "C" + i, ref: "C" + i, x: 10 + i * 8, y: 30, n: 2 }))];
+  const pads = parts.flatMap(p => [{ x: p.x - 0.5, y: p.y }, { x: p.x + 0.5, y: p.y }]);
+  const r = matchLayoutParts(parts, pads);
+  assert.equal(r.level, "near");
+  assert.equal(r.rate, 1);
+  assert.notDeepEqual(r.matched["f1-R1"], r.matched["f2-R1"]);
+  assert.ok(r.matched["f2-R1"].every(k => pads[k].x > 50));
 });
 
 test("效能：1,500 顆零件、約 7,000 焊墊需定位時 < 2 秒", () => {

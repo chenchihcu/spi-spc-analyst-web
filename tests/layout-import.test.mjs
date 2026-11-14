@@ -51,7 +51,7 @@ test("受控座標匯入 → 套用錫膏層（平移＋鏡像）→ 每顆零�
   assert.equal(info.rate, 1);
   assert.equal(Object.keys(info.matched).length, PARTS.length);
   for (const p of PARTS) {
-    const idx = info.matched[p.ref], [ex, ey] = GERBER.layoutTransform(tf, p.x, p.y);
+    const idx = info.matched[JSON.stringify(["", "comp", p.ref])], [ex, ey] = GERBER.layoutTransform(tf, p.x, p.y);
     const cx = idx.reduce((s, k) => s + info.geom.pads[k].x, 0) / idx.length, cy = idx.reduce((s, k) => s + info.geom.pads[k].y, 0) / idx.length;
     assert.ok(Math.hypot(cx - ex, cy - ey) < 1e-6, `${p.ref} 焊墊群中心`);
   }
@@ -82,6 +82,21 @@ test("無關的圖檔不套用；只有板框不能標示焊墊", () => {
   assert.match(core.layoutStatusText(info), /對不上.*未套用/);
   const onlyOutline = core.buildLayoutInfo(rows, { outline: GERBER.parseGerber(OUTLINE, { keepDraws: true }) }, [], "lookup");
   assert.match(onlyOutline.error, /錫膏層或銅箔層/);
+});
+
+test("子板：座標檔不分子板時各子板共用同一份焊墊並在狀態列說明；鍵含子板", () => {
+  const tab = core.csvTable(spiCsv().split("\n").map((l, i) => i ? l.replace(/^B(\d)/, (_, b) => `P1,${b}`) : "Panel,Figure,RefDes,Pin,Volume,Height,Area").join("\n"));
+  const map = core.autoMap(tab.head);
+  const place = { items: PARTS.map(p => ({ ref: p.ref, x: p.x, y: p.y, side: "TOP" })), controlled: true };
+  const rows = core.buildRows(tab, map, { side: "TOP", place }).rows;
+  assert.deepEqual([...new Set(rows.map(r => String(r.figure)))].sort(), ["1", "2"]);
+  const info = core.buildLayoutInfo(rows, { paste: GERBER.parseGerber(pasteGerber(null)) }, [], "lookup");
+  assert.equal(info.level, "near");
+  assert.equal(info.rate, 1, "同位號同中心不得被判為焊墊重疊");
+  const k1 = JSON.stringify([rows.find(r => String(r.figure) === "1").figure, "comp", "R1"]), k2 = JSON.stringify([rows.find(r => String(r.figure) === "2").figure, "comp", "R1"]);
+  assert.ok(info.matched[k1] && info.matched[k2]);
+  assert.equal(Object.keys(info.matched).length, PARTS.length * 2);
+  assert.match(core.layoutStatusText(info), /座標檔不分子板，各子板標在同一份焊墊/);
 });
 
 test("銅箔層排除導通孔；錫膏層優先，銅箔層成為背景", () => {

@@ -3278,6 +3278,7 @@ function parseGerber(input, opts = {}) {
   let mir = "N", rotDeg = 0, scale = 1, offA = 0, offB = 0;
   const attr = { fn: "", ref: "", pin: "" };
   const pads = [], draws = [], stats = { flashes: 0, regions: 0, draws: 0, clear: 0, skippedLarge: 0, skippedFn: 0, unknownAperture: 0 };
+  const clears = []; // 清除極性（LPC）的外框與當時已有的焊墊數：只影響之前畫的物件
   let contour = null, srStart = -1, sr = null, bx0 = Infinity, by0 = Infinity, bx1 = -Infinity, by1 = -Infinity, sawCode = false;
   const grow = (px, py) => { if (px < bx0) bx0 = px; if (px > bx1) bx1 = px; if (py < by0) by0 = py; if (py > by1) by1 = py; };
 
@@ -3301,7 +3302,6 @@ function parseGerber(input, opts = {}) {
   }
   function flash(px, py) {
     stats.flashes++;
-    if (!dark) { stats.clear++; return; }
     const ap = apertures.get(curAp);
     if (!ap) { stats.unknownAperture++; return; }
     const s = apertureShape(ap, macros);
@@ -3323,6 +3323,7 @@ function parseGerber(input, opts = {}) {
       const dims = s.kind === "r" || s.kind === "o" ? [s.L * sc, s.W * sc] : [pad.w, pad.h];
       pad.L = Math.max(...dims); pad.W = Math.min(...dims);
     }
+    if (!dark) { stats.clear++; clears.push({ box: [pad.x - pad.w / 2, pad.y - pad.h / 2, pad.x + pad.w / 2, pad.y + pad.h / 2], before: pads.length }); return; }
     if (s.complex) pad.complex = true;
     if (fn) pad.fn = fn;
     if (attr.ref) pad.ref = attr.ref;
@@ -3361,7 +3362,7 @@ function parseGerber(input, opts = {}) {
     contour = null;
     if (pts.length < 3) return;
     stats.regions++;
-    if (!dark) { stats.clear++; return; }
+    if (!dark) { stats.clear++; clears.push({ box: polyBox(pts), before: pads.length }); return; }
     if (Math.hypot(pts[0][0] - pts[pts.length - 1][0], pts[0][1] - pts[pts.length - 1][1]) < 1e-9) pts.pop();
     if (pts.length < 3) return;
     const bb = polyBox(pts), w = bb[2] - bb[0], h = bb[3] - bb[1];
@@ -3478,8 +3479,8 @@ function parseGerber(input, opts = {}) {
         stats.draws++;
         if (keepDraws && dark) {
           let px = x, py = y;
-          for (const [qx, qy] of pts) { if (draws.length < GERBER_LIMITS.maxDraws) draws.push([px, py, qx, qy]); px = qx; py = qy; }
-          grow(x, y); grow(tx, ty);
+          grow(x, y);
+          for (const [qx, qy] of pts) { if (draws.length < GERBER_LIMITS.maxDraws) draws.push([px, py, qx, qy]); grow(qx, qy); px = qx; py = qy; }
         }
       }
     } else if (op === 2) { if (inRegion) { closeContour(); contour = [[tx, ty]]; } }
@@ -3521,6 +3522,30 @@ function parseGerber(input, opts = {}) {
   if (!fs) return { error: "缺少 FS 格式宣告：請由 CAD 重新輸出 RS-274X（Extended Gerber）", code: "no_format" };
   if (!k) return { error: "缺少單位宣告（MO）：請由 CAD 重新輸出 RS-274X（Extended Gerber）", code: "no_unit" };
   if (ipNeg) warnings.add("負片影像（IPNEG）：焊墊可能為反相，請確認");
+  if (clears.length && pads.length) {
+    // 清除圖形蓋住焊墊外框 ≥ 90%：視為已移除；部分重疊：保留位置但面積不採用（complex）
+    const cell = 2, grid = new Map(), key = (i, j) => i * 1000003 + j;
+    pads.forEach((p, k) => { for (let i = Math.floor((p.x - p.w / 2) / cell); i <= Math.floor((p.x + p.w / 2) / cell); i++) for (let j = Math.floor((p.y - p.h / 2) / cell); j <= Math.floor((p.y + p.h / 2) / cell); j++) { const id = key(i, j); let a = grid.get(id); if (!a) grid.set(id, a = []); a.push(k); } });
+    const gone = new Set();
+    let cut = 0;
+    for (const c of clears) {
+      const [x0, y0, x1, y1] = c.box, i0 = Math.floor(x0 / cell), i1 = Math.floor(x1 / cell), j0 = Math.floor(y0 / cell), j1 = Math.floor(y1 / cell);
+      const seen = new Set(), cand = (i1 - i0 + 1) * (j1 - j0 + 1) > pads.length ? pads.map((_, k) => k) : null;
+      const visit = k => {
+        if (seen.has(k) || k >= c.before || gone.has(k)) return;
+        seen.add(k);
+        const p = pads[k], ox = Math.min(x1, p.x + p.w / 2) - Math.max(x0, p.x - p.w / 2), oy = Math.min(y1, p.y + p.h / 2) - Math.max(y0, p.y - p.h / 2);
+        if (ox <= 1e-9 || oy <= 1e-9) return;
+        if (ox * oy >= 0.9 * p.w * p.h) gone.add(k);
+        else if (!p.cut) { p.cut = true; p.complex = true; cut++; }
+      };
+      if (cand) cand.forEach(visit);
+      else for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) for (const k of grid.get(key(i, j)) || []) visit(k);
+    }
+    if (gone.size) { warnings.add(`${gone.size} 個焊墊被清除圖形覆蓋，已移除`); for (const k of [...gone].sort((a, b) => b - a)) pads.splice(k, 1); }
+    if (cut) warnings.add(`${cut} 個焊墊被清除圖形部分切除，面積不採用`);
+    stats.clearedPads = gone.size; stats.cutPads = cut;
+  }
   const kept = pads.length;
   const ff = fileFunction.toLowerCase();
   const layerGuess = /^paste/.test(ff) ? "paste" : /^copper/.test(ff) ? "copper" : /^profile/.test(ff) ? "outline" : "";
@@ -3547,8 +3572,9 @@ function quickCheckGerber(input) {
   if (!text || /\u0000/.test(head.slice(0, 4096)) || !/[*%]/.test(head)) return { error: "不是 Gerber 檔：請選錫膏層、銅箔層或板框的 Gerber（.gtp、.gbr 等）", code: "not_gerber" };
   if (!/%FS[LTD]?[AI]?(?:N\d+)?(?:G\d+)?X\d\dY\d\d/.test(head)) return { error: "缺少 FS 格式宣告：請由 CAD 重新輸出 RS-274X（Extended Gerber）", code: "no_format" };
   if (!/%MO(?:MM|IN)\*/.test(head) && !/(?:^|[*\s])G7[01]\*/.test(head)) return { error: "缺少單位宣告（MO）：請由 CAD 重新輸出 RS-274X（Extended Gerber）", code: "no_unit" };
-  const count = needle => { let n = 0, i = text.indexOf(needle); while (i >= 0) { n++; i = text.indexOf(needle, i + needle.length); } return n; };
-  const flashes = count("D03*"), regions = count("G36*"), draws = count("D01*");
+  // D 碼可寫成 D03* 或 D3*（與完整解析一致）；只計數不建陣列
+  const count = re => { let n = 0; while (re.exec(text)) n++; return n; };
+  const flashes = count(/D0*3\*/g), regions = count(/G36\*/g), draws = count(/D0*1\*/g);
   if (flashes + regions > GERBER_LIMITS.maxPads) return { error: `焊墊 ${flashes + regions} 個，超過上限 ${GERBER_LIMITS.maxPads}：請只輸出單一圖層，不要用整個拼板`, code: "too_many_pads" };
   if (!flashes && !regions && !draws) return { error: "檔案中沒有焊墊或線段：請確認選的是錫膏層、銅箔層或板框檔", code: "no_pads" };
   const ff = ((head.match(/%TF\.FileFunction,([^*]*)\*%/) || [])[1] || "").replace(/[^\w ,.+-]/g, "").slice(0, 64);
@@ -3653,8 +3679,9 @@ function anchorCandidates(parts, pads, nearest) {
   return first.slice(0, 40).map(tf => ({ ...tf, score: evalTransform(sample, pads, nearest, tf, false).acc })).sort((p, q) => q.score - p.score);
 }
 
-/** 對應零件與焊墊。parts：[{ref, x?, y?, n, pins?}]（x/y 為座標檔中心；pins 為量測的腳位名）；pads：用來對應的焊墊（已排除非印刷物件）。
- *  回傳 { level: "pad"|"ref"|"near"|"none", tf, rate, matched:{ref:[padIdx]}, pinPad:{ref:{pin:padIdx}}, unresolved:[{ref, reason}] } */
+/** 對應零件與焊墊。parts：[{id?, ref, x?, y?, n, pins?}]（id 為零件唯一鍵，例如含子板的鍵，預設為 ref；x/y 為座標檔中心；pins 為量測的腳位名）；
+ *  pads：用來對應的焊墊（已排除非印刷物件）。X2 分群依 ref，結果一律以 id 為鍵。
+ *  回傳 { level: "pad"|"ref"|"near"|"none", tf, rate, matched:{id:[padIdx]}, pinPad:{id:{pin:padIdx}}, unresolved:[{id, ref, reason}] } */
 function matchLayoutParts(parts, pads) {
   const res = { level: "none", tf: null, rate: 0, matched: {}, pinPad: {}, unresolved: [], total: parts.length };
   if (!parts.length || !pads.length) return res;
@@ -3665,11 +3692,12 @@ function matchLayoutParts(parts, pads) {
     let pins = 0, hit = 0;
     for (const part of parts) {
       const idx = byRef.get(part.ref);
-      if (!idx) { res.unresolved.push({ ref: part.ref, reason: "圖檔沒有此位號" }); continue; }
-      res.matched[part.ref] = idx;
+      const id = part.id ?? part.ref;
+      if (!idx) { res.unresolved.push({ id, ref: part.ref, reason: "圖檔沒有此位號" }); continue; }
+      res.matched[id] = idx;
       const byPin = new Map(idx.filter(k => pads[k].pin).map(k => [pads[k].pin, k])), pp = {};
       for (const pin of part.pins || []) { pins++; if (byPin.has(pin)) { pp[pin] = byPin.get(pin); hit++; } }
-      res.pinPad[part.ref] = pp;
+      res.pinPad[id] = pp;
     }
     res.level = pins && hit >= LAYOUT_MATCH.pinRate * pins ? "pad" : "ref";
     if (res.level !== "pad") res.pinPad = {};
@@ -3677,7 +3705,7 @@ function matchLayoutParts(parts, pads) {
     return res;
   }
   const located = parts.filter(p => Number.isFinite(p.x) && Number.isFinite(p.y) && p.n > 0);
-  for (const p of parts) if (!located.includes(p)) res.unresolved.push({ ref: p.ref, reason: "沒有零件中心座標" });
+  for (const p of parts) if (!located.includes(p)) res.unresolved.push({ id: p.id ?? p.ref, ref: p.ref, reason: "沒有零件中心座標" });
   if (!located.length) return res;
   const nearest = padIndex(pads, LAYOUT_MATCH.cell);
   const score = tf => evalTransform(located, pads, nearest, tf, false);
@@ -3706,8 +3734,8 @@ function matchLayoutParts(parts, pads) {
   res.tf = { o: bestTf.o, tx: Math.round(bestTf.tx * 1e4) / 1e4, ty: Math.round(bestTf.ty * 1e4) / 1e4 };
   located.forEach((part, i) => {
     const g = best.got[i];
-    if (g && !g.bad) res.matched[part.ref] = g.idx;
-    else res.unresolved.push({ ref: part.ref, reason: !g ? "附近沒有足夠的焊墊" : g.bad === "shared" ? "焊墊與其他零件重疊" : "焊墊群中心偏離零件中心" });
+    if (g && !g.bad) res.matched[part.id ?? part.ref] = g.idx;
+    else res.unresolved.push({ id: part.id ?? part.ref, ref: part.ref, reason: !g ? "附近沒有足夠的焊墊" : g.bad === "shared" ? "焊墊與其他零件重疊" : "焊墊群中心偏離零件中心" });
   });
   return res;
 }
@@ -3717,17 +3745,17 @@ return {GERBER_PARSER_VERSION,GERBER_LIMITS,GERBER_NON_PAD_FN,gerberText,unionAr
 /* ---------- 板面圖檔（Gerber）套用到回合：docs/spec-gerber-layout-rfc.md ----------
    只把「零件 → 焊墊索引」與精簡幾何存在 run.info.layout；不改量測列（腳位順序未知，不寫入 x／y） */
 const LAYOUT_LAYER_NAME={paste:"錫膏層",copper:"銅箔層",outline:"板框"};
-/** 由量測列整理零件：位號、座標檔中心（沒有時取實測焊墊座標平均）、焊墊數、腳位名 */
+/** 由量測列整理零件：鍵與問題地圖 partMapKey 相同（含子板），座標檔中心（沒有時取該子板實測焊墊座標平均）、焊墊數、腳位名 */
 function layoutPartsFromRows(rows){const by=new Map();
-  for(const r of rows){if(r.comp==null||r.comp==="")continue;const ref=String(r.comp);let p=by.get(ref);
-    if(!p){p={ref,x:NaN,y:NaN,pads:new Set(),real:new Map()};by.set(ref,p)}
+  for(const r of rows){if(r.comp==null||r.comp==="")continue;const key=JSON.stringify([r.figure??"","comp",r.comp]);let p=by.get(key);
+    if(!p){p={key,ref:String(r.comp),x:NaN,y:NaN,pads:new Set(),real:new Map()};by.set(key,p)}
     if(r.pad!=null)p.pads.add(String(r.pad));
     if(!Number.isFinite(p.x)&&Number.isFinite(r.componentX)&&Number.isFinite(r.componentY)){p.x=r.componentX;p.y=r.componentY}
     if(realXY(r)&&!p.real.has(r.pad))p.real.set(r.pad,[r.x,r.y])}
   return[...by.values()].map(p=>{let{x,y}=p;
     if(!Number.isFinite(x)&&p.real.size){x=0;y=0;for(const[a,b]of p.real.values()){x+=a;y+=b}x/=p.real.size;y/=p.real.size}
     const pre=p.ref+"-",pins=[...p.pads].map(s=>s.startsWith(pre)?s.slice(pre.length):s);
-    return{ref:p.ref,x,y,n:Math.max(1,p.pads.size),pins}})}
+    return{key:p.key,ref:p.ref,x,y,n:Math.max(1,p.pads.size),pins}})}
 /** 對應用的焊墊：有錫膏層用錫膏層，否則用銅箔層；排除 X2 標為導通孔、導體等非印刷物件 */
 function layoutPadSet(layers){const src=layers.paste?"paste":layers.copper?"copper":"";if(!src)return{src,pads:[]};
   const bad=new Set(GERBER.GERBER_NON_PAD_FN);return{src,pads:layers[src].pads.filter(p=>!bad.has(p.fn))}}
@@ -3739,8 +3767,14 @@ function layoutGeomPads(pads){return pads.map(p=>{const o={x:r3(p.x),y:r3(p.y),w
 function buildLayoutInfo(rows,layers,ids,source){const{src,pads}=layoutPadSet(layers),parts=layoutPartsFromRows(rows);
   const info={ids,source,src,level:"none",tf:null,rate:0,total:parts.length,matched:{},pinPad:{},unresolved:[],at:{},geom:null};
   if(!src){info.error="需要錫膏層或銅箔層才能標示焊墊";return info}
-  const m=GERBER.matchLayoutParts(parts,pads);Object.assign(info,{level:m.level,tf:m.tf,rate:m.rate,matched:m.matched,pinPad:m.pinPad,unresolved:m.unresolved,tried:m.tried||null});
-  if(m.tf)for(const u of m.unresolved){const p=parts.find(q=>q.ref===u.ref);if(p&&Number.isFinite(p.x))info.at[u.ref]=GERBER.layoutTransform(m.tf,p.x,p.y).map(r3)}
+  /* 座標檔不分子板：各子板同一位號中心相同，只對應一次再展開到各子板，避免被判為焊墊重疊 */
+  const groups=new Map();for(const p of parts){const g=`${p.ref}\u0000${p.x}\u0000${p.y}\u0000${p.n}`;let a=groups.get(g);if(!a)groups.set(g,a=[]);a.push(p)}
+  const uniq=[...groups.values()].map(a=>({...a[0],id:a[0].key})),members=new Map([...groups.values()].map(a=>[a[0].key,a]));
+  const m=GERBER.matchLayoutParts(uniq,pads),matched={},pinPad={},unresolved=[];
+  for(const[id,idx]of Object.entries(m.matched))for(const p of members.get(id)){matched[p.key]=idx;if(m.pinPad[id])pinPad[p.key]=m.pinPad[id]}
+  for(const u of m.unresolved)for(const p of members.get(u.id)||[])unresolved.push({key:p.key,ref:p.ref,reason:u.reason});
+  Object.assign(info,{level:m.level,tf:m.tf,rate:m.rate,matched,pinPad,unresolved,tried:m.tried||null,shared:[...groups.values()].some(a=>a.length>1)});
+  if(m.tf)for(const u of unresolved){const p=parts.find(q=>q.key===u.key);if(p&&Number.isFinite(p.x))info.at[u.key]=GERBER.layoutTransform(m.tf,p.x,p.y).map(r3)}
   const outline=layers.outline?layers.outline.draws.map(s=>s.map(r3)):[];
   const bg=src==="paste"&&layers.copper?layoutGeomPads(layers.copper.pads):[];
   const all=[...pads.map(p=>[p.x-p.w/2,p.y-p.h/2,p.x+p.w/2,p.y+p.h/2]),...outline.map(s=>[Math.min(s[0],s[2]),Math.min(s[1],s[3]),Math.max(s[0],s[2]),Math.max(s[1],s[3])])];
@@ -3753,7 +3787,7 @@ function layoutStatusText(L){if(!L)return"";const n=Object.keys(L.matched||{}).l
   if(L.level==="none")return`板面圖檔與座標檔對不上（${L.tried?`${L.tried.accepted}／${L.tried.parts} 顆零件對上`:"沒有可對應的零件"}），未套用`;
   const how=L.level==="pad"?"逐焊墊標示":L.level==="ref"?"依圖檔位號標示零件":"依零件標示；無法對應到單一焊墊";
   const tf=L.tf&&(L.tf.o||L.tf.tx||L.tf.ty)?`；已${L.tf.o>=4?"鏡像、":""}${L.tf.o%4?`旋轉 ${(L.tf.o%4)*90}°、`:""}平移 ${L.tf.tx}, ${L.tf.ty} mm`:"";
-  return`${src} · ${how} · ${n} 顆零件對上${u?`，${u} 顆對不上`:""}${tf}${L.source==="lookup"?" · 依料號版次套用":""}`}
+  return`${src} · ${how} · ${n} 顆零件對上${u?`，${u} 顆對不上`:""}${tf}${L.shared?" · 座標檔不分子板，各子板標在同一份焊墊":""}${L.source==="lookup"?" · 依料號版次套用":""}`}
 /* Number.isFinite：空白座標欄解析為 null，全域 isFinite(null) 會當成 0 */
 const realXY=r=>Boolean(r&&!r.gridPos&&Number.isFinite(r.x)&&Number.isFinite(r.y));
 const S={rows:[],metrics:[],metric:"volume",group:ALL_GRP,comp:null,chart:"xbars",relChart:"specScatter",pad:null,board:null,specSrc:"sample",partSpec:null,specDraft:null,specsG:null,sqDir:"Y",specs:JSON.parse(JSON.stringify(DEF_SPECS)),stencil:120,heightUnit:"um",htol:{lo:75,hi:125},step:{on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]},selZone:1,wipe:5,aperture:{groups:{}},geometryPads:null,padCoverage:null,pendingVerify:false,runVendor:"generic",ovCapSnap:null,ovCapSnapKey:"",source:"範例資料",tab:"issues",sub:"import",issuesSub:"list",controlSub:"uni",improveSub:"compare",F:[],issLv:"all",issCat:"all",issEnt:null,pmapSelection:null,issGroup:"cases",ctx:null,colorMode:"status",heatMode:"avg",sim3dMode:"real",exag:20,ghost:true,bridgeWarn:true,csAxis:"X",selectedPad:null,A:null,ai:"",aiModel:"",duo:{active:false,posture:"folded",mode:"master-detail",leftTab:"issues",rightTab:"sim3d",thumbSide:"right",pinnedPad:null,dockOpen:false}};
@@ -7707,7 +7741,7 @@ function renderPmap() {
   const L = pmapLayout(), Lall = curRun()?.info?.layout;
   const drawn = [];
   if (L) {
-    const unmatched = sorted.filter(item => !(item.part.comp && L.matched[item.part.comp]));
+    const unmatched = sorted.filter(item => !L.matched[item.part.key]);
     chart = `<div class="pmap-board"><div class="pmap-zoom" role="group" aria-label="縮放"><button type="button" data-zoom="in" aria-label="放大">＋</button><button type="button" data-zoom="out" aria-label="縮小">－</button><button type="button" data-zoom="fit">全板</button></div><canvas class="pmap-canvas" tabindex="0" data-map-focus="board" role="img" aria-label="板面焊墊圖：方向鍵移動、＋－縮放；以零件清單選取零件"></canvas></div>
       <p class="note" role="status">${esc(layoutStatusText(L))}</p>${section("對不上板面圖檔的零件",unmatched,"unmatched")}
       <details class="part-map-all"${listOpen?" open":""}><summary data-map-focus="all-parts">零件清單</summary>${list(sorted,"list")}</details>`;
@@ -12691,7 +12725,7 @@ function pmapPadPath(g,p,X,Y,k){const w=Math.max(p.w*k,1.5),h=Math.max(p.h*k,1.5
   else if(p.poly&&p.w*k>=3){p.poly.forEach(([a,b],i)=>i?g.lineTo(X(a),Y(b)):g.moveTo(X(a),Y(b)));g.closePath()}
   else g.rect(cx-w/2,cy-h/2,w,h)}
 function pmapFit(L,W,H){const b=L.geom.box,bw=Math.max(b[2]-b[0],1),bh=Math.max(b[3]-b[1],1),k=Math.min((W-16)/bw,(H-16)/bh);return{k,cx:(b[0]+b[2])/2,cy:(b[1]+b[3])/2,fit:k}}
-function pmapPartCentre(L,comp){const idx=L.matched[comp];if(!idx||!idx.length){const a=L.at&&L.at[comp];return a?{x:a[0],y:a[1],est:true}:null}
+function pmapPartCentre(L,key){const idx=L.matched[key];if(!idx||!idx.length){const a=L.at&&L.at[key];return a?{x:a[0],y:a[1],est:true}:null}
   let x=0,y=0;for(const k of idx){x+=L.geom.pads[k].x;y+=L.geom.pads[k].y}return{x:x/idx.length,y:y/idx.length}}
 function pmapBoardWire(cv,L,items,selection,pick){
   const key=L.ids.map(x=>x.id).join(",");
@@ -12706,10 +12740,10 @@ function pmapBoardWire(cv,L,items,selection,pick){
     g.fillStyle=tok("--line");for(const p of L.geom.bg){pmapPadPath(g,p,X,Y,v.k);g.fill()}
     g.globalAlpha=.55;g.fillStyle=tok("--muted");for(const p of L.geom.pads){pmapPadPath(g,p,X,Y,v.k);g.fill()}g.globalAlpha=1;
     const marks=[];
-    for(const it of items){const comp=it.part.comp;if(!comp)continue;const c=pmapPartCentre(L,comp);if(!c)continue;
-      const sel=selection.part===it.part.key;
-      if(it.level&&L.matched[comp]){g.fillStyle=col[it.level];for(const k of L.matched[comp]){pmapPadPath(g,L.geom.pads[k],X,Y,v.k);g.fill()}}
-      if(sel&&L.matched[comp]){let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;for(const k of L.matched[comp]){const p=L.geom.pads[k];x0=Math.min(x0,X(p.x-p.w/2));x1=Math.max(x1,X(p.x+p.w/2));y0=Math.min(y0,Y(p.y+p.h/2));y1=Math.max(y1,Y(p.y-p.h/2))}
+    for(const it of items){const key=it.part.key,c=pmapPartCentre(L,key);if(!c)continue;
+      const sel=selection.part===key,idx=L.matched[key];
+      if(it.level&&idx){g.fillStyle=col[it.level];for(const k of idx){pmapPadPath(g,L.geom.pads[k],X,Y,v.k);g.fill()}}
+      if(sel&&idx){let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;for(const k of idx){const p=L.geom.pads[k];x0=Math.min(x0,X(p.x-p.w/2));x1=Math.max(x1,X(p.x+p.w/2));y0=Math.min(y0,Y(p.y+p.h/2));y1=Math.max(y1,Y(p.y-p.h/2))}
         g.strokeStyle=tok("--ink");g.lineWidth=2;g.setLineDash([]);g.strokeRect(x0-4,y0-4,x1-x0+8,y1-y0+8)}
       if(it.level||sel)marks.push({it,c,sel})}
     g.font=`700 12px ${tok("--f-mono")||"monospace"}`;g.textAlign="center";g.textBaseline="middle";
@@ -12730,9 +12764,9 @@ function pmapBoardWire(cv,L,items,selection,pick){
   cv.onpointerup=cv.onpointercancel=e=>{const single=pts.size===1;pts.delete(e.pointerId);if(pts.size<2)pinch=null;
     if(e.type!=="pointerup"||!single||moved>6)return;
     const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top,[bx,by]=toBoard(px,py),v=view().v,tol=8/v.k;let best=null;
-    for(const it of items){const comp=it.part.comp,idx=comp&&L.matched[comp];if(!idx)continue;
+    for(const it of items){const idx=L.matched[it.part.key];if(!idx)continue;
       for(const k of idx){const p=L.geom.pads[k];if(Math.abs(bx-p.x)<=p.w/2+tol&&Math.abs(by-p.y)<=p.h/2+tol){const d=Math.hypot(bx-p.x,by-p.y);if(!best||d<best.d)best={it,d}}}}
-    if(!best)for(const it of items){const c=it.part.comp&&pmapPartCentre(L,it.part.comp);if(!c)continue;const d=Math.hypot(bx-c.x,by-c.y)*v.k;if(d<=16&&(!best||d<best.d))best={it,d}}
+    if(!best)for(const it of items){const c=pmapPartCentre(L,it.part.key);if(!c)continue;const d=Math.hypot(bx-c.x,by-c.y)*v.k;if(d<=16&&(!best||d<best.d))best={it,d}}
     if(best)pick(best.it.i)};
   cv.onwheel=e=>{if(!e.ctrlKey&&!e.metaKey)return;e.preventDefault();const r=cv.getBoundingClientRect();zoomAt(e.deltaY<0?1.2:1/1.2,e.clientX-r.left,e.clientY-r.top)};
   cv.onkeydown=e=>{const v=view().v,step=40/v.k,map={ArrowLeft:[-step,0],ArrowRight:[step,0],ArrowUp:[0,step],ArrowDown:[0,-step]};
@@ -12742,7 +12776,7 @@ function pmapBoardWire(cv,L,items,selection,pick){
   const root=cv.closest(".pmap-board");
   for(const b of root.querySelectorAll("[data-zoom]"))b.onclick=()=>{const z=b.dataset.zoom;if(z==="fit"){S.pmapView=null;redraw()}else zoomAt(z==="in"?1.5:1/1.5)};
   /* 選取的零件在畫面外時移到中央 */
-  const selItem=items.find(it=>it.part.key===selection.part),sc=selItem&&selItem.part.comp&&pmapPartCentre(L,selItem.part.comp);
+  const selItem=items.find(it=>it.part.key===selection.part),sc=selItem&&pmapPartCentre(L,selItem.part.key);
   if(sc){const{W,H,v}=view(),x=W/2+(sc.x-v.cx)*v.k,y=H/2-(sc.y-v.cy)*v.k;if(x<0||y<0||x>W||y>H){v.cx=sc.x;v.cy=sc.y;redraw()}}
   const host=cv.closest("#pmap")||cv;if(host._ro)host._ro.disconnect();if(window.ResizeObserver){host._ro=new ResizeObserver(()=>redraw());host._ro.observe(cv)}}
 

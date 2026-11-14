@@ -339,6 +339,16 @@ async function handleRecordsApi(req, repo, user, env) {
 
     const res = await repo.createRecord(rec, bodyBuf);
     if (res.error) return json(res, res.status || 500);
+    if (chk.meta.kind === 'layout' && res.record) {
+      // 同時上傳同一範圍：寫入前檢查都看到空範圍時，寫入後以最早寫入者為準，較晚者刪除自己（留稽核）並回傳衝突
+      const owners = await repo.layoutScopeOwners(chk.meta.part, chk.meta.rev, chk.meta.side, chk.meta.layer);
+      const first = owners[0];
+      if (first && first.id !== res.record.id) {
+        await repo.deleteRecord(res.record.id, user);
+        return first.sha256 === sha256 ? json({ record: first, existing: first.id }, 200)
+          : json({ error: '同料號、版次、面別與圖層已有板面圖檔；內容不同請用新版次，或由管理者刪除舊檔', code: 'version_conflict', existing: first.id }, 409);
+      }
+    }
     const pending = res.record?.lifecycle === 'pending_review';
     return json({ ...res, ...(related.length ? { related } : {}) }, res.status || (pending ? 202 : 201));
   }

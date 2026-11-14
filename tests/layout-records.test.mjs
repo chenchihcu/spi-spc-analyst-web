@@ -3,6 +3,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createCloudHarness } from "./_cloud-harness.mjs";
 import { checkMeta } from "../lib/records-core.mjs";
+import { Repo } from "../lib/repo.mjs";
+import { gzipSync } from "node:zlib";
+import { createHash } from "node:crypto";
 
 const at = (x, y) => `X${Math.round(x * 1e6)}Y${Math.round(y * 1e6)}`;
 const gerber = (ff, pads) => `%FSLAX46Y46*%\n%MOMM*%\n%TF.FileFunction,${ff}*%\n%ADD10R,1.0X0.5*%\nD10*\n${pads.map(([x, y]) => `${at(x, y)}D03*`).join("\n")}\nM02*\n`;
@@ -72,6 +75,25 @@ test("查詢：依料號、版次、面別篩選", async () => {
     assert.deepEqual(await q("&rev=V1"), [a.id, b.id].sort());
     assert.equal((await q("")).length, 3);
   } finally { cloud.close(); }
+});
+
+test("同時上傳同一範圍：寫入前檢查都放行時，較晚寫入者退出並回 409，只留一份", async () => {
+  const cloud = await createCloudHarness();
+  const orig = Repo.prototype.layoutScope;
+  try {
+    // 模擬另一個請求已通過檢查並先寫入：讓本次的寫入前檢查看不到它
+    Repo.prototype.layoutScope = async () => null;
+    const other = gerber("Paste,Top", [[1, 1], [20, 20]]), raw = Buffer.from(other);
+    const first = await cloud.repo.createRecord({ id: "concurrentlayout000001", kind: "layout", part: "LY-1", rev: "V1", side: "TOP", name: "a.gtp",
+      bytes: raw.length, gz_bytes: 0, sha256: createHash("sha256").update(raw).digest("hex"), user: "admin@example.test", created: Date.now(),
+      validationSource: "server_verified", lifecycle: "active", meta: { layer: "paste" } }, gzipSync(raw));
+    assert.ok(first.record);
+    const res = await cloud.post(meta(), PASTE);
+    assert.equal(res.status, 409);
+    assert.equal((await res.json()).existing, "concurrentlayout000001");
+    const left = cloud.db.prepare("SELECT id FROM records WHERE kind = 'layout'").all().map(r => r.id);
+    assert.deepEqual(left, ["concurrentlayout000001"]);
+  } finally { Repo.prototype.layoutScope = orig; cloud.close(); }
 });
 
 test("量測上傳引用板面圖檔：寫入 layoutProof；料號版次面別不符拒絕", async () => {
