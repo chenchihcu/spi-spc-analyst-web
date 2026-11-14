@@ -943,7 +943,16 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 .rec-card-actions button {
   min-height: 44px !important;
   touch-action: manipulation;
+  white-space: nowrap;
 }
+.rec-card-actions{flex-wrap:wrap;justify-content:flex-start}
+.rec-card-actions .sep{width:1px;align-self:stretch;background:var(--line)}
+.rec-card.rec-new{background:var(--accent-soft)}
+.rec-card-info{font-size:var(--fs-caption);line-height:1.5;overflow-wrap:anywhere}
+.rec-badges{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:2px}
+.rec-card-head .rec-badges{justify-content:flex-end;flex:none;max-width:50%;margin-top:0}
+.pair-meta .pill{vertical-align:middle}
+.rec-file{display:inline-block;max-width:18ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;font-size:var(--fs-caption)}
 .rec-card-actions .primary {
   flex: 1 1 auto;
   font-size:var(--fs-body);
@@ -1035,7 +1044,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
     <svg class="mitcorp-logo" viewBox="0 0 248 45" width="143" height="26" fill="currentColor" fill-rule="evenodd" role="img" aria-label="Mitcorp"><path d="M13.8,-0.0L28.5,-0.1L29.2,0.0L30.6,1.0L31.5,2.9L34.7,29.0L35.0,29.8L36.2,30.2L37.5,29.8L38.3,28.2L46.9,3.5L48.0,1.5L48.8,0.8L50.5,-0.1L66.3,0.0L67.6,1.0L68.4,3.2L68.4,30.8L68.3,32.2L67.7,33.8L66.0,34.8L62.8,35.0L59.2,34.8L57.7,33.8L57.3,31.5L57.3,5.8L56.7,4.5L55.2,4.0L53.0,4.7L52.0,6.5L43.5,31.5L42.2,33.3L41.2,34.1L38.2,34.8L28.8,34.8L26.0,34.0L24.6,32.5L24.0,29.8L20.9,5.8L20.2,4.5L18.5,4.0L17.0,4.5L16.5,5.2L12.3,26.8L11.3,30.0L10.5,31.5L8.4,33.8L6.3,35.0L2.2,35.7L1.2,35.7L0.0,35.0L0.0,30.2L1.2,29.6L4.5,28.9L5.4,28.0L6.2,26.2L10.7,3.0L11.9,1.0L13.8,-0.0ZM73.2,-0.0L83.8,0.0L84.6,1.3L84.5,4.2L83.8,5.4L82.8,5.7L75.5,5.8L73.2,5.5L72.7,4.8L72.5,2.8L72.6,1.0L73.2,-0.0ZM90.0,1.7L95.5,1.6L97.2,2.1L97.8,2.8L98.2,4.0L98.3,8.5L98.6,9.2L99.3,9.7L109.8,9.8L110.9,10.2L111.4,12.0L110.9,13.2L110.2,13.6L99.8,13.7L98.8,14.1L98.2,15.5L98.3,27.0L99.0,29.8L100.5,30.9L104.2,31.1L112.5,30.9L113.1,31.5L113.2,33.0L113.0,33.8L112.2,34.6L110.5,35.0L104.5,35.3L95.8,35.1L92.0,33.9L89.9,32.2L88.9,30.5L88.4,27.5L88.4,5.5L88.6,3.0L89.2,2.1L90.0,1.7ZM130.5,9.2L135.5,9.3L144.3,10.0L145.5,10.4L146.1,11.0L146.2,13.2L145.7,14.0L145.0,14.3L140.3,13.8L133.0,13.6L129.5,13.9L127.0,14.9L125.1,17.0L124.3,20.0L124.3,24.0L125.1,27.8L127.0,29.8L130.0,30.9L137.5,31.1L145.2,30.4L146.0,31.0L146.3,32.0L146.2,33.5L145.5,34.3L142.5,35.0L135.2,35.4L129.5,35.4L124.0,34.9L120.5,33.9L118.2,32.8L116.1,30.8L115.1,29.2L114.0,25.5L113.9,20.0L115.0,15.8L116.1,14.0L118.2,12.0L120.5,10.8L124.2,9.8L130.5,9.2ZM161.8,9.5L168.5,9.3L174.8,9.9L178.2,10.8L180.2,11.8L182.8,14.0L183.9,15.8L184.7,18.8L184.9,24.5L184.7,26.2L183.8,29.2L181.8,32.0L178.8,33.9L175.5,34.9L166.0,35.7L156.8,34.8L153.8,33.8L152.0,32.9L150.4,31.5L149.2,30.0L148.3,28.0L147.9,25.5L148.0,18.2L149.1,15.0L151.0,12.8L154.0,11.0L158.0,9.8L161.8,9.5ZM203.0,9.5L209.8,9.4L210.7,10.5L210.8,11.8L210.5,12.8L209.5,13.6L201.8,13.9L200.2,14.2L199.2,14.8L198.7,16.0L198.7,31.0L198.3,33.5L197.5,34.5L196.2,34.9L190.5,34.8L189.1,33.8L188.8,32.0L188.7,15.2L189.2,12.5L190.0,11.7L191.9,10.8L197.2,9.8L203.0,9.5ZM224.0,9.5L230.5,9.3L237.9,9.8L242.2,10.9L244.2,12.0L246.2,14.0L247.0,15.2L247.8,17.3L247.8,27.8L246.9,30.0L245.9,31.5L244.8,32.6L242.8,33.8L240.0,34.8L232.2,35.5L223.2,35.4L222.6,36.0L222.4,36.8L222.2,43.5L221.3,44.8L213.5,44.8L212.6,43.5L212.4,41.8L212.6,13.0L213.2,11.7L214.6,10.8L218.5,9.9L224.0,9.5ZM75.5,9.9L79.0,9.8L81.5,10.0L82.8,10.8L83.4,12.0L83.5,32.2L83.0,33.8L81.5,34.8L75.5,34.8L74.1,34.0L73.7,33.2L73.6,12.0L74.0,10.8L75.5,9.9ZM163.2,13.0L160.8,14.0L159.4,15.2L158.3,18.8L158.1,22.5L158.3,26.5L159.2,29.2L160.5,30.8L162.8,31.8L166.0,32.1L169.8,31.8L172.0,30.8L173.0,29.8L173.9,28.2L174.4,25.0L174.4,21.8L173.9,16.5L173.0,15.0L171.9,14.0L168.5,12.9L163.2,13.0ZM226.0,13.0L223.5,13.5L222.7,14.0L222.4,14.5L222.5,30.5L224.0,31.6L227.5,31.9L232.5,31.9L235.0,31.0L236.0,30.1L237.0,28.7L237.7,25.5L237.8,20.8L237.0,16.2L235.3,14.0L233.0,13.1L230.2,12.8L226.0,13.0Z"/></svg>
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.29.1</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.29.2</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <div class="db-capsule-group" role="group" aria-label="記錄庫與匯出">
@@ -13659,206 +13668,119 @@ async function renderRecPicker(force) {
   if ($("#countPickSpi")) $("#countPickSpi").textContent = S1.length;
   if ($("#countPickPlace")) $("#countPickPlace").textContent = P1.length;
 
-  const tblSpi = $("#tblPickSpi");
-  if (tblSpi) {
-    tblSpi.innerHTML = S1.length ? `<thead><tr>
-      <th>批號 / 料號</th>
-      <th>工單 / 面別</th>
-      <th class="num">板 × 焊墊</th>
-      <th>關聯座標檔</th>
-      <th>品質狀態</th>
-      <th>上傳時間 / 者</th>
-      <th>指紋</th>
-      <th style="text-align:right">操作</th>
-    </tr></thead><tbody>` + S1.map(r => {
-      const wo = [r.workOrder ? `製令:${esc(r.workOrder)}` : "", r.measuredDate ? `日期:${esc(r.measuredDate)}` : "", r.supplierWo ? `廠:${esc(r.supplierWo)}` : "", r.outsourceWo ? `委:${esc(r.outsourceWo)}` : ""].filter(Boolean).join(" ") || "未提供";
-      const placeInfo = placeCell(r, list, reimp);
-      let qualityInfo = `<span class="note">—</span>`;
-      if (r.qualitySnapshot) {
-        const defs = r.qualitySnapshot.defects ?? r.qualitySnapshot.totalDefects ?? 0;
-        if (defs === 0) {
-          qualityInfo = `<span class="pill ok" title="0 缺點">✓ 良品 (0 缺點)</span>`;
-        } else {
-          qualityInfo = `<span class="pill bad" title="缺點數: ${defs}">⚠ ${defs} 缺點</span>`;
-        }
-      }
-      const hl = PICKER_HIGHLIGHT && PICKER_HIGHLIGHT.id === r.id;
-      return `<tr data-row-id="${esc(r.id)}"${hl ? ' class="rec-new"' : ""}>
-        <td><b>${esc(r.lot||"未提供")}</b>${hl && PICKER_HIGHLIGHT.label ? ` <span class="pill warn">${esc(PICKER_HIGHLIGHT.label)}</span>` : ""}<br><span class="note mono" style="font-size:var(--fs-caption)">${esc(r.part || "—")} ${esc(r.rev||"")}</span><br>${spiBadge(r)}</td>
-        <td>${esc(r.side || "—")}<br><span class="note" style="font-size:var(--fs-caption)">${wo}</span></td>
-        <td class="num mono">${r.boards || r.pads ? `${r.boards || "—"} × ${r.pads || "—"}` : '<span class="note" style="white-space:nowrap" title="舊資料未記錄板數與焊墊數">未記錄</span>'}</td>
-        <td>${placeInfo}</td>
-        <td>${qualityInfo}</td>
-        <td class="mono" style="font-size:var(--fs-caption)">${esc(fmtTime(r.created))}<br><span class="note">${esc(r.user)}</span></td>
-        <td>${fp(r)}</td>
-        <td style="text-align:right">
-          <div class="rec-acts">
-            ${!["pending_review","superseded"].includes(r.lifecycle)?`<button class="primary btn-sm" data-pact="load" data-id="${esc(r.id)}" title="載入有效量測分析">載入分析</button>`:""}
-            <button class="btn-sm" data-pact="ver" data-id="${esc(r.id)}" title="檢查原檔指紋與座標對應">對應證明</button>
-            <button class="btn-sm" data-pact="open" data-id="${esc(r.id)}" title="開啟至匯入對應面板以檢視或調整欄位">調整</button>
-            ${editBtn(r)}
-            <button class="btn-sm" data-pact="dl" data-id="${esc(r.id)}">下載原檔</button>
-            ${RecDB.isAdmin&&r.lifecycle==="pending_review"?`<span class="sep" aria-hidden="true"></span><button class="btn-sm" data-pact="new-batch" data-id="${esc(r.id)}">新一批</button><button class="btn-sm" data-pact="correct" data-id="${esc(r.id)}">修正既有</button>`:""}
-            ${delBtn(r)}
-          </div>
-        </td>
-      </tr>`;
-    }).join("") + `</tbody>` : `<tbody><tr><td colspan="8" class="note" style="text-align:center;padding:24px">${q || selectedPart || sideFilter || qualityFilter !== "all" ? "沒有符合篩選條件的量測紀錄" : "資料庫目前尚無量測記錄。請點選下方「＋ 匯入新檔案」進行匯入。"}</td></tr></tbody>`;
+  /* 量測紀錄與座標檔共用同一份檢視模型：兩種紀錄只在 recView 分歧，表格、手機卡片、配對列都由同一組渲染器產生，
+     避免各自手寫模板而在狀態徽章、按鈕組合與順序上漂移（v10.29.2） */
+  const curR = curRun();
+  const sideTxt = s => s === "BOTH" ? "TOP＋BOT" : (s || "—");
+  const qualityPill = r => {
+    if (r.kind !== "spi" || !r.qualitySnapshot) return "";
+    const defs = r.qualitySnapshot.defects ?? r.qualitySnapshot.totalDefects ?? 0;
+    return defs === 0 ? `<span class="pill ok" title="0 缺點">✓ 良品 (0 缺點)</span>` : `<span class="pill bad" title="缺點數: ${defs}">⚠ ${defs} 缺點</span>`;
+  };
+  const btn = (r, pact, label, { primary = false, title = "" } = {}) =>
+    `<button type="button" class="${primary ? "primary " : ""}btn-sm" data-pact="${pact}" data-id="${esc(r.id)}"${title ? ` title="${esc(title)}"` : ""}>${label}</button>`;
+  function citeHtml(p) {
+    const users = (list || []).filter(x => x.kind === "spi" && x.placeId === p.id).sort((a, b) => b.created - a.created);
+    if (!users.length) return `<span class="note">尚無量測引用</span>`;
+    return `<button type="button" class="linkbtn" data-pact="cite" data-id="${esc(p.id)}">被 ${users.length} 筆量測引用</button><div class="note" data-cite-for="${esc(p.id)}"${PAIR_CITE_OPEN.has(p.id) ? "" : " hidden"}>${users.slice(0, 20).map(x => `${esc(x.lot || "未提供批號")}・${esc(x.side || "—")}`).join("、")}${users.length > 20 ? `，另 ${users.length - 20} 筆` : ""}</div>`;
   }
-
-  const cardsSpi = $("#cardsPickSpi");
-  if (cardsSpi) {
-    cardsSpi.innerHTML = S1.length ? S1.map(r => {
-      const wo = [r.workOrder ? `製令:${esc(r.workOrder)}` : "", r.measuredDate ? `日期:${esc(r.measuredDate)}` : "", r.supplierWo ? `廠:${esc(r.supplierWo)}` : "", r.outsourceWo ? `委:${esc(r.outsourceWo)}` : ""].filter(Boolean).join(" ") || "未提供";
-      let qualityInfo = "";
-      if (r.qualitySnapshot) {
-        const defs = r.qualitySnapshot.defects ?? r.qualitySnapshot.totalDefects ?? 0;
-        if (defs === 0) {
-          qualityInfo = `<span class="pill ok" style="font-size:var(--fs-caption)">✓ 良品</span>`;
-        } else {
-          qualityInfo = `<span class="pill bad" style="font-size:var(--fs-caption)">⚠ ${defs} 缺點</span>`;
-        }
-      }
-      const pt = placeText(r, list), again = reimp.get(r.id);
-      return `<div class="rec-card" data-row-id="${esc(r.id)}" style="padding:12px;background:${PICKER_HIGHLIGHT && PICKER_HIGHLIGHT.id === r.id ? "var(--accent-soft)" : "var(--surface)"};border:1px solid var(--line);border-radius:10px;margin-bottom:10px">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
-          <div style="min-width:0">
-            <b style="font-size:var(--fs-heading)">${esc(r.lot||"未提供")}</b>
-            <div class="note" style="font-size:var(--fs-caption);margin-top:2px"><span class="mono">${esc(r.part || "—")}</span> ${esc(r.rev||"")} · 面別: ${esc(r.side || "—")} · ${esc(r.lifecycle==="pending_review"?"待判定":r.lifecycle==="superseded"?"已被修正":r.lifecycle==="active"?"有效":"舊資料・未受控")}</div>
-          </div>
-          <div style="display:flex;gap:4px;align-items:center">
-            ${qualityInfo}
-            <span class="pill" style="font-size:var(--fs-caption);background:var(--surface2)">${esc(r.boards || 0)}板</span>
-          </div>
-        </div>
-        <div class="note" style="font-size:var(--fs-caption);margin:8px 0;line-height:1.4">
-          工單: ${wo}<br>
-          座標: ${placeCell(r, list, reimp)}<br>
-          上傳: ${esc(fmtTime(r.created))} · ${esc(r.user)}
-          ${r.note ? `<br><span style="color:var(--ink)">備註: ${esc(r.note)}</span>` : ""}
-        </div>
-        <div class="rec-card-actions" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
-          ${!["pending_review","superseded"].includes(r.lifecycle)?`<button class="primary" data-pact="load" data-id="${esc(r.id)}" style="flex:1 1 120px;min-height:44px;font-size:var(--fs-body);font-weight:700">載入分析</button>`:""}
-          <button data-pact="ver" data-id="${esc(r.id)}" style="flex:0 0 60px;font-size:var(--fs-body)">對應證明</button>
-          <button data-pact="open" data-id="${esc(r.id)}" style="flex:0 0 60px;min-height:44px;font-size:var(--fs-body)">調整</button>
-          ${again && again.length ? `<button data-pact="goto" data-id="${esc(again[0].id)}" style="min-height:44px;font-size:var(--fs-body)">已重新匯入 →</button>` : !pt && canReimport(r) ? `<button data-pact="reimport" data-id="${esc(r.id)}" style="min-height:44px;font-size:var(--fs-body)">重新受控匯入</button>` : ""}
-          ${RecDB.isAdmin&&r.lifecycle==="pending_review"?`<button data-pact="new-batch" data-id="${esc(r.id)}">新一批</button><button data-pact="correct" data-id="${esc(r.id)}">修正既有</button>`:""}
-          ${editBtn(r)}
-          <button data-pact="dl" data-id="${esc(r.id)}" style="flex:0 0 60px;font-size:var(--fs-body)">下載原檔</button>
-          ${delBtn(r)}
-        </div>
-      </div>`;
-    }).join("") : `<div class="note" style="text-align:center;padding:24px">無符合篩選條件的量測記錄</div>`;
-  }
-
-  const tblPlace = $("#tblPickPlace");
-  if (tblPlace) {
-    tblPlace.innerHTML = P1.length ? `<thead><tr>
-      <th>產品料號</th>
-      <th>面別</th>
-      <th>版次</th>
-      <th>單位</th>
-      <th class="num">元件數</th>
-      <th>受控狀態</th>
-      <th>上傳時間 / 者</th>
-      <th>指紋</th>
-      <th style="text-align:right">操作</th>
-    </tr></thead><tbody>` + P1.map(r => {
+  function recView(r) {
+    const isSpi = r.kind === "spi";
+    const hlRec = !!(PICKER_HIGHLIGHT && PICKER_HIGHLIGHT.id === r.id);
+    const badges = [];
+    if (hlRec && PICKER_HIGHLIGHT.label) badges.push(`<span class="pill warn">${esc(PICKER_HIGHLIGHT.label)}</span>`);
+    const v = { id: r.id, file: r.name || "", user: r.user, created: r.created, note: r.note || "", fp: fp(r), highlight: hlRec,
+      ident: `<span class="mono">${esc(r.part || "—")}</span> ${esc(r.rev || "")} · ${esc(sideTxt(r.side))}` };
+    /* 卡片與配對列的副標：標題已是料號時（座標檔）不再重複料號 */
+    v.sub = isSpi ? v.ident : `${esc(r.rev || "—")} · ${esc(sideTxt(r.side))}`;
+    const actions = [], more = [], admin = [];
+    if (isSpi) {
+      v.title = `<b>${esc(r.lot || "未提供批號")}</b>`;
+      badges.push(spiBadge(r));
+      const q = qualityPill(r); if (q) badges.push(q);
+      v.scale = r.boards || r.pads ? `${esc(r.boards || "—")} 板 × ${esc(r.pads || "—")} 焊墊` : '<span class="note" title="舊資料未記錄板數與焊墊數">未記錄</span>';
+      v.extra = [r.workOrder ? `製令:${esc(r.workOrder)}` : "", r.measuredDate ? `日期:${esc(r.measuredDate)}` : "", r.supplierWo ? `廠:${esc(r.supplierWo)}` : "", r.outsourceWo ? `委:${esc(r.outsourceWo)}` : ""].filter(Boolean).join(" ");
+      v.link = placeCell(r, list, reimp);
+      const st = measurementLink(r, list);
+      v.pairStatus = st.v === "ok" ? `<span class="rec-ok">身分相符</span>` : st.v === "bad" ? `<span class="rec-bad">${esc(st.text)}</span>` : st.v === "missing" ? `<span class="rec-bad">座標檔不存在</span>` : `<span class="note">尚未搭配</span>`;
+      v.pairExtra = st.place
+        ? `<button type="button" class="btn-sm" data-pact="dl-pair" data-id="${esc(r.id)}">下載這一對</button>`
+        : `<button type="button" class="btn-sm" disabled>下載這一對</button><span class="note">座標原檔不在，只能下載量測原檔</span>`;
+      if (!["pending_review", "superseded"].includes(r.lifecycle)) actions.push(btn(r, "load", "載入分析", { primary: true, title: "載入有效量測分析" }));
+      more.push(btn(r, "open", "調整", { title: "開啟至匯入對應面板以檢視或調整欄位" }));
+      if (RecDB.isAdmin && r.lifecycle === "pending_review") admin.push(btn(r, "new-batch", "新一批"), btn(r, "correct", "修正既有"));
+    } else {
+      const selectable = r.lifecycle === "active" && r.validation_source === "server_verified";
       const isCur = PLACE && PLACE.recId === r.id;
-      const selectable=r.lifecycle==="active"&&r.validation_source==="server_verified";
-      const curR = curRun();
       const needsApply = isCur && selectable && canApplyPlacePreview(curR) && !runHasAppliedPlace(curR, r.id);
-      const defBadge = placeBadge(r, selectable), hl = PICKER_HIGHLIGHT && PICKER_HIGHLIGHT.id === r.id;
-      return `<tr data-row-id="${esc(r.id)}"${isCur || hl ? ' class="rec-new"' : ""}>
-        <td><b class="mono">${esc(r.part)}</b>${hl && PICKER_HIGHLIGHT.label ? ` <span class="pill warn">${esc(PICKER_HIGHLIGHT.label)}</span>` : ""}<br><span class="note" title="${esc(r.name || "")}" style="font-size:var(--fs-caption);display:inline-block;max-width:14ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom">${esc(r.name || "")}</span></td>
-        <td>${esc(r.side || "ALL")}</td>
-        <td><span class="pill rev">${esc(r.rev)}</span></td>
-        <td>${esc(r.unit || "未確認")}</td>
-        <td class="num mono">${r.comps || "—"}</td>
-        <td>${defBadge}</td>
-        <td class="mono" style="font-size:var(--fs-caption)">${esc(fmtTime(r.created))}<br><span class="note">${esc(r.user)}</span></td>
-        <td>${fp(r)}</td>
-        <td style="text-align:right">
-          <div class="rec-acts">
-            ${isCur ? `<span class="pill ok">目前已選取</span>${needsApply ? `<button class="primary btn-sm" data-pact="apply-place" data-id="${esc(r.id)}">套用到目前回合</button>` : ""}` : selectable?`<button class="primary btn-sm" data-pact="use-place" data-id="${esc(r.id)}">選取</button>`:r.lifecycle==="archived"?`<span class="note" title="${ARCHIVED_TIP}">不可用於新匯入</span>`:""}
-            <button class="btn-sm" data-pact="ver" data-id="${esc(r.id)}" title="檢查原檔指紋並列出引用的量測">對應證明</button>
-            ${editBtn(r)}
-            <button class="btn-sm" data-pact="dl" data-id="${esc(r.id)}">下載原檔</button>
-            ${RecDB.isAdmin&&(selectable||r.validation_source==="legacy")?'<span class="sep" aria-hidden="true"></span>':""}
-            ${RecDB.isAdmin&&selectable?`<button class="btn-sm" data-pact="archive-place" data-id="${esc(r.id)}">封存</button>`:""}
-            ${RecDB.isAdmin&&r.validation_source==="legacy"?`<button class="btn-sm" data-pact="register-legacy-place" data-id="${esc(r.id)}">驗證納管</button>`:""}
-            ${delBtn(r)}
-          </div>
-        </td>
+      v.highlight = hlRec || !!isCur;
+      v.title = `<b class="mono">${esc(r.part || "—")}</b>`;
+      badges.push(placeBadge(r, selectable));
+      if (isCur) badges.push(`<span class="pill ok">目前已選取</span>`);
+      v.scale = `${esc(r.comps || "—")} 元件 · ${esc(r.unit || "未確認單位")}`;
+      v.extra = "";
+      v.link = citeHtml(r);
+      v.pairStatus = v.link;
+      v.pairExtra = "";
+      if (needsApply) actions.push(btn(r, "apply-place", "套用到目前回合", { primary: true }));
+      else if (!isCur && selectable) actions.push(btn(r, "use-place", "選取", { primary: true }));
+      else if (!isCur && r.lifecycle === "archived") actions.push(`<span class="note" title="${ARCHIVED_TIP}">不可用於新匯入</span>`);
+      if (RecDB.isAdmin && selectable) admin.push(btn(r, "archive-place", "封存"));
+      if (RecDB.isAdmin && r.validation_source === "legacy") admin.push(btn(r, "register-legacy-place", "驗證納管"));
+    }
+    v.badges = badges.join(" ");
+    v.primary = actions.join("");
+    const common = [btn(r, "ver", "對應證明", { title: isSpi ? "檢查原檔指紋與座標對應" : "檢查原檔指紋並列出引用的量測" }), btn(r, "dl", "下載原檔"), editBtn(r)];
+    const tail = admin.concat(delBtn(r) ? [delBtn(r)] : []);
+    v.secondary = common.concat(more).join("") + (tail.length ? `<span class="sep" aria-hidden="true"></span>${tail.join("")}` : "");
+    return v;
+  }
+  const REC_HEAD = `<thead><tr><th>檔案</th><th>料號 / 版次 / 面別</th><th>規模</th><th>對應</th><th>上傳時間 / 者</th><th>指紋</th><th style="text-align:right">操作</th></tr></thead>`;
+  const recRowHtml = v => `<tr data-row-id="${esc(v.id)}"${v.highlight ? ' class="rec-new"' : ""}>
+        <td>${v.title}<div class="rec-badges">${v.badges}</div>${v.file ? `<span class="note rec-file" title="${esc(v.file)}">${esc(v.file)}</span>` : ""}</td>
+        <td>${v.ident}${v.extra ? `<br><span class="note">${v.extra}</span>` : ""}</td>
+        <td class="mono" style="white-space:nowrap">${v.scale}</td>
+        <td>${v.link}</td>
+        <td class="mono" style="font-size:var(--fs-caption)">${esc(fmtTime(v.created))}<br><span class="note">${esc(v.user)}</span></td>
+        <td>${v.fp}</td>
+        <td style="text-align:right"><div class="rec-acts">${v.primary}${v.secondary}</div></td>
       </tr>`;
-    }).join("") + `</tbody>` : `<tbody><tr><td colspan="9" class="note" style="text-align:center;padding:24px">${q || selectedPart || sideFilter || PICKER_LINK_FILTER ? "沒有符合篩選條件的座標檔" : "資料庫目前尚無座標檔。請用上方表單登錄。"}</td></tr></tbody>`;
-  }
-
-  const cardsPlace = $("#cardsPickPlace");
-  if (cardsPlace) {
-    const curR = curRun();
-    cardsPlace.innerHTML = P1.length ? P1.map(r => {
-      const isCur = PLACE && PLACE.recId === r.id,selectable=r.lifecycle==="active"&&r.validation_source==="server_verified";
-      const needsApply = isCur && selectable && canApplyPlacePreview(curR) && !runHasAppliedPlace(curR, r.id);
-      return `<div class="rec-card" data-row-id="${esc(r.id)}" style="padding:12px;background:${PICKER_HIGHLIGHT && PICKER_HIGHLIGHT.id === r.id ? "var(--accent-soft)" : "var(--surface)"};border:1px solid var(--line);border-radius:10px;margin-bottom:10px">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
-          <div style="min-width:0">
-            <b class="mono" style="font-size:var(--fs-heading)">${esc(r.part)}</b>
-            <div class="note" style="font-size:var(--fs-caption);margin-top:2px">面別: ${esc(r.side || "ALL")} · 版次: ${esc(r.rev)}</div>
-          </div>
-          <div>
-            ${placeBadge(r, selectable)}
-          </div>
+  const recCardHtml = v => `<div class="rec-card${v.highlight ? " rec-new" : ""}" data-row-id="${esc(v.id)}">
+        <div class="rec-card-head">
+          <div style="min-width:0"><div class="rec-card-title">${v.title}</div><div class="rec-card-sub">${v.sub}</div></div>
+          <div class="rec-badges">${v.badges}</div>
         </div>
-        <div class="note" style="font-size:var(--fs-caption);margin:8px 0">
-          元件數: ${r.comps || "—"} · 單位: ${esc(r.unit || "未確認")}<br>
-          原始檔: <span style="overflow-wrap:anywhere">${esc(r.name || "")}</span><br>
-          ${r.lifecycle === "archived" ? `<span>${ARCHIVED_TIP}</span><br>` : ""}
-          上傳: ${esc(fmtTime(r.created))} · ${esc(r.user)}
-          ${r.note ? `<br><span style="color:var(--ink)">備註: ${esc(r.note)}</span>` : ""}
+        <div class="rec-card-info note">
+          規模：${v.scale}<br>
+          ${v.extra ? `工單：${v.extra}<br>` : ""}
+          對應：${v.link}<br>
+          原始檔：<span style="overflow-wrap:anywhere">${esc(v.file)}</span><br>
+          上傳：${esc(fmtTime(v.created))} · ${esc(v.user)}
+          ${v.note ? `<br><span style="color:var(--ink)">備註：${esc(v.note)}</span>` : ""}
         </div>
-        <div class="rec-card-actions" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
-          ${isCur ? (needsApply ? `<button class="primary" data-pact="apply-place" data-id="${esc(r.id)}" style="flex:1 1 120px;font-size:var(--fs-body)">套用到目前回合</button><span class="pill ok" style="align-self:center">目前已選取</span>` : '<button class="primary" disabled style="flex:1 1 120px;min-height:44px;font-size:var(--fs-body)">目前已選取</button>') : selectable?`<button class="primary" data-pact="use-place" data-id="${esc(r.id)}" style="flex:1 1 120px;min-height:44px;font-size:var(--fs-body)">選取此座標檔</button>`:""}
-          ${RecDB.isAdmin&&selectable?`<button data-pact="archive-place" data-id="${esc(r.id)}">封存</button>`:""}
-          ${RecDB.isAdmin&&r.validation_source==="legacy"?`<button data-pact="register-legacy-place" data-id="${esc(r.id)}">驗證納管</button>`:""}
-          <button data-pact="ver" data-id="${esc(r.id)}" style="flex:0 0 60px;font-size:var(--fs-body)">對應證明</button>
-          <button data-pact="dl" data-id="${esc(r.id)}" style="flex:0 0 60px;font-size:var(--fs-body)">下載原檔</button>
-          ${delBtn(r)}
-        </div>
+        <div class="rec-card-actions">${v.primary}${v.secondary}</div>
       </div>`;
-    }).join("") : `<div class="note" style="text-align:center;padding:24px">無符合篩選條件的座標檔</div>`;
-  }
+  const recTable = (rows, empty) => rows.length ? REC_HEAD + `<tbody>` + rows.map(r => recRowHtml(recView(r))).join("") + `</tbody>`
+    : `<tbody><tr><td colspan="7" class="note" style="text-align:center;padding:24px">${empty}</td></tr></tbody>`;
+  const recCards = (rows, empty) => rows.length ? rows.map(r => recCardHtml(recView(r))).join("") : `<div class="note" style="text-align:center;padding:24px">${empty}</div>`;
+
+  const tblSpi = $("#tblPickSpi");
+  if (tblSpi) tblSpi.innerHTML = recTable(S1, q || selectedPart || sideFilter || qualityFilter !== "all" ? "沒有符合篩選條件的量測紀錄" : "資料庫目前尚無量測記錄。請點選下方「＋ 匯入新檔」進行匯入。");
+  const cardsSpi = $("#cardsPickSpi");
+  if (cardsSpi) cardsSpi.innerHTML = recCards(S1, "無符合篩選條件的量測記錄");
+  const tblPlace = $("#tblPickPlace");
+  if (tblPlace) tblPlace.innerHTML = recTable(P1, q || selectedPart || sideFilter || PICKER_LINK_FILTER ? "沒有符合篩選條件的座標檔" : "資料庫目前尚無座標檔。請用上方表單登錄。");
+  const cardsPlace = $("#cardsPickPlace");
+  if (cardsPlace) cardsPlace.innerHTML = recCards(P1, "無符合篩選條件的座標檔");
 
   function pairMore(html) {
     return html.trim() ? `<details class="pair-more"><summary>更多</summary><div class="rec-acts">${html}</div></details>` : "";
   }
-  function spiPairRow(r) {
-    const st = measurementLink(r, list);
-    const hl = PICKER_HIGHLIGHT && PICKER_HIGHLIGHT.id === r.id ? " rec-new" : "";
-    const primary = !["pending_review", "superseded"].includes(r.lifecycle) ? `<button type="button" class="primary btn-sm" data-pact="load" data-id="${esc(r.id)}">載入分析</button>` : "";
-    const pairBtn = st.place
-      ? `<button type="button" class="btn-sm" data-pact="dl-pair" data-id="${esc(r.id)}">下載這一對</button>`
-      : `<button type="button" class="btn-sm" disabled>下載這一對</button><span class="note">座標原檔不在，只能下載量測原檔</span>`;
-    const status = st.v === "ok" ? `<span class="rec-ok">身分相符</span>` : st.v === "bad" ? `<span class="rec-bad">${esc(st.text)}</span>` : st.v === "missing" ? `<span class="rec-bad">座標檔不存在</span>` : `<span class="note">尚未搭配</span>`;
-    const more = `<button type="button" class="btn-sm" data-pact="ver" data-id="${esc(r.id)}">對應證明</button><button type="button" class="btn-sm" data-pact="dl" data-id="${esc(r.id)}">下載原檔</button><button type="button" class="btn-sm" data-pact="open" data-id="${esc(r.id)}">調整</button>${editBtn(r)}${RecDB.isAdmin && r.lifecycle === "pending_review" ? `<button type="button" class="btn-sm" data-pact="new-batch" data-id="${esc(r.id)}">新一批</button><button type="button" class="btn-sm" data-pact="correct" data-id="${esc(r.id)}">修正既有</button>` : ""}${delBtn(r)}`;
-    return `<div class="pair-row${hl}" data-row-id="${esc(r.id)}"><div class="pair-meta"><b>${esc(r.lot || "未提供批號")}</b> ${spiBadge(r)} · ${esc(r.side || "—")} · ${status}<br><span class="note">${esc(r.name || "")}</span></div><div class="rec-acts">${primary}${pairBtn}${pairMore(more)}</div></div>`;
+  function pairRowHtml(r) {
+    const v = recView(r);
+    return `<div class="pair-row${v.highlight ? " rec-new" : ""}" data-row-id="${esc(v.id)}"><div class="pair-meta">${v.title} ${v.badges} · ${v.sub}<br><span class="note">${esc(v.file)}</span> · ${v.pairStatus}</div><div class="rec-acts">${v.primary}${v.pairExtra}${pairMore(v.secondary)}</div></div>`;
   }
-  function placePairRow(p) {
-    const selectable = p.lifecycle === "active" && p.validation_source === "server_verified";
-    const isCur = PLACE && PLACE.recId === p.id;
-    const curR = curRun();
-    const needsApply = isCur && selectable && canApplyPlacePreview(curR) && !runHasAppliedPlace(curR, p.id);
-    const users = (list || []).filter(x => x.kind === "spi" && x.placeId === p.id).sort((a, b) => b.created - a.created);
-    const cite = users.length
-      ? `<button type="button" class="linkbtn" data-pact="cite" data-id="${esc(p.id)}">被 ${users.length} 筆量測引用</button><div id="cite-${esc(p.id)}" class="note"${PAIR_CITE_OPEN.has(p.id) ? "" : " hidden"}>${users.slice(0, 20).map(x => `${esc(x.lot || "未提供批號")}・${esc(x.side || "—")}`).join("、")}${users.length > 20 ? `，另 ${users.length - 20} 筆` : ""}</div>`
-      : `<span class="note">尚無量測引用</span>`;
-    const primary = isCur ? `<span class="pill ok">目前已選取</span>${needsApply ? `<button type="button" class="primary btn-sm" data-pact="apply-place" data-id="${esc(p.id)}">套用到目前回合</button>` : ""}` : selectable ? `<button type="button" class="primary btn-sm" data-pact="use-place" data-id="${esc(p.id)}">選取</button>` : "";
-    const more = `<button type="button" class="btn-sm" data-pact="ver" data-id="${esc(p.id)}">對應證明</button><button type="button" class="btn-sm" data-pact="dl" data-id="${esc(p.id)}">下載原檔</button>${editBtn(p)}${RecDB.isAdmin && selectable ? `<button type="button" class="btn-sm" data-pact="archive-place" data-id="${esc(p.id)}">封存</button>` : ""}${RecDB.isAdmin && p.validation_source === "legacy" ? `<button type="button" class="btn-sm" data-pact="register-legacy-place" data-id="${esc(p.id)}">驗證納管</button>` : ""}${delBtn(p)}`;
-    const hl = isCur || (PICKER_HIGHLIGHT && PICKER_HIGHLIGHT.id === p.id) ? " rec-new" : "";
-    const side = p.side === "BOTH" ? "TOP＋BOT" : (p.side || "—");
-    const fresh = PICKER_HIGHLIGHT && PICKER_HIGHLIGHT.id === p.id && PICKER_HIGHLIGHT.label ? ` <span class="pill warn">${esc(PICKER_HIGHLIGHT.label)}</span>` : "";
-    return `<div class="pair-row${hl}" data-row-id="${esc(p.id)}"><div class="pair-meta"><b class="mono">${esc(p.part)}</b> ${esc(p.rev)} · ${esc(side)}${fresh} · ${esc(p.name || "")}<br>${cite}</div><div class="rec-acts">${primary}${pairMore(more)}</div></div>`;
-  }
+  const spiPairRow = pairRowHtml, placePairRow = pairRowHtml;
   function renderPairBoard() {
     const board = $("#pairBoard");
     if (!board) return;
@@ -14381,8 +14303,7 @@ function setupRecPicker() {
     const id = b.dataset.id, act = b.dataset.pact;
     if (act === "cite") {
       if (PAIR_CITE_OPEN.has(id)) PAIR_CITE_OPEN.delete(id); else PAIR_CITE_OPEN.add(id);
-      const box = document.getElementById("cite-" + id);
-      if (box) box.hidden = !PAIR_CITE_OPEN.has(id);
+      document.querySelectorAll("[data-cite-for]").forEach(box => { if (box.dataset.citeFor === id) box.hidden = !PAIR_CITE_OPEN.has(id); });
       return;
     }
     const rec = await recFind(id);
