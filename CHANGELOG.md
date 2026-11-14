@@ -15,6 +15,12 @@
 - **檔案邊界**：清除極性（LPC）整個蓋住的焊墊移除、部分切除的面積不採用並提示；`D3*`／`D1*` 寫法在 Worker 檢查與完整解析一致；整圓板框以弧線點計算範圍；同時上傳同一範圍時較晚寫入者退出並回 409；圖檔上限 30 MB、步進重複 2,500 次。
 - **紀錄**：新量測上傳時引用所選圖檔，伺服器核對後寫入 `layoutProof`；重新開啟沿用當時的檔，舊紀錄依料號版次查詢並標示。分享連結不帶板面圖檔幾何。
 - **測試**：新增 `tests/gerber-pads.test.mjs`、`tests/layout-match.test.mjs`、`tests/layout-records.test.mjs`、`tests/layout-import.test.mjs`、`tests/layout-ui.test.mjs`；`tests/mobile-layout.test.mjs` 8h。
+## v10.29.4 — 2026-11-14（字型：只自帶實際使用的字重）
+
+不改字型家族、字級、版面、統計或資料。
+
+- **根因**：介面只用 400／700 字重，但 Barlow Condensed 只自帶 500／600、IBM Plex Mono 只自帶 400／500。品牌標題與 KPI 數字要 700，瀏覽器載入 600，比設計細；粗體等寬數字（如統計表頭 `th.num`）沒有 700 檔，只能用 500 加瀏覽器假粗體。Barlow 500 從未載入，卻仍被離線版以 base64 內嵌。
+- **修正**：`vendor/fonts` 改為 Barlow Condensed 700、IBM Plex Mono 400＋700（fontsource 5.3.0 latin，與既有檔同源），移除 Barlow 500／600 與 Plex 500。主頁、登入頁（`lib/auth-handler.mjs`）與舊 Netlify 登入頁同步改用 700 檔。
 
 ## v10.29.3 — 2026-11-14（記錄庫：量測紀錄與座標檔呈現一致）
 
