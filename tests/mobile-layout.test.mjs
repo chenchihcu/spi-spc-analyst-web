@@ -356,6 +356,25 @@ test('8f. 色彩回歸：手動深色 LISA 與剖面圖例、畫線共用色彩 
   assert.match(draw, /css\("--cs-label"\)/, '空狀態文字需使用主題相容的文字 token');
 });
 
+test('8g. 剖面切片畫布依顯示尺寸 × dpr 繪製，參考線同值標籤合併（v10.28.5）', () => {
+  // 固定 460×190 點陣被 width:100%;height:auto 拉伸到卡片寬度，dpr 2 下放大約 2.5 倍而模糊變形
+  const tag = htmlSource.match(/<canvas id="cProfile"[^>]*>/)?.[0] || '';
+  assert.ok(tag, '需有 #cProfile');
+  assert.doesNotMatch(tag, /height:auto/, '剖面畫布不可用 height:auto 拉伸固定點陣');
+  assert.match(tag, /class="cs-profile"/, '剖面畫布需套用固定 CSS 尺寸的 .cs-profile');
+  assert.match(htmlSource, /\.cs-profile\{display:block;width:100%;height:\d+px\}/, '.cs-profile 需有固定 CSS 高度');
+
+  const drawStart = htmlSource.indexOf('function drawCrossSectionProfile(r)');
+  const drawEnd = htmlSource.indexOf('\nfunction selectPadForProfile(r)', drawStart);
+  const draw = htmlSource.slice(drawStart, drawEnd);
+  assert.match(draw, /devicePixelRatio/, '需依 devicePixelRatio 設定點陣');
+  assert.match(draw, /getBoundingClientRect\(\)/, '需依實際顯示尺寸設定點陣');
+  assert.match(draw, /setTransform\(dpr,0,0,dpr,0,0\)/, '需以 setTransform 換算（不可累積 scale）');
+  assert.doesNotMatch(draw, /const W=cvs\.width,H=cvs\.height/, '座標不可再直接用點陣寬高');
+  assert.match(draw, /labels\.join\("／"\)/, '同值參考線標籤需合併');
+  assert.match(htmlSource, /addEventListener\("resize",\(\)=>\{clearTimeout\(csRsT\)/, '視窗縮放後需重畫剖面圖');
+});
+
 test('9. 版面回歸：code review（v10.3.3）找到的問題', () => {
   const at = (s) => { const i = htmlSource.indexOf(s); assert.ok(i >= 0, `找不到 CSS：${s}`); return i; };
 
