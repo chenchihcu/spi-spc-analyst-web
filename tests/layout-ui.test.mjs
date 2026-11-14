@@ -131,7 +131,10 @@ test("紀錄庫登錄表單：管理者可見；解析並預選圖層與面別�
   const { w, hook, d } = await page();
   d.querySelector("#btnOpenRecModal").click();
   d.querySelector("#btnPickPlace").click();
-  assert.ok(await until(() => !d.querySelector("#boxPickPlace").hidden && !d.querySelector("#boxUploadLayoutForm").hidden), "管理者應看到登錄表單");
+  assert.ok(await until(() => !d.querySelector("#boxPickPlace").hidden && !d.querySelector("#recPlaceAdminBar").hidden), "管理者應看到登錄按鈕");
+  assert.equal(d.querySelector("#boxUploadLayoutForm").hidden, true, "登錄表單預設收合，不佔清單空間");
+  d.querySelector("#btnShowLayoutForm").click();
+  assert.equal(d.querySelector("#boxUploadLayoutForm").hidden, false, "按下後展開登錄表單");
   d.querySelector("#upLayPart").value = PART;
   d.querySelector("#upLayRev").value = REV;
   const bot = PASTE.replace("Paste,Top", "Paste,Bot");

@@ -60,7 +60,7 @@ test("驗證有效紀錄：對應證明對話框顯示已證明與位號 N/M；�
   await openPicker(t);
   assert.ok(await until(() => rowOf(d, "#tblPickSpi", "LOT-A")));
   assert.match(rowOf(d, "#tblPickSpi", "LOT-A").textContent, /PF-1 V2/, "關聯座標欄顯示座標料號與版次，不再只寫已綁定");
-  assert.ok(d.querySelector(`#cardsPickSpi [data-pact="ver"][data-id="${spi.id}"]`), "手機卡片也有驗證按鈕");
+  assert.ok(d.querySelector(`#tblPickSpi tr[data-row-id="${spi.id}"] .rec-menu [data-pact="ver"]`), "對應證明在該列的「⋯」選單（桌面與手機同一份標記）");
   rowOf(d, "#tblPickSpi", "LOT-A").querySelector('[data-pact="ver"]').click();
   assert.ok(await until(() => /已證明對應：位號 1\/1/.test($("#proofBody").textContent)), $("#proofBody").textContent);
   assert.equal($("#proofModal").hidden, false);
@@ -182,7 +182,7 @@ test("座標登錄：相近料號要再按一次才存入；存入後篩選切�
   assert.deepEqual(t.errs, []);
 });
 
-test("配對卡：未成對顯示尚未搭配與座標檔不存在；從卡片匯入帶入料號版次面別", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+test("清單：對應狀態寫在列內，快速篩選帶筆數；從座標列匯入帶入料號版次面別", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const t = await cloudPage(), { d, $, w, cloud } = t;
   $("#btnOpenRecModal").click();
   $("#btnPickPlace").click();
@@ -195,13 +195,25 @@ test("配對卡：未成對顯示尚未搭配與座標檔不存在；從卡片�
   await seedLegacy(cloud, { id: "legacymissingpair00001", part: "PAIR-1", lot: "LOT-MISS", side: "TOP", name: "miss.csv", placeId: "missingplace0000000000" }, WIDE);
   await w.SPI_TEST_HOOK.RecDB.list();
   $("#btnOpenRecModal").click();
-  assert.ok(await until(() => !$("#boxPickPairs").hidden && /LOT-NONE/.test($("#pairBoard").textContent)));
-  assert.match($("#pairBoard").textContent, /尚未搭配/);
-  assert.match($("#pairBoard").textContent, /座標檔不存在/);
-  assert.match($("#pairBoard").textContent, /身分相符/);
-  assert.match($("#pairBoard").textContent, /被 1 筆量測引用/);
-  const imp = [...d.querySelectorAll("#pairBoard [data-pair-import]")].find(b => b.dataset.pairPart === "PAIR-1" && b.dataset.pairRev === "V4" && b.dataset.placeId === place.id);
-  assert.ok(imp, "已配對的卡片可匯入量測");
+  assert.ok(await until(() => !$("#boxPickSpi").hidden && /LOT-NONE/.test($("#tblPickSpi").textContent)), "預設開啟量測清單");
+  assert.match(rowOf(d, "#tblPickSpi", "LOT-NONE").textContent, /尚未搭配/);
+  assert.match(rowOf(d, "#tblPickSpi", "LOT-MISS").textContent, /座標檔不存在/);
+  assert.match(rowOf(d, "#tblPickSpi", "LOT-PAIR").textContent, /身分相符/);
+  // 未成對不再置頂：最新的量測排第一，例外改由帶筆數的快速篩選找
+  assert.match(d.querySelector("#tblPickSpi tbody tr").textContent, /LOT-PAIR/, "清單維持新到舊，不把未成對排到最前");
+  const quick = mode => $(`#recQuickFilters [data-link="${mode}"]`);
+  assert.match(quick("unlinked").textContent, /尚未搭配座標 1/);
+  assert.match(quick("missing").textContent, /座標檔不存在 1/);
+  quick("missing").click();
+  assert.ok(await until(() => d.querySelectorAll("#tblPickSpi tr[data-row-id]").length === 1 && /LOT-MISS/.test($("#tblPickSpi").textContent)), "快速篩選只留座標檔不存在的量測");
+  assert.equal(quick("missing").getAttribute("aria-pressed"), "true");
+  quick("missing").click();
+  assert.ok(await until(() => d.querySelectorAll("#tblPickSpi tr[data-row-id]").length === 3), "再按一次取消篩選");
+  $("#btnPickPlace").click();
+  assert.ok(await until(() => /被 1 筆量測引用/.test($("#tblPickPlace").textContent)));
+  assert.equal(quick("unused"), null, "沒有無引用的座標檔時不顯示該篩選");
+  const imp = [...d.querySelectorAll("#tblPickPlace .rec-menu [data-pair-import]")].find(b => b.dataset.pairPart === "PAIR-1" && b.dataset.pairRev === "V4" && b.dataset.placeId === place.id);
+  assert.ok(imp, "座標列的選單可匯入量測");
   imp.click();
   const filled = await until(() => $("#inPart").value === "PAIR-1" && $("#inRev").value === "V4" && $("#selSide").value === "TOP" && w.SPI_TEST_HOOK.getPlace()?.recId === place.id);
   assert.ok(filled, JSON.stringify({ part: $("#inPart") && $("#inPart").value, rev: $("#inRev") && $("#inRev").value, side: $("#selSide") && $("#selSide").value, place: w.SPI_TEST_HOOK.getPlace(), toast: $("#toast") && $("#toast").textContent, errs: t.errs, tab: $("#p-data") && $("#p-data").hidden }));
@@ -211,24 +223,23 @@ test("配對卡：未成對顯示尚未搭配與座標檔不存在；從卡片�
   assert.deepEqual(t.errs, []);
 });
 
-test("配對審查修正：捷徑選座標會重轉、身分警示不被冒泡清除、篩選保留引用座標、狀態徽章、取消登錄不殘留", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+test("審查修正：捷徑選座標會重轉、身分警示不被冒泡清除、篩選保留引用座標、狀態徽章、取消登錄不殘留", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const t = await cloudPage(), { d, $, w, cloud } = t;
   const place = await cloud.upload({ kind: "place", part: "REV-1", rev: "V1", side: "TOP", unit: "mm", name: "rev.csv" }, PLACE_CSV);
   await cloud.upload({ kind: "spi", part: "REV-1", rev: "V1", side: "TOP", placeId: place.id, workOrder: "WO-R", lot: "LOT-ONLY-SPI", name: "m.csv", vendor: "lirong" }, WIDE);
   await w.SPI_TEST_HOOK.RecDB.list();
 
-  // 篩選只命中量測（批號）時，配對卡仍顯示它引用的座標，匯入鈕帶既有座標 ID，並顯示狀態徽章
+  // 搜尋只命中量測（批號）時，該列仍依完整清單判定座標對應，不因座標被篩掉而寫成不存在
   $("#btnOpenRecModal").click();
-  assert.ok(await until(() => !$("#boxPickPairs").hidden && /LOT-ONLY-SPI/.test($("#pairBoard").textContent)));
+  assert.ok(await until(() => !$("#boxPickSpi").hidden && /LOT-ONLY-SPI/.test($("#tblPickSpi").textContent)));
   $("#recPickerQ").value = "LOT-ONLY-SPI";
   await w.SPI_TEST_HOOK.renderRecPicker();
-  assert.ok(/LOT-ONLY-SPI/.test($("#pairBoard").textContent));
-  const card = [...d.querySelectorAll("#pairBoard .pair-card")].find(c => /LOT-ONLY-SPI/.test(c.textContent));
-  assert.ok(card, $("#pairBoard").textContent);
-  assert.doesNotMatch(card.textContent, /此版次還沒有座標檔/, "引用的座標不應被篩選成空位");
-  assert.match(card.textContent, /被 1 筆量測引用/);
-  assert.equal(card.querySelector("[data-pair-import]").dataset.placeId, place.id);
-  assert.match(card.querySelector(`[data-row-id] .pill`)?.textContent || "", /有效/, "量測列顯示生命週期徽章");
+  const card = rowOf(d, "#tblPickSpi", "LOT-ONLY-SPI");
+  assert.ok(card, $("#tblPickSpi").textContent);
+  assert.match(card.textContent, /身分相符/, "引用的座標不應被搜尋篩成不存在");
+  assert.doesNotMatch(card.textContent, /座標檔不存在|尚未搭配/);
+  assert.ok(card.querySelector('.rec-menu [data-pact="dl-pair"]'), "座標還在時可下載這一對");
+  assert.match(card.querySelector(".pill")?.textContent || "", /有效/, "量測列顯示生命週期徽章");
 
   // 按「先登錄座標檔」後關閉，返回匯入的意圖要清除
   $("#recPickerClose").click();

@@ -105,8 +105,9 @@ test("開機首頁顯示範例提示列，點擊頂端或提示列按鈕可開�
   $("#btnOpenRecModal").click();
   await tick(30);
   assert.ok(!modal.hidden && modal.classList.contains("open"), "點擊頂端按鈕應開啟選取視窗");
-  assert.equal($("#boxPickPairs").hidden, false, "一般入口預設開啟配對");
-  assert.equal($("#boxPickSpi").hidden, true, "一般入口預設隱藏量測清單");
+  assert.equal($("#boxPickSpi").hidden, false, "一般入口預設開啟量測清單");
+  assert.equal($("#btnPickSpi").hidden, false, "量測分頁按鈕可見");
+  assert.equal($("#btnPickPlace").hidden, false, "座標檔分頁按鈕可見");
   assert.equal($("#boxPickPlace").hidden, true, "一般入口預設隱藏座標庫分頁");
   assert.notEqual($("#pickQualitySeg").style.display, "none", "一般入口顯示品質狀態篩選");
   $("#btnRecPickerCloseBottom").click();
@@ -126,8 +127,7 @@ test("開機首頁顯示範例提示列，點擊頂端或提示列按鈕可開�
   $("#btnOpenRecModal").click();
   await tick(30);
   assert.ok(!modal.hidden && modal.classList.contains("open"));
-  assert.equal($("#boxPickPairs").hidden, false, "再次從一般入口開啟應回到配對");
-  assert.equal($("#boxPickSpi").hidden, true, "量測清單應隱藏");
+  assert.equal($("#boxPickSpi").hidden, false, "再次從一般入口開啟應回到量測清單");
   assert.equal($("#boxPickPlace").hidden, true, "座標庫分頁應隱藏");
   assert.notEqual($("#pickQualitySeg").style.display, "none", "品質狀態篩選應重新顯示");
   $("#recPickerClose").click();
@@ -270,34 +270,21 @@ test("SMT 產線過濾工具列、品質快照狀態與手機端卡片流", { sk
   allQBtn.click();
   await tick(30);
 
-  // 6. 驗證手機端卡片流與觸控熱區
-  const cardsSpi = $("#cardsPickSpi");
-  assert.ok(cardsSpi, "手機端量測卡片容器應存在");
-  assert.ok(cardsSpi.innerHTML.includes("LOT-OK"), "手機端卡片應渲染 LOT-OK");
-  const cardLoadBtn = cardsSpi.querySelector("button[data-pact=load]");
-  assert.ok(cardLoadBtn, "手機端卡片應有載入分析主按鈕");
-  // 觸控高度由 .rec-card-actions 的 CSS 提供（不寫行內 min-height，以免蓋過觸控規則）
-  assert.ok(cardLoadBtn.closest(".rec-card-actions"), "手機端主按鈕應在 .rec-card-actions 內");
-  assert.match(fs.readFileSync(HTML, "utf8"), /\.rec-card-actions button \{\r?\n\s*min-height: 44px/, "手機卡片按鈕高度應符合 Apple HIG (>= 44px)");
+  // 6. 桌面與手機共用同一份清單標記（不再有第二份手機卡片）；觸控高度由 CSS 提供
+  assert.equal($("#cardsPickSpi"), null, "不應再有另一份手機卡片容器");
+  const src = fs.readFileSync(HTML, "utf8");
+  assert.match(src, /@media \(pointer:coarse\)\{\.rec-list \.rec-acts>button,\.rec-menu>summary,\.rec-menu-list button[^}]*min-height:44px/, "清單按鈕與選單在觸控裝置應 >= 44px");
 
-  // 7. 量測紀錄與座標檔共用同一套呈現（v10.29.2：原本各自手寫表格、卡片、配對列而漂移）
-  const heads = sel => [...d.querySelectorAll(`${sel} thead th`)].map(th => th.textContent.trim()).join("|");
-  assert.ok(d.querySelectorAll("#tblPickPlace tbody tr[data-row-id]").length, "座標檔表格應有資料列");
-  assert.equal(heads("#tblPickSpi"), heads("#tblPickPlace"), "量測與座標檔表格欄位應相同");
-  for (const box of ["#cardsPickSpi", "#cardsPickPlace"]) {
-    const card = d.querySelector(`${box} .rec-card`);
-    assert.ok(card, `${box} 應有卡片`);
-    assert.ok(card.querySelector(".rec-card-head .rec-badges .pill"), `${box} 卡片應以徽章顯示狀態`);
-    for (const act of ["ver", "dl", "edit-meta", "del"]) assert.ok(card.querySelector(`[data-pact="${act}"]`), `${box} 卡片應有 ${act} 動作`);
-    assert.ok([...card.querySelectorAll(".rec-card-actions button")].every(b => !b.getAttribute("style")), `${box} 卡片按鈕不應有行內樣式`);
-  }
-  const pairRows = [...d.querySelectorAll("#pairBoard .pair-row")];
-  const pairOf = kind => pairRows.find(row => w.SPI_TEST_HOOK.RecDB.cache.some(x => x.id === row.dataset.rowId && x.kind === kind));
-  for (const kind of ["spi", "place"]) {
-    const row = pairOf(kind);
-    assert.ok(row, `配對頁應有 ${kind} 列`);
-    assert.ok(row.querySelector(".pair-meta .pill"), `配對頁 ${kind} 列應顯示狀態徽章`);
-    assert.ok(row.querySelector('.pair-more [data-pact="dl"]') && row.querySelector('.pair-more [data-pact="ver"]'), `配對頁 ${kind} 列的「更多」應有對應證明與下載原檔`);
+  // 7. 量測紀錄與座標檔共用同一個列渲染器：每列一顆主鈕，其餘動作在「⋯」選單
+  for (const [tbl, primary] of [["#tblPickSpi", "load"], ["#tblPickPlace", "use-place"]]) {
+    const row = d.querySelector(`${tbl} tbody tr[data-row-id]`);
+    assert.ok(row, `${tbl} 應有資料列`);
+    assert.ok(row.querySelector(".rec-main .rec-l1 .pill"), `${tbl} 列應以徽章顯示狀態`);
+    const outside = [...row.querySelectorAll(".rec-acts button")].filter(b => !b.closest(".rec-menu"));
+    assert.ok(outside.length <= 1, `${tbl} 列在選單外最多一顆主鈕`);
+    if (primary === "load") assert.ok(row.querySelector(`.rec-acts>[data-pact="load"]`), "量測列主鈕應為載入分析");
+    for (const act of ["ver", "dl", "edit-meta", "del"]) assert.ok(row.querySelector(`.rec-menu [data-pact="${act}"]`), `${tbl} 列選單應有 ${act} 動作`);
+    assert.ok([...row.querySelectorAll("button")].every(b => !b.getAttribute("style")), `${tbl} 列按鈕不應有行內樣式`);
   }
 
   assert.deepEqual(errs, []);
@@ -344,7 +331,7 @@ test("座標庫明確版次選取與備註修改對話框", { skip: !JSDOM && "�
 
   // 3. 測試工單與備註修改彈窗
   const editBtn = $("#tblPickPlace [data-pact=edit-meta]");
-  assert.ok(editBtn, "原上傳者應有 ✏️ 備註按鈕");
+  assert.ok(editBtn, "管理者應有修改備註動作");
   editBtn.click();
   await tick(50);
 
@@ -358,7 +345,7 @@ test("座標庫明確版次選取與備註修改對話框", { skip: !JSDOM && "�
     const t = $("#toast");
     return t && t.textContent && /已更新量測鑑別資料與備註/.test(t.textContent);
   }), "應提示成功更新");
-  assert.ok(await until(() => $("#cardsPickPlace").textContent.includes("產線工程測試樣品")), "座標備註應寫回資料庫並顯示在卡片");
+  assert.ok(await until(() => $("#tblPickPlace").textContent.includes("產線工程測試樣品")), "座標備註應寫回資料庫並顯示在清單列");
 
   assert.deepEqual(errs, []);
 });
