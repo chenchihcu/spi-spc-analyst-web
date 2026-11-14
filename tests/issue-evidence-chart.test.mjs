@@ -67,5 +67,12 @@ test("問題卡證據小圖：內容與說明一致、軸文字不在拉伸的 S
     assert.equal(xs.length, 2, "兩根長條各有一個 x 標籤");
     assert.match(xs[0].getAttribute("style"), /left:25\.00%;transform:translateX\(-50%\)/);
   }
+  // 參考線拉大刻度、兩個極值很接近時，y 標籤不可重疊（Codex 審查 #167）
+  const html = w.SPI_TEST_HOOK.evSvg({ type: "bars", title: "t", labels: ["a", "b"], values: [10, 11], ref: [3], hi: [] }, "warn");
+  const tops = [...html.matchAll(/<span style="top:([\d.]+)px">/g)].map((m) => +m[1]);
+  assert.equal(tops.length, 2);
+  assert.ok(tops[1] - tops[0] >= 15, `y 標籤間距 ${tops[1] - tops[0]}px 應 ≥ 一行高`);
+  assert.match(html, />11\.0</);
+  assert.match(html, />10\.0</);
   w.close();
 });
