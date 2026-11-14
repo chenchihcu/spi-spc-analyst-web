@@ -1,6 +1,6 @@
 ---
 name: verify-spi-spc
-description: "在 SPI·SPC 分析台專案用隔離的本機 Cloudflare Worker、D1 與 Google Chrome 驗證使用者流程，取得登入、資料庫、管制圖、3D 與報告預覽的操作證據。"
+description: "SPI·SPC 分析台本機 Worker、D1 與 Chrome 流程驗證。Use when 以隔離 Worker、D1 與 verify.py 驗證登入、記錄庫、管制圖、3D 與報告預覽。Do NOT use for 跨專案 Playwright（用 automate-playwright-browser）、桌面截圖（用 capture-desktop-screenshot）或發布閘門（用 validate-production-release）。"
 ---
 
 # SPI·SPC 分析台本機驗證

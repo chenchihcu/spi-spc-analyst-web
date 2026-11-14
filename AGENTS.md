@@ -44,16 +44,16 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
 - **改變列欄位語意（改名、不再填值）時，同一個 PR 更新所有讀取端**：先 grep 該欄位的全部讀取處（統計、3D、報表 3D、匯出），沒有更新的讀取端要有 fail-visible 處理，不可靜默算出 NaN。
   - 檢查：該匯入路徑有一條測試串過 `buildRows` 到各讀取端（例：`tests/step8.test.mjs`「受控座標匯入 → buildRows → 3D 示意位置皆為有限值」）。
   - 出處：PR #53（座標改寫 `componentX/Y`，3D 仍讀 `r.x/r.y`）→ 2026-10-28 正式站 3D 空白。
-- **3D 空間佈局優先序與虛擬網格 Fail-Visible 守則**：焊墊 3D 位置解析（`pos3D`）必須嚴格遵守三階優先序：真實焊墊物理座標（`realXY(r)`）優先 $\to$ CAD 受控元件中心（`componentX/Y`）展開次之 $\to$ 虛擬格狀回退（`gridPos`）保底。虛擬網格座標不得搶先覆蓋 CAD 元件座標；全板僅有虛擬網格時，HUD 與工具列必須以醒目標示（`grid: true`、HUD 警示文字、`#grid3dWarn` 橫幅）明確揭露「無實際座標，為排列示意網格」，嚴禁靜默展示為真實 PCBA 佈局以防誤導檢驗判讀。
-  - 檢查：`node --test tests/step8.test.mjs`「3D 座標優先順序與虛擬格狀警示」通過。
-  - 出處：PR #98（2026-11-05，缺少焊墊座標時 `pos3D` 誤將 49×49 網格覆蓋 CAD 元件座標致 3D 佈局失真，且無任何示意警語）。
+- **3D 空間佈局優先序與虛擬網格 Fail-Visible 守則**：焊墊 3D 位置解析（`pos3D`）必須嚴格遵守三階優先序：真實焊墊物理座標（`realXY(r)`）優先 $\to$ CAD 受控元件中心（`componentX/Y`）展開次之 $\to$ 虛擬格狀回退（`gridPos`）保底。虛擬網格座標不得搶先覆蓋 CAD 元件座標；全板僅有虛擬網格時，HUD 與工具列必須以醒目標示（`grid: true`、HUD 警示文字、`#grid3dWarn` 橫幅）明確揭露「無實際座標，為排列示意網格」，嚴禁靜默展示為真實 PCBA 佈局以防誤導檢驗判讀。`pos3D(rows)` 不得原地改寫 `r.w`／`r.d`／`r.shape` 污染 `dfmTable`；僅供 3D 渲染的推估幾何須以不可列舉屬性（`enumerable: false`）掛在 `P.get(r)` 上，維持 `{ ...P.get(r) }` 座標結構不變。
+  - 檢查：`node --test tests/step8.test.mjs tests/reverse-traceability-5000.test.mjs` 通過。
+  - 出處：PR #98（2026-11-05，網格覆蓋 CAD 元件座標）；PR #180（v10.33.0，2026-11-15，`pos3D` 改寫 `S.rows` 致先看 3D 再看 DFM 時 `geomAssumed` 失真）。
 
 ## 分析範圍
 
-- **分析範圍一致（全部元件 → 元件群組 → 單一元件）**：讀取量測列的頁面、圖表、報告、匯出與 AI 摘要，一律經 `scopeFilter(st)`（介面端 `inScopeS(r)`）篩選，或使用已篩選的 `S.A`；問題清單與報告的問題用 `scopedFindings()`／`issueScope()`。不寫行內 `r.group===S.group`。新分頁登記在 `SCOPE_PANELS`；仍以全板計算的區塊登記在 `SCOPE_BOARD_CARDS`，並放 `.scope-board-note`「全板分析，不隨元件範圍變動」。影響分析結果的範圍欄位要進 `anKey` 與 `preSet`。不對元件子集重跑偵測規則（小樣本誤報未經 `test:slow` 校準）。
+- **分析範圍一致（全部元件 → 元件群組 → 單一元件）**：讀取量測列的頁面、圖表、報告、匯出與 AI 摘要，一律經 `scopeFilter(st)`（介面端 `inScopeS(r)`）篩選，或使用已篩選的 `S.A`；問題清單與報告的問題用 `scopedFindings()`／`issueScope()`，DFM 表用 `scopedDfmTable()`。單一元件範圍鍵值 `st.comp` 一律使用 `compKeyOf(r)`；當篩選結果為 0 列時，`scopedFindings()` 與 `scopedDfmTable()` 必須回傳 `[]`，不得靜默退回全板資料。不寫行內 `r.group===S.group`。新分頁登記在 `SCOPE_PANELS`；仍以全板計算的區塊登記在 `SCOPE_BOARD_CARDS`，並放 `.scope-board-note`「全板分析，不隨元件範圍變動」。影響分析結果的範圍欄位要進 `anKey` 與 `preSet`。不對元件子集重跑偵測規則（小樣本誤報未經 `test:slow` 校準）。
   - 檢查：`node --test tests/component-scope.test.mjs` 通過；改動範圍相關程式後跑 `node tools/mutation-check.mjs`，fixture 裡每項破壞都要讓測試變紅。新增讀取端時在 `tests/fixtures/mutations-component-scope.json` 加一項對應破壞。
   - 規格：`docs/spec-component-scope-rfc.md`。
-  - 出處：v10.26.0（2026-11-13）。改版前元件群組只影響部分頁面：問題清單、多變量 T²、形貌、統計清單與匯出仍是全板資料，卻顯示在群組標示下。
+  - 出處：v10.26.0（2026-11-13，群組範圍一致化）；PR #180（v10.33.0，2026-11-15，修正空範圍退回全板與 `dfmTable` 漏篩）。
 
 ## 統計與問題偵測
 
@@ -112,15 +112,15 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
 
 ## 測試環境
 
-- **跨行 regex 一律寫 `\r?\n`**：本 repo 在 Windows 以 `core.autocrlf=true` 檢出為 CRLF。CI 使用 `windows-latest`，只接受 `\n` 的斷言會在 CI 失敗。
-  - 檢查：`npm test` 在 Windows 本機與 CI 皆通過。
-  - 出處：v10.3.2（v10.3.1 新增的版面測試在 Windows 失敗）。
+- **跨行 regex、多行字串替換與子行程測試輸出解析**：本 repo 在 Windows 以 `core.autocrlf=true` 檢出為 CRLF。跨行 regex 一律寫 `\r?\n`；對原碼做多行字串替換（如 `mutation-check.mjs`）須對齊檔案的換行符號；以子行程呼叫 `node --test` 並解析 `# fail`／`not ok` 時，必須傳入 `--test-reporter=tap`（Node 24 預設 `spec` reporter 不輸出 `# fail`）。
+  - 檢查：`npm test` 與 `node tools/mutation-check.mjs` 在 Windows 本機與 CI 皆通過。
+  - 出處：v10.3.2（版面測試 CRLF 失敗）；PR #180（v10.33.0，2026-11-15，`mutation-check.mjs` 因 CRLF 與 Node 24 預設 reporter 將失敗誤判為綠燈）。
 - **SPA 啟動路徑完整性**：修改 `analyze()`、`loadExample()` 或頂層計算邏輯時，不可遺漏區域變數宣告或造成執行期例外；頁面初始化失敗會讓 `<script>` 尾端的 `window.SPI_TEST_HOOK` 沒有掛上，後續測試連鎖失敗。
   - 檢查：先跑 `node --test tests/ui.smoke.test.js`。
   - 出處：步驟 14 除錯紀錄（2026-10-17）。
-- **VM 沙箱二進位物件**：`tests/_load.js` 的 `loadCore()` 沙箱需提供 `TextEncoder`、`TextDecoder`、`Uint8Array`、`DataView`、`ArrayBuffer`。
-  - 檢查：`tests/step14.test.mjs` 無 `ReferenceError: TextEncoder is not defined`。
-  - 出處：步驟 14 M-20 OpenXML 匯出除錯紀錄（2026-10-17）。
+- **VM 沙箱二進位物件與跨 Realm 陣列斷言**：`tests/_load.js` 的 `loadCore()` 沙箱需提供 `TextEncoder`、`TextDecoder`、`Uint8Array`、`DataView`、`ArrayBuffer`。`loadCore()` 函式回傳之陣列帶有 VM realm `Array.prototype`，在測試中以 `assert.deepStrictEqual` 與宿主陣列字面量比對前，須先以 `Array.from(...)` 轉為宿主陣列。
+  - 檢查：`node --test tests/step14.test.mjs tests/reverse-traceability-5000.test.mjs` 通過。
+  - 出處：步驟 14 M-20 OpenXML 匯出除錯紀錄（2026-10-17）；PR #180（v10.33.0，2026-11-15，VM 陣列跨 realm `deepStrictEqual` 失敗）。
 - **非同步測試不用固定休眠**：等待 IndexedDB 交易或非同步 DOM 渲染時，用帶逾時的條件輪詢，不用 `await setTimeout(200)` 之類的固定等待。
   - 檢查：測試中等待非同步狀態處皆為條件輪詢。
   - 出處：步驟 6 除錯紀錄（2026-10-17）。
