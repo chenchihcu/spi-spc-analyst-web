@@ -1,4 +1,4 @@
-// NVIDIA 服務商設定介面：金鑰欄位、即時模型清單「更新模型清單」按鈕（新增／移除／改選／失敗沿用／重新載入後還原）
+// AI 服務商設定介面：三個服務商同一套欄位與控制項；NVIDIA 即時模型清單經「檢查可用模型」更新（新增／移除／改選／失敗沿用／重新載入後還原）
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("fs");
@@ -47,7 +47,7 @@ const modelsReply = (models, available = models, results = {}) => async (url) =>
 };
 const optionValues = ($) => [...$("#selAiModel").options].map((o) => o.value);
 
-test("NVIDIA：三個服務商皆有金鑰欄位；更新模型清單會新增、移除、改選，失敗沿用舊清單，重新載入後還原", { skip: !JSDOM && "未安裝 jsdom（npm install）" }, async () => {
+test("NVIDIA：三個服務商皆有金鑰欄位；檢查可用模型會新增、移除、改選，失敗沿用舊清單，重新載入後還原", { skip: !JSDOM && "未安裝 jsdom（npm install）" }, async () => {
   let reply = modelsReply(["openai/gpt-oss-20b", "meta/old-model"]);
   const calls = [];
   const fetchImpl = (url, init) => { calls.push({ url: String(url), headers: (init && init.headers) || {} }); return reply(url, init); };
@@ -57,9 +57,9 @@ test("NVIDIA：三個服務商皆有金鑰欄位；更新模型清單會新增�
 
   for (const id of ["inAiKey", "inAiKeyAntigravity", "inAiKeyNvidia", "btnAiKeyToggleNvidia", "aiBadgeNvidia"]) assert.ok($("#" + id), "需有 #" + id);
   d.querySelector('#aiProviderSeg [data-ai-prov="nvidia"]').click();
-  assert.equal($("#btnAiCheckModels").textContent, "更新模型清單");
+  assert.equal($("#btnAiCheckModels").textContent, "檢查可用模型");
   assert.equal($("#aiModelListNote").hidden, false);
-  assert.equal($("#aiModelListNote").textContent, "尚未更新模型清單");
+  assert.equal($("#aiModelListNote").textContent, "推薦型錄 1 個模型 · 尚未檢查");
   assert.deepEqual(optionValues($), ["openai/gpt-oss-20b", "custom"], "未更新前用內建清單");
   assert.equal($("#aiPriceLabel").textContent, "免費帳號不計費，受 NVIDIA 帳號速率與額度限制");
   assert.equal($("#inAiUsdLim").disabled, true, "免費服務商不設定美金上限");
@@ -109,16 +109,17 @@ test("NVIDIA：三個服務商皆有金鑰欄位；更新模型清單會新增�
   // 上游失敗：清單不變，訊息說明沿用
   reply = async () => ({ ok: false, status: 502, json: async () => ({ ok: false, error: "401 Unauthorized" }) });
   $("#btnAiCheckModels").click();
-  await waitFor(() => /更新失敗/.test($("#aiCfgMsg").textContent), "失敗訊息");
-  assert.match($("#aiCfgMsg").textContent, /NVIDIA 模型清單更新失敗：401 Unauthorized；沿用上次的清單/);
+  await waitFor(() => /檢查失敗/.test($("#aiCfgMsg").textContent), "失敗訊息");
+  assert.match($("#aiCfgMsg").textContent, /NVIDIA 模型檢查失敗：401 Unauthorized；沿用上次的清單/);
   assert.deepEqual(optionValues($), ["openai/gpt-oss-20b", "meta/llama-next-70b", "nvidia/nemotron-3-embed-1b", "nvidia/nemotron-new", "custom"]);
-  assert.equal($("#btnAiCheckModels").textContent, "更新模型清單");
+  assert.equal($("#btnAiCheckModels").textContent, "檢查可用模型");
   assert.equal($("#btnAiCheckModels").disabled, false);
 
-  // 其他服務商維持「檢查可用模型」
+  // 其他服務商：同一顆按鈕、同一行狀態（型錄模型數）
   d.querySelector('#aiProviderSeg [data-ai-prov="openai"]').click();
   assert.equal($("#btnAiCheckModels").textContent, "檢查可用模型");
-  assert.equal($("#aiModelListNote").hidden, true);
+  assert.equal($("#aiModelListNote").hidden, false);
+  assert.equal($("#aiModelListNote").textContent, "推薦型錄 4 個模型 · 尚未檢查");
   assert.equal($("#selAiEffort").disabled, false);
   assert.equal($("#inAiUsdLim").disabled, false);
   assert.deepEqual(a.errs, []);
@@ -177,5 +178,40 @@ test("NVIDIA：所選模型未通過可用性驗證時改選最快的可用模�
   await waitFor(() => /目前沒有可用模型/.test(a.$("#aiCfgMsg").textContent), "無可用模型訊息");
   assert.equal(a.$("#selAiModel").value, "fast/model", "沒有可用模型時不改選");
   assert.match(a.$("#aiModelListNote").textContent, /驗證可用 0 個/);
+  assert.deepEqual(a.errs, []);
+});
+
+test("三個服務商的設定卡、欄位名稱與控制項同一標準（由型錄產生）", { skip: !JSDOM && "未安裝 jsdom（npm install）" }, async () => {
+  const a = open({}, async () => ({ ok: true, status: 200, json: async () => ({ ok: true, providers: {} }) }));
+  await new Promise((r) => setTimeout(r, 50));
+  const { $, d, w } = a;
+  w.SPI_TEST_HOOK.setTab("ai");
+  const { AI_PROVIDER_CATALOG, AI_CHECK_MODELS_BTN } = await import("../lib/ai-providers.mjs");
+  const segIds = [...d.querySelectorAll("#aiProviderSeg [data-ai-prov]")].map((b) => b.dataset.aiProv);
+  assert.deepEqual(segIds, AI_PROVIDER_CATALOG.map((p) => p.id), "服務商切換鈕依型錄順序產生");
+  const cards = [...d.querySelectorAll("#aiKeyCards [data-ai-key-card]")];
+  assert.equal(cards.length, AI_PROVIDER_CATALOG.length);
+  const shape = (el) => [...el.querySelectorAll("*")].map((n) => n.tagName + (n.type ? ":" + n.type : "")).join(",");
+  for (const p of AI_PROVIDER_CATALOG) {
+    const card = d.querySelector(`[data-ai-key-card="${p.id}"]`);
+    assert.equal(shape(card), shape(cards[0]), p.id + " 金鑰卡結構與其他服務商相同");
+    assert.equal(card.querySelector("b").textContent, `${p.label} API Key`);
+    const input = card.querySelector("input");
+    assert.equal(input.id, p.ui.inputId);
+    assert.equal(input.placeholder, p.ui.keyPlaceholder);
+    assert.ok(p.ui.keyPlaceholder && p.ui.consoleName, p.id + " 型錄需有 keyPlaceholder、consoleName");
+    d.querySelector(`#aiProviderSeg [data-ai-prov="${p.id}"]`).click();
+    assert.equal($("#btnAiCheckModels").textContent, AI_CHECK_MODELS_BTN, p.id + " 同一顆檢查按鈕");
+    assert.equal($("#aiModelListNote").hidden, false, p.id + " 狀態列皆顯示");
+    assert.ok($("#aiModelListNote").textContent.length > 0);
+    assert.equal($("#aiModelProvName").textContent, p.label);
+    assert.equal($("#aiLimitProvTitle").textContent, `${p.label} 配額上限`);
+    for (const o of $("#selAiModel").options) {
+      if (o.value === "custom") continue;
+      assert.match(o.textContent, /^\S+（.+）$/, `${p.id} 模型選項格式一致：${o.textContent}`);
+    }
+    const rec = [...$("#selAiEffort").options].filter((o) => o.textContent.endsWith("（推薦）")).map((o) => o.value);
+    assert.deepEqual(rec, [p.defaultEffort || "high"], p.id + " 推理強度的推薦標記依型錄預設");
+  }
   assert.deepEqual(a.errs, []);
 });
