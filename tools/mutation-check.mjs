@@ -23,7 +23,8 @@ try {
     const hits = orig.split(m.from).length - 1;
     if (hits !== 1) { bad++; console.log(`✗ ${m.name}: 樣式出現 ${hits} 次（需恰好 1 次）`); continue; }
     writeFileSync(HTML, orig.replace(m.from, m.to));
-    const r = spawnSync(process.execPath, ["--test", test], { cwd: ROOT, encoding: "utf8", maxBuffer: 1 << 30 });
+    // 下方解析 TAP；明確指定，避免 Node 的預設 spec reporter 被誤判為沒有失敗。
+    const r = spawnSync(process.execPath, ["--test", "--test-reporter=tap", test], { cwd: ROOT, encoding: "utf8", maxBuffer: 1 << 30 });
     if (r.error) { bad++; console.log(`✗ ${m.name}: 執行錯誤 ${r.error.message}`); continue; }
     const failed = Number((r.stdout.match(/^# fail (\d+)/m) || [])[1] || 0);
     const which = [...r.stdout.matchAll(/^not ok \d+ - (.+)$/gm)].map((x) => x[1]);

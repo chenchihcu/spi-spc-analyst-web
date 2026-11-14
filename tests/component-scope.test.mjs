@@ -314,3 +314,5 @@ test("捷徑選到其他群組的元件時，先改到該元件的群組", { ski
   assert.equal(H.S.group, "U2 BGA");
   assert.equal(d.querySelector("#selGroup").value, "U2 BGA");
 });
+
+test("診斷所有讀取端共用元件範圍",()=>{const rows=core.sampleData(),st=baseState(core,{rows,group:"ALL",comp:key("U2")}),M=core.buildDiagnosticModel(st);assert.ok(M.rows.length>0);assert.ok(M.rows.every(r=>r.comp==="U2"));assert.ok(M.details.every(d=>d.row.comp==="U2"));});
