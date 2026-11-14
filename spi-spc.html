@@ -10236,159 +10236,171 @@ function dispose3DNode(o){
 }
 /* 建立極度擬真 3D 零件模型 Object3D */
 function buildComponent3DObject(THREE, spec, compMode){
-  const group=new THREE.Group();
-  const isSemi=compMode==="semi";
-  const op=isSemi?0.58:1.0;
-  const opMet=isSemi?0.75:1.0;
+  if(!THREE)return null;
+  try{
+    const group=new THREE.Group();
+    const isSemi=compMode==="semi";
+    const op=isSemi?0.58:1.0;
+    const opMet=isSemi?0.75:1.0;
 
-  const matDark=new THREE.MeshStandardMaterial({color:0x18181a,roughness:0.45,metalness:0.1,transparent:isSemi,opacity:op});
-  const matSilver=new THREE.MeshStandardMaterial({color:0xd6d8dc,roughness:0.22,metalness:0.88,transparent:isSemi,opacity:opMet});
-  const matCeramic=new THREE.MeshStandardMaterial({color:0x9e7b54,roughness:0.35,metalness:0.15,transparent:isSemi,opacity:op});
-  const matInductor=new THREE.MeshStandardMaterial({color:0x282b30,roughness:0.55,metalness:0.3,transparent:isSemi,opacity:op});
-  const matSubstrate=new THREE.MeshStandardMaterial({color:0x1e5a32,roughness:0.6,metalness:0.08,transparent:isSemi,opacity:op});
-  const matWhite=new THREE.MeshStandardMaterial({color:0xf5f5f7,roughness:0.4,metalness:0.1,transparent:isSemi,opacity:op});
+    const setPos=(m,x,y,z)=>{
+      if(!m)return;
+      if(m.position&&typeof m.position.set==="function")m.position.set(x,y,z);
+      else if(m.position){m.position.x=x;m.position.y=y;m.position.z=z}
+    };
 
-  const L=Math.max(spec.bodyL,0.2),W=Math.max(spec.bodyW,0.2),H=Math.max(spec.bodyH,0.15);
+    const matDark=new THREE.MeshStandardMaterial({color:0x18181a,roughness:0.45,metalness:0.1,transparent:isSemi,opacity:op});
+    const matSilver=new THREE.MeshStandardMaterial({color:0xd6d8dc,roughness:0.22,metalness:0.88,transparent:isSemi,opacity:opMet});
+    const matCeramic=new THREE.MeshStandardMaterial({color:0x9e7b54,roughness:0.35,metalness:0.15,transparent:isSemi,opacity:op});
+    const matInductor=new THREE.MeshStandardMaterial({color:0x282b30,roughness:0.55,metalness:0.3,transparent:isSemi,opacity:op});
+    const matSubstrate=new THREE.MeshStandardMaterial({color:0x1e5a32,roughness:0.6,metalness:0.08,transparent:isSemi,opacity:op});
+    const matWhite=new THREE.MeshStandardMaterial({color:0xf5f5f7,roughness:0.4,metalness:0.1,transparent:isSemi,opacity:op});
 
-  if(spec.family==="chip_r"||spec.family==="chip_c"||spec.family==="chip_l"||spec.family==="chip_led"){
-    const bMat=spec.family==="chip_c"?matCeramic:spec.family==="chip_l"?matInductor:matDark;
-    const capL=Math.max(0.06,Math.min(L*0.24,0.5));
-    const midL=Math.max(0.05,L-capL*2);
+    const L=Math.max(spec.bodyL,0.2),W=Math.max(spec.bodyW,0.2),H=Math.max(spec.bodyH,0.15);
 
-    const bodyMesh=new THREE.Mesh(new THREE.BoxGeometry(midL,H*0.96,W*0.96),bMat);
-    bodyMesh.position.y=H/2;
-    group.add(bodyMesh);
+    if(spec.family==="chip_r"||spec.family==="chip_c"||spec.family==="chip_l"||spec.family==="chip_led"){
+      const bMat=spec.family==="chip_c"?matCeramic:spec.family==="chip_l"?matInductor:matDark;
+      const capL=Math.max(0.06,Math.min(L*0.24,0.5));
+      const midL=Math.max(0.05,L-capL*2);
 
-    const c1=new THREE.Mesh(new THREE.BoxGeometry(capL,H,W),matSilver);
-    c1.position.set(-L/2+capL/2,H/2,0);
-    const c2=new THREE.Mesh(new THREE.BoxGeometry(capL,H,W),matSilver);
-    c2.position.set(L/2-capL/2,H/2,0);
-    group.add(c1);
-    group.add(c2);
+      const bodyMesh=new THREE.Mesh(new THREE.BoxGeometry(midL,H*0.96,W*0.96),bMat);
+      setPos(bodyMesh,0,H/2,0);
+      group.add(bodyMesh);
 
-    if(spec.family==="chip_r"&&L>=1.8){
-      const mark=new THREE.Mesh(new THREE.BoxGeometry(midL*0.5,0.02,W*0.4),matWhite);
-      mark.position.set(0,H+0.01,0);
-      group.add(mark);
+      const c1=new THREE.Mesh(new THREE.BoxGeometry(capL,H,W),matSilver);
+      setPos(c1,-L/2+capL/2,H/2,0);
+      const c2=new THREE.Mesh(new THREE.BoxGeometry(capL,H,W),matSilver);
+      setPos(c2,L/2-capL/2,H/2,0);
+      group.add(c1);
+      group.add(c2);
+
+      if(spec.family==="chip_r"&&L>=1.8){
+        const mark=new THREE.Mesh(new THREE.BoxGeometry(midL*0.5,0.02,W*0.4),matWhite);
+        setPos(mark,0,H+0.01,0);
+        group.add(mark);
+      }
+    }else if(spec.family==="diode"){
+      const bodyMesh=new THREE.Mesh(new THREE.BoxGeometry(L,H,W),matDark);
+      setPos(bodyMesh,0,H/2,0);
+      group.add(bodyMesh);
+
+      const bandW=Math.max(0.12,L*0.15);
+      const band=new THREE.Mesh(new THREE.BoxGeometry(bandW,H*1.02,W*1.02),matWhite);
+      setPos(band,-L/2+bandW*1.2,H/2,0);
+      group.add(band);
+
+      const leadL=Math.max(0.2,(spec.pitchX-L)/2);
+      const lead1=new THREE.Mesh(new THREE.BoxGeometry(leadL,0.08,W*0.45),matSilver);
+      setPos(lead1,-L/2-leadL/2,0.04,0);
+      const lead2=new THREE.Mesh(new THREE.BoxGeometry(leadL,0.08,W*0.45),matSilver);
+      setPos(lead2,L/2+leadL/2,0.04,0);
+      group.add(lead1);
+      group.add(lead2);
+    }else if(spec.family==="sot"){
+      const bodyMesh=new THREE.Mesh(new THREE.BoxGeometry(L,H,W),matDark);
+      setPos(bodyMesh,0,H/2+0.1,0);
+      group.add(bodyMesh);
+
+      const pW=0.4,pT=0.08,ext=(spec.pitchY-W)/2;
+      const pin1=new THREE.Mesh(new THREE.BoxGeometry(pW,pT,ext+0.1),matSilver);
+      setPos(pin1,-spec.pitchX,pT/2,-W/2-ext/2);
+      const pin2=new THREE.Mesh(new THREE.BoxGeometry(pW,pT,ext+0.1),matSilver);
+      setPos(pin2,spec.pitchX,pT/2,-W/2-ext/2);
+      const pin3=new THREE.Mesh(new THREE.BoxGeometry(pW,pT,ext+0.1),matSilver);
+      setPos(pin3,0,pT/2,W/2+ext/2);
+      group.add(pin1);
+      group.add(pin2);
+      group.add(pin3);
+    }else if(spec.family==="soic"){
+      const bodyMesh=new THREE.Mesh(new THREE.BoxGeometry(L,H,W),matDark);
+      setPos(bodyMesh,0,H/2+0.1,0);
+      group.add(bodyMesh);
+
+      const dot=new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.2,0.02,12),matWhite);
+      setPos(dot,-L/2+0.4,H+0.11,-W/2+0.4);
+      group.add(dot);
+
+      const nSide=Math.max(1,Math.floor((spec.nPins||8)/2));
+      const pPitch=spec.pitchX||1.27;
+      const ext=(spec.pitchY-W)/2;
+      for(let i=0;i<nSide;i++){
+        const px=(i-(nSide-1)/2)*pPitch;
+        const l1=new THREE.Mesh(new THREE.BoxGeometry(0.35,0.08,ext+0.1),matSilver);
+        setPos(l1,px,0.04,-W/2-ext/2);
+        const l2=new THREE.Mesh(new THREE.BoxGeometry(0.35,0.08,ext+0.1),matSilver);
+        setPos(l2,px,0.04,W/2+ext/2);
+        group.add(l1);
+        group.add(l2);
+      }
+    }else if(spec.family==="bga"){
+      const subH=0.25;
+      const subMesh=new THREE.Mesh(new THREE.BoxGeometry(L,subH,W),matSubstrate);
+      setPos(subMesh,0,0.12+subH/2,0);
+      group.add(subMesh);
+
+      const capH=H-subH,capL=L*0.85,capW=W*0.85;
+      const capMesh=new THREE.Mesh(new THREE.BoxGeometry(capL,capH,capW),matSilver);
+      setPos(capMesh,0,0.12+subH+capH/2,0);
+      group.add(capMesh);
+
+      const dot=new THREE.Mesh(new THREE.CylinderGeometry(0.25,0.25,0.02,12),matWhite);
+      setPos(dot,-capL/2+0.4,0.12+H+0.01,-capW/2+0.4);
+      group.add(dot);
+    }else{
+      const bodyMesh=new THREE.Mesh(new THREE.BoxGeometry(L,H,W),matDark);
+      setPos(bodyMesh,0,H/2,0);
+      group.add(bodyMesh);
+
+      const pin1Ind=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.18,0.02,12),matWhite);
+      setPos(pin1Ind,-L/2+0.35,H+0.01,-W/2+0.35);
+      group.add(pin1Ind);
     }
-  }else if(spec.family==="diode"){
-    const bodyMesh=new THREE.Mesh(new THREE.BoxGeometry(L,H,W),matDark);
-    bodyMesh.position.y=H/2;
-    group.add(bodyMesh);
 
-    const bandW=Math.max(0.12,L*0.15);
-    const band=new THREE.Mesh(new THREE.BoxGeometry(bandW,H*1.02,W*1.02),matWhite);
-    band.position.set(-L/2+bandW*1.2,H/2,0);
-    group.add(band);
-
-    const leadL=Math.max(0.2,(spec.pitchX-L)/2);
-    const lead1=new THREE.Mesh(new THREE.BoxGeometry(leadL,0.08,W*0.45),matSilver);
-    lead1.position.set(-L/2-leadL/2,0.04,0);
-    const lead2=new THREE.Mesh(new THREE.BoxGeometry(leadL,0.08,W*0.45),matSilver);
-    lead2.position.set(L/2+leadL/2,0.04,0);
-    group.add(lead1);
-    group.add(lead2);
-  }else if(spec.family==="sot"){
-    const bodyMesh=new THREE.Mesh(new THREE.BoxGeometry(L,H,W),matDark);
-    bodyMesh.position.y=H/2+0.1;
-    group.add(bodyMesh);
-
-    const pW=0.4,pT=0.08,ext=(spec.pitchY-W)/2;
-    const pin1=new THREE.Mesh(new THREE.BoxGeometry(pW,pT,ext+0.1),matSilver);
-    pin1.position.set(-spec.pitchX,pT/2,-W/2-ext/2);
-    const pin2=new THREE.Mesh(new THREE.BoxGeometry(pW,pT,ext+0.1),matSilver);
-    pin2.position.set(spec.pitchX,pT/2,-W/2-ext/2);
-    const pin3=new THREE.Mesh(new THREE.BoxGeometry(pW,pT,ext+0.1),matSilver);
-    pin3.position.set(0,pT/2,W/2+ext/2);
-    group.add(pin1);
-    group.add(pin2);
-    group.add(pin3);
-  }else if(spec.family==="soic"){
-    const bodyMesh=new THREE.Mesh(new THREE.BoxGeometry(L,H,W),matDark);
-    bodyMesh.position.y=H/2+0.1;
-    group.add(bodyMesh);
-
-    const dot=new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.2,0.02,12),matWhite);
-    dot.position.set(-L/2+0.4,H+0.11,-W/2+0.4);
-    group.add(dot);
-
-    const nSide=Math.max(1,Math.floor((spec.nPins||8)/2));
-    const pPitch=spec.pitchX||1.27;
-    const ext=(spec.pitchY-W)/2;
-    for(let i=0;i<nSide;i++){
-      const px=(i-(nSide-1)/2)*pPitch;
-      const l1=new THREE.Mesh(new THREE.BoxGeometry(0.35,0.08,ext+0.1),matSilver);
-      l1.position.set(px,0.04,-W/2-ext/2);
-      const l2=new THREE.Mesh(new THREE.BoxGeometry(0.35,0.08,ext+0.1),matSilver);
-      l2.position.set(px,0.04,W/2+ext/2);
-      group.add(l1);
-      group.add(l2);
-    }
-  }else if(spec.family==="bga"){
-    const subH=0.25;
-    const subMesh=new THREE.Mesh(new THREE.BoxGeometry(L,subH,W),matSubstrate);
-    subMesh.position.y=0.12+subH/2;
-    group.add(subMesh);
-
-    const capH=H-subH,capL=L*0.85,capW=W*0.85;
-    const capMesh=new THREE.Mesh(new THREE.BoxGeometry(capL,capH,capW),matSilver);
-    capMesh.position.y=0.12+subH+capH/2;
-    group.add(capMesh);
-
-    const dot=new THREE.Mesh(new THREE.CylinderGeometry(0.25,0.25,0.02,12),matWhite);
-    dot.position.set(-capL/2+0.4,0.12+H+0.01,-capW/2+0.4);
-    group.add(dot);
-  }else{
-    const bodyMesh=new THREE.Mesh(new THREE.BoxGeometry(L,H,W),matDark);
-    bodyMesh.position.y=H/2;
-    group.add(bodyMesh);
-
-    const pin1Ind=new THREE.Mesh(new THREE.CylinderGeometry(0.18,0.18,0.02,12),matWhite);
-    pin1Ind.position.set(-L/2+0.35,H+0.01,-W/2+0.35);
-    group.add(pin1Ind);
-  }
-
-  return group;
+    return group;
+  }catch(e){return null}
 }
 /* 根據目前選定板面的元件清單產生全板 3D 擬真零件模型並加入目標父物件 */
 function buildComponentMeshes3D(bRows, P, cx, cy, parentObj){
   if(!window.THREE||!parentObj)return;
   const compMode=S.comp3dMode||"semi";
   if(compMode==="off")return;
-
-  const compMap=new Map();
-  for(const r of bRows){
-    const pos=P.get(r);
-    if(!pos)continue;
-    const compName=r.comp||r.pad;
-    let entry=compMap.get(compName);
-    if(!entry){
-      const pkg=r.pkg||r.placePkg;
-      const rot=Number.isFinite(+r.componentRot)?+r.componentRot:0;
-      const cxRaw=Number.isFinite(r.componentX)?r.componentX:(pos?pos.x:0);
-      const cyRaw=Number.isFinite(r.componentY)?r.componentY:(pos?pos.y:0);
-      compMap.set(compName,entry={compName,pkg,rot,cxRaw,cyRaw,pads:[],spec:null});
+  try{
+    const compMap=new Map();
+    for(const r of bRows){
+      const pos=P.get(r);
+      if(!pos)continue;
+      const compName=r.comp||r.pad;
+      let entry=compMap.get(compName);
+      if(!entry){
+        const pkg=r.pkg||r.placePkg;
+        const rot=Number.isFinite(+r.componentRot)?+r.componentRot:0;
+        const cxRaw=Number.isFinite(r.componentX)?r.componentX:(pos?pos.x:0);
+        const cyRaw=Number.isFinite(r.componentY)?r.componentY:(pos?pos.y:0);
+        compMap.set(compName,entry={compName,pkg,rot,cxRaw,cyRaw,pads:[],spec:null});
+      }
+      entry.pads.push(r);
     }
-    entry.pads.push(r);
-  }
 
-  const compRootGroup=new THREE.Group();
-  compRootGroup.name="comp3dGroup";
+    const compRootGroup=new THREE.Group();
+    compRootGroup.name="comp3dGroup";
 
-  for(const entry of compMap.values()){
-    const spec=resolveComponentSpec(entry.pkg,entry.compName,entry.pads.length);
-    entry.spec=spec;
-    if(spec.family==="tp")continue;
+    for(const entry of compMap.values()){
+      const spec=resolveComponentSpec(entry.pkg,entry.compName,entry.pads.length);
+      entry.spec=spec;
+      if(spec.family==="tp")continue;
 
-    const meshGroup=buildComponent3DObject(THREE,spec,compMode);
-    const posX=entry.cxRaw-cx;
-    const posZ=cy-entry.cyRaw;
-    meshGroup.position.set(posX,0.08,posZ);
-    meshGroup.rotation.y=-(entry.rot||0)*Math.PI/180;
-    compRootGroup.add(meshGroup);
-  }
+      const meshGroup=buildComponent3DObject(THREE,spec,compMode);
+      if(!meshGroup)continue;
+      const posX=entry.cxRaw-cx;
+      const posZ=cy-entry.cyRaw;
+      if(meshGroup.position&&typeof meshGroup.position.set==="function")meshGroup.position.set(posX,0.08,posZ);
+      else if(meshGroup.position){meshGroup.position.x=posX;meshGroup.position.y=0.08;meshGroup.position.z=posZ}
+      if(meshGroup.rotation)meshGroup.rotation.y=-(entry.rot||0)*Math.PI/180;
+      compRootGroup.add(meshGroup);
+    }
 
-  parentObj.add(compRootGroup);
+    parentObj.add(compRootGroup);
+  }catch(err){}
 }
 /* 3D 示意位置：受控座標檔只給元件中心（componentX/Y，不可寫回焊墊 X/Y），
    3D 只為顯示在元件中心附近展開同元件焊墊；統計與回合資料都不使用這些位置 */
@@ -10416,7 +10428,7 @@ function pos3D(rows){
         r.shape=geom.shape;
         r.dimAssumed=true;
       }
-      map.set(r,{x:r.componentX+geom.x,y:r.componentY+geom.y,est:true,grid:false,rot,compSpec:spec});
+      map.set(r,{x:r.componentX+geom.x,y:r.componentY+geom.y,est:true,grid:false});
     }
   }
   for(const r of gridRows){
