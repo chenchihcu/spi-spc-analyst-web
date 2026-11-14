@@ -1033,6 +1033,31 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
 @media(min-width:1280px){
   header.top,.brand,.toprow{flex-wrap:nowrap!important}
 }
+/* 診斷：二維資料保留局部捲動，控制項可於窄螢幕重排。 */
+#diagnosticPanel{min-width:0;display:grid;gap:12px}
+#diagnosticPanel[hidden]{display:none}
+#diagnosticPanel .grid2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+#diagnosticPanel :is(.card,.tbl,.toolbar){min-width:0;max-width:100%}
+#diagnosticPanel .tbl{overflow:auto;max-height:420px}
+#diagnosticPanel :is(button,select,summary){min-height:44px}
+#diagnosticPanel select{max-width:100%;font-family:inherit}
+#diagnosticPanel button[aria-pressed=true]{outline:2px solid var(--accent);background:var(--accent-soft)}
+#diagnosticPanel button small{display:block}
+#diagnosticPanel .diag-bad{color:var(--ng)}
+#diagnosticPanel .tbl.sticky-head thead th{top:0!important}
+#diagMatrix button{white-space:nowrap;min-width:9em}
+#diagnosticPanel .chartbox>canvas{width:100%;height:100%}
+.diag-pages{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:8px}
+.diag-plot{overflow:auto;max-height:420px}
+.diag-plot svg{display:block;min-width:760px;width:100%;color:var(--series2)}
+.diag-plot svg text{fill:var(--ink);font:var(--fs-caption) var(--f-mono)}
+.diag-plot svg :is(path,circle){stroke:currentColor;fill:none;stroke-width:1.5}
+.diag-plot svg rect{stroke:currentColor;fill:var(--surface2)}
+.diag-plot .diag-selected{color:var(--accent);stroke-width:3}
+.diag-plot .diag-selected :is(path,circle){stroke-width:3}
+#diagPositionPlot [data-pos]{cursor:pointer}
+@media(max-width:820px){#diagnosticPanel .grid2{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){#diagnosticPanel select{font-size:var(--fs-input)}}
 </style>
 <!-- 開機期間：瀏覽器可能在主程式執行前先畫出空的問題頁，之後清單填入會把下方內容整片推走（CLS）；主程式跑完才顯示 -->
 <style id="bootHide">#p-issues>:not(.iss-top){visibility:hidden}</style>
@@ -1048,7 +1073,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
     <svg class="mitcorp-logo" viewBox="0 0 248 45" width="143" height="26" fill="currentColor" fill-rule="evenodd" role="img" aria-label="Mitcorp"><path d="M13.8,-0.0L28.5,-0.1L29.2,0.0L30.6,1.0L31.5,2.9L34.7,29.0L35.0,29.8L36.2,30.2L37.5,29.8L38.3,28.2L46.9,3.5L48.0,1.5L48.8,0.8L50.5,-0.1L66.3,0.0L67.6,1.0L68.4,3.2L68.4,30.8L68.3,32.2L67.7,33.8L66.0,34.8L62.8,35.0L59.2,34.8L57.7,33.8L57.3,31.5L57.3,5.8L56.7,4.5L55.2,4.0L53.0,4.7L52.0,6.5L43.5,31.5L42.2,33.3L41.2,34.1L38.2,34.8L28.8,34.8L26.0,34.0L24.6,32.5L24.0,29.8L20.9,5.8L20.2,4.5L18.5,4.0L17.0,4.5L16.5,5.2L12.3,26.8L11.3,30.0L10.5,31.5L8.4,33.8L6.3,35.0L2.2,35.7L1.2,35.7L0.0,35.0L0.0,30.2L1.2,29.6L4.5,28.9L5.4,28.0L6.2,26.2L10.7,3.0L11.9,1.0L13.8,-0.0ZM73.2,-0.0L83.8,0.0L84.6,1.3L84.5,4.2L83.8,5.4L82.8,5.7L75.5,5.8L73.2,5.5L72.7,4.8L72.5,2.8L72.6,1.0L73.2,-0.0ZM90.0,1.7L95.5,1.6L97.2,2.1L97.8,2.8L98.2,4.0L98.3,8.5L98.6,9.2L99.3,9.7L109.8,9.8L110.9,10.2L111.4,12.0L110.9,13.2L110.2,13.6L99.8,13.7L98.8,14.1L98.2,15.5L98.3,27.0L99.0,29.8L100.5,30.9L104.2,31.1L112.5,30.9L113.1,31.5L113.2,33.0L113.0,33.8L112.2,34.6L110.5,35.0L104.5,35.3L95.8,35.1L92.0,33.9L89.9,32.2L88.9,30.5L88.4,27.5L88.4,5.5L88.6,3.0L89.2,2.1L90.0,1.7ZM130.5,9.2L135.5,9.3L144.3,10.0L145.5,10.4L146.1,11.0L146.2,13.2L145.7,14.0L145.0,14.3L140.3,13.8L133.0,13.6L129.5,13.9L127.0,14.9L125.1,17.0L124.3,20.0L124.3,24.0L125.1,27.8L127.0,29.8L130.0,30.9L137.5,31.1L145.2,30.4L146.0,31.0L146.3,32.0L146.2,33.5L145.5,34.3L142.5,35.0L135.2,35.4L129.5,35.4L124.0,34.9L120.5,33.9L118.2,32.8L116.1,30.8L115.1,29.2L114.0,25.5L113.9,20.0L115.0,15.8L116.1,14.0L118.2,12.0L120.5,10.8L124.2,9.8L130.5,9.2ZM161.8,9.5L168.5,9.3L174.8,9.9L178.2,10.8L180.2,11.8L182.8,14.0L183.9,15.8L184.7,18.8L184.9,24.5L184.7,26.2L183.8,29.2L181.8,32.0L178.8,33.9L175.5,34.9L166.0,35.7L156.8,34.8L153.8,33.8L152.0,32.9L150.4,31.5L149.2,30.0L148.3,28.0L147.9,25.5L148.0,18.2L149.1,15.0L151.0,12.8L154.0,11.0L158.0,9.8L161.8,9.5ZM203.0,9.5L209.8,9.4L210.7,10.5L210.8,11.8L210.5,12.8L209.5,13.6L201.8,13.9L200.2,14.2L199.2,14.8L198.7,16.0L198.7,31.0L198.3,33.5L197.5,34.5L196.2,34.9L190.5,34.8L189.1,33.8L188.8,32.0L188.7,15.2L189.2,12.5L190.0,11.7L191.9,10.8L197.2,9.8L203.0,9.5ZM224.0,9.5L230.5,9.3L237.9,9.8L242.2,10.9L244.2,12.0L246.2,14.0L247.0,15.2L247.8,17.3L247.8,27.8L246.9,30.0L245.9,31.5L244.8,32.6L242.8,33.8L240.0,34.8L232.2,35.5L223.2,35.4L222.6,36.0L222.4,36.8L222.2,43.5L221.3,44.8L213.5,44.8L212.6,43.5L212.4,41.8L212.6,13.0L213.2,11.7L214.6,10.8L218.5,9.9L224.0,9.5ZM75.5,9.9L79.0,9.8L81.5,10.0L82.8,10.8L83.4,12.0L83.5,32.2L83.0,33.8L81.5,34.8L75.5,34.8L74.1,34.0L73.7,33.2L73.6,12.0L74.0,10.8L75.5,9.9ZM163.2,13.0L160.8,14.0L159.4,15.2L158.3,18.8L158.1,22.5L158.3,26.5L159.2,29.2L160.5,30.8L162.8,31.8L166.0,32.1L169.8,31.8L172.0,30.8L173.0,29.8L173.9,28.2L174.4,25.0L174.4,21.8L173.9,16.5L173.0,15.0L171.9,14.0L168.5,12.9L163.2,13.0ZM226.0,13.0L223.5,13.5L222.7,14.0L222.4,14.5L222.5,30.5L224.0,31.6L227.5,31.9L232.5,31.9L235.0,31.0L236.0,30.1L237.0,28.7L237.7,25.5L237.8,20.8L237.0,16.2L235.3,14.0L233.0,13.1L230.2,12.8L226.0,13.0Z"/></svg>
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.33.0</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.34.0</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <div class="db-capsule-group" role="group" aria-label="記錄庫與匯出">
@@ -1128,6 +1153,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
     <nav class="panel-subnav panel-subnav--inline" aria-label="問題偵測子視圖">
       <button type="button" data-subnav-issues="list" aria-current="page">問題清單</button>
       <button type="button" data-subnav-issues="cross">交叉驗證</button>
+      <button type="button" data-subnav-issues="diagnostic">多視角診斷</button>
     </nav>
   </div>
   <div class="issues-subviews" style="display:grid;gap:12px">
@@ -1156,6 +1182,15 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
     <div class="card"><h3>X̄ 越界板 vs P' 圖越界板 </h3><div id="overlap"></div></div>
   </div></div>
     
+    </div>
+    <div data-issues-sub="diagnostic" hidden id="diagnosticPanel">
+      <div class="card"><div class="toolbar" style="justify-content:space-between;flex-wrap:wrap"><div><h3>多視角診斷 <small id="diagContext"></small></h3><p class="note" id="diagStatus" role="status"></p></div><button type="button" id="diagBack">返回問題清單</button><label for="diagMetric">量測</label><select id="diagMetric"></select><button type="button" id="diagClear">清除選取</button></div></div>
+      <div class="grid2">
+        <div class="card"><h3>板號 × 元件不良矩陣 <small id="diagMatrixSub"></small></h3><div class="toolbar"><label for="diagMatrixBy">分組</label><select id="diagMatrixBy"><option value="comp">元件</option><option value="figure">子板</option><option value="group">群組</option></select></div><div class="tbl" style="overflow:auto;max-height:420px"><table id="diagMatrix"></table></div><div class="diag-pages" id="diagEntityPages"></div><div class="diag-pages" id="diagBoardPages"></div></div>
+        <div class="card"><h3>分層量測分布 <small id="diagBoxSub"></small></h3><label for="diagBoxBy">分組</label><select id="diagBoxBy"><option value="group">群組</option><option value="figure">子板</option><option value="comp">元件</option><option value="stroke">刮刀方向（實際資料）</option></select><div class="diag-plot" id="diagBoxPlot"></div><div class="diag-pages" id="diagBoxPages"></div><div class="tbl" style="overflow:auto"><table id="diagBox"></table></div></div>
+      </div>
+      <div class="card"><h3>製程因素與量測關聯 <small id="diagFactorSub"></small></h3><label for="diagFactor">因素</label><select id="diagFactor"><option value="pressure">刮刀壓力</option><option value="speed">印刷速度</option><option value="sep">分離速度</option></select><div class="chartbox tall"><canvas id="diagFactorChart" role="img" aria-label="製程因素與量測關聯散佈圖"></canvas></div><div class="diag-pages" id="diagFactorPages"></div><div class="tbl" style="overflow:auto"><table id="diagFactorTable"></table></div></div>
+<div class="card"><h3>完整板序管制圖</h3><p class="note" id="diagControlSub"></p><div class="chartbox"><canvas id="diagControl" role="img" aria-label="完整板序管制圖；對應資料在下方"></canvas></div><details><summary>管制圖對應資料</summary><div class="tbl"><table id="diagControlData"></table></div></details></div><div class="card"><h3>位置與明細</h3><p class="note" id="diagPositionNote"></p><div class="diag-plot" id="diagPositionPlot"></div><div class="diag-pages" id="diagDetailPages"></div><div class="tbl"><table id="diagDetails"></table></div></div>
     </div>
 </section>
 
@@ -3870,6 +3905,61 @@ function specClassify(r,sp,st){const d=[];let hl=sp&&sp.height?sp.height.lsl:nul
   if((!st||st.heightUnit!=="unknown")&&r.height!=null){if(isNumLim(hl)&&r.height<hl)d.push("LOWH");else if(isNumLim(hu)&&r.height>hu)d.push("HIH")}
   if(sp&&((sp.offx&&r.offx!=null&&((hasLsl(sp.offx)&&r.offx<sp.offx.lsl)||(hasUsl(sp.offx)&&r.offx>sp.offx.usl)))||(sp.offy&&r.offy!=null&&((hasLsl(sp.offy)&&r.offy<sp.offy.lsl)||(hasUsl(sp.offy)&&r.offy>sp.offy.usl)))))d.push("OFF");
   return d}
+
+/* 診斷純計算：只讀同回合資料，不偵測新問題，不修改列、選取或分析設定。 */
+const diagNumber=v=>typeof v==="number"&&Number.isFinite(v);
+function diagValue(r,m,st){return m==="hpct"?(diagNumber(r.height)?r.height/padThk(r,st)*100:null):diagNumber(r[m])?r[m]:null}
+function diagEntity(r,by){return by==="comp"?(compKeyOf(r)||JSON.stringify([r.figure??"","unknown",r.group??""])):JSON.stringify([by,r[by]??""])}
+function diagLabel(r,by){return by==="comp"?(r.comp||"未分類元件")+(r.figure!=null&&r.figure!==""?` · 子板 ${r.figure}`:""):String(r[by]??"未提供")}
+function diagRowClass(r,st){
+  const metrics=["volume","height","area","offx","offy"],clean={...r};let eligible=0,missing=0;
+  if(!specReady(st))return{codes:[],eligible:false,missing:0,noSpec:true};
+  for(const m of metrics){
+    const sp=specFor(r,m,st),valid=sp&&(m==="area"?hasUsl(sp):hasAnySpec(sp));
+    if(!diagNumber(r[m])){clean[m]=null;if(valid)missing++}else if(valid)eligible++;
+  }
+  return{codes:eligible?classify(clean,st.specs,st):[],eligible:eligible>0,missing,noSpec:eligible===0&&missing===0};
+}
+function buildDiagnosticModel(st,selection={}){
+  const metric=selection.metric||st.metric,by=selection.matrixBy||"comp",boxBy=selection.boxBy||"group",factor=selection.factor||"pressure";
+  const rows=(st.rows||[]).filter(scopeFilter(st)),boards=[],entities=new Map(),cells=new Map(),boxes=new Map(),points=new Map(),details=[],boardSeen=new Set();
+  let missingMetric=0,missingFactor=0,missingStroke=0,missingBox=0;
+  for(const r of rows){
+    if(!boardSeen.has(r.board)){boardSeen.add(r.board);boards.push(r.board);cells.set(r.board,new Map())}
+    const key=diagEntity(r,by);if(!entities.has(key))entities.set(key,{key,label:diagLabel(r,by)});
+    const cm=cells.get(r.board);let c=cm.get(key);if(!c)cm.set(key,c={board:r.board,key,total:0,n:0,bad:0,missing:0,noSpec:0,partial:0,rate:null});
+    const cl=diagRowClass(r,st),v=diagValue(r,metric,st);c.total++;if(cl.eligible){c.n++;if(cl.codes.length)c.bad++;if(cl.missing)c.partial++}else if(cl.noSpec)c.noSpec++;else c.missing++;
+    const detail={row:r,key,value:v,...cl};details.push(detail);
+    if(v==null)missingMetric++;
+    const hasBox=boxBy!=="stroke"||(r.stroke!=null&&String(r.stroke).trim()!=="");
+    if(!hasBox)missingStroke++;
+    if(v!=null&&hasBox){const bk=diagEntity(r,boxBy);let b=boxes.get(bk);if(!b)boxes.set(bk,b={key:bk,label:diagLabel(r,boxBy),values:[],boards:new Set()});b.values.push(v);b.boards.add(r.board)}else missingBox++;
+    if(!diagNumber(r[factor])||v==null||r.board==null||r.group==null||r.group===""){missingFactor++;continue}
+    const pk=JSON.stringify([r.board,r.group,r[factor]]);let p=points.get(pk);if(!p)points.set(pk,p={board:r.board,group:r.group,x:r[factor],n:0,sum:0});p.n++;p.sum+=v;
+  }
+  for(const bm of cells.values())for(const c of bm.values())c.rate=c.n?c.bad/c.n:null;
+  const box=[...boxes.values()].map(b=>{const a=b.values.sort((x,y)=>x-y),q1=quant(a,.25),med=quant(a,.5),q3=quant(a,.75),iqr=q3-q1,low=q1-1.5*iqr,high=q3+1.5*iqr,inside=a.filter(x=>x>=low&&x<=high);return{key:b.key,label:b.label,n:a.length,boards:b.boards.size,q1,med,q3,lo:inside[0],hi:inside.at(-1),out:a.filter(x=>x<low||x>high)}});
+  const factors=[...points.values()].map(p=>({...p,y:p.sum/p.n}));
+  return{rows,boards,entities:[...entities.values()],cells,box,factors,details,metric,by,boxBy,factor,missingMetric,missingFactor,missingStroke,missingBox,factorComparable:new Set(factors.map(p=>p.x)).size>1};
+}
+/* 僅解析結構化欄位；不從標題猜位號、板號或量測。模糊焊墊保留全回合。 */
+function diagnosticSource(st,issue){
+  const rows=(st.rows||[]).filter(scopeFilter(st)),bs=[...new Set(rows.map(r=>r.board))],boards=new Set(),parts=new Set(),groups=new Set(),pads=new Set();
+  for(const e of issue?.ents||[]){if(e.startsWith("b:"))boards.add(e.slice(2));if(e.startsWith("g:"))groups.add(e.slice(2));if(e.startsWith("p:"))pads.add(e.slice(2));if(e.startsWith("drift:")){const at=bs.indexOf(e.slice(6));if(at>=0)bs.slice(at).forEach(b=>boards.add(b))}}
+  if(issue?.go?.board!=null)boards.add(issue.go.board);
+  if(issue?.go?.pad!=null)pads.add(String(issue.go.pad));
+  if(issue?.go?.group&&!isAllGrp(issue.go.group))groups.add(issue.go.group);
+  for(const p of pads){const matches=rows.filter(r=>String(r.pad)===p&&(!groups.size||groups.has(r.group))&&(!boards.size||boards.has(r.board))),keys=new Set(matches.map(compKeyOf).filter(Boolean));if(keys.size===1)for(const k of keys)parts.add(k)}
+  const metrics=[issue?.go?.metric,issue?.sig?.k,...(issue?.sig?.ks||[])].filter(m=>METRICS[m]);
+  return{issue:issue?.id??null,metric:metrics[0]||st.metric,chart:issue?.go?.tab==="control"?issue.go.chart:null,pad:issue?.go?.pad??null,boards:[...boards].filter(b=>bs.includes(b)),parts:[...parts],groups:[...groups].filter(g=>rows.some(r=>r.group===g))};
+}
+function diagnosticMatch(r,selection={}){
+  if(selection.board!=null&&r.board!==selection.board)return false;
+  if(selection.entity!=null&&diagEntity(r,selection.matrixBy||"comp")!==selection.entity)return false;
+  if(selection.board!=null||selection.entity!=null)return true;
+  const s=selection.source;if(!s)return true;
+  return(!s.boards.length||s.boards.includes(r.board))&&(!s.parts.length?s.groups.length===0||s.groups.includes(r.group):s.parts.includes(compKeyOf(r)));
+}
 
 /* ============ 分析 ============ */
 /* 分析快取（大檔效能）：同一份資料（rows 陣列）與相同設定直接沿用上次結果，數值與重新計算逐位元相同。
@@ -7105,7 +7195,7 @@ function computeLocalOosDensity(rows,coordGetter,clsFn){
   }
   return out;
 }
-if(typeof module!=="undefined")module.exports={compKeyOf,compKeyParse,scopeFilter,scopeParts,scopePart,scopeSpecGroup,scopeLabel,normalizeScope,scopeIsNarrow,SCOPE_PANELS,SCOPE_BOARD_CARDS,SCOPE_BOARD_NOTE,issuesMd,fmMd,rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,adSample,adSampleHash,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,geomAssumed,areaRatio,aspectRatio,maxThkForAR,apVolNL,detectIssues,buildProblemCases,issueCaseCounts,overallVerdict,compareRuns,dfmTable,scopedDfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,groupBasisOfRow,groupBasisForRows,groupBasisLabel,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,withScopeCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,GERBER,layoutPartsFromRows,layoutPadSet,buildLayoutInfo,layoutStatusText};
+if(typeof module!=="undefined")module.exports={buildDiagnosticModel,diagnosticSource,diagnosticMatch,diagRowClass,compKeyOf,compKeyParse,scopeFilter,scopeParts,scopePart,scopeSpecGroup,scopeLabel,normalizeScope,scopeIsNarrow,SCOPE_PANELS,SCOPE_BOARD_CARDS,SCOPE_BOARD_NOTE,issuesMd,fmMd,rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,adSample,adSampleHash,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,geomAssumed,areaRatio,aspectRatio,maxThkForAR,apVolNL,detectIssues,buildProblemCases,issueCaseCounts,overallVerdict,compareRuns,dfmTable,scopedDfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,groupBasisOfRow,groupBasisForRows,groupBasisLabel,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,withScopeCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,GERBER,layoutPartsFromRows,layoutPadSet,buildLayoutInfo,layoutStatusText};
 </script>
 <script>
 
@@ -7936,7 +8026,7 @@ function renderIssues(){const F0=S.F||[],sc=issueScope(),F=sc?F0.filter(x=>sc.ow
       ${x.explained_pads&&x.explained_pads.length?`<p class="note" style="margin:0"><b>已解釋焊墊（D-30）：</b>${esc(x.explained_pads.join("；"))}</p>`:""}</div>
       <div style="min-width:0">${evSvg(x.ev,x.lv)}</div></div>
     <div class="iss-foot"><span class="note">${x.corrob.length?"相關發現（佐證）："+x.corrob.slice(0,5).map(i=>`<button class="linkbtn" data-jump="${i}">#${i} ${esc(byId[i].title.slice(0,22))}${byId[i].title.length>22?"…":""}</button>`).join("、"):"無跨證據族佐證"}${x.same_phenomenon&&x.same_phenomenon.length?(x.corrob.length?"　｜　":"")+"同一現象："+x.same_phenomenon.slice(0,5).map(i=>`<button class="linkbtn" data-jump="${i}">#${i} ${esc(byId[i].title.slice(0,18))}${byId[i].title.length>18?"…":""}</button>`).join("、"):""}</span>
-      <button class="primary" data-go="${x.id}">${GOLAB[x.go&&x.go.tab]||"查看"} →</button></div></div></details>`;
+      <button type="button" class="linkbtn" data-diag-issue="${x.id}">多視角診斷</button><button class="primary" data-go="${x.id}">${GOLAB[x.go&&x.go.tab]||"查看"} →</button></div></div></details>`;
   const caseShell=c=>{const hint=c.msa_volume_hint?`<p class="note" style="margin:4px 0 8px">量測一致性不足，體積結論須現場確認</p>`:"";
     const meta=[c.shape,c.scope,c.time].filter(Boolean).join("｜");
     return `<details class="iss-case" data-case="${c.id}"${ISS_OPEN.has("c"+c.id)?" open":""}>
@@ -8050,7 +8140,107 @@ $("#btnGateRuns").onclick=()=>{setTab("data");setSub("runs")};
 function renderTab(){if(RENDER_HOLD)return;if(typeof syncScopeUI==="function")syncScopeUI();if(showPanels(S.tab))return;perfSpan("render:"+S.tab,renderTabInner);nextFrame(enhancePanel)}
 function renderDeepPanel(){renderAdv();renderStats()}
 function renderImprovePanel(){if(S.improveSub==="compare")renderCompare();else if(S.improveSub==="dfm")renderDfm();else renderLab()}
-function renderIssuesPanel(){if(S.issuesSub==="cross"){renderCross();renderFM()}else renderIssues()}
+const DIAG={rows:null,run:null,findings:null,source:null,board:null,entity:null,metric:null,page:0,boardPage:0,boxPage:0,factorPage:0,detailPage:0,matrixBy:"comp",boxBy:"group",factor:"pressure",back:null,cache:null,analysis:null};
+function syncDiagnostic(){
+  if(DIAG.rows!==S.rows||DIAG.run!==S.runId){Object.assign(DIAG,{rows:S.rows,run:S.runId,source:null,board:null,entity:null,metric:null,page:0,boardPage:0,boxPage:0,factorPage:0,detailPage:0,back:null,cache:null,analysis:null})}
+  if(DIAG.findings!==S.F){DIAG.findings=S.F;DIAG.source=null;DIAG.back=null}
+}
+function diagnosticModel(){
+  syncDiagnostic();const key=JSON.stringify([clsSig(S),S.group,S.comp,DIAG.metric||S.metric,DIAG.matrixBy,DIAG.boxBy,DIAG.factor]);
+  if(!DIAG.cache||DIAG.cache.key!==key)DIAG.cache={key,model:buildDiagnosticModel(S,{...DIAG,metric:DIAG.metric||S.metric})};
+  return DIAG.cache.model;
+}
+function diagnosticAnalysis(M){
+  const requested=DIAG.source?.chart||S.chart;
+  const pad=DIAG.source?.pad??S.pad,st={...S,metric:M.metric,chart:requested,pad};
+  const key=JSON.stringify([anKey(st),requested,pad]);
+  if(DIAG.analysis?.key===key)return DIAG.analysis;
+  const base=analyzeBase(st);
+  // Some X̄-R points represent subgroups rather than individual boards.
+  const subgroupFallback=requested==="xbarr"&&(!base.xr.pts.length||base.xr.pts.some((p,i)=>p.lab!==base.boards[i])||base.xr.pts.length!==base.boards.length);
+  const chart=subgroupFallback?"xbars":requested;
+  const A=analyzeView({...st,chart},base);
+  DIAG.analysis={key,A,chart,subgroupFallback};
+  return DIAG.analysis;
+}
+function diagnosticPage(items,field,size,host,label){
+  const count=Math.max(1,Math.ceil(items.length/size));DIAG[field]=Math.max(0,Math.min(DIAG[field],count-1));
+  $(host).innerHTML=`<button type="button" data-diag-page="${field}" data-step="-1"${DIAG[field]===0?" disabled":""}>${label}上一頁</button><span role="status">${DIAG[field]+1} / ${count} 頁 · ${items.length} 筆</span><button type="button" data-diag-page="${field}" data-step="1"${DIAG[field]===count-1?" disabled":""}>${label}下一頁</button>`;
+  return items.slice(DIAG[field]*size,(DIAG[field]+1)*size);
+}
+const diagTable=(heads,rows)=>`<thead><tr>${heads.map(x=>`<th scope="col">${x}</th>`).join("")}</tr></thead><tbody>${rows.length?rows.join(""):`<tr><td colspan="${heads.length}">沒有可用資料</td></tr>`}</tbody>`;
+function selectDiagnostic(board,entity=DIAG.entity){DIAG.board=board;DIAG.entity=entity;DIAG.detailPage=0;renderDiagnostic()}
+function openDiagnostic(issue){
+  syncDiagnostic();DIAG.source=diagnosticSource(S,issue);DIAG.metric=DIAG.source.metric;DIAG.board=null;DIAG.entity=null;DIAG.page=0;DIAG.boardPage=0;DIAG.detailPage=0;
+  DIAG.back={id:issue.id,scroll:window.scrollY,open:new Set(ISS_OPEN),pg:{...ISS_PG},lv:S.issLv,cat:S.issCat,ent:S.issEnt,group:S.issGroup,pmap:S.pmapSelection?{...S.pmapSelection}:null};
+  setTab("issues/diagnostic");$("#diagBack").focus();
+}
+function backDiagnostic(){
+  syncDiagnostic();const b=DIAG.back;if(b){S.issLv=b.lv;S.issCat=b.cat;S.issEnt=b.ent;S.issGroup=b.group;S.pmapSelection=b.pmap;ISS_OPEN.clear();b.open.forEach(x=>ISS_OPEN.add(x));ISS_OPEN.add(b.id);Object.assign(ISS_PG,b.pg)}
+  setTab("issues/list");if(!b)return;
+  const el=$("#iss-"+b.id);if(el){const c=el.closest(".iss-case");if(c)c.open=true;el.open=true;const button=el.querySelector("[data-diag-issue]");if(button)button.focus({preventScroll:true});window.scrollTo(0,b.scroll)}
+}
+function renderDiagnostic(){
+  const focused=document.activeElement,mark=focused?.closest("#diagnosticPanel")?{...focused.dataset}:null;
+  renderDiagnosticContent();
+  if(mark?.dboard!=null){const candidates=$$("#diagnosticPanel [data-dboard]");const match=candidates.find(b=>b.dataset.dboard===mark.dboard&&b.dataset.dentity===mark.dentity);if(match)match.focus({preventScroll:true})}
+  else if(mark?.diagPage){const buttons=$$("#diagnosticPanel [data-diag-page]").filter(b=>b.dataset.diagPage===mark.diagPage);const match=buttons.find(b=>b.dataset.step===mark.step&&!b.disabled)||buttons.find(b=>!b.disabled);if(match)match.focus({preventScroll:true})}
+}
+function renderDiagnosticContent(){
+  const M=diagnosticModel(),metric=METRICS[M.metric],picked=DIAG.board!=null||DIAG.entity!=null||!!DIAG.source;
+  $("#diagContext").textContent=DIAG.source?`來源問題 #${DIAG.source.issue} · ${metric.label}`:`${scopeLabel(S)} · ${metric.label}`;
+  $("#diagBack").textContent=DIAG.back?"返回來源問題":"返回問題清單";
+  $("#diagMetric").innerHTML=(S.metrics||[]).map(m=>`<option value="${m}"${m===M.metric?" selected":""}>${METRICS[m].label}</option>`).join("");
+  $("#diagStatus").textContent=!M.rows.length?"尚無範圍內量測資料":`${DIAG.board!=null?`選取板 ${DIAG.board} · `:""}${DIAG.source&&!DIAG.source.boards.length&&!DIAG.source.parts.length&&!DIAG.source.groups.length?"來源無明確歸屬，保留目前全回合範圍。":""}矩陣不良率採既有分類器；分母僅含至少一項可由規格判定的列，多代碼只計一筆。部分量測缺值仍列入可判定分母並另行揭露。`;
+  const boardIndex=new Map(M.boards.map((b,i)=>[b,i])),entityIndex=new Map(M.entities.map((e,i)=>[e.key,i])),selectedCells=new Set();if(picked)for(const d of M.details)if(diagnosticMatch(d.row,DIAG))selectedCells.add(JSON.stringify([d.row.board,d.key]));
+  const shown=diagnosticPage(M.entities,"page",25,"#diagEntityPages","實體"),boards=diagnosticPage(M.boards,"boardPage",40,"#diagBoardPages","板號");
+  $("#diagMatrixSub").textContent=`${M.boards.length} 板 × ${M.entities.length} 實體 · 每頁最多 40 板 × 25 實體`;
+  $("#diagMatrix").innerHTML=diagTable(["元件／子板／群組",...boards.map(b=>esc(b))],shown.map(e=>`<tr><th scope="row">${esc(e.label)}</th>`+boards.map(b=>{const c=M.cells.get(b)?.get(e.key),selected=selectedCells.has(JSON.stringify([b,e.key])),detail=c?`不良 ${c.bad}／可判定 ${c.n}；無法判定 ${c.missing+c.noSpec}（缺量測 ${c.missing}、無適用規格 ${c.noSpec}）；部分量測缺值 ${c.partial}`:"沒有量測列";return`<td><button type="button" data-dboard="${boardIndex.get(b)}" data-dentity="${entityIndex.get(e.key)}" aria-pressed="${selected}" title="${esc(detail)}" aria-label="${esc(b)} ${esc(e.label)} ${esc(detail)}" class="${c?.bad?"diag-bad":""}">${selected?"◆ ":""}${c?.rate!=null?`${c.bad?"⚠ ":""}${f(c.rate*100,1)}% · ${c.bad}/${c.n}`:"無法判定"}${c&&(c.missing+c.noSpec+c.partial)?`<small>缺量測 ${c.missing} · 無規格 ${c.noSpec} · 部分缺值 ${c.partial}</small>`:""}</button></td>`}).join("")+"</tr>"));
+  const boxes=diagnosticPage(M.box,"boxPage",25,"#diagBoxPages","分層");
+  $("#diagBoxSub").textContent=`${metric.label} · 排除 ${M.missingBox} 筆（量測缺值 ${M.missingMetric}${DIAG.boxBy==="stroke"?`、實際刮刀方向缺值 ${M.missingStroke}；不以奇偶板補值`:""}）· 鬚外點不代表不良`;
+  $("#diagBox").innerHTML=diagTable(["分層","焊墊筆數","板數","下鬚","第一四分位","中位數","第三四分位","上鬚","鬚外點"],boxes.map(b=>`<tr><th>${esc(b.label)}</th><td>${b.n}</td><td>${b.boards}</td>${[b.lo,b.q1,b.med,b.q3,b.hi].map(v=>`<td>${f(v,2)}</td>`).join("")}<td><details><summary>${b.out.length} 點</summary>${b.out.map(v=>f(v,2)).join("、")||"無"}</details></td></tr>`));
+  drawDiagnosticBoxes(boxes,metric);
+  const factor=FACT[DIAG.factor],factors=diagnosticPage(M.factors,"factorPage",100,"#diagFactorPages","因素");
+  $("#diagFactorSub").textContent=`每點為板 × 元件群組 × 實際因素值的量測平均 · 排除缺值 ${M.missingFactor} 筆 · ${M.factorComparable?"僅呈現關聯，不推定因果":"因素值不足兩種，無法比較"}`;
+  $("#diagFactorTable").innerHTML=diagTable(["板號","群組",esc(factor.label),esc(metric.label),"焊墊筆數"],factors.map(p=>`<tr><td><button type="button" data-dboard="${boardIndex.get(p.board)}">${esc(p.board)}</button></td><td>${esc(p.group)}</td><td>${f(p.x,2)}</td><td>${f(p.y,2)}</td><td>${p.n}</td></tr>`));
+  $("#diagFactorChart").parentElement.hidden=!M.factors.length;
+  mk("diagFactorChart",{type:"scatter",data:{datasets:[{label:"板 × 群組 × 因素值",data:M.factors.map(p=>({x:p.x,y:p.y,p})),pointRadius:4,pointStyle:M.factors.map(p=>p.board===DIAG.board?"rectRot":"circle"),backgroundColor:M.factors.map(p=>p.board===DIAG.board?css("--accent"):css("--series2"))}]},options:baseOpts({onClick:(e,els,ch)=>{const p=ch.getElementsAtEventForMode(e,"nearest",{intersect:true},true)[0];if(p)selectDiagnostic(M.factors[p.index].board,null)},plugins:{tooltip:{callbacks:{label:i=>`${i.raw.p.board} · ${i.raw.p.group} · ${f(i.raw.y,2)} · n=${i.raw.p.n}`}}},scales:{x:{type:"linear",title:{display:true,text:`${factor.label} (${factor.unit})`}},y:{title:{display:true,text:`${metric.label} (${metric.unit})`}}}})});
+  const details=M.details.filter(d=>diagnosticMatch(d.row,DIAG)),detailPage=diagnosticPage(details,"detailPage",100,"#diagDetailPages","明細");
+  $("#diagDetails").innerHTML=diagTable(["板號","子板","元件","焊墊","量測","判定","座標來源","X","Y"],detailPage.map(d=>`<tr><td><button type="button" data-dboard="${boardIndex.get(d.row.board)}" data-dentity="${entityIndex.get(d.key)}">${esc(d.row.board)}</button></td><td>${esc(d.row.figure??"未提供")}</td><td>${esc(d.row.comp??"未提供")}</td><td>${esc(d.row.pad??"未提供")}</td><td>${d.value==null?"缺值":f(d.value,2)}</td><td>${d.eligible?d.codes.length?`⚠ ${d.codes.join("、")}`:"規格內":"無法判定"}${d.missing?" · 部分量測缺值":""}</td><td>${diagPosition(d.row).label}</td><td>${diagPosition(d.row).x==null?"—":f(diagPosition(d.row).x,3)}</td><td>${diagPosition(d.row).y==null?"—":f(diagPosition(d.row).y,3)}</td></tr>`));
+  drawDiagnosticPosition(M,picked);
+  if(M.rows.length){
+    const {A,chart,subgroupFallback}=diagnosticAnalysis(M),active=new Set(details.map(d=>d.row.board));
+    const reason=A.chartReason||({xbars:A.xs,imr:A.imr,ewma:A.ewma,cusum:A.cusum,p:A.pc,xbarr:A.xr}[chart]?.subgroupWarning)||"";
+    $("#diagControlSub").textContent=[chartName(chart),metric.label,scopeLabel(S),subgroupFallback?"X̄-R 子群組無法逐板對齊，顯示 X̄-S":"",chart==="imr"?`焊墊 ${A.imr.pad??"無"}`:"",reason].filter(Boolean).join(" · ");
+    drawCtrl("diagControl",false,{A,chart,boards:M.boards,selected:picked?active:new Set(),onBoard:b=>selectDiagnostic(b),onPlot:(series,signals)=>{
+      $("#diagControlData").innerHTML=diagTable(["板號",...series.map(ds=>esc(ds.label)),"訊號"],M.boards.map((b,i)=>{
+        const selected=picked&&active.has(b),values=series.map(ds=>ds.data[i]);
+        return `<tr><td><button type="button" data-dboard="${boardIndex.get(b)}" aria-pressed="${selected}">${selected?"◆ ":""}${esc(b)}</button></td>${values.map(v=>`<td>${diagNumber(v)?f(v,3):"—"}</td>`).join("")}<td>${A.chartRejected?"無法判定":!diagNumber(values[0])?"量測缺值":signals.has(b)?"⚠ 觸發既有規則":"未觸發"}</td></tr>`;
+      }));
+    }});
+  }else{$("#diagControlSub").textContent="沒有可用資料";$("#diagControlData").innerHTML="";if(charts.diagControl){charts.diagControl.destroy();delete charts.diagControl}}
+}
+function drawDiagnosticBoxes(boxes,metric){
+  const vals=boxes.flatMap(b=>[b.lo,b.hi,...b.out]);let lo=Infinity,hi=-Infinity;for(const v of vals){lo=Math.min(lo,v);hi=Math.max(hi,v)}const span=hi-lo||1,x=v=>180+(v-lo)/span*590,h=Math.max(80,boxes.length*38+45);
+  $("#diagBoxPlot").innerHTML=`<svg viewBox="0 0 800 ${h}" role="img" aria-label="${esc(metric.label)}盒鬚圖；精確值見下方表格"><text x="180" y="18">${diagNumber(lo)?f(lo,2):"無資料"}</text><text x="710" y="18">${diagNumber(hi)?f(hi,2):""}</text>${boxes.map((b,i)=>{const y=40+i*38;return`<g><title>${esc(b.label)}</title><text x="0" y="${y+4}">${esc(b.label.length>20?b.label.slice(0,20)+"…":b.label)}</text><path d="M${x(b.lo)} ${y}H${x(b.hi)}M${x(b.lo)} ${y-7}V${y+7}M${x(b.hi)} ${y-7}V${y+7}"/><rect x="${x(b.q1)}" y="${y-10}" width="${Math.max(1,x(b.q3)-x(b.q1))}" height="20"/><path d="M${x(b.med)} ${y-10}V${y+10}"/>${b.out.map(v=>`<circle cx="${x(v)}" cy="${y}" r="3"/>`).join("")}</g>`}).join("")}</svg>`;
+}
+function diagPosition(r){return realXY(r)?{x:r.x,y:r.y,kind:"real",label:"實際焊墊座標"}:diagNumber(r.componentX)&&diagNumber(r.componentY)?{x:r.componentX,y:r.componentY,kind:"cad",label:"CAD 元件中心"}:{x:null,y:null,kind:"grid",label:"示意排列（無實際座標）"}}
+function drawDiagnosticPosition(M,picked){
+  const by=new Map();for(const d of M.details){const r=d.row,k=JSON.stringify([r.figure??"",compKeyOf(r),r.pad]);let p=by.get(k);if(!p){p={...diagPosition(r),label:`${r.comp||"未提供元件"} · ${r.pad||"未提供焊墊"}`,board:r.board,entity:d.key,hit:false,bad:false};by.set(k,p)}if(diagnosticMatch(r,DIAG)){p.hit=true;p.board=r.board;p.bad=p.bad||d.codes.length>0}}
+  const all=[...by.values()];all.forEach((p,i)=>p.index=i);const physical=all.filter(p=>p.x!=null),grid=all.filter(p=>p.x==null);let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;for(const p of physical){x0=Math.min(x0,p.x);x1=Math.max(x1,p.x);y0=Math.min(y0,p.y);y1=Math.max(y1,p.y)}
+  const draw=(ps,schematic)=>ps.map((p,i)=>{const x=schematic?20+i%25*29:20+(p.x-x0)/(x1-x0||1)*720,y=schematic?20+Math.floor(i/25)*24:20+(p.y-y0)/(y1-y0||1)*300;return`<g class="${picked&&p.hit?"diag-selected":""}" data-pos="${p.index}"><title>${esc(p.label)}${p.bad?" · 規格異常":""}</title>${p.bad?`<path d="M${x} ${y-5}L${x+5} ${y+5}H${x-5}Z"/>`:p.kind==="cad"?`<rect x="${x-4}" y="${y-4}" width="8" height="8"/>`:`<circle cx="${x}" cy="${y}" r="${picked&&p.hit?5:3}"/>`}</g>`}).join("");
+  $("#diagPositionNote").textContent=`實際焊墊座標 ${physical.filter(p=>p.kind==="real").length} 個位置（圓形）／CAD 元件中心 ${physical.filter(p=>p.kind==="cad").length} 個位置（方形）；無實際座標 ${grid.length} 個位置另以示意排列顯示。CAD 中心可能重疊；三角形表示規格異常，選取加粗。下方明細可用鍵盤操作。`;
+  $("#diagPositionPlot").innerHTML=(physical.length?`<svg viewBox="0 0 760 340" role="img" aria-label="實際焊墊座標與 CAD 元件中心位置圖">${draw(physical,false)}</svg>`:"")+(grid.length?`<p>示意排列（無實際座標）</p><svg viewBox="0 0 760 ${Math.ceil(grid.length/25)*24+20}" role="img" aria-label="無實際座標的示意排列">${draw(grid,true)}</svg>`:"");
+  $("#diagPositionPlot").onclick=e=>{const g=e.target.closest("[data-pos]");if(!g)return;const p=all[+g.dataset.pos];selectDiagnostic(p.board,p.entity)};
+}
+function enterDiagnostic(){syncDiagnostic();DIAG.source=null;DIAG.metric=null;DIAG.back=null;DIAG.board=null;DIAG.entity=null;setTab("issues/diagnostic")}
+$("#diagBack").onclick=backDiagnostic;
+$("#diagClear").onclick=()=>{DIAG.source=null;DIAG.board=null;DIAG.entity=null;DIAG.detailPage=0;renderDiagnostic()};
+for(const [id,field]of[["diagMatrixBy","matrixBy"],["diagBoxBy","boxBy"],["diagFactor","factor"],["diagMetric","metric"]])$("#"+id).onchange=e=>{DIAG[field]=e.target.value;DIAG.page=0;DIAG.boxPage=0;DIAG.factorPage=0;DIAG.detailPage=0;if(field==="matrixBy")DIAG.entity=null;renderDiagnostic()};
+$("#diagnosticPanel").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.diagPage){DIAG[b.dataset.diagPage]+=+b.dataset.step;renderDiagnostic();return}if(b.dataset.dboard!=null){const M=diagnosticModel();selectDiagnostic(M.boards[+b.dataset.dboard],b.dataset.dentity!=null?M.entities[+b.dataset.dentity]?.key:null)}});
+$("#issList").addEventListener("click",e=>{const b=e.target.closest("[data-diag-issue]");if(!b)return;e.preventDefault();e.stopPropagation();const issue=S.F.find(x=>String(x.id)===b.dataset.diagIssue);if(issue)openDiagnostic(issue)});
+
+function renderIssuesPanel(){if(S.issuesSub==="cross"){renderCross();renderFM()}else if(S.issuesSub==="diagnostic")renderDiagnostic();else renderIssues()}
 function renderControlPanel(){if(S.controlSub==="multi")renderHotellingT2UI();else renderControl()}
 function renderTabByName(k){const fn=({issues:renderIssuesPanel,overview:renderOverview,control:renderControlPanel,capability:renderCap,sim3d:render3D,deep:renderDeepPanel,improve:renderImprovePanel,ai:()=>{},report:renderReport,data:()=>{renderSpecTbl();renderZones();renderAperture();renderRuns()}})[k];if(fn)fn()} function renderTabInner(){if(S.duo&&S.duo.active){if(S.tab==="report"||S.duo.leftTab==="report"||S.duo.rightTab==="report"){renderTabByName("report");return}renderTabByName(S.duo.leftTab||S.tab);if(S.duo.rightTab&&S.duo.rightTab!==S.duo.leftTab)renderTabByName(S.duo.rightTab)}else renderTabByName(S.tab)}
 
@@ -8145,7 +8335,7 @@ function parseTabTarget(raw){
   const s=String(raw||"").replace(/^#/,"").trim();
   if(!s)return{tab:"issues"};
   const parts=s.split("/"),root=parts[0],sub=parts[1]||null;
-  if(root==="issues"){const issuesSub=sub&&["list","cross"].includes(sub)?sub:"list";return{tab:"issues",issuesSub}}
+  if(root==="issues"){const issuesSub=sub&&["list","cross","diagnostic"].includes(sub)?sub:"list";return{tab:"issues",issuesSub}}
   if(root==="control"){const controlSub=sub&&["uni","multi"].includes(sub)?sub:"uni";return{tab:"control",controlSub}}
   if(root==="deep"){if(sub==="cross")return{tab:"issues",issuesSub:"cross"};return{tab:"deep"}}
   if(root==="improve"){const improveSub=sub&&["compare","dfm","lab"].includes(sub)?sub:"compare";return{tab:"improve",improveSub}}
@@ -8158,7 +8348,7 @@ function parseTabTarget(raw){
   return{tab:root}
 }
 function tabHashFor(tab,issuesSub,controlSub,improveSub){
-  if(tab==="issues")return issuesSub==="cross"?"issues/cross":"issues";
+  if(tab==="issues")return issuesSub==="diagnostic"?"issues/diagnostic":issuesSub==="cross"?"issues/cross":"issues";
   if(tab==="control")return controlSub==="multi"?"control/multi":"control";
   if(tab==="improve")return"improve/"+(improveSub||"compare");
   if(tab==="deep")return"deep";
@@ -8248,54 +8438,74 @@ function renderOverview(){
   drawCtrl("cOvCtrl",true);drawPareto("cOvPareto");
 }
 
-function chartName(){return{xbars:"X̄-S",xbarr:"X̄-R",imr:"I-MR",p:"P′ 圖",ewma:"EWMA",cusum:"CUSUM"}[S.chart]||"管制圖"}
+function chartName(chart=S.chart){return{xbars:"X̄-S",xbarr:"X̄-R",imr:"I-MR",p:"P′ 圖",ewma:"EWMA",cusum:"CUSUM"}[chart]||"管制圖"}
 function goBoard(b){if(!b)return;S.board=b;$("#selBoard").value=b;setTab("sim3d")}
 function goPad(p){S.chart="imr";S.pad=p;$("#selChart").value="imr";recompute(true);S.controlSub="uni";setTab("control");window.scrollTo({top:0,behavior:"smooth"})}
 const clickOpts=labs=>({onClick:(e,_,ch)=>{const el=ch.getElementsAtEventForMode(e,"index",{intersect:false},true)[0];if(el)goBoard(labs[el.index])},onHover:(e,els,ch)=>{ch.canvas.style.cursor="pointer"}});
 
 /* ---------- 管制圖 ---------- */
-function drawCtrl(id,mini){const A=S.A,c=S.chart,ng=css("--ng"),acc=css("--accent"),ink=css("--muted"),s2=css("--series2");
+function drawCtrl(id,mini,context=null){const A=context?.A||S.A,c=context?.chart||S.chart,ng=css("--ng"),acc=css("--accent"),ink=css("--muted"),s2=css("--series2");
+  const clicks=labs=>context?{onClick:(e,_,ch)=>{const hit=ch.getElementsAtEventForMode(e,"index",{intersect:false},true)[0];if(hit)context.onBoard(ch.data.labels[hit.index])}}:clickOpts(labs);
+  const plot=cfg=>{
+    if(context){
+      const order=context.boards,indices=new Map(cfg.data.labels.map((b,i)=>[b,i]));
+      const signals=new Set(order.filter(b=>A.nel.flag.has(indices.get(b))));
+      for(const ds of cfg.data.datasets){
+        ds.data=order.map(b=>indices.has(b)?ds.data[indices.get(b)]:null);
+        for(const key of ["pointRadius","pointBackgroundColor","pointBorderColor"])if(Array.isArray(ds[key]))ds[key]=order.map(b=>indices.has(b)?ds[key][indices.get(b)]:0);
+      }
+      cfg.data.labels=order;
+      const observed=cfg.data.datasets.slice(0,c==="cusum"?2:1);
+      for(const ds of observed){
+        ds.pointStyle=order.map(b=>context.selected.has(b)?"rectRot":signals.has(b)?"triangle":"circle");
+        ds.pointRadius=order.map(b=>context.selected.has(b)?7:3);
+      }
+      cfg.options.plugins.tooltip={callbacks:{label:i=>i.dataset.label+": "+f(i.raw,3)}};
+      context.onPlot?.(cfg.data.datasets.filter(ds=>ds.label),signals);
+    }
+    mk(id,cfg);
+  };
   if(c==="xbarr"){
     const xr=A.xr;
     if(!xr||xr.rejected){
-      mk(id,{type:"line",data:{labels:[],datasets:[]},options:baseOpts({plugins:{title:{display:true,text:xr?xr.reason:"X̄-R 無法計算",color:ng}}})});
+      plot({type:"line",data:{labels:[],datasets:[]},options:baseOpts({plugins:{title:{display:true,text:xr?xr.reason:"X̄-R 無法計算",color:ng}}})});
       return;
     }
     const pts=xr.pts,ucl=pts.map(p=>p.ucl),lcl=pts.map(p=>p.lcl),cl=xr.cl;
     const sig=(xr.uclX-cl)/3;
     const zones=mini?[]:[1,2].flatMap(k=>[1,-1].map(sgn=>({label:"",data:pts.map(()=>cl+sgn*k*sig),borderColor:css("--grid"),borderWidth:1,pointRadius:0,borderDash:[2,3]})));
-    mk(id,{type:"line",data:{labels:pts.map(p=>p.lab),datasets:[
+    plot({type:"line",data:{labels:pts.map(p=>p.lab),datasets:[
       {label:"X̄ (平均)",data:pts.map(p=>p.v),borderColor:s2,borderWidth:1.6,pointRadius:pts.map((p,i)=>A.nel.flag.has(i)?(mini?4:5.5):(mini?2.5:3.5)),pointBackgroundColor:pts.map((p,i)=>A.nel.flag.has(i)?ng:s2),pointBorderColor:pts.map((p,i)=>A.nel.flag.has(i)?ng:s2),tension:0},
       {label:"UCL",data:ucl,borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},
       {label:"LCL",data:lcl,borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},
       {label:"CL",data:pts.map(()=>cl),borderColor:acc,borderWidth:1.2,pointRadius:0},...zones]},
-      options:baseOpts(withLimits({...clickOpts(pts.map(p=>p.lab)),plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex===0,callbacks:{label:i=>`${f(i.raw,2)} ${METRICS[A.m].unit} · z ${f(pts[i.dataIndex].z,2)}`}}}},[{n:"UCL",v:ucl.at(-1),c:ng},{n:"CL",v:cl,c:acc},{n:"LCL",v:lcl.at(-1),c:ng}],mini))});
+      options:baseOpts(withLimits({...clicks(pts.map(p=>p.lab)),plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex===0,callbacks:{label:i=>`${f(i.raw,2)} ${METRICS[A.m].unit} · z ${f(pts[i.dataIndex].z,2)}`}}}},[{n:"UCL",v:ucl.at(-1),c:ng},{n:"CL",v:cl,c:acc},{n:"LCL",v:lcl.at(-1),c:ng}],mini))});
     return;
   }
   if(c==="ewma"){const P=A.ewma,out=P.map(p=>p.v>p.ucl||p.v<p.lcl);
-    mk(id,{type:"line",data:{labels:P.map(p=>p.lab),datasets:[
+    plot({type:"line",data:{labels:P.map(p=>p.lab),datasets:[
       {label:"EWMA",data:P.map(p=>p.v),borderColor:s2,borderWidth:1.8,pointRadius:P.map((_,i)=>out[i]?(mini?4:5.5):(mini?2:3)),pointBackgroundColor:P.map((_,i)=>out[i]?ng:s2),pointBorderColor:P.map((_,i)=>out[i]?ng:s2)},
       {label:"每板平均",data:P.map(p=>p.raw),showLine:false,pointRadius:mini?1.5:2.5,pointBackgroundColor:ink,pointBorderColor:"transparent"},
       {label:"UCL",data:P.map(p=>p.ucl),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},{label:"LCL",data:P.map(p=>p.lcl),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},
       {label:"CL",data:P.map(()=>A.gMean),borderColor:acc,borderWidth:1.2,pointRadius:0}]},
-      options:baseOpts(withLimits({...clickOpts(P.map(p=>p.lab)),plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex<2,callbacks:{label:i=>(i.datasetIndex?"板平均 ":"EWMA ")+f(i.raw,2)+" "+METRICS[A.m].unit}}}},[{n:"UCL",v:P.at(-1)?.ucl,c:ng},{n:"CL",v:A.gMean,c:acc},{n:"LCL",v:P.at(-1)?.lcl,c:ng}],mini))});return}
+      options:baseOpts(withLimits({...clicks(P.map(p=>p.lab)),plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex<2,callbacks:{label:i=>(i.datasetIndex?"板平均 ":"EWMA ")+f(i.raw,2)+" "+METRICS[A.m].unit}}}},[{n:"UCL",v:P.at(-1)?.ucl,c:ng},{n:"CL",v:A.gMean,c:acc},{n:"LCL",v:P.at(-1)?.lcl,c:ng}],mini))});return}
   if(c==="cusum"){const P=A.cusum.pts,h=A.cusum.h,out=P.map(p=>p.cp>h||p.cm>h);
-    mk(id,{type:"line",data:{labels:P.map(p=>p.lab),datasets:[
+    plot({type:"line",data:{labels:P.map(p=>p.lab),datasets:[
       {label:"C+",data:P.map(p=>p.cp),borderColor:s2,borderWidth:1.8,pointRadius:P.map((p,i)=>p.cp>h?(mini?4:5.5):(mini?2:3)),pointBackgroundColor:P.map(p=>p.cp>h?ng:s2),pointBorderColor:"transparent"},
       {label:"C−",data:P.map(p=>-p.cm),borderColor:acc,borderWidth:1.8,borderDash:[5,3],pointRadius:P.map((p,i)=>p.cm>h?(mini?4:5.5):(mini?2:3)),pointBackgroundColor:P.map(p=>p.cm>h?ng:acc),pointBorderColor:"transparent"},
       {label:"+h",data:P.map(()=>h),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},{label:"−h",data:P.map(()=>-h),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0}]},
-      options:baseOpts(withLimits({...clickOpts(P.map(p=>p.lab)),plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex<2,callbacks:{label:i=>(i.datasetIndex?"C− ":"C+ ")+f(Math.abs(i.raw),2)+" σ"}}}},[{n:"+h",v:h,c:ng},{n:"−h",v:-h,c:ng}],mini))});return}
+      options:baseOpts(withLimits({...clicks(P.map(p=>p.lab)),plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex<2,callbacks:{label:i=>(i.datasetIndex?"C− ":"C+ ")+f(Math.abs(i.raw),2)+" σ"}}}},[{n:"+h",v:h,c:ng},{n:"−h",v:-h,c:ng}],mini))});return}
   const pts=c==="imr"?A.imr.pts:c==="p"?A.pc.pts:A.xs.pts;
   const ucl=c==="imr"?pts.map(()=>A.imr.ucl):pts.map(p=>p.ucl),lcl=c==="imr"?pts.map(()=>A.imr.lcl):pts.map(p=>p.lcl),cl=c==="imr"?A.imr.cl:c==="p"?A.pc.cl:A.xs.cl;
   const sig=c==="imr"?(A.imr.ucl-A.imr.cl)/3:null;
   const scale=c==="p"?100:1;   // P′ 圖以 % 顯示：資料、界限與分區線都要乘同一倍數
   const zones=mini?[]:[1,2].flatMap(k=>[1,-1].map(sgn=>({label:"",data:pts.map((p,i)=>{let v=cl+sgn*k*((c==="imr"?sig:(ucl[i]-cl)/3));if(c==="p")v=Math.max(0,Math.min(1,v));return v*scale}),borderColor:css("--grid"),borderWidth:1,pointRadius:0,stepped:c==="p"?"middle":false,borderDash:[2,3]})));
-  mk(id,{type:"line",data:{labels:pts.map(p=>p.lab),datasets:[
+  plot({type:"line",data:{labels:pts.map(p=>p.lab),datasets:[
     {label:"量測",data:pts.map(p=>p.v*scale),borderColor:s2,borderWidth:1.6,pointRadius:mini?2.5:3.5,pointBackgroundColor:pts.map((p,i)=>A.nel.flag.has(i)?ng:s2),pointBorderColor:pts.map((p,i)=>A.nel.flag.has(i)?ng:s2),pointRadius:pts.map((p,i)=>A.nel.flag.has(i)?(mini?4:5.5):(mini?2.5:3.5)),tension:0},
     {label:"UCL",data:ucl.map(v=>v*scale),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0,stepped:c==="p"?"middle":false},
     {label:"LCL",data:lcl.map(v=>v*scale),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0,stepped:c==="p"?"middle":false},
     {label:"CL",data:pts.map(()=>cl*scale),borderColor:acc,borderWidth:1.2,pointRadius:0},...zones]},
-    options:baseOpts(withLimits({...clickOpts(pts.map(p=>p.lab)),plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex===0,callbacks:{label:i=>`${f(i.raw,c==="p"?2:2)}${c==="p"?" %":" "+METRICS[A.m].unit}  ·  z ${f(pts[i.dataIndex].z,2)}`}}}},[{n:"UCL",v:ucl.at(-1)*scale,c:ng},{n:"CL",v:cl*scale,c:acc},{n:"LCL",v:lcl.at(-1)*scale,c:ng}],mini))});
+    options:baseOpts(withLimits({...clicks(pts.map(p=>p.lab)),plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex===0,callbacks:{label:i=>`${f(i.raw,c==="p"?2:2)}${c==="p"?" %":" "+METRICS[A.m].unit}  ·  z ${f(pts[i.dataIndex].z,2)}`}}}},[{n:"UCL",v:ucl.at(-1)*scale,c:ng},{n:"CL",v:cl*scale,c:acc},{n:"LCL",v:lcl.at(-1)*scale,c:ng}],mini))});
 }
 function renderControl(){
   if(!hasData()){
@@ -11650,7 +11860,7 @@ function exportReportMd(){if(needSpec()){const md=reportMd();save("spi-spc-repor
 function exportBoardStatsCsv(){if(!needSpec())return;const src=runSrc(curRun()),swo=src&&src.supplierWo?src.supplierWo:"",owo=src&&src.outsourceWo?src.outsourceWo:"";save("board-stats.csv",withScopeCsv(S,toCSV([["board","supplier_wo","outsource_wo","n","mean","sd","min","q1","median","q3","max","defect_pads","defect_rate","spec_source"],...S.A.byBoard.map(b=>[b.board,swo,owo,b.n,f(b.mean,3),f(b.sd,3),b.min,f(b.q1,2),f(b.med,2),f(b.q3,2),b.max,b.defects,f(b.p,4),specSrcText()])])));}
 function exportDefectPadsCsv(){if(!needSpec())return;save("defect-pads.csv",withScopeCsv(S,toCSV([["board","pad","component","group","volume","height","area","offset_x","offset_y","defects","spec_source"],...S.A.defRows.map(r=>[r.board,r.pad,r.comp,r.group,r.volume,r.height,r.area,r.offx,r.offy,r.codes.map(c=>DEFECTS[c]).join(" / "),specSrcText()])])));}
 
-$$("[data-subnav-issues]").forEach(b=>{b.onclick=()=>setTab(b.dataset.subnavIssues==="cross"?"issues/cross":"issues")});
+$$("[data-subnav-issues]").forEach(b=>{b.onclick=()=>b.dataset.subnavIssues==="diagnostic"?enterDiagnostic():setTab("issues/"+b.dataset.subnavIssues)});
 $$("[data-subnav-control]").forEach(b=>{b.onclick=()=>setTab(b.dataset.subnavControl==="multi"?"control/multi":"control")});
 $$("[data-subnav-improve]").forEach(b=>{b.onclick=()=>setTab("improve/"+b.dataset.subnavImprove)});
 function openAppSettings(section){
@@ -15912,7 +16122,7 @@ setupRecPicker();
 setupExportCenter();
 
 /* 測試用：只有測試在載入前設定 window.SPI_TEST_HOOK 時才公開內部函式 */
-if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{importSearchMatch,renderImportSourceSummary,updateImportWorkflow,showImportValidationError,clearImportValidationError});
+if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{buildDiagnosticModel,diagnosticSource,diagnosticMatch,DIAG,diagnosticModel,diagnosticAnalysis,renderDiagnostic,openDiagnostic,backDiagnostic,selectDiagnostic,syncDiagnostic,switchRun,clearRuns,importSearchMatch,renderImportSourceSummary,updateImportWorkflow,showImportValidationError,clearImportValidationError});
 function pdfFileName(){
   const src=runSrc(curRun());
   const part=safeFn((src&&src.part)||S.part||"SAMPLE");

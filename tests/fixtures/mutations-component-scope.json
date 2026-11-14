@@ -102,6 +102,11 @@
       "to": "if(false){"
     },
     {
+      "name": "診斷沒有套用元件範圍",
+      "from": "const rows=(st.rows||[]).filter(scopeFilter(st)),boards=[],entities=",
+      "to": "const rows=(st.rows||[]),boards=[],entities="
+    },
+    {
       "name": "匯出 XLSX 沒篩元件範圍",
       "from": "async function exportIssuesXlsx(){if(!needSpec())return;save(\"spi-issues.xlsx\",await issuesXlsx(scopedFindings()))}",
       "to": "async function exportIssuesXlsx(){if(!needSpec())return;save(\"spi-issues.xlsx\",await issuesXlsx(S.F))}"
