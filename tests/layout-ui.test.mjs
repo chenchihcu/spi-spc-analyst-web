@@ -93,11 +93,22 @@ test("開啟引用板面圖檔的量測：自動套用、問題地圖改畫焊�
   assert.deepEqual(errs, []);
 });
 
+test("鋼板檔開孔：開啟紀錄後寫入回合設定，面積比表標示來源與套用數（v10.31.0）", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { w, hook, d } = await page();
+  assert.ok(await until(() => w.eval("S.aperture&&S.aperture.file&&Object.keys(S.aperture.file).length") === 15), "15 顆零件開孔尺寸一致，應全部套用");
+  assert.ok(hook.curRun().cfg.aperture.file, "回合設定應保存鋼板檔開孔");
+  hook.setTab("data"); hook.setSub("settings");
+  assert.ok(await until(() => /鋼板檔開孔已套用 15 顆零件/.test(d.querySelector("#apNote")?.textContent || "")), d.querySelector("#apNote")?.textContent);
+  assert.ok([...d.querySelectorAll("#apTbl td .note")].some(n => n.textContent === "鋼板檔"), "實際開孔欄應標示來源「鋼板檔」");
+  hook.setTab("issues");
+});
+
 test("分享連結不帶板面圖檔幾何", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const { hook } = await page();
   assert.ok(hook.curRun().info.layout);
   const pack = JSON.stringify(hook.sharePack());
   assert.ok(!pack.includes('"layout"'), "分享內容不得含 layout");
+  assert.ok(!pack.includes('"file"'), "分享內容不得含鋼板檔開孔");
   assert.ok(hook.curRun().info.layout, "分享不改動目前回合");
 });
 
