@@ -83,9 +83,16 @@ test('[M-06 / TV-6] CUSUM 以規格目標為中心，符合 TV-6 預期值，>10
     chart: 'cusum',
     specs: { volume: { lsl: 70, usl: 130, tgt: 100 } }
   };
+  // 預設中心為整批平均（與問題偵測「持續漂移」同一基準）
   const Anormal = core.analyze(stNormal);
-  assert.equal(Anormal.cusum.center, 100);
+  assert.ok(Math.abs(Anormal.cusum.center - Anormal.gMean) < 1e-9);
+  assert.equal(Anormal.cusum.centerType, 'mean');
   assert.equal(Anormal.cusum.centerFallback, false);
+  // 明確指定 target 才以規格目標為中心
+  const Atarget = core.analyze({ ...stNormal, cusumCenter: 'target' });
+  assert.equal(Atarget.cusum.center, 100);
+  assert.equal(Atarget.cusum.centerType, 'target');
+  assert.equal(Atarget.cusum.centerFallback, false);
 
   // 2. Outlying target = 0.5 (deviates > 10σ from gMean ~101)
   const stOutlying = {
@@ -93,12 +100,36 @@ test('[M-06 / TV-6] CUSUM 以規格目標為中心，符合 TV-6 預期值，>10
     metric: 'volume',
     group: 'ALL',
     chart: 'cusum',
+    cusumCenter: 'target',
     specs: { volume: { lsl: 0.1, usl: 1.0, tgt: 0.5 } }
   };
   const Aoutlying = core.analyze(stOutlying);
   assert.equal(Aoutlying.cusum.centerFallback, true);
   assert.match(Aoutlying.cusum.centerReason, /偏離資料平均 >10σ/);
   assert.ok(Math.abs(Aoutlying.cusum.center - Aoutlying.gMean) < 1e-6);
+});
+
+// 2026-11-14 回報：體積平均固定高於目標約 8%，CUSUM 以目標為中心時 C+ 每板線性累加、B04 起全部是訊號
+test('CUSUM 預設不把固定偏離目標當成漂移；真的後段位移仍出訊號', () => {
+  let seed = 7;
+  const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648 - 0.5; };
+  const mk = (shiftAt) => {
+    const rows = [];
+    for (let b = 0; b < 20; b++) {
+      const bm = 108 + rnd() * 6 + (shiftAt != null && b >= shiftAt ? 12 : 0);
+      for (let p = 1; p <= 10; p++) rows.push({ board: 'B' + String(b + 1).padStart(2, '0'), refdes: 'R' + p, pad: String(p), group: '0603', volume: bm + rnd() * 4, x: p * 10, y: 10 });
+    }
+    return { rows, metric: 'volume', group: 'ALL', chart: 'cusum', specs: { volume: { lsl: 50, usl: 150, tgt: 100 } } };
+  };
+  const steady = core.analyze(mk(null));
+  assert.equal(steady.cusum.centerType, 'mean');
+  const out = steady.cusum.pts.filter((p) => p.cp > steady.cusum.h || p.cm > steady.cusum.h);
+  assert.equal(out.length, 0, `穩定但偏離目標的製程不應出 CUSUM 訊號：${out.map((p) => p.lab).join(',')}`);
+  // 對照：舊行為（以目標為中心）會整條都是訊號
+  const tgt = core.analyze({ ...mk(null), cusumCenter: 'target' });
+  assert.ok(tgt.cusum.pts.filter((p) => p.cp > tgt.cusum.h).length >= 15);
+  const shifted = core.analyze(mk(12));
+  assert.ok(shifted.cusum.pts.slice(12).some((p) => p.cp > shifted.cusum.h), '後段位移應出訊號');
 });
 
 // -------------------------------------------------------------
