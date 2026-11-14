@@ -157,3 +157,55 @@ test("紀錄庫登錄表單：管理者可見；解析並預選圖層與面別�
   del.click();
   assert.ok(await until(() => d.querySelectorAll("#upLayList [data-del-layout]").length === 1), "刪除後剩一份");
 });
+
+test("匯入步驟 ①：未選座標時也顯示 Gerber 板面圖檔列與登錄入口；入口開啟座標檔分頁的登錄表單並帶入料號、版次、面別", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { w, hook, d, place } = await page();
+  d.querySelector("#recPickerClose").click();
+  hook.setTab("data"); hook.setSub("import");
+  d.querySelector("#placeClear").click();
+  assert.equal(d.querySelector("#layoutRow").hidden, false, "雲端模式下未選座標也要看得到板面圖檔列");
+  assert.match(d.querySelector("#layoutRow .lbl").textContent, /Gerber/);
+  assert.equal(d.querySelector("#layoutState").textContent, "選取受控座標檔與面別後，顯示已登錄的圖層");
+  d.querySelector("#selSide").value = "TOP";
+  d.querySelector("#selSide").dispatchEvent(new w.Event("change"));
+  hook.setPlace({ recId: place.id, part: PART, rev: REV, name: "place.csv", tab: w.eval("csvTable")(PLACE_CSV), side: "TOP", unit: "mm" });
+  for (const id of ["#upLayPart", "#upLayRev", "#upLaySide"]) d.querySelector(id).value = "";
+  d.querySelector("#btnRegisterLayout").click();
+  const form = d.querySelector("#boxUploadLayoutForm");
+  assert.ok(await until(() => !d.querySelector("#recPickerModal").hidden && !d.querySelector("#boxPickPlace").hidden && !form.hidden), "應開啟座標檔分頁並展開登錄表單");
+  assert.equal(form.parentElement.id, "boxPickPlace", "登錄表單在看得到的座標檔分頁");
+  assert.equal(d.querySelector("#btnPickPlace").getAttribute("aria-selected"), "true", "座標檔分頁按鈕亮起");
+  assert.equal(d.querySelector("#btnShowLayoutForm").getAttribute("aria-expanded"), "true");
+  assert.deepEqual([d.querySelector("#upLayPart").value, d.querySelector("#upLayRev").value, d.querySelector("#upLaySide").value], [PART, REV, "TOP"]);
+  assert.ok(await until(() => d.querySelectorAll("#upLayList [data-del-layout]").length === 1), "應列出此料號已登錄的圖層");
+  // 料號規格分頁不顯示登錄表單；回到座標檔分頁恢復
+  d.querySelector("#btnPickSpecs").click();
+  assert.ok(await until(() => form.hidden), "料號規格分頁不顯示登錄表單");
+  d.querySelector("#btnPickPlace").click();
+  assert.ok(await until(() => !form.hidden && form.parentElement.id === "boxPickPlace"), "回到座標檔分頁應恢復");
+});
+
+test("登錄與目前回合同料號、版次、面別的板面圖檔：立即套用到目前回合；引用當時圖檔的回合不變", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { w, hook, d } = await page();
+  const run = hook.curRun(), proofLayout = run.info.layout;
+  assert.equal(proofLayout.source, "proof");
+  const submit = async (side, text, name) => {
+    d.querySelector("#upLayPart").value = PART; d.querySelector("#upLayRev").value = REV;
+    d.querySelector("#upLaySide").value = ""; d.querySelector("#upLayLayer").value = "";
+    Object.defineProperty(d.querySelector("#upLayFile"), "files", { value: [new w.File([text], name)], configurable: true });
+    d.querySelector("#upLayFile").dispatchEvent(new w.Event("change"));
+    assert.ok(await until(() => d.querySelector("#upLaySide").value === side && d.querySelector("#upLayLayer").value), "應依檔案預選");
+    d.querySelector("#upLayState").textContent = "";
+    d.querySelector("#btnSubmitLayout").click();
+    assert.ok(await until(() => /已存入板面圖檔/.test(d.querySelector("#upLayState").textContent)), d.querySelector("#upLayState").textContent);
+  };
+  // 目前回合（TOP）引用當時的錫膏層：再登錄同面別的銅箔層不改動它
+  await submit("TOP", PASTE.replace("Paste,Top", "Copper,L1,Top"), "top.gtl");
+  await tick(100);
+  assert.equal(hook.curRun().info.layout, proofLayout, "有 layoutProof 的回合維持當時的圖檔");
+  // 沒有引用圖檔的 BOT 回合：登錄 BOT 錫膏層後立即套用
+  run.info.src = { ...run.info.src, side: "BOT" }; delete run.info.layout;
+  await submit("BOT", PASTE.replace("Paste,Top", "Paste,Bot"), "bottom.gbp");
+  assert.ok(await until(() => hook.curRun().info.layout && hook.curRun().info.layout.source === "lookup"), "應依料號版次套用到目前回合");
+  assert.equal(Object.keys(hook.curRun().info.layout.matched).length, PARTS.length);
+});

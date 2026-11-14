@@ -1600,7 +1600,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
           <span class="note" id="placeState" role="status" aria-live="polite"></span>
         </div>
         <div id="placeChoices" role="group" aria-label="符合的座標檔"></div>
-        <div class="row" id="layoutRow" hidden><span class="lbl" style="align-self:center">板面圖檔</span><span class="note" id="layoutState" role="status" aria-live="polite"></span></div>
+        <div class="row" id="layoutRow" hidden><span class="lbl" style="align-self:center">Gerber 板面圖檔（選用）</span><button type="button" id="btnRegisterLayout">登錄板面圖檔</button><span class="note" id="layoutState" role="status" aria-live="polite"></span></div>
         <p class="note" id="placeChoiceNote" style="margin:0">位號與原檔指紋於套用時由伺服器確認。</p>
         <p class="note" id="vendorNote" hidden style="margin:0">立榮格式每列一焊墊（各板橫排），TOP／BOT 分別匯入；高度 % 依<b>鋼板厚度（必填）</b>換算 µm，並由座標檔對應位置與封裝群組。</p>
       </div>
@@ -11465,6 +11465,7 @@ $("#btnSelectPlace").onclick=()=>{if(typeof openRecPickerModal==="function")open
 /* 3D 示意網格警示：一鍵開啟座標檔庫，選取後套用至目前回合 */
 $("#btnGridApplyPlace").onclick=()=>{if(typeof openRecPickerModal==="function")openRecPickerModal("place",{forRunPlace:true});else $("#btnSelectPlace").onclick()};
 $("#btnRegisterPlace").onclick=()=>{if(typeof openRecPickerModal==="function")openRecPickerModal("place");RETURN_IMPORT_AFTER_PLACE=true;PLACE_FORM_OPEN=true;if($("#upPlacePart"))$("#upPlacePart").value=safeId($("#inPart").value);if($("#upPlaceRev"))$("#upPlaceRev").value=($("#inRev").value||"").trim();const side=$("#selSide").value;if((side==="TOP"||side==="BOT")&&$("#upPlaceSide"))$("#upPlaceSide").value=side;syncPlaceForms();$("#upPlaceSide")?.focus()};
+$("#btnRegisterLayout").onclick=()=>openLayoutRegister();
 $("#placeChoices").onclick=async e=>{const b=e.target.closest("[data-pick-place]");if(!b)return;const rec=(RecDB.cache||[]).find(x=>x.id===b.dataset.pickPlace);if(!rec){toast("找不到這份座標檔，請重新整理");return}try{await usePlaceRec(rec);syncPlaceToCurrentRun({notify:true});if(IMP&&IMP.raw)reconvert()}catch(er){toast(er.message)}};
 async function saveControlledPlacement(fl,part,rev,side,unit){
   if(RecDB.mode!=="cloud")throw new Error("請先登入並連線到雲端資料庫");
@@ -13107,6 +13108,8 @@ var RecDB={mode:"local",me:"本機",isAdmin:false,cache:null,ready:null,
   async auditDel(seq){await this.ready;if(this.mode!=="cloud")throw new Error("本機舊資料僅供查閱");return this.jfetch("/api/records?audit_seq="+encodeURIComponent(seq),{method:"DELETE"})},
   async audit(){await this.ready;if(this.mode==="cloud")return((await this.jfetch("/api/records?audit=1")).entries||[]).map(x=>deepClean(x));return(await LocalRec.audit()).map(x=>deepClean(x))}};
 RecDB.ready=meP.then(j=>{if(j&&j.user){RecDB.mode="cloud";RecDB.me=j.user}}).catch(()=>{});
+/* 登入狀態確定後才知道是否顯示板面圖檔列；頁面已關閉（document 不在）時略過 */
+RecDB.ready.then(()=>{if(window.document)refreshLayoutRow()});
 function recWhere(){return RecDB.mode==="cloud"?"雲端資料庫":"這台電腦的瀏覽器"}
 const fmtTime=t=>t?new Date(t).toLocaleString("zh-TW",{hour12:false}):"—";
 /* 下載原始檔（位元組不變）：claude.ai 用平台下載；一般瀏覽器直接下載 */
@@ -13195,12 +13198,14 @@ async function recFind(id,fresh){
 /* 從資料庫載入座標檔（不重新存檔） */
 /* ---------- 板面圖檔（Gerber）：登錄、匯入時查詢、套用到回合（docs/spec-gerber-layout-rfc.md） ---------- */
 /* var：placeShow() 可能在本段執行前呼叫 refreshLayoutRow，避免 let／const 暫時死區 */
-var LAYOUT_SEL=null,LAYOUT_SEL_GEN=0,UP_LAY_FILE=null,UP_LAY_PARSED=null,UP_LAY_BYTES=null,LAYOUT_PARSED=new Map();
+var PICKER_FOCUS_LAYOUT=false,LAYOUT_SEL=null,LAYOUT_SEL_GEN=0,UP_LAY_FILE=null,UP_LAY_PARSED=null,UP_LAY_BYTES=null,LAYOUT_PARSED=new Map();
 function layoutKey(part,rev,side){return`${part}\u0000${rev}\u0000${side}`}
 /* 匯入步驟 ①：所選受控座標（料號、版次）與量測面別已登錄的板面圖檔 */
 async function refreshLayoutRow(){const row=$("#layoutRow"),st=$("#layoutState");if(!row||!st)return;
-  const side=$("#selSide")?.value||"",want=PLACE&&RecDB.mode==="cloud"&&(side==="TOP"||side==="BOT")?{part:PLACE.part,rev:PLACE.rev,side}:null;
-  row.hidden=!want;if(!want){LAYOUT_SEL=null;return}
+  /* 頁面初始化時 placeShow() 可能早於 RecDB 指派（var 提升後仍是 undefined） */
+  const cloud=!!RecDB&&RecDB.mode==="cloud",side=$("#selSide")?.value||"",want=PLACE&&cloud&&(side==="TOP"||side==="BOT")?{part:PLACE.part,rev:PLACE.rev,side}:null;
+  row.hidden=!cloud;
+  if(!want){LAYOUT_SEL=null;LAYOUT_SEL_GEN=(LAYOUT_SEL_GEN||0)+1;st.textContent=cloud?"選取受控座標檔與面別後，顯示已登錄的圖層":"";return}
   const key=layoutKey(want.part,want.rev,want.side);
   if(LAYOUT_SEL&&LAYOUT_SEL.key===key){st.textContent=layoutRowText(LAYOUT_SEL.recs);return}
   const gen=LAYOUT_SEL_GEN=(LAYOUT_SEL_GEN||0)+1;st.textContent="正在查詢板面圖檔…";
@@ -13240,7 +13245,19 @@ function applyLayoutAperture(run,L){const file=L&&L.ap&&Object.keys(L.ap).length
   run.cfg=run.cfg||{};run.cfg.aperture=put(run.cfg.aperture);
   if(run===curRun()){S.aperture=put(S.aperture);recompute();return true}return false}
 
-/* 紀錄庫「座標檔庫」：登錄板面圖檔（管理者） */
+/* 剛登錄的板面圖檔與目前回合同料號、版次、面別時立即套用；回合已有當時引用的圖檔（layoutProof）則維持不變 */
+function syncLayoutToCurrentRun(rec){const run=curRun(),src=run&&runSrc(run);
+  if(!src||src.part!==rec.part||src.rev!==rec.rev||src.side!==rec.side)return;
+  const L=run.info&&run.info.layout;if(L&&L.source==="proof")return;
+  attachLayoutToRun(run,src)}
+/* 匯入步驟 ① 的「登錄板面圖檔」：開啟紀錄庫並帶入料號、版次、面別 */
+function openLayoutRegister(){if(typeof openRecPickerModal!=="function")return;
+  openRecPickerModal("place");PICKER_FOCUS_LAYOUT=true;LAYOUT_FORM_OPEN=true;syncPlaceForms();
+  const side=$("#selSide")?.value||"",put=(id,v)=>{const el=$(id);if(el&&v)el.value=v};
+  put("#upLayPart",PLACE?PLACE.part:safeId($("#inPart")?.value||""));put("#upLayRev",PLACE?PLACE.rev:($("#inRev")?.value||"").trim());
+  if(side==="TOP"||side==="BOT")put("#upLaySide",side);
+  renderLayoutList()}
+/* 紀錄庫：登錄板面圖檔（管理者） */
 function upLayInfoText(p){if(!p)return"";if(p.error)return"";
   const b=p.bbox,size=b?`範圍 ${(b[2]-b[0]).toFixed(1)} × ${(b[3]-b[1]).toFixed(1)} mm`:"";
   const n=p.padCount?`${p.padCount.toLocaleString()} 個焊墊`:`${p.draws.length.toLocaleString()} 條線段`;
@@ -13277,7 +13294,7 @@ function initLayoutForm(){const file=$("#upLayFile");if(!file)return;
       LAYOUT_PARSED.set(rec.id,UP_LAY_PARSED);
       state.innerHTML=`<span class="ok">✓ 已存入板面圖檔 <span class="mono">${esc(rec.part)}</span> ${esc(rec.rev)}（${esc(rec.side)}，${esc(LAYOUT_LAYER_NAME[layer])}）</span>`;
       UP_LAY_FILE=UP_LAY_PARSED=UP_LAY_BYTES=null;file.value="";$("#upLayFileName").textContent="";info.textContent="";$("#upLayLayer").value="";
-      LAYOUT_SEL=null;refreshLayoutRow();renderLayoutList()}
+      LAYOUT_SEL=null;refreshLayoutRow();renderLayoutList();syncLayoutToCurrentRun(rec)}
     catch(e){state.innerHTML=`<span class="err">上傳失敗：${esc(e.message)}</span>`}
     finally{btn.disabled=false}}}
 
@@ -15169,6 +15186,10 @@ async function renderRecPicker(force) {
       return n||on?`<button type="button" data-link="${mode}" aria-pressed="${on}">${label} ${n}</button>`:""}).join("")}
   const panelCount=(selectedPart?1:0)+(sideFilter?1:0)+(PICKER_TAB==="spi"&&qualityFilter!=="all"?1:0),fbtn=$("#btnRecFilters");
   if(fbtn){fbtn.textContent=panelCount?`篩選 (${panelCount})`:"篩選";fbtn.dataset.on=panelCount?"1":"0"}
+  /* 匯入步驟 ① 的「登錄板面圖檔」：座標檔分頁展開表單並聚焦第一個空欄位 */
+  if(PICKER_FOCUS_LAYOUT){PICKER_FOCUS_LAYOUT=false;const lay=$("#boxUploadLayoutForm");
+    if(lay&&!lay.hidden){if(lay.scrollIntoView)lay.scrollIntoView({block:"start"});(["#upLayPart","#upLayRev","#upLaySide"].map(i=>$(i)).find(el=>el&&!el.value)||$("#upLayFile"))?.focus()}
+    else $("#recPickerNotice").textContent="只有管理者可以登錄板面圖檔；請管理者登錄後再匯入量測"}
 
   if ($("#countPickSpi")) $("#countPickSpi").textContent = S1.length;
   if ($("#countPickPlace")) $("#countPickPlace").textContent = P1.length;
