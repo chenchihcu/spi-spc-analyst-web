@@ -12863,6 +12863,9 @@ function setSub(k,anchor){
   if(!sub)sub=ANCHOR_SUB[scrollA]||"paste-spec";
   S.sub=sub;
   $$("#p-data .subtab").forEach(b=>{const on=b.dataset.sub===sub;b.setAttribute("aria-selected",String(on));b.tabIndex=on?0:-1});
+  /* 窄螢幕子分頁列可橫向捲動：選取中的子分頁捲入可見範圍（只動子分頁列，不動整頁） */
+  const bar=$("#p-data .subtabs"),cur=bar&&bar.querySelector(".subtab[aria-selected=true]");
+  if(bar&&cur&&bar.scrollWidth>bar.clientWidth){const l=cur.offsetLeft-bar.offsetLeft,r=l+cur.offsetWidth;if(l<bar.scrollLeft)bar.scrollLeft=l-8;else if(r>bar.scrollLeft+bar.clientWidth)bar.scrollLeft=r-bar.clientWidth+8}
   $$("#p-data [data-sub]:not(.subtab)").forEach(el=>el.hidden=el.dataset.sub!==sub);
   if(S.tab==="data")renderTab();
   if(scrollA&&ANCHOR_SUB[scrollA]===sub)nextFrame(()=>scrollSettingsAnchor(scrollA));
