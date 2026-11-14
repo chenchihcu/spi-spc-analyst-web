@@ -276,7 +276,29 @@ test("SMT 產線過濾工具列、品質快照狀態與手機端卡片流", { sk
   assert.ok(cardsSpi.innerHTML.includes("LOT-OK"), "手機端卡片應渲染 LOT-OK");
   const cardLoadBtn = cardsSpi.querySelector("button[data-pact=load]");
   assert.ok(cardLoadBtn, "手機端卡片應有載入分析主按鈕");
-  assert.ok(cardLoadBtn.style.minHeight.includes("44px"), "手機端主按鈕高度應符合 Apple HIG (>= 44px)");
+  // 觸控高度由 .rec-card-actions 的 CSS 提供（不寫行內 min-height，以免蓋過觸控規則）
+  assert.ok(cardLoadBtn.closest(".rec-card-actions"), "手機端主按鈕應在 .rec-card-actions 內");
+  assert.match(fs.readFileSync(HTML, "utf8"), /\.rec-card-actions button \{\r?\n\s*min-height: 44px/, "手機卡片按鈕高度應符合 Apple HIG (>= 44px)");
+
+  // 7. 量測紀錄與座標檔共用同一套呈現（v10.29.2：原本各自手寫表格、卡片、配對列而漂移）
+  const heads = sel => [...d.querySelectorAll(`${sel} thead th`)].map(th => th.textContent.trim()).join("|");
+  assert.ok(d.querySelectorAll("#tblPickPlace tbody tr[data-row-id]").length, "座標檔表格應有資料列");
+  assert.equal(heads("#tblPickSpi"), heads("#tblPickPlace"), "量測與座標檔表格欄位應相同");
+  for (const box of ["#cardsPickSpi", "#cardsPickPlace"]) {
+    const card = d.querySelector(`${box} .rec-card`);
+    assert.ok(card, `${box} 應有卡片`);
+    assert.ok(card.querySelector(".rec-card-head .rec-badges .pill"), `${box} 卡片應以徽章顯示狀態`);
+    for (const act of ["ver", "dl", "edit-meta", "del"]) assert.ok(card.querySelector(`[data-pact="${act}"]`), `${box} 卡片應有 ${act} 動作`);
+    assert.ok([...card.querySelectorAll(".rec-card-actions button")].every(b => !b.getAttribute("style")), `${box} 卡片按鈕不應有行內樣式`);
+  }
+  const pairRows = [...d.querySelectorAll("#pairBoard .pair-row")];
+  const pairOf = kind => pairRows.find(row => w.SPI_TEST_HOOK.RecDB.cache.some(x => x.id === row.dataset.rowId && x.kind === kind));
+  for (const kind of ["spi", "place"]) {
+    const row = pairOf(kind);
+    assert.ok(row, `配對頁應有 ${kind} 列`);
+    assert.ok(row.querySelector(".pair-meta .pill"), `配對頁 ${kind} 列應顯示狀態徽章`);
+    assert.ok(row.querySelector('.pair-more [data-pact="dl"]') && row.querySelector('.pair-more [data-pact="ver"]'), `配對頁 ${kind} 列的「更多」應有對應證明與下載原檔`);
+  }
 
   assert.deepEqual(errs, []);
 });
