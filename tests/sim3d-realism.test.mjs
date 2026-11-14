@@ -523,4 +523,3 @@ test("3D 零件模擬三態切換：#seg3dCompMode 按鈕切換半透明/實心/
   assert.equal(S.comp3dMode, "semi");
   assert.equal(btns[0].getAttribute("aria-pressed"), "true");
 });
-
