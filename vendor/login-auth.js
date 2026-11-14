@@ -52,6 +52,12 @@
         });
         const res = await resp.json().catch(() => ({}));
         if (resp.ok && res.ok) {
+          // 只記帳號（正規化 email），永不儲存密碼或 d
+          const remember = form.querySelector("#remember");
+          try {
+            if (remember && remember.checked) localStorage.setItem("spi-last-user", user.toLowerCase());
+            else if (remember) localStorage.removeItem("spi-last-user");
+          } catch { /* 無痕或封鎖站台資料時略過 */ }
           location.replace(res.next || next);
           return;
         }
