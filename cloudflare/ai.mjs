@@ -7,6 +7,7 @@ import {
   lookupModelPricing,
   sendsReasoningEffort,
   SMALL_MODEL_RE,
+  AI_CHECK_MODELS_BTN,
 } from '../lib/ai-providers.mjs';
 
 // 預設模型為 OpenAI gpt-6.1-terra（可用環境變數 AI_MODEL 或請求標頭 X-AI-Model 覆寫），推理強度預設為 high。
@@ -393,16 +394,17 @@ export function formatTimeoutDiagnostics(provLabel, diag) {
 }
 
 export function formatUpstreamFailureMessage(provLabel, status, extracted, didRetry, diag) {
+  // 依型錄能力欄位（consoleName、free）組訊息，不比對服務商名稱；三個服務商共用同一套文字
+  const prov = Object.values(PROVIDERS).find((p) => p.label === provLabel);
   const base = extracted.message
     ? `${status} ${extracted.message}`
     : `${provLabel} 回應 HTTP ${status}`;
   if (extracted.hasLimitZero || /limit:\s*0/i.test(extracted.message)) {
-    const where = provLabel === 'Antigravity' ? 'Google AI Studio' : `${provLabel} 主控台`;
+    const where = prov?.consoleName || `${provLabel} 主控台`;
     return `${base}。此 API 金鑰對該模型額度為 0，請至 ${where} 確認計費／配額，或改選其他模型／服務商。`;
   }
   if (status === 404 && (extracted.code === 'model_not_found' || /does not exist|is not found/i.test(extracted.message))) {
-    const btn = PROVIDERS.nvidia && provLabel === PROVIDERS.nvidia.label ? '更新模型清單' : '檢查可用模型';
-    return `${base}。此金鑰無法使用該模型，請在 AI 設定按「${btn}」後改選。`;
+    return `${base}。此金鑰無法使用該模型，請在 AI 設定按「${AI_CHECK_MODELS_BTN}」後改選。`;
   }
   if (status === 404 && /^Route \S+ not found/i.test(extracted.message)) {
     return `${base}。此端點沒有 Chat Completions 路由，請確認自訂 API 端點網址。`;
@@ -411,7 +413,7 @@ export function formatUpstreamFailureMessage(provLabel, status, extracted, didRe
     const tail = didRetry ? `已自動改用推理強度 ${TIMEOUT_FALLBACK_EFFORT} 重試仍逾時` : '上游超過 100 秒未開始回應';
     return `${base}。${tail}${formatTimeoutDiagnostics(provLabel, diag)}；請在 AI 設定改選較快的模型，或稍後再試。`;
   }
-  if (status === 429 && PROVIDERS.nvidia?.free && provLabel === PROVIDERS.nvidia.label) {
+  if (status === 429 && prov?.free) {
     return `${base}。免費帳號速率或額度已達上限，請稍後再試或改用其他服務商。`;
   }
   if (didRetry && (status === 429 || status === 503)) {
@@ -685,7 +687,7 @@ async function fetchWithModelFallback(targetUrl, headers, baseBody, candidates, 
       return {
         res: null,
         tried: candidates.filter((m) => outcomes.has(m)).map((m) => ({ model: m, outcome: outcomes.get(m) })),
-        error: `${provLabel} 候選模型都沒有產出分析內容：${list}；請稍後再試，或在 AI 設定按「更新模型清單」後改選其他模型。`,
+        error: `${provLabel} 候選模型都沒有產出分析內容：${list}；請稍後再試，或在 AI 設定按「${AI_CHECK_MODELS_BTN}」後改選其他模型。`,
       };
     };
     const queue = candidates.slice(1).map((m, j) => [m, j + 1]);

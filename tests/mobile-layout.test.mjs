@@ -401,7 +401,8 @@ test('9. 版面回歸：code review（v10.3.3）找到的問題', () => {
   assert.match(htmlSource, /availableModels=\{sig,models:j\.models\}/, '可用模型清單需綁定查詢簽章');
   assert.match(htmlSource, /av\.sig===aiModelSig\(act,pCfg\)\?av\.models:null/, '金鑰或端點變更後不可再套用舊清單');
   assert.match(htmlSource, /const cur=snapshotAiInputsToCfg\(loadAiCfg\(\)\),curP=cur\.providers\[act\];\r?\n\s*if\(cur\.activeProvider!==act\|\|aiModelSig\(act,curP\)!==sig\)/, '回應時需比對最新設定');
-  for (const id of ['aiProviderSeg', 'inAiKey', 'inAiKeyAntigravity', 'selAiModel', 'btnAiCheckModels', 'inAiCustomModel', 'selAiEffort', 'inAiCustomEndpoint']) {
+  // 各服務商金鑰卡（#inAiKey 等）由 AI_PROVIDERS_META 產生，存在性見 tests/ai-nvidia-ui.test.js
+  for (const id of ['aiProviderSeg', 'aiKeyCards', 'selAiModel', 'btnAiCheckModels', 'inAiCustomModel', 'selAiEffort', 'inAiCustomEndpoint']) {
     assert.match(htmlSource, new RegExp('id="' + id + '"'), 'AI 設定介面需有 #' + id);
   }
 });
