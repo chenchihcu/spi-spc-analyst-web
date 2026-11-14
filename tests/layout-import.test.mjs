@@ -113,3 +113,60 @@ test("銅箔層排除導通孔；錫膏層優先，銅箔層成為背景", () =>
   assert.equal(both.src, "paste");
   assert.equal(both.geom.bg.length, copper.pads.length);
 });
+
+/* ---------- v10.31.0：鋼板檔開孔進入 aperture() ---------- */
+/** 錫膏層：R 開孔可調尺寸；U2 改成尺寸不一（模擬含散熱墊的 QFN） */
+function pasteWithOpenings(rw, rh) {
+  let g = `%FSLAX46Y46*%\n%MOMM*%\n%TF.FileFunction,Paste,Top*%\n%ADD10R,${rw}X${rh}*%\n%ADD11R,1.5X0.6*%\n%ADD12R,1.2X0.6*%\n`;
+  for (const p of PARTS) FOOT[kind(p.ref)].forEach(([dx, dy], k) => {
+    const ap = kind(p.ref) === "R" ? 10 : p.ref === "U2" && k === 0 ? 12 : 11;
+    g += `D${ap}*\n${at(p.x + dx, p.y + dy)}D03*\n`;
+  });
+  return g + "M02*\n";
+}
+const keyOf = ref => JSON.stringify(["", "comp", ref]);
+const withFile = (rows, file) => baseState(core, { rows, aperture: { groups: {}, file } });
+
+test("鋼板檔開孔：尺寸一致的零件取實際開孔，尺寸不一的零件列出不套用", () => {
+  const rows = importRows();
+  const info = core.buildLayoutInfo(rows, { paste: GERBER.parseGerber(pasteWithOpenings(0.6, 0.5)) }, [], "lookup");
+  assert.deepEqual([...info.ap[keyOf("R1")]], [0.6, 0.5, "r", 0.3, 2.2]);
+  assert.deepEqual([...info.ap[keyOf("U4")]], [1.5, 0.6, "r", 0.9, 4.2]);
+  assert.equal(info.ap[keyOf("U2")], undefined, "U2 開孔尺寸不一，不套用");
+  assert.deepEqual([...info.apMixed], [keyOf("U2")]);
+  const st = withFile(rows, info.ap), r1 = rows.find(r => r.comp === "R1"), u2 = rows.find(r => r.comp === "U2");
+  const a = core.aperture(r1, st);
+  assert.deepEqual([a.L, a.W, a.shape, a.src], [0.6, 0.5, "rect", "鋼板檔"]);
+  assert.ok(Math.abs(core.areaRatio(r1, st) - 0.3 / (2.2 * 0.12)) < 1e-9);
+  assert.ok(Math.abs(core.maxThkForAR(r1, st) - 0.3 / (2.2 * 0.66) * 1000) < 1e-9);
+  // 沒有鋼板檔資料的零件與改版前逐位元相同
+  const plain = baseState(core, { rows });
+  assert.deepEqual(core.aperture(u2, st), core.aperture(u2, plain));
+  assert.equal(core.areaRatio(u2, st), core.areaRatio(u2, plain));
+});
+
+test("鋼板檔開孔觸發面積比 DFM 判定；沒有鋼板檔時沿用 0.7 mm 估算不判定", () => {
+  const rows = importRows();
+  const info = core.buildLayoutInfo(rows, { paste: GERBER.parseGerber(pasteWithOpenings(0.2, 0.2)) }, [], "lookup");
+  const dfm = F => F.filter(x => x.sig && x.sig.t === "dfm").map(x => x.sig.g || x.group);
+  const before = core.detectIssues(baseState(core, { rows }));
+  assert.equal(dfm(before).length, 0, "0.7 mm 估算幾何不得產生 DFM 卡");
+  const after = core.detectIssues(withFile(rows, info.ap));
+  assert.ok(dfm(after).some(g => String(g).startsWith("R")), `應有 R 群組面積比不足：${JSON.stringify(dfm(after))}`);
+  const tbl = core.dfmTable(withFile(rows, info.ap)).find(x => String(x.g).startsWith("R"));
+  assert.ok(tbl && tbl.ar < 0.66, JSON.stringify(tbl));
+});
+
+test("圓形與非矩形開孔：面積比用實際面積與周長", () => {
+  const rows = importRows();
+  let g = `%FSLAX46Y46*%\n%MOMM*%\n%ADD10C,0.5*%\n%ADD11O,1.5X0.6*%\n`;
+  for (const p of PARTS) FOOT[kind(p.ref)].forEach(([dx, dy]) => { g += `D${kind(p.ref) === "R" ? 10 : 11}*\n${at(p.x + dx, p.y + dy)}D03*\n`; });
+  const info = core.buildLayoutInfo(rows, { paste: GERBER.parseGerber(g + "M02*\n") }, [], "lookup");
+  const st = withFile(rows, info.ap), r1 = rows.find(r => r.comp === "R1"), u2 = rows.find(r => r.comp === "U2");
+  const a = core.aperture(r1, st);
+  assert.equal(a.shape, "round");
+  assert.ok(Math.abs(core.areaRatio(r1, st) - 0.5 / (4 * 0.12)) < 1e-9, "圓形 AR = d ÷ 4t");
+  const o = core.aperture(u2, st), area = 1.5 * 0.6 - (4 - Math.PI) * 0.09, perim = 2 * 0.9 + Math.PI * 0.6;
+  assert.ok(Math.abs(core.areaRatio(u2, st) - area / (perim * 0.12)) < 1e-4, "長圓形以實際面積與周長（開孔值存到 5 位小數）");
+  assert.equal(o.src, "鋼板檔");
+});
