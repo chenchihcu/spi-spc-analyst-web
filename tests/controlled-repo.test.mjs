@@ -358,3 +358,78 @@ test('稽核紀錄刪除：資料庫寫入失敗時回 503 且原列仍在', asy
   assert.equal((await failing.deleteAuditEntry(seq, 'admin@example.com')).status, 503);
   assert.equal((await repo.listAuditLog()).some(e => e.seq === seq), true);
 });
+
+test('管理者重新命名（records.name）：支援四類紀錄、驗證合法字元與保留指紋／稽核', async () => {
+  const { db, r2, env, cookie, upload } = apiHarness();
+  const repo = new Repo(db, r2);
+  const pl = (await (await upload('admin@example.com', { kind: 'place', part: 'P', rev: 'V5', side: 'TOP', unit: 'mm', name: 'orig-place.csv' },
+    'RefDes,X,Y,Layer\nU1,1,2,L1-TOP\n')).json()).record;
+  const sp = (await (await upload('user@example.com', { kind: 'spi', part: 'P', rev: 'V5', side: 'TOP', placeId: pl.id, workOrder: 'WO-R', name: 'orig-spi.csv' },
+    'Component ID,PAD ID,Height(%)1\nU1_1,1,88\n')).json()).record;
+  const specId = id(80);
+  await repo.createRecord({ id: specId, kind: 'spec', part: 'P', name: 'P-v1.json', sha256: 'sha-spec', user: 'admin@example.com', bytes: 12, created: 80 }, new Uint8Array([1, 2]));
+
+  const patch = async (user, body) => handleRequest(new Request('https://spi.test/api/records', {
+    method: 'PATCH',
+    headers: { 'content-type': 'application/json', cookie: await cookie(user), origin: 'https://spi.test' },
+    body: JSON.stringify(body),
+  }), env);
+
+  assert.equal((await patch('user@example.com', { id: sp.id, action: 'update_meta', name: 'nope.csv' })).status, 403);
+  assert.equal((await patch('admin@example.com', { id: sp.id, action: 'update_meta', name: '   ' })).status, 400);
+  assert.equal((await patch('admin@example.com', { id: sp.id, action: 'update_meta', name: 'bad/name.csv' })).status, 400);
+  assert.equal((await patch('admin@example.com', { id: sp.id, action: 'update_meta', name: 'x'.repeat(161) })).status, 400);
+  assert.equal((await patch('admin@example.com', { id: specId, action: 'update_meta', note: 'blocked' })).status, 400);
+
+  const r1 = await patch('admin@example.com', { id: pl.id, action: 'update_meta', name: 'new-place.csv' });
+  assert.equal(r1.status, 200);
+  assert.equal((await repo.getRecord(pl.id)).name, 'new-place.csv');
+  assert.equal((await repo.getRecord(pl.id)).sha256, pl.sha256);
+
+  const r2Res = await patch('admin@example.com', { id: specId, action: 'update_meta', name: 'P-spec-renamed.json' });
+  assert.equal(r2Res.status, 200);
+  assert.equal((await repo.getRecord(specId)).name, 'P-spec-renamed.json');
+
+  const r3 = await patch('admin@example.com', { id: sp.id, action: 'update_meta', name: 'renamed-spi.csv' });
+  assert.equal(r3.status, 200);
+  assert.equal((await repo.getRecord(sp.id)).name, 'renamed-spi.csv');
+  assert.equal((await repo.getRecord(sp.id)).sha256, sp.sha256);
+
+  const audits = await repo.listAuditLog();
+  const metaLogs = audits.filter(e => e.action === 'update_meta');
+  assert.equal(metaLogs.length, 3);
+  assert.deepEqual(metaLogs[0].changes.name, { from: 'orig-spi.csv', to: 'renamed-spi.csv' });
+});
+
+test('管理者批次刪除（POST /api/records/batch-delete）：權限、數量上限、同批先刪量測再刪座標與明細回報', async () => {
+  const { db, r2, env, cookie, upload } = apiHarness();
+  const repo = new Repo(db, r2);
+  const pl = (await (await upload('admin@example.com', { kind: 'place', part: 'P', rev: 'V5', side: 'TOP', unit: 'mm', name: 'p.csv' },
+    'RefDes,X,Y,Layer\nU1,1,2,L1-TOP\n')).json()).record;
+  const sp = (await (await upload('user@example.com', { kind: 'spi', part: 'P', rev: 'V5', side: 'TOP', placeId: pl.id, workOrder: 'WO-B', name: 's.csv' },
+    'Component ID,PAD ID,Height(%)1\nU1_1,1,88\n')).json()).record;
+
+  const batchDel = async (user, body) => handleRequest(new Request('https://spi.test/api/records/batch-delete', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', cookie: await cookie(user), origin: 'https://spi.test' },
+    body: JSON.stringify(body),
+  }), env);
+
+  assert.equal((await batchDel('user@example.com', { ids: [sp.id] })).status, 403);
+  assert.equal((await batchDel('admin@example.com', { ids: [] })).status, 400);
+  assert.equal((await batchDel('admin@example.com', { ids: Array.from({ length: 51 }, (_, i) => id(i + 1)) })).status, 400);
+
+  // place 排在 spi 前面，確認後端自動先刪 spi 再刪 place，且缺漏 ID 會進 failed
+  const missingId = id(999);
+  const res = await batchDel('admin@example.com', { ids: [pl.id, sp.id, missingId, sp.id] });
+  assert.equal(res.status, 200);
+  const data = await res.json();
+  assert.deepEqual(data.deleted, [sp.id, pl.id]);
+  assert.equal(data.failed.length, 1);
+  assert.equal(data.failed[0].id, missingId);
+  assert.equal(await repo.getRecord(sp.id), null);
+  assert.equal(await repo.getRecord(pl.id), null);
+  assert.equal(r2.objects.has(`records/${sp.id}`), false);
+  assert.equal(r2.objects.has(`records/${pl.id}`), false);
+  assert.equal((await repo.listAuditLog()).filter(e => e.action === 'delete').length, 2);
+});

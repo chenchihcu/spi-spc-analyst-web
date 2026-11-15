@@ -34,12 +34,12 @@ test("記錄庫原始碼：單一捲動區，分頁內不設高度上限，沒�
   assert.match(SRC, /\.rec-scroll\{[^}]*flex:1 1 auto;[^}]*min-height:0;[^}]*overflow-y:auto/, ".rec-scroll 必須吃滿剩餘高度並自行捲動");
   for (const cls of ["rec-head", "rec-toolbar", "rec-foot"]) assert.match(SRC, new RegExp(`\\.${cls}\\{[^}]*flex:none`), `.${cls} 不可被壓縮或捲動`);
   assert.doesNotMatch(SRC, /rec-desktop-view|rec-mobile-view|id="pairBoard"|id="cardsPick/, "桌面與手機共用同一份清單標記");
-  // 清單一定排在捲動區的第一個分頁；登錄表單不在量測分頁
+  // 清單一定排在捲動區的第一個分頁；登錄表單移入專用對話框
   const spiPane = html.slice(html.indexOf('id="boxPickSpi"'), html.indexOf('id="boxPickPlace"'));
   assert.doesNotMatch(spiPane, /<form|class="field"|id="boxUpload/, "量測分頁只放清單，不放表單");
-  assert.match(html, /id="boxUploadPlaceForm"[^>]*\shidden/, "座標登錄表單預設收合");
-  assert.match(html, /id="boxUploadLayoutForm"[^>]*\shidden/, "板面圖檔登錄表單預設收合");
-  assert.doesNotMatch(html, /id="btnPick(Spi|Place|Specs)"[^>]*\shidden/, "分頁按鈕不可隱藏（入口會開到這些分頁）");
+  assert.match(SRC, /id="uploadPlaceModal"[^>]*\shidden/, "座標登錄對話框預設關閉");
+  assert.match(SRC, /id="uploadLayoutModal"[^>]*\shidden/, "板面圖檔登錄對話框預設關閉");
+  assert.doesNotMatch(html, /id="btnPick(Spi|Place|Layout|Specs|Import)"[^>]*\shidden/, "五大功能分頁按鈕皆不可隱藏");
 });
 
 test("記錄庫行為：預設是量測清單，新到舊，每列一顆主鈕，例外用帶筆數的篩選", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
@@ -90,26 +90,122 @@ test("記錄庫行為：預設是量測清單，新到舊，每列一顆主鈕�
   assert.match($('#recQuickFilters [data-link="unlinked"]').textContent, new RegExp(`尚未搭配座標 ${unlinked}$`));
   assert.equal($('#recQuickFilters [data-link="missing"]'), null, "筆數為 0 的篩選不顯示");
 
-  // 座標檔分頁：登錄表單收合，按下才展開；量測分頁的對應篩選不帶過來
+  // 座標檔分頁：登錄改為獨立對話框（不常駐清單上方），按下才開啟；量測分頁的對應篩選不帶過來
   $('#recQuickFilters [data-link="unlinked"]').click();
   assert.ok(await until(() => d.querySelectorAll("#tblPickSpi tr[data-row-id]").length === 1));
   $("#btnPickPlace").click();
   assert.ok(await until(() => d.querySelectorAll("#tblPickPlace tr[data-row-id]").length === 2), "換到座標檔分頁不沿用量測的對應篩選");
   assert.equal($("#recPlaceAdminBar").hidden, false, "管理者看得到登錄按鈕");
-  assert.equal($("#boxUploadPlaceForm").hidden, true, "登錄表單預設收合");
+  assert.equal($("#uploadPlaceModal").hidden, true, "座標登錄對話框預設關閉");
   $("#btnShowPlaceForm").click();
-  assert.equal($("#boxUploadPlaceForm").hidden, false);
-  assert.equal($("#btnShowPlaceForm").getAttribute("aria-expanded"), "true");
+  assert.equal($("#uploadPlaceModal").hidden, false);
+  $("#uploadPlaceClose").click();
   assert.match($('#recQuickFilters [data-link="unused"]').textContent, /無量測引用 1$/);
 
-  // 「尚未搭配」量測的選單可直接帶料號去登錄座標檔
+  // 「尚未搭配」量測的選單可直接帶料號開啟座標登錄對話框
   $("#btnPickSpi").click();
   assert.ok(await until(() => d.querySelectorAll("#tblPickSpi tr[data-row-id]").length === 2));
-  assert.equal($("#boxUploadPlaceForm").hidden, true, "離開座標檔分頁後表單不出現在量測清單上方");
   const up = [...d.querySelectorAll("#tblPickSpi tr[data-row-id]")].find(tr => /LOT-OLD/.test(tr.textContent)).querySelector(".rec-menu [data-pair-upload]");
   assert.ok(up, "尚未搭配的量測可從選單登錄座標檔");
   up.click();
-  assert.ok(await until(() => !$("#boxPickPlace").hidden && !$("#boxUploadPlaceForm").hidden && $("#upPlacePart").value === "LAY-1"), "切到座標檔分頁、展開表單並帶入料號");
+  assert.ok(await until(() => !$("#boxPickPlace").hidden && !$("#uploadPlaceModal").hidden && $("#upPlacePart").value === "LAY-1"), "切到座標檔分頁、開啟座標登錄對話框並帶入料號");
+  $("#uploadPlaceClose").click();
+
+  assert.deepEqual(errs, []);
+  cloud.close();
+});
+
+test("記錄庫升級契約：五大分頁、檔名重新命名、批次刪除預檢與語意對話框（左確認右取消）", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const cloud = await createCloudHarness();
+  const place = await cloud.upload({ kind: "place", part: "UX-1", rev: "V1", side: "TOP", unit: "mm", name: "ux1.csv" }, PLACE_CSV);
+  const placeUnused = await cloud.upload({ kind: "place", part: "UX-2", rev: "V1", side: "TOP", unit: "mm", name: "ux2.csv" }, PLACE_CSV + "C2,1,2,TOP\n");
+  const spi1 = await cloud.upload({ kind: "spi", part: "UX-1", rev: "V1", side: "TOP", placeId: place.id, workOrder: "WO-A", lot: "LOT-A", name: "a.csv", vendor: "lirong" }, WIDE);
+  const gbr = "%FSLAX36Y36*%\n%MOMM*%\n%TF.FileFunction,Paste,Top*%\n%ADD10C,0.5*%\nD10*\nX1000000Y1000000D03*\nM02*\n";
+  const layout = await cloud.upload({ kind: "layout", part: "UX-1", rev: "V1", side: "TOP", layer: "paste", name: "top.gtp" }, gbr);
+
+  const errs = [];
+  const dom = new JSDOM(SRC.replace(/<script src=[^>]+><\/script>/g, ""), { runScripts: "dangerously", url: "https://example.test/", beforeParse(w) {
+    w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === "measureText" ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
+    Object.defineProperty(w.HTMLElement.prototype, "offsetParent", { get() { let e = this; while (e) { if (e.hidden) return null; e = e.parentElement; } return w.document.body; } });
+    w.Element.prototype.scrollIntoView = () => {}; w.matchMedia = () => ({ matches: false, addEventListener() {} }); w.ResizeObserver = class { observe() {} }; w.scrollTo = () => {}; w.scrollBy = () => {};
+    w.Chart = class { constructor() {} destroy() {} static register() {} };
+    Object.assign(w, { Response, DecompressionStream });
+    withIdb(w);
+    installBrowserCloud(w, cloud);
+    w.SPI_TEST_HOOK = { bootSample: true };
+    w.addEventListener("error", e => errs.push(e.message));
+  } });
+  const w = dom.window, d = w.document, $ = s => d.querySelector(s);
+  await w.SPI_TEST_HOOK.RecDB.ready;
+
+  // 1. 驗證所有新對話框頁尾按鈕順序為左確認、右取消
+  for (const [okId, cancelId] of [
+    ["#btnSubmitPlace", "#uploadPlaceCancel"],
+    ["#btnSubmitLayout", "#uploadLayoutCancel"],
+    ["#recRenameSave", "#recRenameCancel"],
+    ["#recConfirmOk", "#recConfirmCancel"],
+    ["#recNewBatchSave", "#recNewBatchCancel"],
+    ["#recCorrectSave", "#recCorrectCancel"],
+    ["#recBatchConfirmDel", "#recBatchConfirmCancel"],
+  ]) {
+    const okBtn = $(okId), cancelBtn = $(cancelId);
+    assert.ok(okBtn && cancelBtn, `${okId} 與 ${cancelId} 應存在`);
+    assert.ok(okBtn.compareDocumentPosition(cancelBtn) & 4, `${okId}（確認）應位於 ${cancelId}（取消）左側`);
+  }
+
+  // 2. 開啟記錄庫並切換至板面圖檔與匯入分頁
+  $("#btnOpenRecModal").click();
+  assert.ok(await until(() => d.querySelectorAll("#tblPickSpi tr[data-row-id]").length === 1), "量測分頁應顯示 1 筆");
+  assert.equal($("#countPickLayout").textContent, "1", "板面圖檔分頁應顯示 1 筆");
+
+  // 點擊 .rec-main 開啟檔案詳情檢視面板
+  $("#tblPickSpi tr[data-row-id] .rec-main").click();
+  assert.ok(await until(() => !$("#recDetailModal").hidden), "點擊主資訊欄應開啟檔案詳情檢視");
+  assert.match($("#recDetailBody").textContent, new RegExp(spi1.sha256), "詳情應顯示完整 64 碼 SHA-256");
+  $("#recDetailClose").click();
+
+  // 板面圖檔分頁與匯入分頁切換
+  $("#btnPickLayout").click();
+  assert.ok(await until(() => !$("#boxPickLayout").hidden && d.querySelectorAll("#tblPickLayout tr[data-row-id]").length === 1), "板面圖檔分頁應列出 Gerber");
+  assert.equal(layout.id, $("#tblPickLayout tr[data-row-id]").dataset.rowId);
+
+  $("#btnPickImport").click();
+  assert.ok(await until(() => !$("#boxPickImport").hidden && $("#recToolbarSearchGroup").hidden), "切到匯入分頁時隱藏列表搜尋列");
+  $("#btnPickPlace").click();
+  assert.ok(await until(() => !$("#boxPickPlace").hidden && d.querySelectorAll("#tblPickPlace tr[data-row-id]").length === 2), "切回座標分頁應列出 2 筆");
+
+  // 3. 管理者快速重新命名（保留原始 SHA-256）
+  const renameBtn = $(`#tblPickPlace tr[data-row-id="${placeUnused.id}"] [data-pact="rename"]`);
+  assert.ok(renameBtn, "管理者應有重新命名動作");
+  renameBtn.click();
+  assert.ok(await until(() => !$("#recRenameModal").hidden), "應開啟重新命名對話框");
+  $("#recRenameInput").value = "ux2_renamed.txt";
+  $("#recRenameInput").dispatchEvent(new w.Event("input"));
+  assert.equal($("#recRenameExtWarn").hidden, false, "更改副檔名應顯示提醒");
+  $("#recRenameSave").click();
+  assert.ok(await until(() => $("#recRenameModal").hidden && $("#tblPickPlace").textContent.includes("ux2_renamed.txt")), "應完成重命名並刷新清單");
+
+  // 4. 管理者批次選取＋受引用安全預檢略過＋批次刪除
+  $("#btnRecBatchSelectAll").click();
+  assert.equal($("#recBatchBar").hidden, false, "勾選後應顯示批次動作列");
+  assert.equal($("#recBatchDelNum").textContent, "2", "應選取 2 筆座標檔");
+  $("#btnRecBatchDelete").click();
+  assert.ok(await until(() => !$("#recBatchConfirmModal").hidden), "應開啟批次刪除安全檢查對話框");
+  assert.equal($("#recBatchWarnBox").hidden, false, "被量測引用的座標應觸發警告");
+  assert.equal($("#recBatchExcludeRisk").hidden, false, "應顯示一鍵略過受引用項目按鈕");
+  $("#recBatchExcludeRisk").click();
+  assert.match($("#recBatchConfirmDel").textContent, /\(1\)/, "略過受引用項後應剩 1 筆可刪");
+  $("#recBatchConfirmDel").click();
+  assert.ok(await until(() => $("#recBatchConfirmModal").hidden && d.querySelectorAll("#tblPickPlace tr[data-row-id]").length === 1), "批次刪除未引用座標後應剩 1 筆受引用座標");
+  assert.equal($("#recBatchBar").hidden, true, "刪除完成後批次列自動隱藏");
+
+  // 5. 封存確認對話框（不使用 window.confirm）
+  w.confirm = () => { throw new Error("檔案管理操作不應再呼叫 window.confirm"); };
+  w.prompt = () => { throw new Error("檔案管理操作不應再呼叫 window.prompt"); };
+  $(`#tblPickPlace tr[data-row-id="${place.id}"] [data-pact="archive-place"]`).click();
+  assert.ok(await until(() => !$("#recConfirmModal").hidden), "封存應開啟語意確認對話框");
+  $("#recConfirmOk").click();
+  assert.ok(await until(() => $("#recConfirmModal").hidden && /已封存/.test($("#tblPickPlace").textContent)), "封存應成功更新清單狀態");
 
   assert.deepEqual(errs, []);
   cloud.close();

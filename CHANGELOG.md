@@ -2,6 +2,13 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.37.0 — 2026-11-15（量測記錄與座標檔資料庫介面重構與檔案管理強化）
+
+- **五大頁籤整合與匯入收斂**：移除 `#p-data` 內的「匯入資料」子分頁（`#p-data` 預設開啟「鋼板規格設定」），將完整 5 步驟匯入流程與「板面圖檔（Gerber）」提升為 `#recPickerModal` 一級頁籤（`量測記錄` / `座標檔` / `板面圖檔` / `規格與稽核` / `匯入資料`），支援全視窗檔案拖放載入與匯入完成後留頁狀態橫幅（`#impDoneBanner`）。
+- **獨立上傳與語意化操作對話框**：將座標檔與 Gerber 板面圖檔登錄表單抽離為獨立對話框（`#uploadPlaceModal`、`#uploadLayoutModal`，支援三層自動配對），並以左確認／右取消語意對話框（`#recRenameModal`、`#recConfirmModal`、`#recNewBatchModal`、`#recCorrectModal`、`#recBatchConfirmModal`）全面取代資料庫流程中的瀏覽器原生 `confirm`／`prompt`。
+- **管理者常駐批次作業、重新命名與詳情檢視**：擴充後端 `POST /api/records/batch-delete`（單次上限 50 筆）與四類紀錄顯示檔名 `records.name` 重新命名（保留 `spec` 內容不可變與 `update_meta` 稽核）；前端新增 `44×44px` 常駐核取方塊、批次下載／相依安全預檢刪除列、`#recDetailModal` 詳情檢視（含 SHA-256 複製）及行動版底部動作表 `#recActionSheet`。
+- **局部作用域主題與無障礙規範**：`#recPickerModal` 與附屬對話框限定套用 Engineering Blue（`#2563EB`）＋ Amber（`#D97706`）亮／暗雙模式配色與篩選抽屜／排序／依料號分組工具列，通過字級、雙字重（400／700）、`data-layout` 斷點與 a11y 掃描驗證。
+
 ## v10.36.2 — 2026-11-15（匯出狀態與發布掃描診斷）
 
 - 批次匯出逐項記錄失敗，完成訊息列出成功數、失敗數與失敗項目；未知匯出類型明確視為失敗，避免誤報全數完成。

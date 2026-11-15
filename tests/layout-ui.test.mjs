@@ -127,14 +127,14 @@ test("匯入步驟 ①：選受控座標與面別後顯示已登錄圖層；新�
   assert.ok(await until(() => d.querySelector("#layoutState").textContent === "未登錄板面圖檔"), "BOT 面沒有登錄");
 });
 
-test("紀錄庫登錄表單：管理者可見；解析並預選圖層與面別後存入，清單可刪除", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+test("紀錄庫登錄表單：管理者可見；解析並預選圖層與面別後存入，清單與板面圖檔分頁皆可刪除", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const { w, hook, d } = await page();
   d.querySelector("#btnOpenRecModal").click();
-  d.querySelector("#btnPickPlace").click();
-  assert.ok(await until(() => !d.querySelector("#boxPickPlace").hidden && !d.querySelector("#recPlaceAdminBar").hidden), "管理者應看到登錄按鈕");
-  assert.equal(d.querySelector("#boxUploadLayoutForm").hidden, true, "登錄表單預設收合，不佔清單空間");
+  d.querySelector("#btnPickLayout").click();
+  assert.ok(await until(() => !d.querySelector("#boxPickLayout").hidden && !d.querySelector("#recLayoutAdminBar").hidden), "管理者應看到板面圖檔登錄按鈕");
+  assert.equal(d.querySelector("#uploadLayoutModal").hidden, true, "板面圖檔登錄對話框預設關閉，不佔清單空間");
   d.querySelector("#btnShowLayoutForm").click();
-  assert.equal(d.querySelector("#boxUploadLayoutForm").hidden, false, "按下後展開登錄表單");
+  assert.equal(d.querySelector("#uploadLayoutModal").hidden, false, "按下後開啟板面圖檔登錄對話框");
   d.querySelector("#upLayPart").value = PART;
   d.querySelector("#upLayRev").value = REV;
   const bot = PASTE.replace("Paste,Top", "Paste,Bot");
@@ -146,22 +146,24 @@ test("紀錄庫登錄表單：管理者可見；解析並預選圖層與面別�
   d.querySelector("#btnSubmitLayout").click();
   assert.ok(await until(() => /已存入板面圖檔/.test(d.querySelector("#upLayState").textContent)), d.querySelector("#upLayState").textContent);
   assert.ok(await until(() => d.querySelectorAll("#upLayList [data-del-layout]").length === 2), "清單應列出兩份");
+  assert.ok(await until(() => d.querySelectorAll("#tblPickLayout tr[data-row-id]").length === 2), "板面圖檔分頁應列出兩份");
   // 錯誤：缺欄位、非 Gerber 檔
   const bad = new w.File(["RefDes,X,Y\nR1,1,2\n"], "x.gbr");
   Object.defineProperty(d.querySelector("#upLayFile"), "files", { value: [bad], configurable: true });
   d.querySelector("#upLayFile").dispatchEvent(new w.Event("change"));
   assert.ok(await until(() => /不是 Gerber 檔/.test(d.querySelector("#upLayState").textContent)), "非 Gerber 應說明");
-  // 刪除剛存入的 BOT 檔
-  w.confirm = () => true;
+  // 刪除剛存入的 BOT 檔（使用語意刪除確認對話框，不用 window.confirm）
   const del = [...d.querySelectorAll("#upLayList [data-del-layout]")].find(b => /BOT/.test(b.getAttribute("aria-label")));
   del.click();
+  assert.ok(await until(() => !d.querySelector("#recDeleteModal").hidden), "應開啟語意刪除確認對話框");
+  d.querySelector("#recDeleteConfirm").click();
   assert.ok(await until(() => d.querySelectorAll("#upLayList [data-del-layout]").length === 1), "刪除後剩一份");
 });
 
-test("匯入步驟 ①：未選座標時也顯示 Gerber 板面圖檔列與登錄入口；入口開啟座標檔分頁的登錄表單並帶入料號、版次、面別", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+test("匯入步驟 ①：未選座標時也顯示 Gerber 板面圖檔列與登錄入口；入口開啟板面圖檔分頁的登錄對話框並帶入料號、版次、面別", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const { w, hook, d, place } = await page();
   d.querySelector("#recPickerClose").click();
-  hook.setTab("data"); hook.setSub("import");
+  hook.setSub("import");
   d.querySelector("#placeClear").click();
   assert.equal(d.querySelector("#layoutRow").hidden, false, "雲端模式下未選座標也要看得到板面圖檔列");
   assert.match(d.querySelector("#layoutRow .lbl").textContent, /Gerber/);
@@ -171,18 +173,13 @@ test("匯入步驟 ①：未選座標時也顯示 Gerber 板面圖檔列與登�
   hook.setPlace({ recId: place.id, part: PART, rev: REV, name: "place.csv", tab: w.eval("csvTable")(PLACE_CSV), side: "TOP", unit: "mm" });
   for (const id of ["#upLayPart", "#upLayRev", "#upLaySide"]) d.querySelector(id).value = "";
   d.querySelector("#btnRegisterLayout").click();
-  const form = d.querySelector("#boxUploadLayoutForm");
-  assert.ok(await until(() => !d.querySelector("#recPickerModal").hidden && !d.querySelector("#boxPickPlace").hidden && !form.hidden), "應開啟座標檔分頁並展開登錄表單");
-  assert.equal(form.parentElement.id, "boxPickPlace", "登錄表單在看得到的座標檔分頁");
-  assert.equal(d.querySelector("#btnPickPlace").getAttribute("aria-selected"), "true", "座標檔分頁按鈕亮起");
-  assert.equal(d.querySelector("#btnShowLayoutForm").getAttribute("aria-expanded"), "true");
+  const dlg = d.querySelector("#uploadLayoutModal");
+  assert.ok(await until(() => !d.querySelector("#recPickerModal").hidden && !d.querySelector("#boxPickLayout").hidden && !dlg.hidden), "應開啟板面圖檔分頁並開啟登錄對話框");
+  assert.equal(d.querySelector("#btnPickLayout").getAttribute("aria-selected"), "true", "板面圖檔分頁按鈕亮起");
   assert.deepEqual([d.querySelector("#upLayPart").value, d.querySelector("#upLayRev").value, d.querySelector("#upLaySide").value], [PART, REV, "TOP"]);
   assert.ok(await until(() => d.querySelectorAll("#upLayList [data-del-layout]").length === 1), "應列出此料號已登錄的圖層");
-  // 料號規格分頁不顯示登錄表單；回到座標檔分頁恢復
-  d.querySelector("#btnPickSpecs").click();
-  assert.ok(await until(() => form.hidden), "料號規格分頁不顯示登錄表單");
-  d.querySelector("#btnPickPlace").click();
-  assert.ok(await until(() => !form.hidden && form.parentElement.id === "boxPickPlace"), "回到座標檔分頁應恢復");
+  d.querySelector("#uploadLayoutClose").click();
+  assert.equal(dlg.hidden, true, "關閉板面圖檔登錄對話框");
 });
 
 test("登錄與目前回合同料號、版次、面別的板面圖檔：立即套用到目前回合；引用當時圖檔的回合不變", { skip: !JSDOM && "未安裝 jsdom" }, async () => {

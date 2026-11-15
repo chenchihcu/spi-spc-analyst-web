@@ -95,22 +95,22 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   assert.equal(d.querySelectorAll("#issList details.iss-card:not([open])").length, 0, "全部展開");
   $("#issCollapse").click();
   assert.equal(d.querySelectorAll("#issList details.iss-card[open]").length, 0, "全部收合");
-  // 頂端不再重複規格輸入；資料與規格頁分為 4 個子分頁（匯入、鋼板規格、錫膏印刷規格、回合管理）
+  // 頂端不再重複規格輸入；資料與規格頁分為 3 個子分頁（鋼板規格、錫膏印刷規格、回合管理），匯入資料收斂至記錄庫對話框 (#boxPickImport)
   assert.equal(d.querySelector("#inLsl"), null, "規格輸入只保留在資料與規格頁");
-  assert.deepEqual([...d.querySelectorAll("#p-data .subtab")].map((b) => b.textContent.trim()), ["匯入資料", "鋼板規格設定", "錫膏印刷規格設定", "回合管理"]);
+  assert.deepEqual([...d.querySelectorAll("#p-data .subtab")].map((b) => b.textContent.trim()), ["鋼板規格設定", "錫膏印刷規格設定", "回合管理"]);
   // 子分頁鍵盤：只有選取中的在 Tab 順序，左右鍵切換
-  assert.deepEqual([...d.querySelectorAll("#p-data .subtab")].map((b) => b.tabIndex), [0, -1, -1, -1]);
+  assert.deepEqual([...d.querySelectorAll("#p-data .subtab")].map((b) => b.tabIndex), [0, -1, -1]);
   const subKey = (key) => d.querySelector("#p-data .subtabs").dispatchEvent(new w.KeyboardEvent("keydown", { key, bubbles: true }));
   subKey("ArrowRight");
-  assert.equal(d.querySelector('#p-data .subtab[data-sub="stencil-spec"]').getAttribute("aria-selected"), "true", "右鍵切到鋼板規格設定");
-  subKey("ArrowRight");
-  assert.equal(d.querySelector('#p-data .subtab[data-sub="paste-spec"]').getAttribute("aria-selected"), "true", "再按右鍵切到錫膏印刷規格設定");
+  assert.equal(d.querySelector('#p-data .subtab[data-sub="paste-spec"]').getAttribute("aria-selected"), "true", "右鍵切到錫膏印刷規格設定");
   subKey("ArrowRight");
   assert.equal(d.querySelector('#p-data .subtab[data-sub="runs"]').getAttribute("aria-selected"), "true", "再按右鍵切到回合管理");
   subKey("ArrowRight");
-  assert.equal(d.querySelector('#p-data .subtab[data-sub="import"]').getAttribute("aria-selected"), "true", "最後一項按右鍵回到匯入資料");
+  assert.equal(d.querySelector('#p-data .subtab[data-sub="stencil-spec"]').getAttribute("aria-selected"), "true", "最後一項按右鍵回到鋼板規格設定");
   subKey("End");
   assert.equal(d.querySelector('#p-data .subtab[data-sub="runs"]').getAttribute("aria-selected"), "true", "End 切到最後一項");
+  assert.equal(d.querySelector('#p-data div[data-sub="import"]'), null, "匯入資料已整併進記錄庫對話框");
+  assert.ok(d.querySelector("#recPickerModal #boxPickImport"), "記錄庫應包含 #boxPickImport");
   // 欄位歸屬：鋼板頁只含鋼板欄位，錫膏印刷頁只含印刷參數與規格
   const stencilPane = d.querySelector('#p-data div[data-sub="stencil-spec"]'), pastePane = d.querySelector('#p-data div[data-sub="paste-spec"]');
   for (const id of ["inStencil2", "stencilNote", "chkStep", "zoneTbl", "zoneMap", "apTbl", "geomPadFile"]) {
@@ -225,10 +225,10 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
     assert.equal(hook.S.relChart, rk);
   }
 
-  // 資料與規格：匯入步驟拆為流程卡＋5張獨立卡片（無巢狀卡）、跨卡事件委派及空狀態呈現
-  tab("data");
+  // 記錄庫匯入資料分頁：匯入步驟拆為流程卡＋5張獨立卡片（無巢狀卡）、跨卡事件委派及空狀態呈現
   w.SPI_TEST_HOOK.setSub("import");
-  const impSub = d.querySelector('#p-data div[data-sub="import"]');
+  const impSub = d.getElementById("boxPickImport");
+  assert.ok(impSub && !impSub.hidden, "setSub('import') 應開啟記錄庫「匯入資料」分頁 #boxPickImport");
   assert.ok(impSub.querySelector(".imp-flow-card"), "應有頂部匯入流程總覽卡");
   for (const cid of ["impStep1Card", "impStep2Card", "impStep3Card", "impStep4Card", "impStep5Card"]) {
     const card = d.getElementById(cid);
@@ -239,7 +239,9 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   assert.equal($("#mapBox").hidden, false, "讀取資料後應展開步驟 ③～⑤ 的 #mapBox");
   $("#inPart").value = "PART-X-01";
   $("#inPart").dispatchEvent(new w.Event("input", { bubbles: true }));
-  assert.match($("#impSourceSummary").textContent, /PART-X-01/, "跨卡片修改 #inPart 應透過 [data-sub='import'] 委派更新來源摘要");
+  assert.match($("#impSourceSummary").textContent, /PART-X-01/, "跨卡片修改 #inPart 應透過 #boxPickImport 委派更新來源摘要");
+  d.getElementById("recPickerClose").click();
+  tab("data");
   w.SPI_TEST_HOOK.setSub("runs");
   while (hook.S.runs.length) d.querySelector("#runTbl [data-delrun]").click();
   assert.ok(d.querySelector("#runTbl tbody .empty-row .empty-cell"), "無回合時 #runTbl 應呈現空狀態列");

@@ -2,7 +2,7 @@ import { configured, handle as handleAuth, users } from '../lib/auth-handler.mjs
 import { SEC } from '../lib/security-headers.mjs';
 import { APP_VERSION } from '#build-info';
 import { Repo } from '../lib/repo.mjs';
-import { checkMeta, checkMetaPatch, clean, MAX_GZ, MAX_RAW } from '../lib/records-core.mjs';
+import { checkMeta, checkMetaPatch, checkBatchDeleteIds, clean, MAX_GZ, MAX_RAW } from '../lib/records-core.mjs';
 import { checkSpecBody, MAX_SPEC_RAW } from '../lib/part-spec-core.mjs';
 import { handleAnalyze } from './ai.mjs';
 import { handleShare } from '../lib/share-core.mjs';
@@ -440,12 +440,52 @@ async function handleRecordsApi(req, repo, user, env) {
   return json({ error: '原始量測紀錄與座標檔不能直接覆寫；只能修改工單/備註或刪除' }, 405);
 }
 
+async function handleBatchDeleteApi(req, repo, user) {
+  if (req.method !== 'POST') return json({ error: '不支援的請求方法' }, 405);
+  if (!(await repo.isAdmin(user))) return json({ error: '只有管理者可以批次刪除紀錄' }, 403);
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    return json({ error: '請求主體必須為 JSON' }, 400);
+  }
+  const chk = checkBatchDeleteIds(body);
+  if (chk.error) return json({ error: chk.error }, 400);
+
+  // 同批含量測與座標／圖檔時，先刪量測紀錄，避免順序造成誤判引用阻擋
+  const kindOrder = { spi: 0, layout: 1, spec: 2, place: 3 };
+  const placeholders = chk.ids.map(() => '?').join(',');
+  const kindMap = new Map();
+  try {
+    const { results = [] } = await repo.db.prepare(
+      `SELECT id, kind FROM records WHERE id IN (${placeholders})`
+    ).bind(...chk.ids).all();
+    for (const row of results) kindMap.set(row.id, row.kind);
+  } catch {}
+  const orderedIds = [...chk.ids].sort((a, b) => (kindOrder[kindMap.get(a)] ?? 9) - (kindOrder[kindMap.get(b)] ?? 9));
+
+  const now = Date.now();
+  const deleted = [];
+  const failed = [];
+  for (const id of orderedIds) {
+    try {
+      const r = await repo.deleteRecord(id, user, now);
+      if (r?.error) failed.push({ id, error: r.error, ...(r.code ? { code: r.code } : {}), status: r.status || 400 });
+      else deleted.push(r?.deleted || id);
+    } catch (e) {
+      failed.push({ id, error: e?.message || '刪除失敗', status: 500 });
+    }
+  }
+  return json({ ok: true, deleted, failed });
+}
+
 async function route(req, env) {
   const url = new URL(req.url), path = url.pathname;
   const repo = new Repo(env.DB, env.BLOBS);
   const user = req.headers.get('x-spi-user') || '';
 
   if (path === '/api/records') return handleRecordsApi(req, repo, user, env);
+  if (path === '/api/records/batch-delete') return handleBatchDeleteApi(req, repo, user);
   if (path === '/api/admin/users') return handleAdminApi(req, repo, user, env);
   if (path === '/api/share') return handleShare(req, repo, user, env);
   if (path === '/api/analyze') return handleAnalyze(req, env, user);
