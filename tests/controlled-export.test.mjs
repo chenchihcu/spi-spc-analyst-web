@@ -34,10 +34,10 @@ test('正式匯出以伺服器目前生命週期為準，讀取失敗時停止',
   const statusButton = w.document.querySelector('#stateSpi');
   statusButton.focus();
   statusButton.click();
-  const unmatchedModal = w.document.querySelector('#unmatchedRefsModal');
+  const unmatchedModal = w.document.querySelector('#proofModal');
   assert.equal(unmatchedModal.hidden, false);
-  assert.equal(w.document.querySelector('#unmatchedRefsTitle').textContent, '無座標位號（3）');
-  assert.equal(w.document.querySelector('#unmatchedRefsList').textContent, 'L87、R737、R738');
+  assert.equal(w.document.querySelector('#proofTitle').textContent, '無座標位號（3）');
+  assert.equal(w.document.querySelector('#proofBody').textContent, 'L87、R737、R738');
   unmatchedModal.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
   assert.equal(unmatchedModal.hidden, true);
   assert.equal(w.document.activeElement, statusButton);

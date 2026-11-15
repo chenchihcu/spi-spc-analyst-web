@@ -100,3 +100,17 @@ test("規格鋼板控制項唯一且分屬鋼板／錫膏印刷規格子頁；�
     assert.equal(/\sopen[\s>]/.test(block.slice(0, block.indexOf(">"))), false);
   }
 });
+
+test("UI 整併後共用對話框存在且重複舊對話框與重複匯出按鈕已移除", () => {
+  for (const id of ["confirmModal", "proofModal", "recEditModal", "uploadRefModal", "recAdjudicateModal", "exportGroupsHost"]) {
+    assert.equal((html.match(new RegExp(`id="${id}"`, "g")) || []).length, 1, `共用元件 #${id} 應唯一存在`);
+  }
+  for (const legacy of [
+    "btnRepPdf", "btnMailDlPdf", "specConfirmModal", "recDeleteModal", "recConfirmModal",
+    "recBatchConfirmModal", "unmatchedRefsModal", "recRenameModal", "uploadPlaceModal",
+    "uploadLayoutModal", "recNewBatchModal", "recCorrectModal"
+  ]) {
+    assert.equal(html.includes(`id="${legacy}"`), false, `已整併或移除之舊 ID #${legacy} 不應殘留`);
+  }
+  assert.equal(html.includes("panel-subnav"), false, "舊子分頁樣式 .panel-subnav 應統一為 .subtabs/.subtab");
+});

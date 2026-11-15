@@ -123,7 +123,7 @@ test("D-02 / R-MAIL：整頁「轉寄」畫面 (#mail) 欄位與無彈窗規範"
   assert.ok(d.querySelector("#btnMailCopySummary"), "存在複製摘要按鈕");
   assert.ok(d.querySelector("#btnSharePdf"), "存在主分享按鈕 #btnSharePdf");
   assert.ok(d.querySelector("#btnSharePdfWithSummary"), "存在連同摘要分享按鈕 #btnSharePdfWithSummary");
-  assert.ok(d.querySelector("#btnMailDlPdf"), "存在下載 PDF 按鈕 #btnMailDlPdf");
+  assert.equal(d.querySelector("#btnMailDlPdf"), null, "下載 PDF 收斂至匯出中心");
   assert.ok(d.querySelector("#btnMailOpenMailto"), "存在開啟郵件按鈕 #btnMailOpenMailto");
   assert.ok(d.querySelector("#btnMailBack"), "存在返回報告按鈕 #btnMailBack");
 

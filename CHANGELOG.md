@@ -2,6 +2,12 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.38.0 — 2026-11-15（介面元件、對話框與前端動作整併簡化）
+
+- **共用對話框整併**：將 4 組確認對話框合併為 `#confirmModal`、3D 無座標位號清單併入 `#proofModal`、重新命名與編輯合併為 `#recEditModal`（`edit`／`rename` 模式）、座標與板面圖檔登錄合併為 `#uploadRefModal`（`place`／`layout` 模式）、新一批與修正既有合併為 `#recAdjudicateModal`，全面維持「左確認、右取消」排序。
+- **導覽與子分頁收斂**：統一 `.panel-subnav` 與 `.subtabs` 樣式與事件接線（`setupSubtabs`）；手機更多選單 `#moreSheetDataList` 與 `#sheetUserTools` 改由 `USER_MENU_ACTIONS` 宣告產生，移除桌機／行動重複監聽與無效的 `#btnDl3d`、報告頁重複 `#btnRepPdf`、郵件頁 `#btnMailDlPdf` 及 `#btnRecPickerGoImport`。
+- **匯出與 API 工具整併**：`#exportGroupsHost` 改由 `EXPORT_GROUPS` 資料驅動渲染並共用 `openModal`/`closeModal`；精簡 `exportRepPdf({ lite })` 共享邏輯並抽出 `apiFetch`／`apiFetchJson` 共用請求處理；統計公式、D1/R2 結構、API 契約與 `RecDB.create` fail-closed 行為均維持不變（規格書：`docs/spec-ui-code-consolidation-rfc.md`）。
+
 ## v10.37.0 — 2026-11-15（量測記錄與座標檔資料庫介面重構與檔案管理強化）
 
 - **五大頁籤整合與匯入收斂**：移除 `#p-data` 內的「匯入資料」子分頁（`#p-data` 預設開啟「鋼板規格設定」），將完整 5 步驟匯入流程與「板面圖檔（Gerber）」提升為 `#recPickerModal` 一級頁籤（`量測記錄` / `座標檔` / `板面圖檔` / `規格與稽核` / `匯入資料`），支援全視窗檔案拖放載入與匯入完成後留頁狀態橫幅（`#impDoneBanner`）。
