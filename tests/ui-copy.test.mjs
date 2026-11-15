@@ -62,13 +62,16 @@ test("spi-spc.html 保留功能型折疊", () => {
   assert.match(html, /<summary>預覽送出內容<\/summary>/);
 });
 
-test("規格鋼板控制項唯一且位於設定 Hub；關係圖不含已拒絕圖種", () => {
-  const settings = html.slice(html.indexOf('<div data-sub="settings"'), html.indexOf('<div data-sub="runs"'));
-  assert.ok(settings.length > 0, "設定 Hub 應在回合管理之前結束");
-  for (const id of ["chkStep", "apTbl", "zoneMap"]) {
+test("規格鋼板控制項唯一且分屬鋼板／錫膏印刷規格子頁；關係圖不含已拒絕圖種", () => {
+  const stencilAt = html.indexOf('<div data-sub="stencil-spec"'), pasteAt = html.indexOf('<div data-sub="paste-spec"'), runsAt = html.indexOf('<div data-sub="runs"');
+  assert.ok(stencilAt > 0 && pasteAt > stencilAt && runsAt > pasteAt, "鋼板規格設定、錫膏印刷規格設定應依序在回合管理之前");
+  const stencilPane = html.slice(stencilAt, pasteAt), settings = html.slice(stencilAt, runsAt);
+  for (const id of ["chkStep", "apTbl", "zoneMap", "inStencil2"]) {
     assert.equal((html.match(new RegExp(`id="${id}"`, "g")) || []).length, 1, `#${id} 應只出現一次`);
-    assert.match(settings, new RegExp(`id="${id}"`), `#${id} 應位於規格子頁`);
+    assert.match(stencilPane, new RegExp(`id="${id}"`), `#${id} 應位於鋼板規格設定`);
   }
+  assert.equal(html.includes('data-sub="settings"'), false, "不應再留合併的規格子分頁");
+  assert.equal(html.includes("資料與規格 → 規格設定"), false, "文案不應再指向舊的規格設定子頁");
   const appSettings = html.slice(html.indexOf('id="appSettingsModal"'), html.indexOf("<!-- 量測記錄"));
   for (const id of ["aiSettingsCard", "btnThemeSettings", "settingsUiSection"]) {
     assert.equal((html.match(new RegExp(`id="${id}"`, "g")) || []).length, 1, `#${id} 應只出現一次`);

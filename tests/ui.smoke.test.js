@@ -95,16 +95,33 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   assert.equal(d.querySelectorAll("#issList details.iss-card:not([open])").length, 0, "全部展開");
   $("#issCollapse").click();
   assert.equal(d.querySelectorAll("#issList details.iss-card[open]").length, 0, "全部收合");
-  // 頂端不再重複規格輸入；資料與規格頁分為 3 個子分頁（匯入、規格、回合管理）
+  // 頂端不再重複規格輸入；資料與規格頁分為 4 個子分頁（匯入、鋼板規格、錫膏印刷規格、回合管理）
   assert.equal(d.querySelector("#inLsl"), null, "規格輸入只保留在資料與規格頁");
-  assert.equal(d.querySelectorAll("#p-data .subtab").length, 3);
+  assert.deepEqual([...d.querySelectorAll("#p-data .subtab")].map((b) => b.textContent.trim()), ["匯入資料", "鋼板規格設定", "錫膏印刷規格設定", "回合管理"]);
   // 子分頁鍵盤：只有選取中的在 Tab 順序，左右鍵切換
-  assert.deepEqual([...d.querySelectorAll("#p-data .subtab")].map((b) => b.tabIndex), [0, -1, -1]);
-  d.querySelector("#p-data .subtabs").dispatchEvent(new w.KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
-  assert.equal(d.querySelector('#p-data .subtab[data-sub="settings"]').textContent.trim(), "規格");
-  assert.equal(d.querySelector('#p-data .subtab[data-sub="settings"]').getAttribute("aria-selected"), "true", "右鍵切到規格");
-  d.querySelector("#p-data .subtabs").dispatchEvent(new w.KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+  assert.deepEqual([...d.querySelectorAll("#p-data .subtab")].map((b) => b.tabIndex), [0, -1, -1, -1]);
+  const subKey = (key) => d.querySelector("#p-data .subtabs").dispatchEvent(new w.KeyboardEvent("keydown", { key, bubbles: true }));
+  subKey("ArrowRight");
+  assert.equal(d.querySelector('#p-data .subtab[data-sub="stencil-spec"]').getAttribute("aria-selected"), "true", "右鍵切到鋼板規格設定");
+  subKey("ArrowRight");
+  assert.equal(d.querySelector('#p-data .subtab[data-sub="paste-spec"]').getAttribute("aria-selected"), "true", "再按右鍵切到錫膏印刷規格設定");
+  subKey("ArrowRight");
   assert.equal(d.querySelector('#p-data .subtab[data-sub="runs"]').getAttribute("aria-selected"), "true", "再按右鍵切到回合管理");
+  subKey("ArrowRight");
+  assert.equal(d.querySelector('#p-data .subtab[data-sub="import"]').getAttribute("aria-selected"), "true", "最後一項按右鍵回到匯入資料");
+  subKey("End");
+  assert.equal(d.querySelector('#p-data .subtab[data-sub="runs"]').getAttribute("aria-selected"), "true", "End 切到最後一項");
+  // 欄位歸屬：鋼板頁只含鋼板欄位，錫膏印刷頁只含印刷參數與規格
+  const stencilPane = d.querySelector('#p-data div[data-sub="stencil-spec"]'), pastePane = d.querySelector('#p-data div[data-sub="paste-spec"]');
+  for (const id of ["inStencil2", "stencilNote", "chkStep", "zoneTbl", "zoneMap", "apTbl", "geomPadFile"]) {
+    assert.ok(stencilPane.querySelector("#" + id), `#${id} 應在鋼板規格設定`);
+    assert.equal(pastePane.querySelector("#" + id), null, `#${id} 不應在錫膏印刷規格設定`);
+  }
+  for (const id of ["selSqDir", "inWipe2", "partSpecBar", "btnSpecSave", "btnSpecDiscard", "btnSpecVers", "specTbl", "specGrpBox"]) {
+    assert.ok(pastePane.querySelector("#" + id), `#${id} 應在錫膏印刷規格設定`);
+    assert.equal(stencilPane.querySelector("#" + id), null, `#${id} 不應在鋼板規格設定`);
+  }
+  assert.equal(d.querySelector('#p-data div[data-sub="settings"]'), null, "不再留合併的規格面板");
   const wrap = d.querySelector(".wrap");
   for (const id of ["p-overview", "p-control", "p-capability", "p-sim3d", "p-deep", "p-improve", "p-ai", "p-report", "p-gate", "p-data", "p-share", "p-shares", "p-mail"]) {
     assert.equal(d.getElementById(id).parentElement, wrap, `#${id} 應在 .wrap 內`);
@@ -113,7 +130,8 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   assert.equal(d.querySelector("#exportCenterModal").parentElement, d.body, "匯出對話框留在 .wrap 外");
   const runsPane = d.querySelector('#p-data div[data-sub="runs"]');
   assert.equal(runsPane.parentElement, d.getElementById("p-data"), "回合管理與規格並列");
-  assert.equal(runsPane.parentElement, d.querySelector('#p-data div[data-sub="settings"]').parentElement);
+  assert.equal(runsPane.parentElement, d.querySelector('#p-data div[data-sub="paste-spec"]').parentElement);
+  assert.equal(runsPane.parentElement, d.querySelector('#p-data div[data-sub="stencil-spec"]').parentElement);
   assert.equal(d.querySelector("#pmap").parentElement.id, "pmapDetails", "問題地圖不再套一層卡");
   assert.equal(d.querySelector('#p-control [data-control-sub="multi"] .grid2'), null, "多變量區不留空 grid");
   tab("data");
@@ -137,7 +155,23 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   assert.equal(d.querySelector("#appSettingsModal").hidden, true, "關閉後設定對話框應隱藏");
   assert.ok(!d.querySelector("#appSettingsModal").classList.contains("open"), "關閉後應移除 .open");
   w.SPI_TEST_HOOK.setSub("specs", "spec");
-  assert.equal(w.SPI_TEST_HOOK.S.sub, "settings", "舊別名 specs 應對應規格子分頁");
+  assert.equal(w.SPI_TEST_HOOK.S.sub, "paste-spec", "舊別名 specs 應對應錫膏印刷規格設定");
+  w.SPI_TEST_HOOK.setSub("settings");
+  assert.equal(w.SPI_TEST_HOOK.S.sub, "paste-spec", "舊別名 settings 應對應錫膏印刷規格設定");
+  w.SPI_TEST_HOOK.setSub("stencil");
+  assert.equal(w.SPI_TEST_HOOK.S.sub, "stencil-spec", "舊別名 stencil 應對應鋼板規格設定");
+  assert.equal(d.querySelector('#p-data div[data-sub="stencil-spec"]').hidden, false, "鋼板頁應顯示");
+  // 捷徑落點：鋼板／規格 → 鋼板頁聚焦厚度；擦拭連結 → 錫膏印刷頁聚焦擦拭；錫膏頁「修改鋼板厚度」→ 鋼板頁
+  tab("issues"); $("#railSpecBtn").click();
+  assert.equal(w.SPI_TEST_HOOK.S.sub, "stencil-spec", "鋼板／規格捷徑應開鋼板規格設定");
+  assert.equal(d.activeElement, $("#inStencil2"), "鋼板／規格捷徑應聚焦厚度");
+  w.SPI_TEST_HOOK.setSub("paste-spec");
+  assert.match($("#pasteStencilRef").textContent, new RegExp(`鋼板厚度 ${w.SPI_TEST_HOOK.S.stencil} µm`), "錫膏印刷頁應顯示目前鋼板厚度");
+  assert.equal(d.querySelector('#p-data div[data-sub="paste-spec"] input#inStencil2'), null, "錫膏印刷頁不可直接改厚度");
+  $("#btnGoStencilThk").click();
+  assert.equal(w.SPI_TEST_HOOK.S.sub, "stencil-spec", "修改鋼板厚度連結應開鋼板規格設定");
+  assert.equal(d.activeElement, $("#inStencil2"));
+  if ($("#btnGoWipeSpec")) { $("#btnGoWipeSpec").click(); assert.equal(w.SPI_TEST_HOOK.S.sub, "paste-spec", "擦拭連結應開錫膏印刷規格設定"); assert.equal(d.activeElement, $("#inWipe2")); }
   w.SPI_TEST_HOOK.setTab("deep/cross");
   assert.equal($("[data-tab=issues]").getAttribute("aria-selected"), "true", "#deep/cross 應開問題偵測");
   assert.equal(w.SPI_TEST_HOOK.S.issuesSub, "cross", "#deep/cross 應開交叉驗證");
