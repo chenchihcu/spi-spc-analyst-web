@@ -177,6 +177,30 @@ table.show-all tr.more-row{display:table-row}
 .tbl-more{margin-top:6px;font-size:var(--fs-caption)}
 .tbl.sticky-head{overflow:visible}
 .tbl.sticky-head thead th{position:sticky;top:var(--stickyH,0px);background:var(--surface);z-index:1}
+/* 資料與規格（#p-data）：子分頁卡片流、步驟卡片、表單網格與規格工具列 */
+#p-data > [data-sub]:not(.subtab){display:grid;grid-template-columns:minmax(0,1fr);gap:16px;min-width:0}
+#p-data > [data-sub]:not(.subtab) > .card,#mapBox > .card{min-width:0}
+.imp-flow-card h3{margin-bottom:10px}
+.imp-step-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+.imp-step-head .imp-step-title{margin:0}
+.data-form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:10px 14px;align-items:start}
+.data-form-grid .field input,.data-form-grid .field select{width:100%;max-width:100%;box-sizing:border-box}
+.imp-place-bar{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+.imp-apply-bar{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface2)}
+.imp-apply-opts{flex:1 1 auto;min-width:0}
+.imp-apply-bar #inRunName{flex:1 1 220px;min-width:min(100%,180px);max-width:340px}
+#impStep2Card #pasteIn{min-height:96px}
+.spec-param-box{background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:12px;display:grid;gap:10px}
+.spec-ver-bar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;padding:10px 0 4px;border-top:1px solid var(--line);margin-top:12px}
+.spec-ver-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.spec-toolbar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.spec-grp-add{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-end;margin-top:10px}
+.spec-grp-add .field{min-width:min(100%,180px)}
+#specTbl td,#specTbl th,#specGrpTbl td,#specGrpTbl th,#zoneTbl td,#zoneTbl th,#apTbl td,#apTbl th,#runTbl td,#runTbl th{vertical-align:middle}
+#specTbl td input,#specGrpTbl td input,#zoneTbl td input[type=number],#apTbl td input[type=number]{font-variant-numeric:tabular-nums}
+.tbl .empty-row td:first-child{position:static;border-right:none;box-shadow:none}
+.tbl .empty-msg{display:inline-block;max-width:56ch;white-space:normal}
+@media (max-width:600px){.empty-row td,.empty-cell{text-align:left;padding:18px 12px!important}.tbl .empty-msg{display:block;max-width:min(100%,calc(100vw - 96px))}}
 @media (pointer:coarse){.subtab{min-height:44px}.menu button,.menu a{padding:12px 14px}}
 .printHead{display:none}
 .print3d,.print3d-err{display:none}
@@ -1069,7 +1093,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
     <svg class="mitcorp-logo" viewBox="0 0 248 45" width="143" height="26" fill="currentColor" fill-rule="evenodd" role="img" aria-label="Mitcorp"><path d="M13.8,-0.0L28.5,-0.1L29.2,0.0L30.6,1.0L31.5,2.9L34.7,29.0L35.0,29.8L36.2,30.2L37.5,29.8L38.3,28.2L46.9,3.5L48.0,1.5L48.8,0.8L50.5,-0.1L66.3,0.0L67.6,1.0L68.4,3.2L68.4,30.8L68.3,32.2L67.7,33.8L66.0,34.8L62.8,35.0L59.2,34.8L57.7,33.8L57.3,31.5L57.3,5.8L56.7,4.5L55.2,4.0L53.0,4.7L52.0,6.5L43.5,31.5L42.2,33.3L41.2,34.1L38.2,34.8L28.8,34.8L26.0,34.0L24.6,32.5L24.0,29.8L20.9,5.8L20.2,4.5L18.5,4.0L17.0,4.5L16.5,5.2L12.3,26.8L11.3,30.0L10.5,31.5L8.4,33.8L6.3,35.0L2.2,35.7L1.2,35.7L0.0,35.0L0.0,30.2L1.2,29.6L4.5,28.9L5.4,28.0L6.2,26.2L10.7,3.0L11.9,1.0L13.8,-0.0ZM73.2,-0.0L83.8,0.0L84.6,1.3L84.5,4.2L83.8,5.4L82.8,5.7L75.5,5.8L73.2,5.5L72.7,4.8L72.5,2.8L72.6,1.0L73.2,-0.0ZM90.0,1.7L95.5,1.6L97.2,2.1L97.8,2.8L98.2,4.0L98.3,8.5L98.6,9.2L99.3,9.7L109.8,9.8L110.9,10.2L111.4,12.0L110.9,13.2L110.2,13.6L99.8,13.7L98.8,14.1L98.2,15.5L98.3,27.0L99.0,29.8L100.5,30.9L104.2,31.1L112.5,30.9L113.1,31.5L113.2,33.0L113.0,33.8L112.2,34.6L110.5,35.0L104.5,35.3L95.8,35.1L92.0,33.9L89.9,32.2L88.9,30.5L88.4,27.5L88.4,5.5L88.6,3.0L89.2,2.1L90.0,1.7ZM130.5,9.2L135.5,9.3L144.3,10.0L145.5,10.4L146.1,11.0L146.2,13.2L145.7,14.0L145.0,14.3L140.3,13.8L133.0,13.6L129.5,13.9L127.0,14.9L125.1,17.0L124.3,20.0L124.3,24.0L125.1,27.8L127.0,29.8L130.0,30.9L137.5,31.1L145.2,30.4L146.0,31.0L146.3,32.0L146.2,33.5L145.5,34.3L142.5,35.0L135.2,35.4L129.5,35.4L124.0,34.9L120.5,33.9L118.2,32.8L116.1,30.8L115.1,29.2L114.0,25.5L113.9,20.0L115.0,15.8L116.1,14.0L118.2,12.0L120.5,10.8L124.2,9.8L130.5,9.2ZM161.8,9.5L168.5,9.3L174.8,9.9L178.2,10.8L180.2,11.8L182.8,14.0L183.9,15.8L184.7,18.8L184.9,24.5L184.7,26.2L183.8,29.2L181.8,32.0L178.8,33.9L175.5,34.9L166.0,35.7L156.8,34.8L153.8,33.8L152.0,32.9L150.4,31.5L149.2,30.0L148.3,28.0L147.9,25.5L148.0,18.2L149.1,15.0L151.0,12.8L154.0,11.0L158.0,9.8L161.8,9.5ZM203.0,9.5L209.8,9.4L210.7,10.5L210.8,11.8L210.5,12.8L209.5,13.6L201.8,13.9L200.2,14.2L199.2,14.8L198.7,16.0L198.7,31.0L198.3,33.5L197.5,34.5L196.2,34.9L190.5,34.8L189.1,33.8L188.8,32.0L188.7,15.2L189.2,12.5L190.0,11.7L191.9,10.8L197.2,9.8L203.0,9.5ZM224.0,9.5L230.5,9.3L237.9,9.8L242.2,10.9L244.2,12.0L246.2,14.0L247.0,15.2L247.8,17.3L247.8,27.8L246.9,30.0L245.9,31.5L244.8,32.6L242.8,33.8L240.0,34.8L232.2,35.5L223.2,35.4L222.6,36.0L222.4,36.8L222.2,43.5L221.3,44.8L213.5,44.8L212.6,43.5L212.4,41.8L212.6,13.0L213.2,11.7L214.6,10.8L218.5,9.9L224.0,9.5ZM75.5,9.9L79.0,9.8L81.5,10.0L82.8,10.8L83.4,12.0L83.5,32.2L83.0,33.8L81.5,34.8L75.5,34.8L74.1,34.0L73.7,33.2L73.6,12.0L74.0,10.8L75.5,9.9ZM163.2,13.0L160.8,14.0L159.4,15.2L158.3,18.8L158.1,22.5L158.3,26.5L159.2,29.2L160.5,30.8L162.8,31.8L166.0,32.1L169.8,31.8L172.0,30.8L173.0,29.8L173.9,28.2L174.4,25.0L174.4,21.8L173.9,16.5L173.0,15.0L171.9,14.0L168.5,12.9L163.2,13.0ZM226.0,13.0L223.5,13.5L222.7,14.0L222.4,14.5L222.5,30.5L224.0,31.6L227.5,31.9L232.5,31.9L235.0,31.0L236.0,30.1L237.0,28.7L237.7,25.5L237.8,20.8L237.0,16.2L235.3,14.0L233.0,13.1L230.2,12.8L226.0,13.0Z"/></svg>
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.36.1</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.36.2</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <div class="db-capsule-group" role="group" aria-label="記錄庫與匯出">
@@ -1573,7 +1597,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
     <button role="tab" class="subtab" data-sub="runs" aria-selected="false">回合管理</button>
   </div>
   <div data-sub="import">
-    <div class="card">
+    <div class="card imp-flow-card">
       <h3>匯入 SPI 資料 </h3>
       <ol class="imp-flow" id="impFlowSteps" aria-label="資料匯入步驟">
         <li data-flow-step="format" data-state="current"><b>① 格式與座標</b><span class="imp-flow-status" data-flow-state>確認格式、面別與受控座標</span></li>
@@ -1582,18 +1606,20 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
         <li data-flow-step="metadata" data-state="pending"><b>④ 紀錄資料</b><span class="imp-flow-status" data-flow-state>填寫產品、版次與工單或日期</span></li>
         <li data-flow-step="apply" data-state="pending"><b>⑤ 驗證與套用</b><span class="imp-flow-status" data-flow-state>執行既有驗證並保存</span></li>
       </ol>
-      <p id="impFlowStatus" class="note" role="status" aria-live="polite" style="margin:0 0 8px">請依序完成各區段；套用時會再執行正式驗證。</p>
+      <p id="impFlowStatus" class="note" role="status" aria-live="polite" style="margin:0">請依序完成各區段；套用時會再執行正式驗證。</p>
       <div id="impValidationSummary" role="alert" aria-live="assertive" tabindex="-1" hidden>
         <span data-import-error></span>
         <button type="button" data-import-error-jump hidden>前往需修正欄位</button>
       </div>
-      <h4 class="imp-step-title">① 格式、面別與受控座標</h4>
-      <div class="vendor" id="vendorBox">
-        <div class="row">
+    </div>
+    <div class="card" id="impStep1Card">
+      <div class="imp-step-head"><h4 class="imp-step-title">① 格式、面別與受控座標</h4></div>
+      <div class="vendor" id="vendorBox" style="margin-bottom:0">
+        <div class="data-form-grid">
           <div class="field"><label for="selVendor">加工廠 SPI 格式</label><select id="selVendor"><option value="generic">通用格式（每列一筆量測）</option><option value="lirong">立榮電子（每列一焊墊、各板橫排）</option><option value="zsf">振順豐（絕對值橫排）</option></select></div>
           <div class="field" id="sideField"><label for="selSide">量測面別（必選）</label><select id="selSide" aria-describedby="selSideError selSideAuto"><option value="">請選擇</option><option value="TOP">TOP 面</option><option value="BOT">BOT 面</option></select><span class="note" id="selSideError" aria-live="polite"></span><span class="side-auto" id="selSideAuto" role="status" hidden></span></div>
         </div>
-        <div class="row" id="placeRow" hidden>
+        <div class="row imp-place-bar" id="placeRow" hidden>
           <span class="lbl" style="align-self:center">受控座標檔（必選）</span>
           <button type="button" id="btnSelectPlace" aria-describedby="btnSelectPlaceError">從資料庫選取</button><span class="note" id="btnSelectPlaceError" aria-live="polite"></span>
           <button type="button" id="btnRegisterPlace">先登錄座標檔</button>
@@ -1605,50 +1631,62 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
         <p class="note" id="placeChoiceNote" style="margin:0">位號與原檔指紋於套用時由伺服器確認。</p>
         <p class="note" id="vendorNote" hidden style="margin:0">立榮格式每列一焊墊（各板橫排），TOP／BOT 分別匯入；高度 % 依<b>鋼板厚度（必填）</b>換算 µm，並由座標檔對應位置與封裝群組。</p>
       </div>
-      <h4 class="imp-step-title">② 選擇量測檔或貼上資料</h4>
+    </div>
+    <div class="card" id="impStep2Card">
+      <div class="imp-step-head"><h4 class="imp-step-title">② 選擇量測檔或貼上資料</h4></div>
       <div class="drop" id="drop">拖放 CSV 或 Excel（.xlsx）檔到這裡，或 <label for="fileIn" style="color:var(--accent);cursor:pointer;text-decoration:underline"><input type="file" id="fileIn" accept=".csv,.txt,.tsv,.xlsx" class="sr" aria-label="選擇 SPI 量測檔案">選擇檔案</label></div>
       <textarea id="pasteIn" aria-label="貼上 CSV 文字" placeholder="或直接貼上 CSV 文字…" style="margin-top:8px"></textarea>
       <div class="row" style="margin-top:8px"><button class="primary" id="btnRead">讀取欄位</button><details class="how demo-tools"><summary>範例資料</summary><button id="btnPhme">載入 PHME 格式範例</button></details><span class="err" id="parseErr" role="status" aria-live="polite"></span></div>
       <div id="impDupNotice" class="note" role="status" hidden style="margin-top:8px;padding:8px 12px;border-radius:8px;background:var(--accent-soft);color:var(--accent-ink)"></div>
-      <div id="mapBox" hidden style="margin-top:12px;display:grid;gap:10px">
+    </div>
+    <div id="mapBox" hidden style="display:grid;grid-template-columns:minmax(0,1fr);gap:16px;min-width:0">
+      <div class="card" id="impStep3Card">
+        <div class="imp-step-head"><h4 class="imp-step-title">③ 欄位對應與資料預覽</h4></div>
         <div id="impSourceSummary" hidden role="group" aria-label="匯入來源與資料脈絡"></div>
-        <h4 class="imp-step-title">③ 欄位對應與資料預覽</h4>
-        <div class="row"><div class="field"><label for="selProfile">機台格式設定檔</label><select id="selProfile"></select></div>
+        <div class="row" style="align-items:flex-end;margin:6px 0"><div class="field"><label for="selProfile">機台格式設定檔</label><select id="selProfile"></select></div>
           <div class="field"><label for="inProfileName">另存為</label><input type="text" id="inProfileName" placeholder="例：供應商 A · KY8030"></div><button id="btnSaveProfile">儲存設定檔</button></div>
-        <div class="row">
+        <div class="data-form-grid" style="margin-top:8px">
           <div class="field"><label for="optOff">偏移單位</label><select id="optOff"><option value="um">µm</option><option value="pct">焊墊尺寸 %</option><option value="mm">mm</option></select></div>
           <div class="field"><label for="optH">高度單位</label><select id="optH"><option value="unknown">來源未標示（需確認）</option><option value="um">µm</option><option value="mm">mm</option></select></div>
           <div class="field"><label for="optVol">體積 % 的分母</label><select id="optVol"><option value="aperture">開孔體積（開孔面積 × 厚度）</option><option value="pad">焊墊面積 × 厚度（換算為開孔基準）</option></select></div>
           <div class="field"><label for="inSub">子群組大小（無板號時）</label><input type="number" id="inSub" value="5" min="2" max="200"></div>
-        </div>
-        <div class="row">
           <div class="field"><label for="optDateFmt">日期格式</label><select id="optDateFmt"><option value="auto">自動判斷</option><option value="YMD">年/月/日 (YMD)</option><option value="DMY">日/月/年 (DMY)</option><option value="MDY">月/日/年 (MDY)</option></select></div>
           <div class="field"><label for="optDupMode">重測重複列</label><select id="optDupMode"><option value="last">保留最後一筆（預設）</option><option value="keepAll">全部保留</option></select></div>
           <div class="field" id="fldGrpFallback"><label for="optGrpFallback">無封裝欄時群組</label><select id="optGrpFallback"><option value="comp">以位號為群組（預設）</option><option value="prefix">以位號字首為群組</option></select></div>
         </div>
-        <div class="tbl" style="max-height:300px;overflow:auto"><table id="mapTbl"></table></div>
-        <div id="mapPrev" class="note"></div>
-        <h4 class="imp-step-title">④ 產品與量測中繼資料</h4>
-        <div class="row recrow" id="recRow"><div class="field"><label for="inLot">批號（選填）</label><input type="text" id="inLot" maxlength="64" placeholder="例：L2410-01"></div><div class="field"><label for="inPart">產品料號（必填）</label><input type="text" id="inPart" class="mono" list="partList" autocomplete="off" maxlength="64" placeholder="例：301-000100124" aria-describedby="inPartHint inPartError"><span class="note" id="inPartHint" aria-live="polite"></span><span class="note" id="inPartError" aria-live="polite"></span></div><div class="field"><label for="inRev">正式版次（必填）</label><input type="text" id="inRev" maxlength="32" placeholder="例：V5" aria-describedby="inRevError"><span class="note" id="inRevError" aria-live="polite"></span></div><div class="field"><label for="inWorkOrder">製令工單（與量測日期至少填一項）</label><input type="text" id="inWorkOrder" maxlength="64" aria-describedby="inWorkOrderError"><span class="note" id="inWorkOrderError" aria-live="polite"></span></div><div class="field"><label for="inMeasuredDate">量測日期（與製令工單至少填一項）</label><input type="date" id="inMeasuredDate" aria-describedby="inMeasuredDateError"><span class="note" id="inMeasuredDateError" aria-live="polite"></span></div><div class="field"><label for="inImpStencil">匯入鋼板厚度 µm（必填）</label><input type="number" id="inImpStencil" min="30" max="300" step="1" list="stencilList" placeholder="例：120" required aria-required="true" aria-describedby="inImpStencilError"><span class="note" id="inImpStencilError" aria-live="polite"></span></div><div class="field"><label for="inSupplierWo">廠商工單號</label><input type="text" id="inSupplierWo" maxlength="64" placeholder="例：SWO-202410-01"></div><div class="field"><label for="inOutsourceWo">外包工單號</label><input type="text" id="inOutsourceWo" maxlength="64" placeholder="例：OWO-88912"></div><span class="note" id="recNote" role="status" aria-live="polite" style="align-self:center;max-width:52ch"></span></div>
-        <p class="note" id="impSaveNotice" style="margin:6px 0;max-width:70ch">正式匯入須連線登入、選取有效受控座標檔；待管理者判定的新檔不納入預設分析。</p>
-        <h4 class="imp-step-title">⑤ 檢查預覽與套用</h4>
-        <div class="row"><label class="row" style="font-size:var(--fs-ui)"><input type="radio" name="impMode" value="new" checked> 新增為新回合</label><input type="text" id="inRunName" aria-label="新回合名稱" placeholder="回合名稱，例：試產 2 · 鋼板 V2" style="min-width:min(100%,220px)">
-          <label class="row" style="font-size:var(--fs-ui)"><input type="radio" name="impMode" value="replace"> 取代目前回合</label><button class="primary" id="btnApply">套用匯入</button></div>
-      <!-- ③ 輔助工程檢驗資料整合卡片 -->
+        <div class="tbl" style="max-height:300px;overflow:auto;margin-top:10px"><table id="mapTbl"></table></div>
+        <div id="mapPrev" class="note" style="margin-top:8px"></div>
       </div>
+      <div class="card" id="impStep4Card">
+        <div class="imp-step-head"><h4 class="imp-step-title">④ 產品與量測中繼資料</h4></div>
+        <div class="data-form-grid recrow" id="recRow"><div class="field"><label for="inLot">批號（選填）</label><input type="text" id="inLot" maxlength="64" placeholder="例：L2410-01"></div><div class="field"><label for="inPart">產品料號（必填）</label><input type="text" id="inPart" class="mono" list="partList" autocomplete="off" maxlength="64" placeholder="例：301-000100124" aria-describedby="inPartHint inPartError"><span class="note" id="inPartHint" aria-live="polite"></span><span class="note" id="inPartError" aria-live="polite"></span></div><div class="field"><label for="inRev">正式版次（必填）</label><input type="text" id="inRev" maxlength="32" placeholder="例：V5" aria-describedby="inRevError"><span class="note" id="inRevError" aria-live="polite"></span></div><div class="field"><label for="inWorkOrder">製令工單（與量測日期至少填一項）</label><input type="text" id="inWorkOrder" maxlength="64" aria-describedby="inWorkOrderError"><span class="note" id="inWorkOrderError" aria-live="polite"></span></div><div class="field"><label for="inMeasuredDate">量測日期（與製令工單至少填一項）</label><input type="date" id="inMeasuredDate" aria-describedby="inMeasuredDateError"><span class="note" id="inMeasuredDateError" aria-live="polite"></span></div><div class="field"><label for="inImpStencil">匯入鋼板厚度 µm（必填）</label><input type="number" id="inImpStencil" min="30" max="300" step="1" list="stencilList" placeholder="例：120" required aria-required="true" aria-describedby="inImpStencilError"><span class="note" id="inImpStencilError" aria-live="polite"></span></div><div class="field"><label for="inSupplierWo">廠商工單號</label><input type="text" id="inSupplierWo" maxlength="64" placeholder="例：SWO-202410-01"></div><div class="field"><label for="inOutsourceWo">外包工單號</label><input type="text" id="inOutsourceWo" maxlength="64" placeholder="例：OWO-88912"></div><span class="note" id="recNote" role="status" aria-live="polite" style="align-self:center;max-width:52ch"></span></div>
+        <p class="note" id="impSaveNotice" style="margin:8px 0 0;max-width:70ch">正式匯入須連線登入、選取有效受控座標檔；待管理者判定的新檔不納入預設分析。</p>
+      </div>
+      <div class="card" id="impStep5Card">
+        <div class="imp-step-head"><h4 class="imp-step-title">⑤ 檢查預覽與套用</h4></div>
+        <div class="imp-apply-bar">
+          <div class="row imp-apply-opts">
+            <label class="row" style="font-size:var(--fs-ui)"><input type="radio" name="impMode" value="new" checked> 新增為新回合</label>
+            <input type="text" id="inRunName" aria-label="新回合名稱" placeholder="回合名稱，例：試產 2 · 鋼板 V2">
+            <label class="row" style="font-size:var(--fs-ui)"><input type="radio" name="impMode" value="replace"> 取代目前回合</label>
+          </div>
+          <button class="primary" id="btnApply">套用匯入</button>
+        </div>
+      </div>
+      <!-- ③ 輔助工程檢驗資料整合卡片 -->
     </div>
   </div>
-  <div data-sub="stencil-spec" hidden style="display:grid;grid-template-columns:minmax(0,1fr);gap:16px;min-width:0">
+  <div data-sub="stencil-spec" hidden>
     <div class="card" id="settingsAnchorThk">
       <h3>鋼板厚度</h3>
-      <div class="row" style="margin-bottom:10px">
+      <div class="data-form-grid" style="margin-bottom:10px">
         <div class="field"><label for="inStencil2">本回合鋼板厚度 µm</label><input type="number" id="inStencil2" list="stencilList" min="30" max="300" step="1"><datalist id="stencilList"><option value="80"><option value="100"><option value="110"><option value="120"><option value="130"><option value="150"></datalist></div>
       </div>
       <p class="note" id="stencilNote" style="margin-top:0"></p>
     </div>
     <div class="card" id="settingsAnchorStencil">
     <h3>階梯鋼板與位置設定 </h3>
-    <div class="row"><label class="row" style="font-size:var(--fs-ui)"><input type="checkbox" id="chkStep"> 啟用階梯鋼板</label><button id="btnAddZone">新增區域</button><span class="note" id="zoneSum"></span></div>
+    <div class="spec-toolbar"><label class="row" style="font-size:var(--fs-ui)"><input type="checkbox" id="chkStep"> 啟用階梯鋼板</label><button id="btnAddZone">新增區域</button><span class="note" id="zoneSum"></span></div>
     <div class="tbl" style="margin-top:10px"><table id="zoneTbl"></table></div>
     <p class="note">位置設定：先在表格選取一個區域（「框選」欄），再於下方板面圖上拖曳框出範圍，該區域會自動改為「座標區域」。座標單位 mm，與 SPI 資料 X / Y 相同。</p>
     <canvas class="heat" id="zoneMap" width="900" height="600" style="touch-action:none;cursor:crosshair" role="img" aria-label="階梯鋼板區域位置圖，可拖曳框選"></canvas>
@@ -1658,7 +1696,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
     <h3>鋼板開孔設定 </h3>
         <div class="tbl"><table id="apTbl"></table></div>
     <p class="note" id="apNote"></p>
-    <div class="row" style="margin-top:10px;flex-wrap:wrap;align-items:flex-end;gap:8px">
+    <div class="spec-toolbar" style="margin-top:10px;align-items:flex-end">
       <label class="row" for="geomPadFile" style="cursor:pointer;font-size:var(--fs-ui)"><input type="file" id="geomPadFile" accept=".csv,.txt,.tsv" class="sr" aria-label="匯入幾何焊墊清單 CSV"><span class="chipbtn" style="border:1px solid var(--line);display:inline-flex;align-items:center">匯入幾何焊墊清單 CSV</span></label>
       <button type="button" id="geomPadClear" hidden>清除幾何清單</button>
     </div>
@@ -1666,29 +1704,33 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
     <div class="tbl" id="geomUncoveredBox" hidden style="margin-top:8px;max-height:200px;overflow:auto"><table id="geomUncoveredTbl"></table></div>
     </div>
   </div>
-  <div data-sub="paste-spec" hidden style="display:grid;grid-template-columns:minmax(0,1fr);gap:16px;min-width:0">
+  <div data-sub="paste-spec" hidden>
     <div class="card" id="settingsAnchorSpec">
-      <div class="row" style="margin-bottom:10px">
-        <div class="field"><label for="selSqDir">刮刀行程方向</label><select id="selSqDir"><option value="Y">沿 PCB Y 方向</option><option value="X">沿 PCB X 方向</option></select></div>
-        <div class="field"><label for="inWipe2">每幾片擦拭一次</label><input type="number" id="inWipe2" min="2" max="50" step="1"></div>
+      <div class="spec-param-box">
+        <div class="data-form-grid">
+          <div class="field"><label for="selSqDir">刮刀行程方向</label><select id="selSqDir"><option value="Y">沿 PCB Y 方向</option><option value="X">沿 PCB X 方向</option></select></div>
+          <div class="field"><label for="inWipe2">每幾片擦拭一次</label><input type="number" id="inWipe2" min="2" max="50" step="1"></div>
+        </div>
+        <p class="note" style="margin:0"><span id="pasteStencilRef"></span> <button type="button" class="linkbtn" id="btnGoStencilThk">修改鋼板厚度</button></p>
       </div>
-      <p class="note" style="margin-top:0"><span id="pasteStencilRef"></span> <button type="button" class="linkbtn" id="btnGoStencilThk">修改鋼板厚度</button></p>
-      <div id="partSpecBar" role="status" style="margin:0 0 8px"></div>
-      <div class="row" style="margin-bottom:10px">
-        <button type="button" class="primary" id="btnSpecSave">儲存為新版本</button>
-        <button type="button" id="btnSpecDiscard">放棄修改</button>
-        <button type="button" id="btnSpecVers">版本清單</button>
+      <div class="spec-ver-bar">
+        <div id="partSpecBar" role="status" style="margin:0;flex:1 1 280px;min-width:0"></div>
+        <div class="spec-ver-actions">
+          <button type="button" class="primary" id="btnSpecSave">儲存為新版本</button>
+          <button type="button" id="btnSpecDiscard">放棄修改</button>
+          <button type="button" id="btnSpecVers">版本清單</button>
+        </div>
       </div>
-      <p class="note" id="specSrcNote" style="margin-top:0"></p>
+      <p class="note" id="specSrcNote" style="margin:6px 0 8px"></p>
       <p class="err" id="specTblErr" role="alert" style="margin:0 0 6px"></p>
       <div class="tbl"><table id="specTbl"></table></div>
       <div id="specGrpBox">
-        <h3 style="margin-top:14px">元件群組覆寫 <small>未列出的項目沿用上表全板規格</small></h3>
+        <h3 style="margin-top:16px">元件群組覆寫 <small>未列出的項目沿用上表全板規格</small></h3>
         <div class="tbl"><table id="specGrpTbl"></table></div>
-        <div class="row" style="margin-top:8px">
+        <div class="spec-grp-add">
           <div class="field"><label for="selSpecGrp">元件群組</label><select id="selSpecGrp"></select></div>
           <div class="field"><label for="selSpecGrpM">量測項目</label><select id="selSpecGrpM"><option value="volume">體積 %</option><option value="hpct">高度 % 鋼板厚</option><option value="area">面積 %</option><option value="offx">X 偏移 µm</option><option value="offy">Y 偏移 µm</option></select></div>
-          <button type="button" id="btnSpecGrpAdd" style="align-self:flex-end">新增覆寫</button>
+          <button type="button" id="btnSpecGrpAdd">新增覆寫</button>
         </div>
       </div>
     </div>
@@ -7271,7 +7313,7 @@ const ZCOL=["#3D6E8F","#B5652B","#7A5BA6","#2C7A4C","#B5487A","#8A7A2C"];
 function persist(){saveRunsSoon()}
 /* ---------- 開孔設定 ---------- */
 function renderAperture(){const groups=[...new Set(S.rows.map(r=>r.group))],b0=S.rows[0]&&S.rows[0].board,hasCsv=S.rows.some(r=>r.apL!=null);
-  $("#apTbl").innerHTML=`<thead><tr><th>元件群組</th><th class="num">焊墊尺寸 mm</th><th>開孔形狀</th><th>線性縮減 %</th><th>指定 L × W mm</th><th class="num">實際開孔 mm</th><th class="num">鋼板 µm</th><th class="num">面積比 AR</th><th class="num">寬厚比</th><th class="num">AR≥0.66 最大厚度</th><th>判讀</th></tr></thead><tbody>`+groups.map(g=>{
+  $("#apTbl").innerHTML=`<thead><tr><th>元件群組</th><th class="num">焊墊尺寸 mm</th><th>開孔形狀</th><th>線性縮減 %</th><th>指定 L × W mm</th><th class="num">實際開孔 mm</th><th class="num">鋼板 µm</th><th class="num">面積比 AR</th><th class="num">寬厚比</th><th class="num">AR≥0.66 最大厚度</th><th>判讀</th></tr></thead><tbody>`+(groups.length?groups.map(g=>{
     const ps0=padReps(S.rows.filter(r=>r.group===g)),geo=ps0.filter(p=>!geomAssumed(p,S)),noGeo=!geo.length,ps=noGeo?ps0:geo,r=ps[0],c=S.aperture.groups[g]||{},a=aperture(r,S),ars=noGeo?[NaN]:ps.map(p=>areaRatio(p,S)),asp=noGeo?NaN:Math.min(...ps.map(p=>aspectRatio(p,S))),arMin=Math.min(...ars),tmax=noGeo?NaN:Math.min(...ps.map(p=>maxThkForAR(p,S))),thk=[...new Set(ps0.map(p=>padThk(p,S)))].join("/");
     /* 0.7 mm 估算幾何不判定面積比（與 detectIssues 同一規則） */
     const st=noGeo?"na":arMin<.66||asp<1.5?"ng":arMin<.75?"warn":"ok",tip=noGeo?"缺焊墊／開孔尺寸，面積比無法判定；請填寫指定 L × W":arMin<.66?`AR 不足：改用 ≤ ${f(tmax,0)} µm（可用階梯鋼板局部減薄）或加大開孔`:asp<1.5?"寬厚比 < 1.5，細間距易堵孔":arMin<.75?"接近下限，建議使用奈米塗層或電鑄鋼板":"符合 IPC-7525";
@@ -7282,7 +7324,8 @@ function renderAperture(){const groups=[...new Set(S.rows.map(r=>r.group))],b0=S
       <td style="white-space:nowrap"><input type="number" id="apl-${gid}" data-g="${g}" data-f="L" value="${c.L??""}" placeholder="L" min="0.05" step="0.01" style="width:70px" aria-label="${g} 開孔長"> × <input type="number" id="apw-${gid}" data-g="${g}" data-f="W" value="${c.W??""}" placeholder="W" min="0.05" step="0.01" style="width:70px" aria-label="${g} 開孔寬"></td>
       <td class="num mono">${noGeo?"—":a.shape==="round"?"Ø"+f(a.L,3):f(a.L,3)+" × "+f(a.W,3)}<div class="note">${noGeo?"未提供尺寸":a.src}</div></td>
       <td class="num mono">${thk}</td><td class="num mono">${f(arMin,2)}${ars.length>1&&Math.max(...ars)-arMin>.01?"–"+f(Math.max(...ars),2):""}</td><td class="num mono">${f(asp,2)}</td><td class="num mono">${f(tmax,0)} µm</td>
-      <td><span class="pill ${st}">${st==="na"?"待確認":st==="ok"?"正常":st==="warn"?"注意":"風險"}</span> <span class="note">${tip}</span></td></tr>`}).join("")+"</tbody>";
+      <td><span class="pill ${st}">${st==="na"?"待確認":st==="ok"?"正常":st==="warn"?"注意":"風險"}</span> <span class="note">${tip}</span></td></tr>`}).join("")
+    :'<tr class="empty-row"><td colspan="11" class="empty-cell"><span class="empty-msg">尚未載入量測資料；匯入或開啟紀錄後，將依元件群組列出焊墊與鋼板開孔設定。</span></td></tr>')+"</tbody>";
   const LA=curRun()&&curRun().info&&curRun().info.layout,nFile=S.aperture.file?Object.keys(S.aperture.file).length:0,nMixed=LA&&LA.apMixed?LA.apMixed.length:0;
   $("#apNote").textContent=(hasCsv?"資料內含逐焊墊開孔尺寸，已優先採用。":"")+(nFile?`鋼板檔開孔已套用 ${nFile} 顆零件${nMixed?`；${nMixed} 顆開孔尺寸不一，無法逐焊墊對應`:""}。`:"")+(S.rows.some(r=>geomAssumed(r,S))?"資料未提供焊墊尺寸，面積比無法判定，請直接填寫「指定 L × W」。":"")+" 寬厚比 = 開孔最短邊 ÷ 鋼板厚度（IPC-7525 建議 ≥ 1.5）。";
   $$("#apTbl [data-g]").forEach(el=>el.onchange=()=>{const g=el.dataset.g,c=S.aperture.groups[g]=S.aperture.groups[g]||{},k=el.dataset.f;
@@ -11014,9 +11057,10 @@ function initRuns(reset){S.runs=[];S.runId=null;
   addRun("試產 2 · V2 BGA 加大＋奈米塗層",sampleData({variant:"B"}),["volume","height","area","offx","offy"],cb);S.runs[1].sample=true;
   S.cmpA=1;S.cmpB=2;switchRun(a)}
 function renderRuns(){if(!S.runs)return;const rail=$(".rail");if(rail)rail.classList.toggle("rail--empty",!S.runs.length);fillSelect($("#selRun"),S.runs.map(r=>[String(r.id),r.name]),String(S.runId));
-  $("#runTbl").innerHTML=`<thead><tr><th>回合名稱</th><th>批號／產品料號</th><th class="num">板</th><th class="num">焊墊</th><th class="num">鋼板 µm</th><th></th></tr></thead><tbody>`+S.runs.map(r=>{const cfg=r.id===S.runId?snapCfg():r.cfg;
+  $("#runTbl").innerHTML=`<thead><tr><th>回合名稱</th><th>批號／產品料號</th><th class="num">板</th><th class="num">焊墊</th><th class="num">鋼板 µm</th><th></th></tr></thead><tbody>`+(S.runs.length?S.runs.map(r=>{const cfg=r.id===S.runId?snapCfg():r.cfg;
     return`<tr${r.id===S.runId?' style="background:var(--accent-soft)"':""}><td><input type="text" id="rn-${r.id}" data-rid="${r.id}" value="${esc(r.name)}" style="min-width:180px" aria-label="回合名稱"></td><td>${runSrc(r)?`<b>${esc(runSrc(r).lot||"未提供")}</b><br><span class="note">${esc(runSrc(r).part)}${runSrc(r).side?" · "+esc(runSrc(r).side):""}</span>${runSrc(r).lifecycle!=="active"?'<br><span class="pill warn">歷史／未驗證</span>':""}`:'<span class="note">'+(r.sample?"範例資料":"未連結資料庫")+"</span>"}</td><td class="num mono">${new Set(r.rows.map(x=>x.board)).size}</td><td class="num mono">${new Set(r.rows.map(x=>x.pad)).size}</td><td class="num mono">${cfg.stencil}${cfg.step&&cfg.step.on?"·階梯":""}${legacyHpct(r)?'<br><span class="pill warn" title="舊版匯入的高度 % 資料，換算厚度未記錄">高度需重新匯入</span>':""}</td>
-    <td style="white-space:nowrap">${r.id===S.runId?'<span class="pill ok">目前</span>':`<button data-use="${r.id}">設為目前</button>`} <button data-delrun="${r.id}">刪除</button></td></tr>`}).join("")+"</tbody>";
+    <td style="white-space:nowrap">${r.id===S.runId?'<span class="pill ok">目前</span>':`<button data-use="${r.id}">設為目前</button>`} <button data-delrun="${r.id}">刪除</button></td></tr>`}).join("")
+    :'<tr class="empty-row"><td colspan="6" class="empty-cell"><span class="empty-msg">目前尚無試產回合。請切換至「匯入資料」上傳量測檔、從頂部「記錄庫」開啟紀錄，或展開下方「範例資料」載入示範回合。</span></td></tr>')+"</tbody>";
   $$("#runTbl [data-rid]").forEach(el=>el.onchange=()=>{const r=S.runs.find(x=>x.id===+el.dataset.rid);r.name=safeId(el.value)||r.name;saveRunsSoon();if(r.id===S.runId)S.source=r.name;syncControls();renderTab()});
   $$("#runTbl [data-use]").forEach(b=>b.onclick=()=>switchRun(+b.dataset.use));
   legacyHpctNote($("#runLegacy"),S.runs);probeLegacyHpct();
@@ -11576,8 +11620,9 @@ function updateImportWorkflow(){
           previewReady?"請檢查欄位預覽與警示，再確認中繼資料後套用。":"請依序完成各區段；套用時會再執行正式驗證。";
 }
 $("#impValidationSummary")?.querySelector("[data-import-error-jump]")?.addEventListener("click",()=>{const target=IMPORT_FLOW_ERROR_TARGET;if(target?.focus){target.focus();target.scrollIntoView?.({block:"center"})}});
-$("#impFlowSteps")?.closest(".card")?.addEventListener("input",e=>{if(e.target.matches("input,select,textarea")){clearImportValidationError();clearImportFieldErrors(e.target.id);syncIdentityHints();if($("#recNote")?.querySelector(".err"))$("#recNote").textContent="";renderImportSourceSummary();updateImportWorkflow()}});
-$("#impFlowSteps")?.closest(".card")?.addEventListener("change",e=>{if(e.target.matches("input,select,textarea")){clearImportValidationError();clearImportFieldErrors(e.target.id);syncIdentityHints();if($("#recNote")?.querySelector(".err"))$("#recNote").textContent="";renderImportSourceSummary();updateImportWorkflow()}});
+const impFlowHost=$("#p-data div[data-sub='import']")||$("#impFlowSteps")?.closest(".card");
+impFlowHost?.addEventListener("input",e=>{if(e.target.matches("input,select,textarea")){clearImportValidationError();clearImportFieldErrors(e.target.id);syncIdentityHints();if($("#recNote")?.querySelector(".err"))$("#recNote").textContent="";renderImportSourceSummary();updateImportWorkflow()}});
+impFlowHost?.addEventListener("change",e=>{if(e.target.matches("input,select,textarea")){clearImportValidationError();clearImportFieldErrors(e.target.id);syncIdentityHints();if($("#recNote")?.querySelector(".err"))$("#recNote").textContent="";renderImportSourceSummary();updateImportWorkflow()}});
 ["optOff","optH","optVol","inSub","optDateFmt","optDupMode","optGrpFallback"].forEach(id=>{const el=$("#"+id);if(el)el.onchange=()=>IMP&&previewImport()});
 $("#selProfile").onchange=e=>{if(!IMP)return;applyProfile(e.target.value);renderMap()};
 $("#btnSaveProfile").onclick=()=>{if(!IMP)return;const name=safeId($("#inProfileName").value)||"自訂設定檔",cols={};Object.entries(IMP.map).forEach(([k,i])=>cols[k]=IMP.tab.head[i]);

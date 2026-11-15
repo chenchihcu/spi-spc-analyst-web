@@ -225,6 +225,29 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
     assert.equal(hook.S.relChart, rk);
   }
 
+  // 資料與規格：匯入步驟拆為流程卡＋5張獨立卡片（無巢狀卡）、跨卡事件委派及空狀態呈現
+  tab("data");
+  w.SPI_TEST_HOOK.setSub("import");
+  const impSub = d.querySelector('#p-data div[data-sub="import"]');
+  assert.ok(impSub.querySelector(".imp-flow-card"), "應有頂部匯入流程總覽卡");
+  for (const cid of ["impStep1Card", "impStep2Card", "impStep3Card", "impStep4Card", "impStep5Card"]) {
+    const card = d.getElementById(cid);
+    assert.ok(card && card.classList.contains("card") && impSub.contains(card), `#${cid} 應為獨立步驟卡片`);
+    assert.equal(card.parentElement.closest(".card"), null, `#${cid} 不可巢狀包在另一張 .card 內`);
+  }
+  $("#btnPhme").click();
+  assert.equal($("#mapBox").hidden, false, "讀取資料後應展開步驟 ③～⑤ 的 #mapBox");
+  $("#inPart").value = "PART-X-01";
+  $("#inPart").dispatchEvent(new w.Event("input", { bubbles: true }));
+  assert.match($("#impSourceSummary").textContent, /PART-X-01/, "跨卡片修改 #inPart 應透過 [data-sub='import'] 委派更新來源摘要");
+  w.SPI_TEST_HOOK.setSub("runs");
+  while (hook.S.runs.length) d.querySelector("#runTbl [data-delrun]").click();
+  assert.ok(d.querySelector("#runTbl tbody .empty-row .empty-cell"), "無回合時 #runTbl 應呈現空狀態列");
+  w.SPI_TEST_HOOK.setSub("stencil-spec");
+  assert.ok(d.querySelector("#apTbl tbody .empty-row .empty-cell"), "無量測資料時 #apTbl 應呈現空狀態列");
+  $("#btnSample").click();
+  assert.equal(d.querySelector("#runTbl tbody .empty-row"), null, "載入範例後應顯示正常回合列");
+
   assert.deepEqual(errs, []);
 });
 

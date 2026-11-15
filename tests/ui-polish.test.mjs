@@ -128,4 +128,9 @@ test("樣式守衛：狀態膠囊同字級、核取方塊配色、子分頁同�
   assert.match(src, /\.subtab\[aria-selected="true"\]\{background:var\(--accent-soft\);color:var\(--accent-ink\);border-color:var\(--accent\)/);
   assert.doesNotMatch(src, /class="rail-fields" style="[^"]*align-items:flex-end/);
   assert.match(src, /Chart\.register\(vlines,limitLabels\)/);
+  assert.match(src, /#p-data > \[data-sub\]:not\(\.subtab\)\{display:grid;grid-template-columns:minmax\(0,1fr\);gap:16px/);
+  assert.match(src, /\.data-form-grid\{display:grid;grid-template-columns:repeat\(auto-fit,minmax\(min\(100%,210px\),1fr\)\)/);
+  assert.match(src, /\.imp-apply-bar\{/);
+  assert.match(src, /\.spec-param-box\{/);
+  assert.match(src, /\.spec-ver-bar\{/);
 });
