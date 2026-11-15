@@ -186,7 +186,7 @@ test("R-PDF 與 M-01：分析報告頁籤、10 個章節勾選、生成多頁 PD
   assert.ok(repTab, "頂端頁籤列存在 report 分析報告按鈕");
   const repPanel = d.querySelector("#p-report");
   assert.ok(repPanel, "存在 #p-report 面板");
-  assert.ok(d.querySelector("#btnRepPdf"), "存在匯出 PDF 按鈕");
+  assert.ok(d.querySelector('[data-exp-act="rep-pdf"]'), "匯出中心存在匯出 PDF 按鈕");
   assert.ok(d.querySelector("#btnRepPrint"), "存在列印整頁報告按鈕");
   assert.ok(d.querySelector("#btnRepMail"), "存在以 Email 傳送按鈕");
 

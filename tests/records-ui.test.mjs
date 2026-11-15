@@ -222,9 +222,9 @@ test("重複檔沿用既有紀錄；從資料庫開啟不重複存；管理者�
   assert.ok(d.querySelector('#tblPickSpi [data-pact=del]'), "管理者可見刪除鈕");
   const spiId = recs.find(r => r.kind === "spi").id;
   $('#tblPickSpi [data-pact=del]').click();
-  assert.ok(await until(() => $("#recDeleteModal").classList.contains("open")), "刪除確認須以 .open 顯示 db-modal");
-  $("#recDeleteConfirm").click();
-  assert.ok(await until(() => $("#recDeleteModal").hidden));
+  assert.ok(await until(() => $("#confirmModal").classList.contains("open")), "刪除確認須以 .open 顯示 db-modal");
+  $("#confirmOk").click();
+  assert.ok(await until(() => $("#confirmModal").hidden));
   assert.equal((await w.eval("SPI_TEST_HOOK.RecDB.list()")).filter(r => r.kind === "spi").length, 0);
   assert.match($("#stateSpi").textContent, /雲端檔已刪除/);
   openPickerTab(d, 'specs');
@@ -236,11 +236,11 @@ test("重複檔沿用既有紀錄；從資料庫開啟不重複存；管理者�
   const before = d.querySelectorAll('#recAudit [data-audit-del]').length;
   assert.ok(before > 0, "管理者可見稽核刪除鈕");
   d.querySelector('#recAudit [data-audit-del]').click();
-  assert.ok(await until(() => $("#recDeleteModal").classList.contains("open")));
-  assert.equal($("#recDeleteTitle").textContent, "刪除稽核紀錄");
-  assert.match($("#recDeleteBody").textContent, /會留下一筆刪除紀錄/);
-  $("#recDeleteConfirm").click();
-  assert.ok(await until(() => $("#recDeleteModal").hidden && /刪除稽核/.test($("#recAudit").textContent)));
+  assert.ok(await until(() => $("#confirmModal").classList.contains("open")));
+  assert.equal($("#confirmTitle").textContent, "刪除稽核紀錄");
+  assert.match($("#confirmBody").textContent, /會留下一筆刪除紀錄/);
+  $("#confirmOk").click();
+  assert.ok(await until(() => $("#confirmModal").hidden && /刪除稽核/.test($("#recAudit").textContent)));
   assert.equal(d.querySelectorAll('#recAudit [data-audit-del]').length, before - 1, "原列刪除，墓碑列沒有刪除鈕");
   assert.deepEqual(errs, []);
 });
@@ -252,11 +252,12 @@ test("座標檔：受控欄位未填不能上傳；存入後可在資料庫選�
   const sv = $("#selVendor"); sv.value = "lirong"; sv.dispatchEvent(new w.Event("change"));
   const PL = "RefDes,X,Y,PartType,Layer\nC1,10,20,C0402,TOP\n";
   await openPlacePicker(d);
+  $('#btnShowPlaceForm')?.click();
   const inp = $('#upPlaceFile');
   Object.defineProperty(inp, 'files', { configurable: true, value: [new w.File([Buffer.from(PL)], 'p.csv')] });
   inp.dispatchEvent(new w.Event('change'));
   await tick(50);
-  $('#btnSubmitPlace').click();
+  $('#btnSubmitRef').click();
   assert.match($("#upPlaceState").textContent || $("#upPlaceState").innerHTML, /請填寫正式料號、版次/);
   assert.equal((await w.eval("SPI_TEST_HOOK.RecDB.list()")).length, 0);
   await uploadPlaceViaPicker(w, d, {

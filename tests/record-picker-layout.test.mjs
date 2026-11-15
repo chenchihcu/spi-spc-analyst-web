@@ -37,8 +37,8 @@ test("記錄庫原始碼：單一捲動區，分頁內不設高度上限，沒�
   // 清單一定排在捲動區的第一個分頁；登錄表單移入專用對話框
   const spiPane = html.slice(html.indexOf('id="boxPickSpi"'), html.indexOf('id="boxPickPlace"'));
   assert.doesNotMatch(spiPane, /<form|class="field"|id="boxUpload/, "量測分頁只放清單，不放表單");
-  assert.match(SRC, /id="uploadPlaceModal"[^>]*\shidden/, "座標登錄對話框預設關閉");
-  assert.match(SRC, /id="uploadLayoutModal"[^>]*\shidden/, "板面圖檔登錄對話框預設關閉");
+  assert.match(SRC, /id="uploadRefModal"[^>]*\shidden/, "受控檔案登錄共用對話框預設關閉");
+  assert.ok(SRC.includes('id="upPlaceFields"') && SRC.includes('id="upLayFields"'), "座標與板面圖檔欄位於共用對話框內分區存在");
   assert.doesNotMatch(html, /id="btnPick(Spi|Place|Layout|Specs|Import)"[^>]*\shidden/, "五大功能分頁按鈕皆不可隱藏");
 });
 
@@ -96,10 +96,10 @@ test("記錄庫行為：預設是量測清單，新到舊，每列一顆主鈕�
   $("#btnPickPlace").click();
   assert.ok(await until(() => d.querySelectorAll("#tblPickPlace tr[data-row-id]").length === 2), "換到座標檔分頁不沿用量測的對應篩選");
   assert.equal($("#recPlaceAdminBar").hidden, false, "管理者看得到登錄按鈕");
-  assert.equal($("#uploadPlaceModal").hidden, true, "座標登錄對話框預設關閉");
+  assert.equal($("#uploadRefModal").hidden, true, "受控檔案登錄對話框預設關閉");
   $("#btnShowPlaceForm").click();
-  assert.equal($("#uploadPlaceModal").hidden, false);
-  $("#uploadPlaceClose").click();
+  assert.equal($("#uploadRefModal").hidden, false);
+  $("#uploadRefClose").click();
   assert.match($('#recQuickFilters [data-link="unused"]').textContent, /無量測引用 1$/);
 
   // 「尚未搭配」量測的選單可直接帶料號開啟座標登錄對話框
@@ -108,8 +108,8 @@ test("記錄庫行為：預設是量測清單，新到舊，每列一顆主鈕�
   const up = [...d.querySelectorAll("#tblPickSpi tr[data-row-id]")].find(tr => /LOT-OLD/.test(tr.textContent)).querySelector(".rec-menu [data-pair-upload]");
   assert.ok(up, "尚未搭配的量測可從選單登錄座標檔");
   up.click();
-  assert.ok(await until(() => !$("#boxPickPlace").hidden && !$("#uploadPlaceModal").hidden && $("#upPlacePart").value === "LAY-1"), "切到座標檔分頁、開啟座標登錄對話框並帶入料號");
-  $("#uploadPlaceClose").click();
+  assert.ok(await until(() => !$("#boxPickPlace").hidden && !$("#uploadRefModal").hidden && $("#upPlacePart").value === "LAY-1"), "切到座標檔分頁、開啟座標登錄對話框並帶入料號");
+  $("#uploadRefClose").click();
 
   assert.deepEqual(errs, []);
   cloud.close();
@@ -138,15 +138,12 @@ test("記錄庫升級契約：五大分頁、檔名重新命名、批次刪除�
   const w = dom.window, d = w.document, $ = s => d.querySelector(s);
   await w.SPI_TEST_HOOK.RecDB.ready;
 
-  // 1. 驗證所有新對話框頁尾按鈕順序為左確認、右取消
+  // 1. 驗證共用對話框頁尾按鈕順序為左確認、右取消
   for (const [okId, cancelId] of [
-    ["#btnSubmitPlace", "#uploadPlaceCancel"],
-    ["#btnSubmitLayout", "#uploadLayoutCancel"],
-    ["#recRenameSave", "#recRenameCancel"],
-    ["#recConfirmOk", "#recConfirmCancel"],
-    ["#recNewBatchSave", "#recNewBatchCancel"],
-    ["#recCorrectSave", "#recCorrectCancel"],
-    ["#recBatchConfirmDel", "#recBatchConfirmCancel"],
+    ["#btnSubmitRef", "#uploadRefCancel"],
+    ["#recEditSave", "#recEditCancel"],
+    ["#confirmOk", "#confirmCancel"],
+    ["#recAdjSave", "#recAdjCancel"],
   ]) {
     const okBtn = $(okId), cancelBtn = $(cancelId);
     assert.ok(okBtn && cancelBtn, `${okId} 與 ${cancelId} 應存在`);
@@ -178,34 +175,34 @@ test("記錄庫升級契約：五大分頁、檔名重新命名、批次刪除�
   const renameBtn = $(`#tblPickPlace tr[data-row-id="${placeUnused.id}"] [data-pact="rename"]`);
   assert.ok(renameBtn, "管理者應有重新命名動作");
   renameBtn.click();
-  assert.ok(await until(() => !$("#recRenameModal").hidden), "應開啟重新命名對話框");
-  $("#recRenameInput").value = "ux2_renamed.txt";
-  $("#recRenameInput").dispatchEvent(new w.Event("input"));
-  assert.equal($("#recRenameExtWarn").hidden, false, "更改副檔名應顯示提醒");
-  $("#recRenameSave").click();
-  assert.ok(await until(() => $("#recRenameModal").hidden && $("#tblPickPlace").textContent.includes("ux2_renamed.txt")), "應完成重命名並刷新清單");
+  assert.ok(await until(() => !$("#recEditModal").hidden), "應開啟重新命名對話框");
+  $("#recEditName").value = "ux2_renamed.txt";
+  $("#recEditName").dispatchEvent(new w.Event("input"));
+  assert.equal($("#recEditExtWarn").hidden, false, "更改副檔名應顯示提醒");
+  $("#recEditSave").click();
+  assert.ok(await until(() => $("#recEditModal").hidden && $("#tblPickPlace").textContent.includes("ux2_renamed.txt")), "應完成重命名並刷新清單");
 
   // 4. 管理者批次選取＋受引用安全預檢略過＋批次刪除
   $("#btnRecBatchSelectAll").click();
   assert.equal($("#recBatchBar").hidden, false, "勾選後應顯示批次動作列");
   assert.equal($("#recBatchDelNum").textContent, "2", "應選取 2 筆座標檔");
   $("#btnRecBatchDelete").click();
-  assert.ok(await until(() => !$("#recBatchConfirmModal").hidden), "應開啟批次刪除安全檢查對話框");
-  assert.equal($("#recBatchWarnBox").hidden, false, "被量測引用的座標應觸發警告");
-  assert.equal($("#recBatchExcludeRisk").hidden, false, "應顯示一鍵略過受引用項目按鈕");
-  $("#recBatchExcludeRisk").click();
-  assert.match($("#recBatchConfirmDel").textContent, /\(1\)/, "略過受引用項後應剩 1 筆可刪");
-  $("#recBatchConfirmDel").click();
-  assert.ok(await until(() => $("#recBatchConfirmModal").hidden && d.querySelectorAll("#tblPickPlace tr[data-row-id]").length === 1), "批次刪除未引用座標後應剩 1 筆受引用座標");
+  assert.ok(await until(() => !$("#confirmModal").hidden), "應開啟批次刪除安全檢查對話框");
+  assert.equal($("#confirmWarnBox").hidden, false, "被量測引用的座標應觸發警告");
+  assert.equal($("#confirmExcludeRisk").hidden, false, "應顯示一鍵略過受引用項目按鈕");
+  $("#confirmExcludeRisk").click();
+  assert.match($("#confirmOk").textContent, /\(1\)/, "略過受引用項後應剩 1 筆可刪");
+  $("#confirmOk").click();
+  assert.ok(await until(() => $("#confirmModal").hidden && d.querySelectorAll("#tblPickPlace tr[data-row-id]").length === 1), "批次刪除未引用座標後應剩 1 筆受引用座標");
   assert.equal($("#recBatchBar").hidden, true, "刪除完成後批次列自動隱藏");
 
   // 5. 封存確認對話框（不使用 window.confirm）
   w.confirm = () => { throw new Error("檔案管理操作不應再呼叫 window.confirm"); };
   w.prompt = () => { throw new Error("檔案管理操作不應再呼叫 window.prompt"); };
   $(`#tblPickPlace tr[data-row-id="${place.id}"] [data-pact="archive-place"]`).click();
-  assert.ok(await until(() => !$("#recConfirmModal").hidden), "封存應開啟語意確認對話框");
-  $("#recConfirmOk").click();
-  assert.ok(await until(() => $("#recConfirmModal").hidden && /已封存/.test($("#tblPickPlace").textContent)), "封存應成功更新清單狀態");
+  assert.ok(await until(() => !$("#confirmModal").hidden), "封存應開啟語意確認對話框");
+  $("#confirmOk").click();
+  assert.ok(await until(() => $("#confirmModal").hidden && /已封存/.test($("#tblPickPlace").textContent)), "封存應成功更新清單狀態");
 
   assert.deepEqual(errs, []);
   cloud.close();

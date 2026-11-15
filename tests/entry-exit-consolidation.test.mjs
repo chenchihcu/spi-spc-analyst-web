@@ -149,11 +149,10 @@ test("整合資料上傳入口與下載出口介面結構與互動契約驗證",
 
   closeBtn.click();
 
-  // 6. 行內重複檔案匯出已收斂至匯出中心；報告頁只留 PDF
-  for (const gone of ["btnStatsCsv", "btnExportCorrectionJson", "btnExpDef"]) {
+  // 6. 行內重複檔案匯出已收斂至匯出中心
+  for (const gone of ["btnStatsCsv", "btnExportCorrectionJson", "btnExpDef", "btnRepPdf", "btnMailDlPdf"]) {
     assert.equal(document.getElementById(gone), null, `行內匯出按鈕 #${gone} 應已移除，改由匯出中心下載`);
   }
-  assert.ok(document.getElementById("btnRepPdf"), "報告頁應保留 PDF 匯出");
   for (const type of ["rep-md", "iss-csv", "iss-xlsx", "rep-pdf", "snap-3d", "cmp-md", "dfm-csv", "dfm-md", "stats-csv", "correction-json", "def-csv"]) {
     assert.ok(document.querySelector(`[data-exp-act="${type}"]`), `匯出中心應支援 ${type}`);
   }

@@ -142,7 +142,8 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   assert.equal(d.querySelector(".rail #railTimeWrap"), null, "分析設定列不應含時段篩選");
   assert.equal(d.querySelector(".rail #inTimeStart"), null, "分析設定列不應含時段輸入");
   assert.ok(d.querySelector("#btnOpenExportModal"), "匯出應以匯出中心為單一入口");
-  assert.ok(d.querySelector("#btnRepPdf"), "分析報告頁保留 PDF 匯出");
+  assert.equal(d.querySelector("#btnRepPdf"), null, "分析報告頁重複 PDF 鈕應收斂至匯出中心");
+  assert.ok(d.querySelector("#btnRepPrint"), "分析報告頁保留整頁列印");
   assert.ok(d.querySelector('#p-ai #aiCompactBar #btnGoAiCfg'), "AI 診斷頁頂部應有精簡狀態列與設定轉跳鈕");
   tab("ai");
   d.querySelector("#btnGoAiCfg").click();

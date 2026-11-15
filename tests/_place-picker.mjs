@@ -25,6 +25,7 @@ export async function openPlacePicker(d) {
 export async function uploadPlaceViaPicker(w, d, { part, rev, side = 'TOP', unit = 'mm', body, name = 'place.csv' }) {
   await openPlacePicker(d);
   const $ = (s) => d.querySelector(s);
+  if ($('#btnShowPlaceForm') && $('#uploadRefModal')?.hidden) $('#btnShowPlaceForm').click();
   $('#upPlacePart').value = part;
   $('#upPlaceRev').value = rev;
   $('#upPlaceSide').value = side;
@@ -34,7 +35,7 @@ export async function uploadPlaceViaPicker(w, d, { part, rev, side = 'TOP', unit
   inp.dispatchEvent(new w.Event('change'));
   await until(() => $('#upPlaceFileName')?.textContent === name || /單位|預覽|失敗/.test($('#upPlaceState')?.textContent || ''));
   for (let attempt = 0; attempt < 4; attempt++) {
-    $('#btnSubmitPlace')?.click();
+    $('#btnSubmitRef')?.click();
     const ok = await until(
       () => /已存入座標檔/.test($('#upPlaceState')?.innerHTML || '') || /上傳失敗/.test($('#upPlaceState')?.textContent || ''),
       80

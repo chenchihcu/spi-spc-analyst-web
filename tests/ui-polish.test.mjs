@@ -125,7 +125,7 @@ test("介面整理：空白狀態、範例資料、KPI 寫法、管制界限數�
 test("樣式守衛：狀態膠囊同字級、核取方塊配色、子分頁同一套強調色、管制圖選項列無行內對齊", () => {
   assert.match(src, /button\.load-state\{[^}]*font-size:var\(--fs-caption\)/);
   assert.match(src, /input\[type=checkbox\],input\[type=radio\][^{]*\{accent-color:var\(--accent\)\}/);
-  assert.match(src, /\.subtab\[aria-selected="true"\]\{background:var\(--accent-soft\);color:var\(--accent-ink\);border-color:var\(--accent\)/);
+  assert.match(src, /\.subtab\[aria-selected="true"\][^}]*\{background:var\(--accent-soft\);color:var\(--accent-ink\);border-color:var\(--accent\)/);
   assert.doesNotMatch(src, /class="rail-fields" style="[^"]*align-items:flex-end/);
   assert.match(src, /Chart\.register\(vlines,limitLabels\)/);
   assert.match(src, /#p-data > \[data-sub\]:not\(\.subtab\)\{display:grid;grid-template-columns:minmax\(0,1fr\);gap:16px/);

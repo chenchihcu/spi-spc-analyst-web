@@ -80,7 +80,7 @@ def database(page, evidence, note):
     expect(spi).to_have_attribute("aria-disabled", "true")
     spi.click(force=True)
     expect(page.locator("#recPickerModal")).to_be_hidden()
-    expect(page.locator("#unmatchedRefsModal")).to_be_hidden()
+    expect(page.locator("#proofModal")).to_be_hidden()
     place = page.locator("#statePlace")
     expect(place).to_have_attribute("role", "status")
     place.click()
@@ -108,7 +108,9 @@ def database(page, evidence, note):
         page.screenshot(path=evidence / ("picker-" + selector[1:] + ".png"))
         page.locator("#recPickerClose").click()
 
-    page.locator('button[data-sub="import"]').click()
+    page.locator("#btnOpenRecModal").click()
+    page.locator("#btnPickImport").click()
+    expect(page.locator("#boxPickImport")).to_be_visible()
     picker_entry("#btnSelectPlace", placement=True)
     open_tab(page, "issues", note)
     size = page.viewport_size
@@ -121,6 +123,10 @@ def database(page, evidence, note):
 
 
 def control(page, evidence, note):
+    sample_btn = page.locator("button[data-load-sample]:visible")
+    if sample_btn.count() > 0:
+        sample_btn.first.click()
+        note("loaded sample dataset for control/3d/report journeys")
     open_tab(page, "control", note)
     expect(page.locator("#ctrlTitle")).to_contain_text("X̄")
     expect(page.locator("#ctrlSub")).to_contain_text(re.compile(r"CL\s*[-+]?\d"))

@@ -144,7 +144,7 @@ test("FR-6：沒有資料時列印、PDF、交付包、AI 都不產生輸出", {
   d.querySelector("#btnRepPrint").click();
   await until(() => /目前沒有量測資料/.test(toast()), "列印提示");
   assert.equal(calls.print, 0, "不可開啟列印");
-  await d.querySelector("#btnRepPdf").onclick();
+  await d.defaultView.SPI_TEST_HOOK.triggerExportByType("rep-pdf");
   d.querySelector("#btnDownloadStandardBundle").click();
   await new Promise((r) => setTimeout(r, 50));
   assert.equal(calls.blob, 0, "不可產生下載檔");
@@ -167,7 +167,7 @@ test("刪除最後一個回合：已畫好的圖表一併銷毀；郵件 PDF 的
   assert.equal(calls.charts.filter((c) => c.alive).length, 0, "空白狀態不可留下舊回合的圖表");
   H.setTab("mail");
   await until(() => /目前沒有量測資料/.test(d.querySelector("#mailStatusText")?.textContent || ""), "郵件頁提示");
-  for (const id of ["#btnMailDlPdf", "#btnSharePdf", "#btnSharePdfWithSummary"]) {
+  for (const id of ["#btnSharePdf", "#btnSharePdfWithSummary"]) {
     const b = d.querySelector(id);
     if (b) assert.ok(b.disabled, id + " 沒有資料時需停用");
   }
