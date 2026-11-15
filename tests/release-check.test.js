@@ -7,11 +7,12 @@ const root = path.join(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'tools/release-check.js'), 'utf8');
 
 // Exercise the real orchestration without recursively launching this test suite.
-function run(args, { testFailure = false, secret = false } = {}) {
+function run(args, { testFailure = false, secret = false, htmlOverride = null } = {}) {
   let tests = 0, scans = 0, result, exit;
   const fakeFs = Object.create(fs);
   fakeFs.readFileSync = (file, ...rest) => String(file).endsWith('release-sentinel.txt')
-    ? 'sk-' + 'A'.repeat(24) : fs.readFileSync(file, ...rest);
+    ? 'sk-' + 'A'.repeat(24)
+    : htmlOverride !== null && String(file).endsWith('spi-spc.html') ? htmlOverride : fs.readFileSync(file, ...rest);
   vm.runInNewContext(source, {
     __dirname: path.join(root, 'tools'),
     require(name) {
@@ -43,6 +44,17 @@ test('release scans do not launch tests or claim release readiness', () => {
   assert.equal(r.result.overall, 'SCAN ONLY');
   assert.equal(r.exit, 0);
   assert.deepEqual(Object.keys(r.result.checks).sort(), ['a11y', 'changelog', 'debug', 'deps', 'docs', 'secrets', 'tests', 'version']);
+});
+
+test('release scan allows only the four reviewed runtime diagnostics', () => {
+  const html = fs.readFileSync(path.join(root, 'spi-spc.html'), 'utf8');
+  const clean = run(['--scans-only'], { htmlOverride: html });
+  assert.equal(clean.result.checks.debug.status, 'pass');
+  assert.deepEqual(clean.result.checks.debug.messages, ['FACT: 無 console 輸出、debugger、alert、TODO、本機位址']);
+
+  const unexpected = run(['--scans-only'], { htmlOverride: html + '\nconsole.log(\"unexpected diagnostic\");' });
+  assert.equal(unexpected.result.checks.debug.status, 'warn');
+  assert.deepEqual(unexpected.result.checks.debug.messages, ['FACT: console 輸出 1 處']);
 });
 
 test('scan-only mode still blocks detected secrets', () => {

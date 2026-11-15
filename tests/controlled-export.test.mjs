@@ -73,6 +73,12 @@ test('正式匯出以伺服器目前生命週期為準，讀取失敗時停止',
   assert.equal(confirms, 0);
   assert.equal(lastName, 'spi-spc-report.md');
 
+  await assert.rejects(hook.triggerExportByType('unknown-test'), /未知匯出項目：unknown-test/);
+  await hook.downloadDeliverablesQueue(['rep-md', 'iss-csv'], async type => {
+    if (type === 'rep-md') throw new Error('simulated failure');
+  });
+  assert.match(w.document.querySelector('#exportQueueStatus').textContent, /匯出完成 1\/2 項；失敗 1 項（rep-md）/);
+
   hook.RecDB.jfetch = async () => { throw new Error('offline'); };
   w.document.querySelector('#btnOpenExportModal').click();
   w.document.querySelector('[data-exp-act="rep-md"]').click();
