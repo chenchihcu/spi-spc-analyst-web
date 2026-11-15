@@ -131,7 +131,10 @@ test("紀錄庫登錄表單：管理者可見；解析並預選圖層與面別�
   const { w, hook, d } = await page();
   d.querySelector("#btnOpenRecModal").click();
   d.querySelector("#btnPickPlace").click();
-  assert.ok(await until(() => !d.querySelector("#boxPickPlace").hidden && !d.querySelector("#boxUploadLayoutForm").hidden), "管理者應看到登錄表單");
+  assert.ok(await until(() => !d.querySelector("#boxPickPlace").hidden && !d.querySelector("#recPlaceAdminBar").hidden), "管理者應看到登錄按鈕");
+  assert.equal(d.querySelector("#boxUploadLayoutForm").hidden, true, "登錄表單預設收合，不佔清單空間");
+  d.querySelector("#btnShowLayoutForm").click();
+  assert.equal(d.querySelector("#boxUploadLayoutForm").hidden, false, "按下後展開登錄表單");
   d.querySelector("#upLayPart").value = PART;
   d.querySelector("#upLayRev").value = REV;
   const bot = PASTE.replace("Paste,Top", "Paste,Bot");
@@ -155,7 +158,7 @@ test("紀錄庫登錄表單：管理者可見；解析並預選圖層與面別�
   assert.ok(await until(() => d.querySelectorAll("#upLayList [data-del-layout]").length === 1), "刪除後剩一份");
 });
 
-test("匯入步驟 ①：未選座標時也顯示 Gerber 板面圖檔列與登錄入口；入口開啟配對頁的登錄表單並帶入料號、版次、面別", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+test("匯入步驟 ①：未選座標時也顯示 Gerber 板面圖檔列與登錄入口；入口開啟座標檔分頁的登錄表單並帶入料號、版次、面別", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const { w, hook, d, place } = await page();
   d.querySelector("#recPickerClose").click();
   hook.setTab("data"); hook.setSub("import");
@@ -169,16 +172,17 @@ test("匯入步驟 ①：未選座標時也顯示 Gerber 板面圖檔列與登�
   for (const id of ["#upLayPart", "#upLayRev", "#upLaySide"]) d.querySelector(id).value = "";
   d.querySelector("#btnRegisterLayout").click();
   const form = d.querySelector("#boxUploadLayoutForm");
-  assert.ok(await until(() => !d.querySelector("#recPickerModal").hidden && !d.querySelector("#boxPickPairs").hidden && !form.hidden), "應開啟配對頁並顯示登錄表單");
-  assert.equal(form.parentElement.id, "pairFormHost", "登錄表單應在看得到的配對頁，不在隱藏的座標檔庫分頁");
-  assert.equal(form.previousElementSibling.id, "boxUploadPlaceForm");
+  assert.ok(await until(() => !d.querySelector("#recPickerModal").hidden && !d.querySelector("#boxPickPlace").hidden && !form.hidden), "應開啟座標檔分頁並展開登錄表單");
+  assert.equal(form.parentElement.id, "boxPickPlace", "登錄表單在看得到的座標檔分頁");
+  assert.equal(d.querySelector("#btnPickPlace").getAttribute("aria-selected"), "true", "座標檔分頁按鈕亮起");
+  assert.equal(d.querySelector("#btnShowLayoutForm").getAttribute("aria-expanded"), "true");
   assert.deepEqual([d.querySelector("#upLayPart").value, d.querySelector("#upLayRev").value, d.querySelector("#upLaySide").value], [PART, REV, "TOP"]);
   assert.ok(await until(() => d.querySelectorAll("#upLayList [data-del-layout]").length === 1), "應列出此料號已登錄的圖層");
-  // 料號規格分頁不顯示登錄表單；回到配對頁恢復
+  // 料號規格分頁不顯示登錄表單；回到座標檔分頁恢復
   d.querySelector("#btnPickSpecs").click();
   assert.ok(await until(() => form.hidden), "料號規格分頁不顯示登錄表單");
-  d.querySelector("#btnPickPairs").click();
-  assert.ok(await until(() => !form.hidden && form.parentElement.id === "pairFormHost"), "回到配對頁應恢復");
+  d.querySelector("#btnPickPlace").click();
+  assert.ok(await until(() => !form.hidden && form.parentElement.id === "boxPickPlace"), "回到座標檔分頁應恢復");
 });
 
 test("登錄與目前回合同料號、版次、面別的板面圖檔：立即套用到目前回合；引用當時圖檔的回合不變", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
