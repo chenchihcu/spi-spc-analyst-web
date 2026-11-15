@@ -2,6 +2,12 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.36.1 — 2026-11-15（「資料與規格」介面結構與空狀態優化）
+
+- **匯入資料**：拆分為流程總覽卡（`#impFlowSteps`）與 5 張獨立步驟卡片（`#impStep1Card`～`#impStep5Card`），步驟 ③～⑤ 隨 `#mapBox` 漸進展開；將表單 `input`/`change` 事件委派提升至 `[data-sub="import"]`，修正跨卡片編輯時狀態與錯誤清除；新增 `.data-form-grid`、`.imp-place-bar` 與 `.imp-apply-bar` 對齊各螢幕表單。
+- **規格設定**：嚴守 `docs/spec-spec-split-rfc.md` 分離歸屬；`stencil-spec` 三卡維持常駐展開並對齊 `.spec-toolbar`；`paste-spec` 內以 `.spec-param-box` 與 `.spec-ver-bar` 區隔製程參數、鋼板參考、料號規格版本操作列與表格。
+- **空狀態**：未載入量測或回合資料時，`#apTbl` 與 `#runTbl` 的 `<tbody>` 呈現 `.empty-row` 引導提示。
+
 ## v10.36.0 — 2026-11-15（記錄庫：以量測清單為主，清單不再被擠到螢幕 1/4）
 
 - **回報**：量測記錄與座標檔資料庫難用。
