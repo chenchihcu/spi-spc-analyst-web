@@ -155,7 +155,7 @@ details[open].iss-card>summary{border-bottom:1px solid var(--line);border-radius
 .rec-acts .sep{width:1px;align-self:stretch;min-height:24px;background:var(--line);margin:0 2px}
 .pill.rev{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
 .pill.arch{background:var(--surface2);color:var(--ink);border:1px dashed var(--muted)}
-tr.rec-new>td,.pair-row.rec-new{background:var(--accent-soft)}
+tr.rec-new>td{background:var(--accent-soft)}
 .up-place-row{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:flex-end}
 .up-place-row .field{margin:0;min-width:0;max-width:100%}
 .up-place-row label,.up-place-lab{display:block;font-size:var(--fs-caption);color:var(--muted)}
@@ -167,18 +167,6 @@ tr.rec-new>td,.pair-row.rec-new{background:var(--accent-soft)}
 .proof-tbl th{font-size:var(--fs-caption);color:var(--muted);font-weight:700}
 .proof-list{max-height:240px;overflow:auto;overflow-wrap:anywhere;padding:6px 0;margin:0}
 .proof-refs li{padding:2px 0}
-.pair-card{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--surface);display:flex;flex-direction:column;gap:8px;min-width:0}
-.pair-card h4{margin:0;font-size:var(--fs-ui);font-weight:700}
-.pair-slot{border:1px dashed var(--line);border-radius:8px;padding:8px;min-width:0;display:flex;flex-direction:column;gap:6px}
-.pair-slot>b{font-size:var(--fs-ui);font-weight:700}
-.pair-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding-top:6px;border-top:1px solid var(--line);min-width:0}
-.pair-row .pair-meta{min-width:0;overflow-wrap:anywhere}
-.pair-more{margin:0}
-.pair-more summary{cursor:pointer;font-size:var(--fs-ui);font-weight:700}
-.pair-orphan{border:1px solid var(--warn);background:var(--warn-soft);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:6px}
-#placeChoices{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-width:0}
-#placeChoices button{font-size:var(--fs-caption)}
-@media (max-width:600px){.proof-tbl thead{display:none}.proof-tbl,.proof-tbl tbody,.proof-tbl tr,.proof-tbl td{display:block;width:100%}.proof-tbl tr{border-bottom:1px solid var(--line);padding:6px 0}.proof-tbl td{border:none;padding:2px 0}.proof-tbl td[data-label]::before{content:attr(data-label) "：";color:var(--muted);font-size:var(--fs-caption)}}
 .seg-btn.active{font-weight:700;box-shadow:inset 0 0 0 1px var(--muted)}
 .imp-step-title{font-size:var(--fs-ui);font-weight:700;color:var(--ink);margin:10px 0 6px}
 .vendor{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding:10px 12px;margin-bottom:10px;border-radius:8px;background:var(--surface2)}
@@ -428,7 +416,7 @@ td.num,th.num{text-align:right}
 #recPickerQ,#recPickerReload{min-height:34px}
 /* 觸控：放在基準高度之後，否則同權重的基準規則會蓋掉 44px */
 @media (pointer:coarse){.seg button,#recPickerQ,#recPickerReload{min-height:44px}}
-@media (pointer:coarse){.pair-card button,.pair-more summary,#placeChoices button{min-height:44px}}
+@media (pointer:coarse){#placeChoices button{min-height:44px}}
 @media (pointer:coarse){#inComp,.comp-list li,.iss-board-scope>summary,.scope-only{min-height:44px}.scopebar #scopeClear{min-width:44px;min-height:44px;justify-content:center}}
 #mapBox{grid-template-columns:minmax(0,1fr)}
 #mapBox>*{min-width:0}
@@ -861,40 +849,6 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
     border:none!important;
   }
 }
-@media (max-width: 768px) {
-  .rec-desktop-view { display: none !important; }
-  .rec-mobile-view { display: flex !important; flex-direction: column; gap: 12px; }
-}
-@media (min-width: 769px) {
-  .rec-desktop-view { display: block !important; }
-  .rec-mobile-view { display: none !important; }
-}
-.rec-card {
-  background: var(--surface2);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 12px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-}
-.rec-card-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 8px;
-}
-.rec-card-title {
-  font-size:var(--fs-heading);
-  font-weight:700;
-  color: var(--ink);
-}
-.rec-card-sub {
-  font-size:var(--fs-caption);
-  color: var(--muted);
-  margin-top: 2px;
-}
 .ui-ico{display:inline-block;vertical-align:middle;flex-shrink:0;color:currentColor}
 .ui-ico--folder{width:18px;height:18px}
 .ui-ico--hint{width:20px;height:20px;color:var(--accent)}
@@ -927,41 +881,83 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
 .modal-proof-body{padding:14px 16px;overflow:auto;display:flex;flex-direction:column;gap:12px;min-height:0}
 .modal-title-wrap{min-width:0;overflow-wrap:anywhere}
 .lib-warn{margin:0 0 8px}
-.rec-card-body {
-  font-size:var(--fs-caption);
-  line-height: 1.5;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px 10px;
-  padding: 6px 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+/* 記錄庫：頭、工具列、頁尾固定，只有 .rec-scroll 捲動（單一捲動區；不得在分頁內再設 max-height） */
+.rec-head{padding:10px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--surface);flex:none}
+.rec-head-title{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
+.rec-head-title h3{margin:0;font-size:var(--fs-heading)}
+.rec-toolbar{padding:10px 16px 6px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--line);background:var(--surface);flex:none;min-width:0}
+.rec-toolbar-row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;min-width:0}
+.rec-tabs .seg-btn{font-size:var(--fs-ui)}
+.rec-tabs .seg-btn.active{background:var(--accent-soft);color:var(--accent-ink)}
+.rec-count{margin-left:4px;font-weight:400;color:var(--muted);font-variant-numeric:tabular-nums}
+.rec-picker-search{display:flex;gap:6px;align-items:center;flex:1 1 260px;max-width:460px;min-width:0}
+.rec-picker-search input{flex:1 1 120px;min-width:0;width:100%;font-size:var(--fs-body)}
+.rec-picker-search button{flex:none;white-space:nowrap}
+.rec-filter-toggle{display:none}
+.rec-filter-toggle[data-on="1"]{border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.rec-filters{display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-width:0}
+.rec-filters select{max-width:100%;font-size:var(--fs-body)}
+.rec-filters .seg-btn{font-size:var(--fs-caption)}
+.rec-status-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;min-width:0;min-height:24px}
+.rec-status-row .note{margin:0;min-width:0;overflow-wrap:anywhere}
+.rec-quick{display:flex;flex-wrap:wrap;gap:6px}
+.rec-quick button{font-size:var(--fs-caption);padding:2px 10px;min-height:28px;border-radius:999px}
+.rec-quick button[aria-pressed="true"]{background:var(--warn-soft);border-color:var(--warn);font-weight:700}
+.rec-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 16px 12px;background:var(--surface)}
+.rec-pane{display:flex;flex-direction:column;gap:10px;min-width:0;padding-top:10px}
+.rec-pane[hidden]{display:none}
+.rec-auth{margin-top:10px;background:var(--accent-soft);border:1px solid var(--accent);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.rec-auth[hidden]{display:none}
+.rec-auth-link{display:inline-flex;align-items:center;text-decoration:none;font-size:var(--fs-ui);padding:6px 14px;border-radius:6px;min-height:44px;font-weight:700;flex:none}
+.rec-admin-bar{display:flex;flex-wrap:wrap;gap:8px}
+.rec-admin-bar[hidden]{display:none}
+.rec-foot{padding:10px 16px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;align-items:center;gap:8px;background:var(--surface2);flex:none}
+/* 清單列：量測與座標共用；桌面與手機同一份標記（tr 以 flex 排版，內容不會撐寬） */
+.rec-list,.rec-list tbody{display:block;width:100%;min-width:0}
+.rec-list tr{display:flex;gap:10px;align-items:flex-start;min-width:0;border-bottom:1px solid var(--line)}
+.rec-list td{border-bottom:none;padding:8px 4px}
+.rec-list td.rec-main{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px;overflow-wrap:anywhere}
+.rec-list td.rec-side{flex:none;padding-left:0}
+.rec-list td.rec-empty{flex:1 1 auto;text-align:center;padding:28px 8px}
+.rec-l1{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;font-size:var(--fs-body)}
+.rec-l2{font-size:var(--fs-ui)}
+.rec-l3,.rec-l4{font-size:var(--fs-caption)}
+.rec-l4{color:var(--muted);flex:1 1 12em;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-l34{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px;min-width:0}
+.rec-l3{min-width:0}
+.rec-list .rec-acts{flex-wrap:nowrap;gap:6px}
+.rec-list .rec-acts>button{min-height:36px;padding:4px 12px;font-size:var(--fs-ui);white-space:nowrap}
+.rec-menu{position:relative}
+.rec-menu>summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;min-width:36px;min-height:36px;border:1px solid var(--line);border-radius:var(--r-sm,6px);background:var(--surface);font-weight:700;font-size:var(--fs-body)}
+.rec-menu>summary::-webkit-details-marker{display:none}
+.rec-menu[open]>summary{background:var(--surface2)}
+.rec-menu-list{position:absolute;right:0;top:calc(100% + 4px);z-index:5;display:flex;flex-direction:column;gap:2px;min-width:11em;padding:6px;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.rec-menu-list button{justify-content:flex-start;text-align:left;border:none;background:none;min-height:36px;padding:6px 10px;font-size:var(--fs-ui);white-space:nowrap;border-radius:6px}
+.rec-menu-list button:hover:not(:disabled){background:var(--surface2)}
+.rec-acts .rec-menu-list .sep{width:auto;height:1px;min-height:0;align-self:stretch;background:var(--line);margin:2px 0}
+.rec-menu-list button[data-pact="del"]{color:var(--ng)}
+@media (max-width:600px){
+  .rec-head-title h3{font-size:var(--fs-body)}
+  #recPickerMode{display:none}
+  .rec-toolbar,.rec-head,.rec-foot{padding-left:12px;padding-right:12px}
+  .rec-scroll{padding:0 12px 12px}
+  .rec-tabs{display:flex;width:100%}
+  .rec-tabs .seg-btn{flex:1 1 0;min-width:0;padding-left:4px;padding-right:4px}
+  .rec-picker-search{max-width:none;flex-basis:100%}
+  .rec-filter-toggle{display:inline-flex}
+  .rec-filters:not(.open){display:none}
+  .rec-foot>button{flex:1 1 0}
+  .rec-status-row{min-height:0}
+  .rec-counts{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+  .rec-head{padding-top:4px;padding-bottom:4px}
+  .rec-toolbar{padding-top:8px}
+  .rec-l34{flex-direction:column;gap:2px}
+  .rec-l4{flex:none;max-width:100%}
+  .rec-list .rec-acts{flex-direction:column;align-items:stretch}
+  .rec-menu>summary{width:100%}
 }
-.rec-card-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 4px;
-}
-.rec-card-actions button {
-  min-height: 44px !important;
-  touch-action: manipulation;
-  white-space: nowrap;
-}
-.rec-card-actions{flex-wrap:wrap;justify-content:flex-start}
-.rec-card-actions .sep{width:1px;align-self:stretch;background:var(--line)}
-.rec-card.rec-new{background:var(--accent-soft)}
-.rec-card-info{font-size:var(--fs-caption);line-height:1.5;overflow-wrap:anywhere}
-.rec-badges{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:2px}
-.rec-card-head .rec-badges{justify-content:flex-end;flex:none;max-width:50%;margin-top:0}
-.pair-meta .pill{vertical-align:middle}
-.rec-file{display:inline-block;max-width:18ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;font-size:var(--fs-caption)}
-.rec-card-actions .primary {
-  flex: 1 1 auto;
-  font-size:var(--fs-body);
-  font-weight:700;
-}
+@media (pointer:coarse){.rec-list .rec-acts>button,.rec-menu>summary,.rec-menu-list button,.rec-quick button,.rec-admin-bar button,.rec-picker-search button,.rec-foot button{min-height:44px}.rec-menu>summary{min-width:44px}}
+.rec-file{display:inline-block;max-width:28ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
 .load-state{display:inline-flex;align-items:center;gap:6px;min-height:32px;max-width:100%;font-size:var(--fs-caption);white-space:normal;overflow-wrap:anywhere}
 button.load-state{border:none;font:inherit;font-size:var(--fs-caption);cursor:default}
 .load-state .light{width:10px;height:10px;border-radius:50%;background:var(--muted);flex:none}
@@ -1073,7 +1069,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
     <svg class="mitcorp-logo" viewBox="0 0 248 45" width="143" height="26" fill="currentColor" fill-rule="evenodd" role="img" aria-label="Mitcorp"><path d="M13.8,-0.0L28.5,-0.1L29.2,0.0L30.6,1.0L31.5,2.9L34.7,29.0L35.0,29.8L36.2,30.2L37.5,29.8L38.3,28.2L46.9,3.5L48.0,1.5L48.8,0.8L50.5,-0.1L66.3,0.0L67.6,1.0L68.4,3.2L68.4,30.8L68.3,32.2L67.7,33.8L66.0,34.8L62.8,35.0L59.2,34.8L57.7,33.8L57.3,31.5L57.3,5.8L56.7,4.5L55.2,4.0L53.0,4.7L52.0,6.5L43.5,31.5L42.2,33.3L41.2,34.1L38.2,34.8L28.8,34.8L26.0,34.0L24.6,32.5L24.0,29.8L20.9,5.8L20.2,4.5L18.5,4.0L17.0,4.5L16.5,5.2L12.3,26.8L11.3,30.0L10.5,31.5L8.4,33.8L6.3,35.0L2.2,35.7L1.2,35.7L0.0,35.0L0.0,30.2L1.2,29.6L4.5,28.9L5.4,28.0L6.2,26.2L10.7,3.0L11.9,1.0L13.8,-0.0ZM73.2,-0.0L83.8,0.0L84.6,1.3L84.5,4.2L83.8,5.4L82.8,5.7L75.5,5.8L73.2,5.5L72.7,4.8L72.5,2.8L72.6,1.0L73.2,-0.0ZM90.0,1.7L95.5,1.6L97.2,2.1L97.8,2.8L98.2,4.0L98.3,8.5L98.6,9.2L99.3,9.7L109.8,9.8L110.9,10.2L111.4,12.0L110.9,13.2L110.2,13.6L99.8,13.7L98.8,14.1L98.2,15.5L98.3,27.0L99.0,29.8L100.5,30.9L104.2,31.1L112.5,30.9L113.1,31.5L113.2,33.0L113.0,33.8L112.2,34.6L110.5,35.0L104.5,35.3L95.8,35.1L92.0,33.9L89.9,32.2L88.9,30.5L88.4,27.5L88.4,5.5L88.6,3.0L89.2,2.1L90.0,1.7ZM130.5,9.2L135.5,9.3L144.3,10.0L145.5,10.4L146.1,11.0L146.2,13.2L145.7,14.0L145.0,14.3L140.3,13.8L133.0,13.6L129.5,13.9L127.0,14.9L125.1,17.0L124.3,20.0L124.3,24.0L125.1,27.8L127.0,29.8L130.0,30.9L137.5,31.1L145.2,30.4L146.0,31.0L146.3,32.0L146.2,33.5L145.5,34.3L142.5,35.0L135.2,35.4L129.5,35.4L124.0,34.9L120.5,33.9L118.2,32.8L116.1,30.8L115.1,29.2L114.0,25.5L113.9,20.0L115.0,15.8L116.1,14.0L118.2,12.0L120.5,10.8L124.2,9.8L130.5,9.2ZM161.8,9.5L168.5,9.3L174.8,9.9L178.2,10.8L180.2,11.8L182.8,14.0L183.9,15.8L184.7,18.8L184.9,24.5L184.7,26.2L183.8,29.2L181.8,32.0L178.8,33.9L175.5,34.9L166.0,35.7L156.8,34.8L153.8,33.8L152.0,32.9L150.4,31.5L149.2,30.0L148.3,28.0L147.9,25.5L148.0,18.2L149.1,15.0L151.0,12.8L154.0,11.0L158.0,9.8L161.8,9.5ZM203.0,9.5L209.8,9.4L210.7,10.5L210.8,11.8L210.5,12.8L209.5,13.6L201.8,13.9L200.2,14.2L199.2,14.8L198.7,16.0L198.7,31.0L198.3,33.5L197.5,34.5L196.2,34.9L190.5,34.8L189.1,33.8L188.8,32.0L188.7,15.2L189.2,12.5L190.0,11.7L191.9,10.8L197.2,9.8L203.0,9.5ZM224.0,9.5L230.5,9.3L237.9,9.8L242.2,10.9L244.2,12.0L246.2,14.0L247.0,15.2L247.8,17.3L247.8,27.8L246.9,30.0L245.9,31.5L244.8,32.6L242.8,33.8L240.0,34.8L232.2,35.5L223.2,35.4L222.6,36.0L222.4,36.8L222.2,43.5L221.3,44.8L213.5,44.8L212.6,43.5L212.4,41.8L212.6,13.0L213.2,11.7L214.6,10.8L218.5,9.9L224.0,9.5ZM75.5,9.9L79.0,9.8L81.5,10.0L82.8,10.8L83.4,12.0L83.5,32.2L83.0,33.8L81.5,34.8L75.5,34.8L74.1,34.0L73.7,33.2L73.6,12.0L74.0,10.8L75.5,9.9ZM163.2,13.0L160.8,14.0L159.4,15.2L158.3,18.8L158.1,22.5L158.3,26.5L159.2,29.2L160.5,30.8L162.8,31.8L166.0,32.1L169.8,31.8L172.0,30.8L173.0,29.8L173.9,28.2L174.4,25.0L174.4,21.8L173.9,16.5L173.0,15.0L171.9,14.0L168.5,12.9L163.2,13.0ZM226.0,13.0L223.5,13.5L222.7,14.0L222.4,14.5L222.5,30.5L224.0,31.6L227.5,31.9L232.5,31.9L235.0,31.0L236.0,30.1L237.0,28.7L237.7,25.5L237.8,20.8L237.0,16.2L235.3,14.0L233.0,13.1L230.2,12.8L226.0,13.0Z"/></svg>
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.35.0</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.36.0</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <div class="db-capsule-group" role="group" aria-label="記錄庫與匯出">
@@ -1934,81 +1930,68 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
 <!-- 量測記錄與座標檔資料庫選取載入中樞 -->
 <div class="db-modal" id="recPickerModal" role="dialog" aria-modal="true" aria-label="量測記錄與座標檔資料庫" hidden>
   <div class="db-modal-panel">
-    <div class="sheet-head" style="padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:var(--surface)">
-      <div style="display:flex;align-items:center;gap:10px">
+    <div class="sheet-head rec-head">
+      <div class="rec-head-title">
         <svg class="ui-ico ui-ico--folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
-        <h3 style="margin:0;font-size:var(--fs-heading)">量測記錄與座標檔資料庫</h3>
-        <span class="note" id="recPickerMode" style="font-size:var(--fs-caption)"></span>
+        <h3>量測記錄與座標檔資料庫</h3>
+        <span class="note" id="recPickerMode"></span>
       </div>
       <button type="button" class="sheet-close" id="recPickerClose" aria-label="關閉選單">✕</button>
     </div>
-    <div style="padding:14px 18px;background:var(--surface);display:flex;flex-direction:column;gap:12px;overflow-y:auto;flex:1 1 auto">
-      <!-- 未登入提示卡片 -->
-      <div id="recPickerAuthNotice" class="card" hidden style="background:var(--accent-soft);border:1px solid var(--accent);padding:12px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:10px">
-        <div>
-          <b style="color:var(--accent-ink);font-size:var(--fs-ui)">雲端資料庫需登入帳號</b>
-          <div class="note" style="margin-top:2px;font-size:var(--fs-caption)">量測與座標資料庫 100% 依託 Cloudflare 雲端，請登入以存取產線資料。</div>
+    <div class="rec-toolbar">
+      <div class="rec-toolbar-row">
+        <div class="seg rec-tabs" role="tablist">
+          <button type="button" class="seg-btn active" id="btnPickSpi" role="tab" aria-selected="true">量測記錄 <span class="rec-count" id="countPickSpi">0</span></button>
+          <button type="button" class="seg-btn" id="btnPickPlace" role="tab" aria-selected="false">座標檔 <span class="rec-count" id="countPickPlace">0</span></button>
+          <button type="button" class="seg-btn" id="btnPickSpecs" role="tab" aria-selected="false">規格與稽核</button>
         </div>
-        <a href="/__login" class="primary" style="display:inline-flex;align-items:center;text-decoration:none;font-size:var(--fs-caption);padding:6px 14px;border-radius:6px;min-height:34px;font-weight:700">前往登入</a>
-      </div>
-
-      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px">
-        <div class="seg" role="tablist" style="display:inline-flex;border:1px solid var(--line);border-radius:8px;padding:2px;background:var(--surface2)">
-          <button type="button" class="seg-btn active" id="btnPickPairs" style="padding:5px 14px;border:none;border-radius:6px;background:var(--surface);font-weight:700;cursor:pointer;font-size:var(--fs-ui)">配對</button>
-          <button type="button" class="seg-btn" id="btnPickSpi" hidden style="padding:5px 14px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-size:var(--fs-ui)">量測記錄 (<span id="countPickSpi">0</span>)</button>
-          <button type="button" class="seg-btn" id="btnPickPlace" hidden style="padding:5px 14px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-size:var(--fs-ui)">座標檔庫 (<span id="countPickPlace">0</span>)</button>
-          <button type="button" class="seg-btn" id="btnPickSpecs" style="padding:5px 14px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-size:var(--fs-ui)">規格與稽核</button>
-        </div>
-        <div class="rec-picker-search" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;flex:1 1 240px;max-width:420px">
-          <input type="text" id="recPickerQ" aria-label="搜尋資料庫" placeholder="搜尋批號、料號、工單或檔名…" style="flex:1 1 160px;min-width:0;width:100%;font-size:var(--fs-body)">
-          <button type="button" id="recPickerQClear">清除搜尋</button>
-          <button type="button" id="recPickerReload" title="重新整理" style="padding:4px 12px">↻</button>
+        <div class="rec-picker-search">
+          <input type="text" id="recPickerQ" aria-label="搜尋資料庫" placeholder="搜尋批號、料號、工單或檔名…">
+          <button type="button" id="recPickerQClear" hidden>清除搜尋</button>
+          <button type="button" id="btnRecFilters" class="rec-filter-toggle" aria-expanded="false" aria-controls="recFilterBar">篩選</button>
+          <button type="button" id="recPickerReload" title="重新整理" aria-label="重新整理">↻</button>
         </div>
       </div>
-
-      <!-- SMT 產線快捷過濾列 -->
-      <div id="recFilterBar" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:6px 10px;background:var(--surface2);border-radius:8px">
-        <select id="pickPartFilter" aria-label="依產品料號篩選" style="font-size:var(--fs-body);padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--surface)">
+      <div id="recFilterBar" class="rec-filters">
+        <select id="pickPartFilter" aria-label="依產品料號篩選">
           <option value="">全部料號</option>
         </select>
-        <div class="seg" id="pickSideSeg" style="display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden">
-          <button type="button" class="seg-btn active" data-side="" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:var(--surface)">全面別</button>
-          <button type="button" class="seg-btn" data-side="TOP" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:transparent">TOP</button>
-          <button type="button" class="seg-btn" data-side="BOT" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:transparent">BOT</button>
+        <div class="seg" id="pickSideSeg">
+          <button type="button" class="seg-btn active" data-side="">全面別</button>
+          <button type="button" class="seg-btn" data-side="TOP">TOP</button>
+          <button type="button" class="seg-btn" data-side="BOT">BOT</button>
         </div>
-        <div class="seg" id="pickQualitySeg" style="display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden">
-          <button type="button" class="seg-btn active" data-qfilter="all" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:var(--surface)">全部狀態</button>
-          <button type="button" class="seg-btn" data-qfilter="ng" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:transparent">僅異常</button>
-          <button type="button" class="seg-btn" data-qfilter="pass" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:transparent">僅合格</button>
+        <div class="seg" id="pickQualitySeg">
+          <button type="button" class="seg-btn active" data-qfilter="all">全部狀態</button>
+          <button type="button" class="seg-btn" data-qfilter="ng">僅異常</button>
+          <button type="button" class="seg-btn" data-qfilter="pass">僅合格</button>
         </div>
-        <div class="seg" id="pickLinkSeg" style="display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden">
-          <button type="button" class="seg-btn active" data-link="" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:var(--surface)">全部對應</button>
-          <button type="button" class="seg-btn" data-link="unlinked" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:transparent">未搭配</button>
-          <button type="button" class="seg-btn" data-link="missing" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:transparent">座標檔不存在</button>
-          <button type="button" class="seg-btn" data-link="unused" style="padding:3px 8px;font-size:var(--fs-caption);border:none;background:transparent">座標無引用</button>
+      </div>
+      <div class="rec-status-row">
+        <div id="recPickerNotice" class="note" role="status"></div>
+        <div id="recQuickFilters" class="rec-quick"></div>
+        <button type="button" id="recPickerClearFilters" class="btn-sm" hidden>清除全部篩選</button>
+      </div>
+    </div>
+    <div class="rec-scroll" id="recPickerScroll">
+      <div id="recPickerAuthNotice" class="card rec-auth" hidden>
+        <div>
+          <b>雲端資料庫需登入帳號</b>
+          <div class="note">請登入以存取量測紀錄與座標檔。</div>
         </div>
-        <button type="button" id="recPickerClearFilters">清除全部篩選</button>
+        <a href="/__login" class="primary rec-auth-link">前往登入</a>
       </div>
 
-      <div id="recPickerNotice" class="note" role="status" style="margin:0"></div>
-
-      <div id="boxPickPairs" style="max-height:56vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px">
-        <div id="pairFormHost" style="display:flex;flex-direction:column;gap:10px"></div>
-        <div id="pairBoard"></div>
+      <div id="boxPickSpi" class="rec-pane">
+        <table id="tblPickSpi" class="rec-list"></table>
       </div>
 
-      <!-- 量測記錄表格與卡片流 -->
-      <div id="boxPickSpi" hidden style="max-height:56vh;overflow-y:auto">
-        <div class="rec-desktop-view tbl">
-          <table id="tblPickSpi"></table>
+      <div id="boxPickPlace" class="rec-pane" hidden>
+        <div id="recPlaceAdminBar" class="rec-admin-bar" hidden>
+          <button type="button" id="btnShowPlaceForm" aria-expanded="false" aria-controls="boxUploadPlaceForm">＋ 登錄座標檔</button>
+          <button type="button" id="btnShowLayoutForm" aria-expanded="false" aria-controls="boxUploadLayoutForm">＋ 登錄板面圖檔</button>
         </div>
-        <div class="rec-mobile-view" id="cardsPickSpi"></div>
-      </div>
-
-      <!-- 座標檔表格與卡片流 -->
-      <div id="boxPickPlace" hidden style="max-height:56vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px">
-        <!-- 獨立上傳新座標檔展開區塊 -->
-        <div id="boxUploadPlaceForm" class="card" style="padding:10px 14px;background:var(--surface2);border:1px dashed var(--line);border-radius:8px">
+        <div id="boxUploadPlaceForm" class="card" hidden style="padding:10px 14px;background:var(--surface2);border:1px dashed var(--line);border-radius:8px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <b style="font-size:var(--fs-ui)">登錄受控座標檔</b>
             <span class="note" style="font-size:var(--fs-caption)">目前正式登錄支援 .csv</span>
@@ -2059,14 +2042,10 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
           <div id="upLayState" class="note" role="status" aria-live="polite" style="margin-top:4px"></div>
           <div id="upLayList" style="margin-top:6px"></div>
         </div>
-
-        <div class="rec-desktop-view tbl">
-          <table id="tblPickPlace"></table>
-        </div>
-        <div class="rec-mobile-view" id="cardsPickPlace"></div>
+        <table id="tblPickPlace" class="rec-list"></table>
       </div>
 
-      <div id="boxPickSpecs" hidden style="max-height:56vh;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+      <div id="boxPickSpecs" class="rec-pane" hidden>
         <section id="adminUsersSection" hidden aria-label="管理者角色" style="margin-top:0"><h3 style="margin:0 0 6px">管理者角色</h3><p class="note">只有既有登入帳號可授予管理權限；最後一位可登入管理者不能撤銷。</p><div id="adminUsers" class="tbl"></div><p id="adminUsersState" class="note" role="status"></p></section>
         <h3 style="margin:0">料號規格 <small id="recSpecSub"></small></h3>
         <p class="note" style="margin:0;max-width:80ch">列出量測紀錄、座標檔與目前回合用到的產品料號的規格版本。版本存檔後不能修改；任何登入者都可以把某一版設為預設，切換會寫入稽核紀錄。</p>
@@ -2074,12 +2053,9 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
         <details class="how" id="recAuditBox" style="margin-top:4px"><summary>稽核紀錄（新增、刪除與設為預設）</summary><div class="tbl" id="recAudit" style="margin-top:8px"></div></details>
       </div>
     </div>
-    <div class="sheet-foot" style="padding:10px 18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;background:var(--surface2);flex:0 0 auto">
-      <span class="note" style="font-size:var(--fs-caption);min-width:0">原始檔不可修改；「對應證明」檢查指紋與座標對應。管理者可刪除量測與座標檔，刪除會寫入稽核紀錄。</span>
-      <div style="display:flex;gap:8px;flex:none">
-        <button type="button" id="btnRecPickerGoImport" style="font-size:var(--fs-body)">＋ 匯入新檔</button>
-        <button type="button" id="btnRecPickerCloseBottom" class="primary" style="font-size:var(--fs-body)">完成</button>
-      </div>
+    <div class="sheet-foot rec-foot">
+      <button type="button" id="btnRecPickerGoImport">＋ 匯入新檔</button>
+      <button type="button" id="btnRecPickerCloseBottom" class="primary">完成</button>
     </div>
   </div>
 </div>
@@ -11497,7 +11473,7 @@ $("#placeClear").onclick=()=>{PLACE=null;placeSave();placeShow();reconvert();cle
 $("#btnSelectPlace").onclick=()=>{if(typeof openRecPickerModal==="function")openRecPickerModal("place");else{$("#btnOpenRecModal")?.click();$("#btnPickPlace")?.click()}};
 /* 3D 示意網格警示：一鍵開啟座標檔庫，選取後套用至目前回合 */
 $("#btnGridApplyPlace").onclick=()=>{if(typeof openRecPickerModal==="function")openRecPickerModal("place",{forRunPlace:true});else $("#btnSelectPlace").onclick()};
-$("#btnRegisterPlace").onclick=()=>{if(typeof openRecPickerModal==="function")openRecPickerModal("pairs");RETURN_IMPORT_AFTER_PLACE=true;if($("#upPlacePart"))$("#upPlacePart").value=safeId($("#inPart").value);if($("#upPlaceRev"))$("#upPlaceRev").value=($("#inRev").value||"").trim();const side=$("#selSide").value;if((side==="TOP"||side==="BOT")&&$("#upPlaceSide"))$("#upPlaceSide").value=side;parkPlaceForm();$("#upPlaceSide")?.focus()};
+$("#btnRegisterPlace").onclick=()=>{if(typeof openRecPickerModal==="function")openRecPickerModal("place");RETURN_IMPORT_AFTER_PLACE=true;PLACE_FORM_OPEN=true;if($("#upPlacePart"))$("#upPlacePart").value=safeId($("#inPart").value);if($("#upPlaceRev"))$("#upPlaceRev").value=($("#inRev").value||"").trim();const side=$("#selSide").value;if((side==="TOP"||side==="BOT")&&$("#upPlaceSide"))$("#upPlaceSide").value=side;syncPlaceForms();$("#upPlaceSide")?.focus()};
 $("#btnRegisterLayout").onclick=()=>openLayoutRegister();
 $("#placeChoices").onclick=async e=>{const b=e.target.closest("[data-pick-place]");if(!b)return;const rec=(RecDB.cache||[]).find(x=>x.id===b.dataset.pickPlace);if(!rec){toast("找不到這份座標檔，請重新整理");return}try{await usePlaceRec(rec);syncPlaceToCurrentRun({notify:true});if(IMP&&IMP.raw)reconvert()}catch(er){toast(er.message)}};
 async function saveControlledPlacement(fl,part,rev,side,unit){
@@ -13290,7 +13266,7 @@ function syncLayoutToCurrentRun(rec){const run=curRun(),src=run&&runSrc(run);
   attachLayoutToRun(run,src)}
 /* 匯入步驟 ① 的「登錄板面圖檔」：開啟紀錄庫並帶入料號、版次、面別 */
 function openLayoutRegister(){if(typeof openRecPickerModal!=="function")return;
-  openRecPickerModal("pairs");PICKER_FOCUS_LAYOUT=true;
+  openRecPickerModal("place");PICKER_FOCUS_LAYOUT=true;LAYOUT_FORM_OPEN=true;syncPlaceForms();
   const side=$("#selSide")?.value||"",put=(id,v)=>{const el=$(id);if(el&&v)el.value=v};
   put("#upLayPart",PLACE?PLACE.part:safeId($("#inPart")?.value||""));put("#upLayRev",PLACE?PLACE.rev:($("#inRev")?.value||"").trim());
   if(side==="TOP"||side==="BOT")put("#upLaySide",side);
@@ -14800,14 +14776,14 @@ async function downloadDeliverablesQueue(types) {
   }
 }
 
-let PICKER_TAB = "pairs";
+let PICKER_TAB = "spi";
+let PLACE_FORM_OPEN = false, LAYOUT_FORM_OPEN = false;
 let PICKER_SIDE_FILTER = "";
 let PICKER_QUALITY_FILTER = "all";
 let PICKER_LINK_FILTER = "";
 let PICKER_FOR_RUN_PLACE = false;
 let PICKER_AUTO_PART_FILTER = null;
 let RETURN_IMPORT_AFTER_PLACE = false;
-let PICKER_FOCUS_IMPORT = "";
 const PAIR_CITE_OPEN = new Set();
 let EDITING_REC_ID = null, DELETING_REC_ID = null;
 let UP_PLACE_FILE_OBJ = null, UP_PLACE_SOURCE_ID = null;
@@ -15075,23 +15051,23 @@ function closeRecDeleteModal() {
   if (cancel) cancel.disabled = false;
   if (closeBtn) closeBtn.disabled = false;
 }
-function parkPlaceForm() {
-  const form = $("#boxUploadPlaceForm");
-  if (!form) return;
-  const lay = $("#boxUploadLayoutForm");
-  if (PICKER_TAB === "specs") { form.hidden = true; if (lay) lay.hidden = true; return; }
-  const host = PICKER_TAB === "place" ? $("#boxPickPlace") : $("#pairFormHost");
-  if (host && form.parentElement !== host) {
-    if (PICKER_TAB === "place") host.prepend(form);
-    else host.appendChild(form);
+/* 登錄表單只在座標檔分頁、由管理者按下按鈕後展開；不常駐在清單上方 */
+function syncPlaceForms() {
+  const admin = RecDB.isAdmin && RecDB.mode === "cloud", onPlace = PICKER_TAB === "place";
+  const bar = $("#recPlaceAdminBar"); if (bar) bar.hidden = !(admin && onPlace);
+  for (const [formSel, btnSel, open] of [["#boxUploadPlaceForm", "#btnShowPlaceForm", PLACE_FORM_OPEN], ["#boxUploadLayoutForm", "#btnShowLayoutForm", LAYOUT_FORM_OPEN]]) {
+    const form = $(formSel), btn = $(btnSel), show = admin && onPlace && open;
+    if (form) form.hidden = !show;
+    if (btn) btn.setAttribute("aria-expanded", show ? "true" : "false");
   }
-  // 板面圖檔表單緊跟在座標檔表單之後：「配對」與「座標檔庫」都看得到
-  if (lay && lay.previousElementSibling !== form) form.after(lay);
+}
+function closeRecMenus(except) {
+  document.querySelectorAll("#recPickerModal details.rec-menu[open]").forEach(d => { if (d !== except) d.open = false; });
 }
 function resetPickerFilters() {
   PICKER_SIDE_FILTER = ""; PICKER_QUALITY_FILTER = "all"; PICKER_LINK_FILTER = "";
-  for (const [sel, attr, val] of [["#pickSideSeg", "side", ""], ["#pickQualitySeg", "qfilter", "all"], ["#pickLinkSeg", "link", ""]])
-    $$(`${sel} button`).forEach(b => { const on = (b.dataset[attr] || "") === val; b.classList.toggle("active", on); b.style.background = on ? "var(--surface)" : "transparent"; });
+  for (const [sel, attr, val] of [["#pickSideSeg", "side", ""], ["#pickQualitySeg", "qfilter", "all"]])
+    $$(`${sel} button`).forEach(b => b.classList.toggle("active", (b.dataset[attr] || "") === val));
 }
 function scrollToPickerRow(id) {
   const el = [...document.querySelectorAll("#recPickerModal [data-row-id]")].find(x => x.dataset.rowId === id && x.offsetParent);
@@ -15143,12 +15119,7 @@ async function renderRecPicker(force) {
     $("#recPickerNotice").innerHTML = `<span class="err">無法讀取資料庫：${esc(e.message)}</span>`;
     return;
   }
-  if($("#boxUploadPlaceForm"))$("#boxUploadPlaceForm").hidden=!RecDB.isAdmin||RecDB.mode!=="cloud";
-  if($("#boxUploadLayoutForm"))$("#boxUploadLayoutForm").hidden=!RecDB.isAdmin||RecDB.mode!=="cloud";
-  parkPlaceForm();
-  if(PICKER_FOCUS_LAYOUT){PICKER_FOCUS_LAYOUT=false;const lay=$("#boxUploadLayoutForm");
-    if(lay&&!lay.hidden){if(lay.scrollIntoView)lay.scrollIntoView({block:"center"});(["#upLayPart","#upLayRev","#upLaySide"].map(i=>$(i)).find(el=>el&&!el.value)||$("#upLayFile"))?.focus()}
-    else $("#recPickerNotice").textContent="只有管理者可以登錄板面圖檔；請管理者登錄後再匯入量測"}
+  syncPlaceForms();
 
   if (PICKER_AUTO_PART_FILTER) {
     const { part, side } = PICKER_AUTO_PART_FILTER;
@@ -15160,7 +15131,6 @@ async function renderRecPicker(force) {
         $$("#pickSideSeg button").forEach(b => {
           const on = (b.dataset.side || "").toUpperCase() === side;
           b.classList.toggle("active", on);
-          b.style.background = on ? "var(--surface)" : "transparent";
         });
       }
     }
@@ -15181,17 +15151,18 @@ async function renderRecPicker(force) {
   const sideFilter = PICKER_SIDE_FILTER;
   const qualityFilter = PICKER_QUALITY_FILTER;
   // 品質篩選只對量測記錄有意義；座標檔庫分頁隱藏，切回時沿用原本的選擇
-  if ($("#pickQualitySeg")) $("#pickQualitySeg").style.display = (PICKER_TAB === "spi" || PICKER_TAB === "pairs") ? "inline-flex" : "none";
-  if ($("#pickLinkSeg")) $("#pickLinkSeg").style.display = PICKER_TAB === "specs" ? "none" : "inline-flex";
+  if ($("#pickQualitySeg")) $("#pickQualitySeg").style.display = PICKER_TAB === "spi" ? "inline-flex" : "none";
   const reimp = reimportMap(list);
 
-  const hit = r => {
+  /* 對應狀態：尚未搭配／座標檔不存在只屬於量測，無量測引用只屬於座標檔 */
+  const linkHit = (r, mode) => mode === "unlinked" ? r.kind === "spi" && !r.placeId
+    : mode === "missing" ? r.kind === "spi" && !!r.placeId && !(list || []).some(x => x.kind === "place" && x.id === r.placeId)
+    : mode === "unused" ? r.kind === "place" && !(list || []).some(x => x.kind === "spi" && x.placeId === r.id) : true;
+  const hit = (r, linkMode = PICKER_LINK_FILTER) => {
     if (!importSearchMatch(r, q)) return false;
     if (selectedPart && r.part !== selectedPart) return false;
     if (sideFilter && (r.side || "").toUpperCase() !== sideFilter && (r.side || "").toUpperCase() !== "BOTH") return false;
-    if (PICKER_LINK_FILTER === "unlinked" && !(r.kind === "spi" && !r.placeId)) return false;
-    if (PICKER_LINK_FILTER === "missing" && !(r.kind === "spi" && r.placeId && !(list || []).some(x => x.kind === "place" && x.id === r.placeId))) return false;
-    if (PICKER_LINK_FILTER === "unused" && (r.kind !== "place" || (list || []).some(x => x.kind === "spi" && x.placeId === r.id))) return false;
+    if (linkMode && !linkHit(r, linkMode)) return false;
     if (r.kind === "spi" && qualityFilter === "pass") {
       const defs = r.qualitySnapshot ? (r.qualitySnapshot.defects ?? r.qualitySnapshot.totalDefects ?? 0) : null;
       if (defs == null || defs > 0) return false;
@@ -15204,9 +15175,9 @@ async function renderRecPicker(force) {
 
   const fp = r => { const v = REC_VER[r.id];
     return `<span class="mono" title="SHA-256 ${esc(r.sha256)}">${esc(String(r.sha256).slice(0, 10))}…</span>${v ? `<br><span class="${v.ok ? "rec-ok" : "rec-bad"}">原檔 ${v.ok ? "✓ 相同" : "✗ 異常"}</span>${v.verdict ? `・<span class="${v.verdict === "ok" ? "rec-ok" : v.verdict === "none" ? "note" : "rec-bad"}">對應 ${PROOF_MARK[v.verdict]}</span>` : ""}` : ""}`; };
-  const delBtn = r => (RecDB.mode === "cloud" && RecDB.isAdmin && (r.kind === "spi" || r.kind === "place"))
-    ? `<button type="button" data-pact="del" data-id="${esc(r.id)}" class="btn-sm">刪除</button>` : "";
-  const editBtn = r => RecDB.isAdmin&&(r.kind==="spi"||r.kind==="place") ? `<button data-pact="edit-meta" data-id="${esc(r.id)}" title="${r.kind==="place"?"修改座標備註":"修改量測中繼資料"}" class="btn-sm">✏️ ${r.kind==="place"?"備註":"資料"}</button>` : "";
+  /* 清單列只在驗證過後顯示結果；完整指紋在「對應證明」 */
+  const verHtml = r => { const v = REC_VER[r.id]; if (!v) return "";
+    return `<span class="${v.ok ? "rec-ok" : "rec-bad"}">原檔 ${v.ok ? "✓ 相同" : "✗ 異常"}</span>${v.verdict ? `・<span class="${v.verdict === "ok" ? "rec-ok" : v.verdict === "none" ? "note" : "rec-bad"}">對應 ${PROOF_MARK[v.verdict]}</span>` : ""}`; };
 
   const S1 = (list || []).filter(r => r.kind === "spi" && hit(r));
   const P1 = (list || []).filter(r => r.kind === "place" && hit(r));
@@ -15214,28 +15185,41 @@ async function renderRecPicker(force) {
   if(q)activeFilters.push("搜尋「"+$("#recPickerQ").value.trim()+"」");
   if(selectedPart)activeFilters.push("料號 "+selectedPart);
   if(sideFilter)activeFilters.push(sideFilter+" 面");
-  if((PICKER_TAB==="spi"||PICKER_TAB==="pairs")&&qualityFilter!=="all")activeFilters.push(qualityFilter==="ng"?"僅異常":"僅合格");
+  if(PICKER_TAB==="spi"&&qualityFilter!=="all")activeFilters.push(qualityFilter==="ng"?"僅異常":"僅合格");
   if(PICKER_LINK_FILTER==="unlinked")activeFilters.push("未搭配");
   if(PICKER_LINK_FILTER==="missing")activeFilters.push("座標檔不存在");
   if(PICKER_LINK_FILTER==="unused")activeFilters.push("座標無引用");
   if($("#recPickerQClear"))$("#recPickerQClear").hidden=!q;
   if($("#recPickerClearFilters"))$("#recPickerClearFilters").hidden=!activeFilters.length;
-  $("#recPickerNotice").textContent="量測紀錄 "+S1.length+" 筆；座標檔 "+P1.length+" 筆。"+(activeFilters.length?"目前篩選："+activeFilters.join("、"):"目前未套用篩選。");
+  /* 筆數已在分頁按鈕上；窄螢幕只把這句留給讀屏，省下一排高度。篩選條件與錯誤訊息照常顯示 */
+  $("#recPickerNotice").innerHTML=`<span class="rec-counts">量測紀錄 ${S1.length} 筆；座標檔 ${P1.length} 筆。</span>`+(activeFilters.length?esc("目前篩選："+activeFilters.join("、")):"");
+  /* 對應狀態改為帶筆數的快速篩選：筆數為 0 且未啟用時不顯示 */
+  const quick=$("#recQuickFilters");
+  if(quick){const defs=PICKER_TAB==="spi"?[["unlinked","尚未搭配座標"],["missing","座標檔不存在"]]:PICKER_TAB==="place"?[["unused","無量測引用"]]:[];
+    quick.innerHTML=defs.map(([mode,label])=>{const n=(list||[]).filter(r=>hit(r,"")&&linkHit(r,mode)).length,on=PICKER_LINK_FILTER===mode;
+      return n||on?`<button type="button" data-link="${mode}" aria-pressed="${on}">${label} ${n}</button>`:""}).join("")}
+  const panelCount=(selectedPart?1:0)+(sideFilter?1:0)+(PICKER_TAB==="spi"&&qualityFilter!=="all"?1:0),fbtn=$("#btnRecFilters");
+  if(fbtn){fbtn.textContent=panelCount?`篩選 (${panelCount})`:"篩選";fbtn.dataset.on=panelCount?"1":"0"}
+  /* 匯入步驟 ① 的「登錄板面圖檔」：座標檔分頁展開表單並聚焦第一個空欄位 */
+  if(PICKER_FOCUS_LAYOUT){PICKER_FOCUS_LAYOUT=false;const lay=$("#boxUploadLayoutForm");
+    if(lay&&!lay.hidden){if(lay.scrollIntoView)lay.scrollIntoView({block:"start"});(["#upLayPart","#upLayRev","#upLaySide"].map(i=>$(i)).find(el=>el&&!el.value)||$("#upLayFile"))?.focus()}
+    else $("#recPickerNotice").textContent="只有管理者可以登錄板面圖檔；請管理者登錄後再匯入量測"}
 
   if ($("#countPickSpi")) $("#countPickSpi").textContent = S1.length;
   if ($("#countPickPlace")) $("#countPickPlace").textContent = P1.length;
 
-  /* 量測紀錄與座標檔共用同一份檢視模型：兩種紀錄只在 recView 分歧，表格、手機卡片、配對列都由同一組渲染器產生，
-     避免各自手寫模板而在狀態徽章、按鈕組合與順序上漂移（v10.29.2） */
+  /* 量測紀錄與座標檔共用同一份檢視模型與同一個列渲染器：兩種紀錄只在 recView 分歧。
+     每列只有一顆主鈕，其餘動作收進「⋯」選單；桌面與手機是同一份標記（v10.35.0） */
   const curR = curRun();
   const sideTxt = s => s === "BOTH" ? "TOP＋BOT" : (s || "—");
+  const cloudAdmin = RecDB.isAdmin && RecDB.mode === "cloud";
   const qualityPill = r => {
     if (r.kind !== "spi" || !r.qualitySnapshot) return "";
     const defs = r.qualitySnapshot.defects ?? r.qualitySnapshot.totalDefects ?? 0;
     return defs === 0 ? `<span class="pill ok" title="0 缺點">✓ 良品 (0 缺點)</span>` : `<span class="pill bad" title="缺點數: ${defs}">⚠ ${defs} 缺點</span>`;
   };
   const btn = (r, pact, label, { primary = false, title = "" } = {}) =>
-    `<button type="button" class="${primary ? "primary " : ""}btn-sm" data-pact="${pact}" data-id="${esc(r.id)}"${title ? ` title="${esc(title)}"` : ""}>${label}</button>`;
+    `<button type="button"${primary ? ' class="primary"' : ""} data-pact="${pact}" data-id="${esc(r.id)}"${title ? ` title="${esc(title)}"` : ""}>${label}</button>`;
   function citeHtml(p) {
     const users = (list || []).filter(x => x.kind === "spi" && x.placeId === p.id).sort((a, b) => b.created - a.created);
     if (!users.length) return `<span class="note">尚無量測引用</span>`;
@@ -15244,160 +15228,69 @@ async function renderRecPicker(force) {
   function recView(r) {
     const isSpi = r.kind === "spi";
     const hlRec = !!(PICKER_HIGHLIGHT && PICKER_HIGHLIGHT.id === r.id);
-    const badges = [];
+    const badges = [], menu = [], admin = [];
     if (hlRec && PICKER_HIGHLIGHT.label) badges.push(`<span class="pill warn">${esc(PICKER_HIGHLIGHT.label)}</span>`);
-    const v = { id: r.id, file: r.name || "", user: r.user, created: r.created, note: r.note || "", fp: fp(r), highlight: hlRec,
-      ident: `<span class="mono">${esc(r.part || "—")}</span> ${esc(r.rev || "")} · ${esc(sideTxt(r.side))}` };
-    /* 卡片與配對列的副標：標題已是料號時（座標檔）不再重複料號 */
-    v.sub = isSpi ? v.ident : `${esc(r.rev || "—")} · ${esc(sideTxt(r.side))}`;
-    const actions = [], more = [], admin = [];
+    const v = { id: r.id, file: r.name || "", user: r.user, created: r.created, note: r.note || "", ver: verHtml(r), highlight: hlRec, primary: "" };
+    menu.push(btn(r, "ver", "對應證明", { title: isSpi ? "檢查原檔指紋與座標對應" : "檢查原檔指紋並列出引用的量測" }), btn(r, "dl", "下載原檔"));
     if (isSpi) {
       v.title = `<b>${esc(r.lot || "未提供批號")}</b>`;
       badges.push(spiBadge(r));
-      const q = qualityPill(r); if (q) badges.push(q);
-      v.scale = r.boards || r.pads ? `${esc(r.boards || "—")} 板 × ${esc(r.pads || "—")} 焊墊` : '<span class="note" title="舊資料未記錄板數與焊墊數">未記錄</span>';
-      v.extra = [r.workOrder ? `製令:${esc(r.workOrder)}` : "", r.measuredDate ? `日期:${esc(r.measuredDate)}` : "", r.supplierWo ? `廠:${esc(r.supplierWo)}` : "", r.outsourceWo ? `委:${esc(r.outsourceWo)}` : ""].filter(Boolean).join(" ");
-      v.link = placeCell(r, list, reimp);
+      const qp = qualityPill(r); if (qp) badges.push(qp);
+      const scale = r.boards || r.pads ? `${esc(r.boards || "—")} 板 × ${esc(r.pads || "—")} 焊墊` : '<span class="note" title="舊資料未記錄板數與焊墊數">板數未記錄</span>';
+      v.meta = [`<span class="mono">${esc(r.part || "—")}</span> ${esc(r.rev || "")}`.trim(), esc(sideTxt(r.side)), r.workOrder ? `製令 ${esc(r.workOrder)}` : "", r.measuredDate ? esc(r.measuredDate) : "",
+        r.supplierWo ? `廠 ${esc(r.supplierWo)}` : "", r.outsourceWo ? `委 ${esc(r.outsourceWo)}` : "", scale].filter(Boolean).join(" · ");
       const st = measurementLink(r, list);
-      v.pairStatus = st.v === "ok" ? `<span class="rec-ok">身分相符</span>` : st.v === "bad" ? `<span class="rec-bad">${esc(st.text)}</span>` : st.v === "missing" ? `<span class="rec-bad">座標檔不存在</span>` : `<span class="note">尚未搭配</span>`;
-      v.pairExtra = st.place
-        ? `<button type="button" class="btn-sm" data-pact="dl-pair" data-id="${esc(r.id)}">下載這一對</button>`
-        : `<button type="button" class="btn-sm" disabled>下載這一對</button><span class="note">座標原檔不在，只能下載量測原檔</span>`;
-      if (!["pending_review", "superseded"].includes(r.lifecycle)) actions.push(btn(r, "load", "載入分析", { primary: true, title: "載入有效量測分析" }));
-      more.push(btn(r, "open", "調整", { title: "開啟至匯入對應面板以檢視或調整欄位" }));
+      v.link = st.v === "ok" ? `<span class="rec-ok">✓ 座標身分相符</span>${st.place.lifecycle === "archived" ? '<span class="note">（座標檔已封存）</span>' : ""}`
+        : st.v === "bad" ? `<span class="rec-bad">✗ ${esc(st.text)}</span> <span class="note">座標檔 <span class="mono">${esc(st.place.part)}</span> ${esc(st.place.rev)} · ${esc(sideTxt(st.place.side))}</span>`
+        : st.v === "missing" ? `<span class="rec-bad">✗ 座標檔不存在</span>` : placeCell(r, list, reimp);
+      if (!["pending_review", "superseded"].includes(r.lifecycle)) v.primary = btn(r, "load", "載入分析", { primary: true, title: "載入有效量測分析" });
+      if (st.place) menu.push(btn(r, "dl-pair", "下載這一對", { title: "量測原檔與所引用的座標原檔各下載一次" }));
+      menu.push(btn(r, "open", "調整", { title: "開啟至匯入對應面板以檢視或調整欄位" }));
+      if (!r.placeId && cloudAdmin) menu.push(`<button type="button" data-pair-upload data-pair-part="${esc(r.part || "")}" data-pair-rev="${esc(r.rev || "")}">登錄座標檔</button>`);
+      if (RecDB.isAdmin) menu.push(btn(r, "edit-meta", "修改資料", { title: "修改量測中繼資料" }));
       if (RecDB.isAdmin && r.lifecycle === "pending_review") admin.push(btn(r, "new-batch", "新一批"), btn(r, "correct", "修正既有"));
     } else {
       const selectable = r.lifecycle === "active" && r.validation_source === "server_verified";
       const isCur = PLACE && PLACE.recId === r.id;
       const needsApply = isCur && selectable && canApplyPlacePreview(curR) && !runHasAppliedPlace(curR, r.id);
       v.highlight = hlRec || !!isCur;
-      v.title = `<b class="mono">${esc(r.part || "—")}</b>`;
+      v.title = `<b class="mono">${esc(r.part || "—")}</b> <span>${esc(r.rev || "—")} · ${esc(sideTxt(r.side))}</span>`;
       badges.push(placeBadge(r, selectable));
       if (isCur) badges.push(`<span class="pill ok">目前已選取</span>`);
-      v.scale = `${esc(r.comps || "—")} 元件 · ${esc(r.unit || "未確認單位")}`;
-      v.extra = "";
+      v.meta = `${esc(r.comps || "—")} 元件 · ${esc(r.unit || "未確認單位")}`;
       v.link = citeHtml(r);
-      v.pairStatus = v.link;
-      v.pairExtra = "";
-      if (needsApply) actions.push(btn(r, "apply-place", "套用到目前回合", { primary: true }));
-      else if (!isCur && selectable) actions.push(btn(r, "use-place", "選取", { primary: true }));
-      else if (!isCur && r.lifecycle === "archived") actions.push(`<span class="note" title="${ARCHIVED_TIP}">不可用於新匯入</span>`);
+      if (needsApply) v.primary = btn(r, "apply-place", "套用到目前回合", { primary: true });
+      else if (!isCur && selectable) v.primary = btn(r, "use-place", "選取", { primary: true });
+      else if (!isCur && r.lifecycle === "archived") v.primary = `<span class="note" title="${ARCHIVED_TIP}">不可用於新匯入</span>`;
+      if (selectable) menu.push(`<button type="button" data-pair-import data-pair-part="${esc(r.part || "")}" data-pair-rev="${esc(r.rev || "")}" data-pair-side="${r.side === "TOP" || r.side === "BOT" ? r.side : ""}" data-place-id="${esc(r.id)}">匯入量測</button>`);
+      if (RecDB.isAdmin) menu.push(btn(r, "edit-meta", "修改備註", { title: "修改座標備註" }));
       if (RecDB.isAdmin && selectable) admin.push(btn(r, "archive-place", "封存"));
       if (RecDB.isAdmin && r.validation_source === "legacy") admin.push(btn(r, "register-legacy-place", "驗證納管"));
     }
+    if (cloudAdmin) admin.push(btn(r, "del", "刪除"));
     v.badges = badges.join(" ");
-    v.primary = actions.join("");
-    const common = [btn(r, "ver", "對應證明", { title: isSpi ? "檢查原檔指紋與座標對應" : "檢查原檔指紋並列出引用的量測" }), btn(r, "dl", "下載原檔"), editBtn(r)];
-    const tail = admin.concat(delBtn(r) ? [delBtn(r)] : []);
-    v.secondary = common.concat(more).join("") + (tail.length ? `<span class="sep" aria-hidden="true"></span>${tail.join("")}` : "");
+    v.menu = menu.join("") + (admin.length ? `<span class="sep" aria-hidden="true"></span>${admin.join("")}` : "");
     return v;
   }
-  const REC_HEAD = `<thead><tr><th>檔案</th><th>料號 / 版次 / 面別</th><th>規模</th><th>對應</th><th>上傳時間 / 者</th><th>指紋</th><th style="text-align:right">操作</th></tr></thead>`;
-  const recRowHtml = v => `<tr data-row-id="${esc(v.id)}"${v.highlight ? ' class="rec-new"' : ""}>
-        <td>${v.title}<div class="rec-badges">${v.badges}</div>${v.file ? `<span class="note rec-file" title="${esc(v.file)}">${esc(v.file)}</span>` : ""}</td>
-        <td>${v.ident}${v.extra ? `<br><span class="note">${v.extra}</span>` : ""}</td>
-        <td class="mono" style="white-space:nowrap">${v.scale}</td>
-        <td>${v.link}</td>
-        <td class="mono" style="font-size:var(--fs-caption)">${esc(fmtTime(v.created))}<br><span class="note">${esc(v.user)}</span></td>
-        <td>${v.fp}</td>
-        <td style="text-align:right"><div class="rec-acts">${v.primary}${v.secondary}</div></td>
+  const recItemHtml = v => `<tr data-row-id="${esc(v.id)}"${v.highlight ? ' class="rec-new"' : ""}>
+        <td class="rec-main">
+          <div class="rec-l1">${v.title}${v.badges}</div>
+          <div class="rec-l2">${v.meta}</div>
+          <div class="rec-l34"><div class="rec-l3">${v.link}${v.ver ? ` · ${v.ver}` : ""}</div>
+          <div class="rec-l4" title="${esc([v.file, fmtTime(v.created), v.user].filter(Boolean).join(" · "))}">${v.file ? `${esc(v.file)} · ` : ""}${esc(fmtTime(v.created))} · ${esc(v.user)}</div></div>
+          ${v.note ? `<div class="rec-l3">備註：${esc(v.note)}</div>` : ""}
+        </td>
+        <td class="rec-side"><div class="rec-acts">${v.primary}<details class="rec-menu"><summary aria-label="更多操作" title="更多操作">⋯</summary><div class="rec-menu-list">${v.menu}</div></details></div></td>
       </tr>`;
-  const recCardHtml = v => `<div class="rec-card${v.highlight ? " rec-new" : ""}" data-row-id="${esc(v.id)}">
-        <div class="rec-card-head">
-          <div style="min-width:0"><div class="rec-card-title">${v.title}</div><div class="rec-card-sub">${v.sub}</div></div>
-          <div class="rec-badges">${v.badges}</div>
-        </div>
-        <div class="rec-card-info note">
-          規模：${v.scale}<br>
-          ${v.extra ? `工單：${v.extra}<br>` : ""}
-          對應：${v.link}<br>
-          原始檔：<span style="overflow-wrap:anywhere">${esc(v.file)}</span><br>
-          上傳：${esc(fmtTime(v.created))} · ${esc(v.user)}
-          ${v.note ? `<br><span style="color:var(--ink)">備註：${esc(v.note)}</span>` : ""}
-        </div>
-        <div class="rec-card-actions">${v.primary}${v.secondary}</div>
-      </div>`;
-  const recTable = (rows, empty) => rows.length ? REC_HEAD + `<tbody>` + rows.map(r => recRowHtml(recView(r))).join("") + `</tbody>`
-    : `<tbody><tr><td colspan="7" class="note" style="text-align:center;padding:24px">${empty}</td></tr></tbody>`;
-  const recCards = (rows, empty) => rows.length ? rows.map(r => recCardHtml(recView(r))).join("") : `<div class="note" style="text-align:center;padding:24px">${empty}</div>`;
+  const recList = (rows, empty) => `<tbody>${rows.length ? rows.map(r => recItemHtml(recView(r))).join("") : `<tr><td class="rec-empty note">${empty}</td></tr>`}</tbody>`;
+  const anyFilter = q || selectedPart || sideFilter || PICKER_LINK_FILTER;
 
   const tblSpi = $("#tblPickSpi");
-  if (tblSpi) tblSpi.innerHTML = recTable(S1, q || selectedPart || sideFilter || qualityFilter !== "all" ? "沒有符合篩選條件的量測紀錄" : "資料庫目前尚無量測記錄。請點選下方「＋ 匯入新檔」進行匯入。");
-  const cardsSpi = $("#cardsPickSpi");
-  if (cardsSpi) cardsSpi.innerHTML = recCards(S1, "無符合篩選條件的量測記錄");
+  if (tblSpi) tblSpi.innerHTML = recList(S1, anyFilter || qualityFilter !== "all" ? "沒有符合篩選條件的量測紀錄" : "資料庫目前尚無量測記錄。請點選下方「＋ 匯入新檔」進行匯入。");
   const tblPlace = $("#tblPickPlace");
-  if (tblPlace) tblPlace.innerHTML = recTable(P1, q || selectedPart || sideFilter || PICKER_LINK_FILTER ? "沒有符合篩選條件的座標檔" : "資料庫目前尚無座標檔。請用上方表單登錄。");
-  const cardsPlace = $("#cardsPickPlace");
-  if (cardsPlace) cardsPlace.innerHTML = recCards(P1, "無符合篩選條件的座標檔");
-
-  function pairMore(html) {
-    return html.trim() ? `<details class="pair-more"><summary>更多</summary><div class="rec-acts">${html}</div></details>` : "";
-  }
-  function pairRowHtml(r) {
-    const v = recView(r);
-    return `<div class="pair-row${v.highlight ? " rec-new" : ""}" data-row-id="${esc(v.id)}"><div class="pair-meta">${v.title} ${v.badges} · ${v.sub}<br><span class="note">${esc(v.file)}</span> · ${v.pairStatus}</div><div class="rec-acts">${v.primary}${v.pairExtra}${pairMore(v.secondary)}</div></div>`;
-  }
-  const spiPairRow = pairRowHtml, placePairRow = pairRowHtml;
-  function renderPairBoard() {
-    const board = $("#pairBoard");
-    if (!board) return;
-    const cited = id => (list || []).some(x => x.kind === "spi" && x.placeId === id);
-    const groups = new Map();
-    const ensure = (part, rev) => {
-      const key = `${part || ""}\u0000${rev || ""}`;
-      if (!groups.has(key)) groups.set(key, { part: part || "", rev: rev || "", places: [], spi: [] });
-      return groups.get(key);
-    };
-    for (const p of P1) if (cited(p.id)) ensure(p.part, p.rev).places.push(p);
-    const orphanSpi = [];
-    for (const r of S1) {
-      const st = measurementLink(r, list);
-      if (st.v === "ok" || st.v === "bad") {
-        const g = ensure(r.part, r.rev);
-        g.spi.push(r);
-        // 篩選只命中量測時，從完整清單帶回它引用的座標，不把既有配對顯示成空位
-        if (st.v === "ok" && !g.places.some(p => p.id === st.place.id)) g.places.push(st.place);
-      } else orphanSpi.push(r);
-    }
-    const orphanPlace = P1.filter(p => !cited(p.id));
-    const uploadBtn = (part, rev) => RecDB.isAdmin && RecDB.mode === "cloud"
-      ? `<button type="button" data-pair-upload data-pair-part="${esc(part)}" data-pair-rev="${esc(rev)}">登錄座標檔</button>`
-      : `<span class="note">只有管理者可以登錄座標檔</span>`;
-    const importBtn = (part, rev, place) => {
-      const side = place && (place.side === "TOP" || place.side === "BOT") ? place.side : "";
-      const pid = place && place.lifecycle === "active" && place.validation_source === "server_verified" ? place.id : "";
-      return `<button type="button" data-pair-import data-pair-part="${esc(part)}" data-pair-rev="${esc(rev)}" data-pair-side="${esc(side)}" data-place-id="${esc(pid)}">匯入量測</button>`;
-    };
-    const filtered = q || selectedPart || sideFilter || PICKER_LINK_FILTER || (qualityFilter !== "all" && (PICKER_TAB === "spi" || PICKER_TAB === "pairs"));
-    let html = "";
-    if (orphanSpi.length || orphanPlace.length) {
-      html += `<section class="pair-orphan" aria-label="未成對"><b>未成對</b>`;
-      html += orphanPlace.map(p => `<div class="pair-slot"><b>座標檔</b>${placePairRow(p)}<p class="note" style="margin:0">此座標還沒有量測。</p>${importBtn(p.part, p.rev, p)}</div>`).join("");
-      html += orphanSpi.map(r => `<div class="pair-slot"><b>量測紀錄</b>${spiPairRow(r)}${r.placeId ? "" : uploadBtn(r.part, r.rev)}</div>`).join("");
-      html += `</section>`;
-    }
-    if (!groups.size && !orphanSpi.length && !orphanPlace.length) {
-      html += `<p class="note">${filtered ? "沒有符合篩選的檔案。" : "尚無量測與座標。先登錄座標檔，再匯入同一料號與版次的量測。"}</p>`;
-    }
-    for (const key of [...groups.keys()].sort((a, b) => a.localeCompare(b, "zh-Hant"))) {
-      const g = groups.get(key);
-      const place = g.places.find(p => p.lifecycle === "active" && p.validation_source === "server_verified") || g.places[0];
-      const fresh = PICKER_HIGHLIGHT && g.places.concat(g.spi).some(x => x.id === PICKER_HIGHLIGHT.id) && PICKER_HIGHLIGHT.label ? ` <span class="pill warn">${esc(PICKER_HIGHLIGHT.label)}</span>` : "";
-      html += `<article class="pair-card"><h4><span class="mono">${esc(g.part || "無料號")}</span> ${esc(g.rev || "無版次")}${fresh}</h4><div class="pair-slot"><b>座標檔</b>${g.places.length ? g.places.map(placePairRow).join("") : `<p class="note" style="margin:0">此版次還沒有座標檔。</p>${uploadBtn(g.part, g.rev)}`}</div><div class="pair-slot"><b>量測紀錄</b>${g.spi.length ? g.spi.map(spiPairRow).join("") : `<p class="note" style="margin:0">此版次還沒有量測。</p>`}${importBtn(g.part, g.rev, place)}</div></article>`;
-    }
-    board.innerHTML = html;
-  }
-  renderPairBoard();
-  if (PICKER_FOCUS_IMPORT) {
-    const want = PICKER_FOCUS_IMPORT;
-    PICKER_FOCUS_IMPORT = "";
-    const btn = [...document.querySelectorAll("#pairBoard [data-pair-import]")].find(b => `${b.dataset.pairPart}\u0000${b.dataset.pairRev}` === want);
-    if (btn) btn.focus();
-  }
+  if (tblPlace) tblPlace.innerHTML = recList(P1, anyFilter ? "沒有符合篩選條件的座標檔" : cloudAdmin ? "資料庫目前尚無座標檔。請按「＋ 登錄座標檔」。" : "資料庫目前尚無座標檔。只有管理者可以登錄座標檔。");
 
   if (PICKER_TAB === "specs") {
-    if ($("#boxUploadPlaceForm")) $("#boxUploadPlaceForm").hidden = true;
-    if ($("#boxUploadLayoutForm")) $("#boxUploadLayoutForm").hidden = true;
     if ($("#pickSideSeg")) $("#pickSideSeg").style.display = "none";
     if ($("#pickQualitySeg")) $("#pickQualitySeg").style.display = "none";
     const hitSpec = r => {
@@ -15420,28 +15313,29 @@ function setupRecPicker() {
   let pickerReturnFocus = null;
 
   function setPickerTab(tab, shouldRender = false) {
-    PICKER_TAB = tab === "place" ? "place" : tab === "specs" ? "specs" : tab === "spi" ? "spi" : "pairs";
-    const tabs = [["pairs", $("#btnPickPairs")], ["spi", $("#btnPickSpi")], ["place", $("#btnPickPlace")], ["specs", $("#btnPickSpecs")]];
+    PICKER_TAB = tab === "place" ? "place" : tab === "specs" ? "specs" : "spi";
+    const tabs = [["spi", $("#btnPickSpi")], ["place", $("#btnPickPlace")], ["specs", $("#btnPickSpecs")]];
     tabs.forEach(([name, btn]) => {
       if (!btn) return;
       const on = PICKER_TAB === name;
       btn.classList.toggle("active", on);
-      btn.style.background = on ? "var(--surface)" : "transparent";
-      if (on) btn.style.fontWeight = "700"; else btn.style.fontWeight = "";
+      btn.setAttribute("aria-selected", on ? "true" : "false");
     });
-    if ($("#boxPickPairs")) $("#boxPickPairs").hidden = PICKER_TAB !== "pairs";
     if ($("#boxPickSpi")) $("#boxPickSpi").hidden = PICKER_TAB !== "spi";
     if ($("#boxPickPlace")) $("#boxPickPlace").hidden = PICKER_TAB !== "place";
     if ($("#boxPickSpecs")) $("#boxPickSpecs").hidden = PICKER_TAB !== "specs";
     if ($("#pickSideSeg")) $("#pickSideSeg").style.display = PICKER_TAB === "specs" ? "none" : "inline-flex";
-    if ($("#pickQualitySeg")) $("#pickQualitySeg").style.display = (PICKER_TAB === "spi" || PICKER_TAB === "pairs") ? "inline-flex" : "none";
-    if ($("#pickLinkSeg")) $("#pickLinkSeg").style.display = PICKER_TAB === "specs" ? "none" : "inline-flex";
-    parkPlaceForm();
+    if ($("#pickQualitySeg")) $("#pickQualitySeg").style.display = PICKER_TAB === "spi" ? "inline-flex" : "none";
+    /* 對應篩選各自只屬於一種紀錄；換分頁時不沿用，避免另一頁變成空清單 */
+    if ((PICKER_LINK_FILTER === "unused") !== (PICKER_TAB === "place")) PICKER_LINK_FILTER = "";
+    syncPlaceForms();
+    const sc = $("#recPickerScroll"); if (sc) sc.scrollTop = 0;
     if (shouldRender) renderRecPicker();
   }
 
-  function open(wantTab = "pairs", opts = {}) {
-    const targetTab = wantTab === "place" ? "place" : wantTab === "specs" ? "specs" : wantTab === "spi" ? "spi" : "pairs";
+  function open(wantTab = "spi", opts = {}) {
+    const targetTab = wantTab === "place" ? "place" : wantTab === "specs" ? "specs" : "spi";
+    PLACE_FORM_OPEN = false; LAYOUT_FORM_OPEN = false;
     if (modal.hidden) pickerReturnFocus = document.activeElement;
     modal.hidden = false;
     modal.classList.add("open");
@@ -15480,12 +15374,12 @@ function setupRecPicker() {
   }
 
   const btnOpen = $("#btnOpenRecModal");
-  if (btnOpen) btnOpen.onclick = () => open("pairs");
+  if (btnOpen) btnOpen.onclick = () => open("spi");
   const mBtnOpen = $("#mBtnOpenRecModal");
   if (mBtnOpen) {
     mBtnOpen.onclick = () => {
       if (typeof moreSheetCtrl !== "undefined" && moreSheetCtrl) moreSheetCtrl.close();
-      open("pairs");
+      open("spi");
     };
   }
   const btnClose = $("#recPickerClose");
@@ -15501,8 +15395,7 @@ function setupRecPicker() {
     };
   }
 
-  const bPairs = $("#btnPickPairs"), bSpi = $("#btnPickSpi"), bPlace = $("#btnPickPlace"), bSpecs = $("#btnPickSpecs");
-  if (bPairs) bPairs.onclick = () => setPickerTab("pairs", true);
+  const bSpi = $("#btnPickSpi"), bPlace = $("#btnPickPlace"), bSpecs = $("#btnPickSpecs");
   if (bSpi) bSpi.onclick = () => setPickerTab("spi", true);
   if (bPlace) bPlace.onclick = () => setPickerTab("place", true);
   if (bSpecs) bSpecs.onclick = () => setPickerTab("specs", true);
@@ -15586,12 +15479,7 @@ function setupRecPicker() {
     sideSeg.addEventListener("click", e => {
       const btn = e.target.closest("button");
       if (!btn) return;
-      sideSeg.querySelectorAll("button").forEach(b => {
-        b.classList.remove("active");
-        b.style.background = "transparent";
-      });
-      btn.classList.add("active");
-      btn.style.background = "var(--surface)";
+      sideSeg.querySelectorAll("button").forEach(b => b.classList.toggle("active", b === btn));
       PICKER_SIDE_FILTER = (btn.dataset.side || "").toUpperCase();
       renderRecPicker();
     });
@@ -15602,32 +15490,26 @@ function setupRecPicker() {
     qSeg.addEventListener("click", e => {
       const btn = e.target.closest("button");
       if (!btn) return;
-      qSeg.querySelectorAll("button").forEach(b => {
-        b.classList.remove("active");
-        b.style.background = "transparent";
-      });
-      btn.classList.add("active");
-      btn.style.background = "var(--surface)";
+      qSeg.querySelectorAll("button").forEach(b => b.classList.toggle("active", b === btn));
       PICKER_QUALITY_FILTER = btn.dataset.qfilter || "all";
       renderRecPicker();
     });
   }
 
-  const linkSeg = $("#pickLinkSeg");
-  if (linkSeg) {
-    linkSeg.addEventListener("click", e => {
-      const btn = e.target.closest("button");
-      if (!btn) return;
-      linkSeg.querySelectorAll("button").forEach(b => {
-        b.classList.remove("active");
-        b.style.background = "transparent";
-      });
-      btn.classList.add("active");
-      btn.style.background = "var(--surface)";
-      PICKER_LINK_FILTER = btn.dataset.link || "";
-      renderRecPicker();
-    });
-  }
+  const quick = $("#recQuickFilters");
+  if (quick) quick.addEventListener("click", e => {
+    const btn = e.target.closest("button[data-link]");
+    if (!btn) return;
+    PICKER_LINK_FILTER = PICKER_LINK_FILTER === btn.dataset.link ? "" : btn.dataset.link;
+    renderRecPicker();
+  });
+  const fBtn = $("#btnRecFilters"), fBar = $("#recFilterBar");
+  if (fBtn && fBar) fBtn.onclick = () => { const on = fBar.classList.toggle("open"); fBtn.setAttribute("aria-expanded", on ? "true" : "false"); };
+  if ($("#btnShowPlaceForm")) $("#btnShowPlaceForm").onclick = () => { PLACE_FORM_OPEN = !PLACE_FORM_OPEN; syncPlaceForms(); if (PLACE_FORM_OPEN) $("#upPlacePart")?.focus(); };
+  if ($("#btnShowLayoutForm")) $("#btnShowLayoutForm").onclick = () => { LAYOUT_FORM_OPEN = !LAYOUT_FORM_OPEN; syncPlaceForms(); if (LAYOUT_FORM_OPEN) $("#upLayPart")?.focus(); };
+  /* 「⋯」選單一次只開一個；點選單外或選了項目就收起 */
+  modal.addEventListener("toggle", e => { if (e.target.matches?.("details.rec-menu") && e.target.open) { closeRecMenus(e.target); e.target.querySelector(".rec-menu-list")?.scrollIntoView?.({ block: "nearest" }); } }, true);
+  modal.addEventListener("click", e => { if (!e.target.closest("details.rec-menu>summary")) closeRecMenus(null); }, true);
 
   // 獨立座標上傳表單事件
   const upPlaceFile = $("#upPlaceFile");
@@ -15689,7 +15571,7 @@ function setupRecPicker() {
         if ($("#upPlacePartHint")) $("#upPlacePartHint").textContent = "";
         if (upPlaceFile) upPlaceFile.value = "";
         if ($("#upPlaceFileName")) $("#upPlaceFileName").textContent = "";
-        if (sv) { PICKER_PART_PRESET = sv.part; resetPickerFilters(); if ($("#recPickerQ")) $("#recPickerQ").value = ""; PICKER_HIGHLIGHT = { id: sv.id, label: "剛存入" }; if (!RETURN_IMPORT_AFTER_PLACE) PICKER_FOCUS_IMPORT = `${sv.part}\u0000${sv.rev}`; }
+        if (sv) { PICKER_PART_PRESET = sv.part; resetPickerFilters(); if ($("#recPickerQ")) $("#recPickerQ").value = ""; PICKER_HIGHLIGHT = { id: sv.id, label: "剛存入" }; }
         await renderRecPicker(true);
         if (sv && RETURN_IMPORT_AFTER_PLACE) {
           RETURN_IMPORT_AFTER_PLACE = false;
@@ -15703,7 +15585,7 @@ function setupRecPicker() {
           syncIdentityHints();
           return;
         }
-        if (sv) scrollToPickerRow(sv.id);
+        if (sv) { scrollToPickerRow(sv.id); document.querySelector(`#tblPickPlace tr[data-row-id="${sv.id}"] .rec-acts>button`)?.focus(); }
         await renderRecords(true);
         syncPlaceToCurrentRun({notify:true});
       } catch(err) {
@@ -15850,9 +15732,11 @@ function setupRecPicker() {
     if (upBtn) {
       if ($("#upPlacePart")) $("#upPlacePart").value = upBtn.dataset.pairPart || "";
       if ($("#upPlaceRev")) $("#upPlaceRev").value = upBtn.dataset.pairRev || "";
-      parkPlaceForm();
+      PLACE_FORM_OPEN = true;
+      setPickerTab("place", false);
+      await renderRecPicker();
       const form = $("#boxUploadPlaceForm");
-      if (form) { form.hidden = !(RecDB.isAdmin && RecDB.mode === "cloud"); if (form.scrollIntoView) form.scrollIntoView({ block: "center" }); }
+      if (form && form.scrollIntoView) form.scrollIntoView({ block: "start" });
       $("#upPlaceSide")?.focus();
       return;
     }
@@ -15909,6 +15793,7 @@ function setupRecPicker() {
         if($("#upPlaceFileName"))$("#upPlaceFileName").textContent=`歷史原始檔：${rec.name}`;
         for(const key of ["Part","Rev"]){const field=$("#upPlace"+key);if(field){field.value="";field.placeholder=`歷史紀錄 ${key==="Part"?rec.part:rec.rev||"未提供"}，請核對正式${key==="Part"?"料號":"版次"}`}}
         $("#upPlaceSide").value="";$("#upPlaceUnit").value="";
+        PLACE_FORM_OPEN=true;syncPlaceForms();
         $("#upPlaceState").textContent="請查核原始檔，重新填寫正式料號、版次、面別與單位；驗證成功會建立新的受控紀錄，舊紀錄保留。";
         $("#boxUploadPlaceForm").scrollIntoView({behavior:"smooth",block:"center"});
         $("#upPlacePart").focus();return;

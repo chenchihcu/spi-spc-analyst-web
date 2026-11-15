@@ -97,6 +97,10 @@ def database(page, evidence, note):
             expect(page.locator("#boxPickPlace")).to_be_visible()
             expect(page.locator("#boxPickSpi")).to_be_hidden()
         else:
+            # 手機寬度下篩選收在「篩選」鈕內，先展開再檢查
+            toggle = page.locator("#btnRecFilters")
+            if toggle.is_visible() and toggle.get_attribute("aria-expanded") != "true":
+                toggle.click()
             expect(page.locator("#pickQualitySeg")).to_be_visible()
             expect(page.locator("#boxPickSpi")).to_be_visible()
             expect(page.locator("#boxPickPlace")).to_be_hidden()
