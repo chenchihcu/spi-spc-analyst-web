@@ -58,9 +58,10 @@ test("整合資料上傳入口與下載出口介面結構與互動契約驗證",
 
   assert.equal(document.getElementById("btnHubExport"), null, "報告頁不應再放與頂欄重複的匯出中心按鈕");
 
-  // 2. 上傳資料入口 (subtab=import) 三段式卡片檢驗
-  const importPanel = document.querySelector('[data-sub="import"]');
-  assert.ok(importPanel, "資料與規格分頁應包含 [data-sub=\"import\"] 容器");
+  // 2. 上傳資料入口（整併於記錄庫 #boxPickImport 分頁）五步驟卡片檢驗
+  assert.equal(document.querySelector('#p-data [data-sub="import"]'), null, "資料與規格分頁不應保留重複的 [data-sub=\"import\"]");
+  const importPanel = document.getElementById("boxPickImport");
+  assert.ok(importPanel, "記錄庫應包含 #boxPickImport 容器");
 
   // 卡片 1: 主要 SPI 量測
   const dropZone = document.getElementById("drop");
