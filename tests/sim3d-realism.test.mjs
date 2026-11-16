@@ -327,13 +327,13 @@ function loadCompModules() {
   const fnMatch = code.match(/function resolveComponentSpec[\s\S]*?function pos3D\(rows\)\{[\s\S]*?\n\}/);
   const threeCode = fs.readFileSync(path.join(ROOT, "vendor", "three-r128.min.js"), "utf8");
   const vm = require("vm");
-  const ctx = { console, Math, Set, Map, Number, String, Array };
+  const ctx = { console, Math, Set, Map, Number, String, Array, Object, JSON };
   vm.createContext(ctx);
   vm.runInContext(threeCode, ctx);
   vm.runInContext(`
-    let T = {};
-    let S = { comp3dMode: "semi" };
-    function realXY(r){ return false; }
+    var T = {};
+    var S = { comp3dMode: "off" };
+    function realXY(r){ return Boolean(r && !r.gridPos && Number.isFinite(r.x) && Number.isFinite(r.y)); }
     ${fnMatch[0]}
   `, ctx);
   return {
@@ -347,57 +347,70 @@ function loadCompModules() {
   };
 }
 
-test("IPC / EIA 封裝幾何推算：0402 與 0603 零件外觀與焊墊尺寸對應", () => {
+test("createSolderPasteGeometry 矩形與圓形網格所有三角面法線皆朝外（不被背面剔除）", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const dom = createPage();
+  const H = await waitFor(() => dom.window.SPI_TEST_HOOK?.createSolderPasteGeometry && dom.window.SPI_TEST_HOOK);
+  const w = dom.window;
+
+  const rRect = { volume: 100, area: 100, height: 120, peaking: 0, coplanarity: 0 };
+  const geoRect = H.createSolderPasteGeometry(1.0, 0.24, 0.8, rRect, 0.02, "rect");
+  const pos = geoRect.attributes.position;
+  const idx = geoRect.index;
+  assert.ok(idx && idx.count > 0, "矩形錫膏幾何需具備索引三角形");
+
+  const a = new w.THREE.Vector3(), b = new w.THREE.Vector3(), c = new w.THREE.Vector3();
+  const ab = new w.THREE.Vector3(), ac = new w.THREE.Vector3(), n = new w.THREE.Vector3(), centroid = new w.THREE.Vector3();
+  let outwardCount = 0;
+  for (let i = 0; i < idx.count; i += 3) {
+    const i0 = idx.getX(i), i1 = idx.getX(i + 1), i2 = idx.getX(i + 2);
+    a.fromBufferAttribute(pos, i0);
+    b.fromBufferAttribute(pos, i1);
+    c.fromBufferAttribute(pos, i2);
+    ab.subVectors(b, a);
+    ac.subVectors(c, a);
+    n.crossVectors(ab, ac);
+    if (n.lengthSq() < 1e-12) continue;
+    centroid.addVectors(a, b).add(c).multiplyScalar(1 / 3);
+    assert.ok(n.dot(centroid) > 0, `矩形第 ${i / 3} 個三角面法線應朝外 (dot=${n.dot(centroid)})`);
+    outwardCount++;
+  }
+  assert.ok(outwardCount >= 24, `應驗證所有頂面、底面與側面三角面，實際=${outwardCount}`);
+});
+
+test("參考依據原則：僅標準 EIA 晶片回傳真實依據尺寸，未知封裝不硬猜尺寸", () => {
   const { resolveComponentSpec } = loadCompModules();
 
-  // 1. 0402 vs 0603 尺寸比對
   const spec0402 = resolveComponentSpec("R0402", "R1", 2);
   const spec0603 = resolveComponentSpec("R0603", "R2", 2);
-
-  assert.equal(spec0402.family, "chip_r");
+  assert.equal(spec0402.grounded, true);
+  assert.equal(spec0402.basis, "eia");
   assert.equal(spec0402.bodyL, 1.00);
   assert.equal(spec0402.bodyW, 0.50);
   assert.equal(spec0402.padL, 0.55);
   assert.equal(spec0402.padW, 0.60);
-  assert.equal(spec0402.pitchX, 1.00);
 
-  assert.equal(spec0603.family, "chip_r");
+  assert.equal(spec0603.grounded, true);
+  assert.equal(spec0603.basis, "eia");
   assert.equal(spec0603.bodyL, 1.60);
   assert.equal(spec0603.bodyW, 0.80);
-  assert.equal(spec0603.padL, 0.85);
-  assert.equal(spec0603.padW, 0.90);
-  assert.equal(spec0603.pitchX, 1.60);
+  assert.ok(spec0603.bodyL > spec0402.bodyL);
 
-  // 斷言：0603 零件與焊墊皆顯著大於 0402
-  assert.ok(spec0603.bodyL > spec0402.bodyL, "0603 零件長度大於 0402");
-  assert.ok(spec0603.bodyW > spec0402.bodyW, "0603 零件寬度大於 0402");
-  assert.ok(spec0603.padL > spec0402.padL, "0603 焊墊長度大於 0402");
-  assert.ok(spec0603.padW > spec0402.padW, "0603 焊墊寬度大於 0402");
-  assert.ok(spec0603.pitchX > spec0402.pitchX, "0603 焊墊間距大於 0402");
+  const specCap = resolveComponentSpec("C0805", "C10", 2);
+  assert.equal(specCap.grounded, true);
+  assert.equal(specCap.basis, "eia");
+  assert.equal(specCap.bodyL, 2.00);
 
-  // 2. 電容與二極體解析
-  const specCap = resolveComponentSpec("C0402", "C10", 2);
-  assert.equal(specCap.family, "chip_c");
-
-  const specDiode = resolveComponentSpec("SOD-323", "D1", 2);
-  assert.equal(specDiode.family, "diode");
-  assert.equal(specDiode.bodyL, 1.7);
-
-  // 3. SOT-23 與 BGA 解析
-  const specSot = resolveComponentSpec("SOT-23", "Q1", 3);
-  assert.equal(specSot.family, "sot");
-  assert.equal(specSot.nPins, 3);
-
-  const specBga = resolveComponentSpec("BGA64-06-06", "U1", 64);
-  assert.equal(specBga.family, "bga");
-  assert.equal(specBga.padShape, "round");
+  for (const pkg of ["SOD-323", "SOT-23", "BGA64-06-06", "SOIC-8", "CONN-10", ""]) {
+    const unk = resolveComponentSpec(pkg, "U1", 4);
+    assert.equal(unk.grounded, false, `${pkg || "(空)"} 無實測與 Gerber 依據時 grounded 必須為 false`);
+    assert.equal(unk.basis, "none");
+  }
 });
 
-test("焊墊幾何旋轉與位移：calcPadOffsetAndGeom 隨角度正確旋轉", () => {
+test("EIA 焊墊角度展開與未知封裝不重疊展平：calcPadOffsetAndGeom 正確處理旋轉與多孔排列", () => {
   const { resolveComponentSpec, calcPadOffsetAndGeom } = loadCompModules();
   const spec = resolveComponentSpec("R0402", "R1", 2);
 
-  // 0 度旋轉
   const p0_1 = calcPadOffsetAndGeom(spec, 0, 2, 0);
   const p0_2 = calcPadOffsetAndGeom(spec, 1, 2, 0);
   assert.equal(p0_1.x, -0.5);
@@ -407,27 +420,19 @@ test("焊墊幾何旋轉與位移：calcPadOffsetAndGeom 隨角度正確旋轉",
   assert.equal(p0_2.x, 0.5);
   assert.equal(p0_2.y, 0);
 
-  // 90 度旋轉：焊墊長寬互換，間距轉至 Y 軸
   const p90_1 = calcPadOffsetAndGeom(spec, 0, 2, 90);
   const p90_2 = calcPadOffsetAndGeom(spec, 1, 2, 90);
-  assert.ok(Math.abs(p90_1.x) < 1e-6, "90 度旋轉後 X 偏移接近 0");
-  assert.ok(Math.abs(p90_1.y - (-0.5)) < 1e-6, "90 度旋轉後 Y 偏移為 -0.5");
-  assert.equal(p90_1.w, 0.60, "90 度旋轉後長度變為原寬度");
-  assert.equal(p90_1.d, 0.55, "90 度旋轉後寬度變為原長度");
+  assert.ok(Math.abs(p90_1.x) < 1e-6);
+  assert.ok(Math.abs(p90_1.y - (-0.5)) < 1e-6);
+  assert.equal(p90_1.w, 0.60);
+  assert.equal(p90_1.d, 0.55);
   assert.ok(Math.abs(p90_2.x) < 1e-6);
   assert.ok(Math.abs(p90_2.y - 0.5) < 1e-6);
 
-  // SOT-23 3 腳非對稱展開
-  const specSot = resolveComponentSpec("SOT-23", "Q1", 3);
-  const s1 = calcPadOffsetAndGeom(specSot, 0, 3, 0);
-  const s2 = calcPadOffsetAndGeom(specSot, 1, 3, 0);
-  const s3 = calcPadOffsetAndGeom(specSot, 2, 3, 0);
-  assert.equal(s1.x, -0.95);
-  assert.equal(s1.y, -1.2);
-  assert.equal(s2.x, 0.95);
-  assert.equal(s2.y, -1.2);
-  assert.equal(s3.x, 0);
-  assert.equal(s3.y, 1.2);
+  const unk = resolveComponentSpec("QFN-16", "U2", 4);
+  const u0 = calcPadOffsetAndGeom(unk, 0, 4, 0);
+  const u1 = calcPadOffsetAndGeom(unk, 1, 4, 0);
+  assert.notDeepEqual([u0.x, u0.y], [u1.x, u1.y], "多腳位無依據零件仍須分開展開以便選取焊墊");
 });
 
 test("pos3D 焊墊展開與 DFM 統計隔離邊界：dimAssumed 嚴格維持 true", () => {
@@ -461,65 +466,174 @@ test("pos3D 焊墊展開與 DFM 統計隔離邊界：dimAssumed 嚴格維持 tru
   assert.ok(P.get(rows[2]).d > P.get(rows[0]).d, "0603 焊墊寬度應大於 0402");
 });
 
-test("極度擬真 3D 零件模型生成：buildComponent3DObject 結構與半透明/實心材質切換", () => {
-  const { resolveComponentSpec, buildComponent3DObject, THREE } = loadCompModules();
+test("Gerber layout 整合 pos3D 與 T.pos 快取失效驗證", () => {
+  const { pos3D, ctx } = loadCompModules();
 
-  const spec0402 = resolveComponentSpec("R0402", "R1", 2);
+  const rows = [
+    { board: "B01", pad: "R1-1", comp: "R1", pkg: "UNKNOWN-2P", figure: "", componentX: 10, componentY: 20, dimAssumed: true },
+    { board: "B01", pad: "R1-2", comp: "R1", pkg: "UNKNOWN-2P", figure: "", componentX: 10, componentY: 20, dimAssumed: true },
+    { board: "B01", pad: "U1-1", comp: "U1", pkg: "QFN-8", figure: "", dimAssumed: true },
+  ];
+  const compKeyR1 = JSON.stringify(["", "comp", "R1"]);
+  const compKeyU1 = JSON.stringify(["", "comp", "U1"]);
+  const layoutPad = {
+    level: "pad",
+    tf: { o: 0, tx: 0, ty: 0 },
+    pinPad: { [compKeyR1]: { "1": 0, "2": 1 }, [compKeyU1]: { "1": 2 } },
+    matched: { [compKeyR1]: [0, 1], [compKeyU1]: [2] },
+    geom: {
+      pads: [
+        { x: 12.5, y: 20.0, w: 0.75, h: 0.65, s: "r" },
+        { x: 14.0, y: 20.0, w: 0.75, h: 0.65, s: "r" },
+        { x: 30.0, y: 40.0, w: 0.50, h: 0.50, s: "c" }
+      ],
+      outline: [[0, 0, 50, 0]],
+      box: [0, 0, 50, 50]
+    }
+  };
 
-  // 半透明模式 (semi)
-  const gSemi = buildComponent3DObject(THREE, spec0402, "semi");
-  assert.ok(gSemi.children.length >= 3, "電阻模型應包含本體與兩端電極");
-  const bodyMeshSemi = gSemi.children[0];
-  assert.equal(bodyMeshSemi.material.transparent, true, "半透明模式需啟用 transparent");
-  assert.equal(bodyMeshSemi.material.opacity, 0.58, "本體透明度為 0.58");
+  const Pno = pos3D(rows, null);
+  assert.equal(Pno.get(rows[2]), undefined, "無 layout 與座標的未知焊墊略過");
 
-  // 實心模式 (solid)
-  const gSolid = buildComponent3DObject(THREE, spec0402, "solid");
-  const bodyMeshSolid = gSolid.children[0];
-  assert.equal(bodyMeshSolid.material.transparent, false, "實心模式為不透明");
-  assert.equal(bodyMeshSolid.material.opacity, 1.0, "實心模式透明度為 1.0");
+  const Ppad = pos3D(rows, layoutPad);
+  assert.equal(Ppad.size, 3);
+  assert.equal(Ppad.get(rows[0]).x, 12.5);
+  assert.equal(Ppad.get(rows[0]).est, false, "pinPad 逐焊墊精準對應時 est 應為 false");
+  assert.equal(Ppad.get(rows[0]).layout, "pad");
+  assert.equal(Ppad.get(rows[0]).w, 0.75);
+  assert.equal(Ppad.get(rows[2]).x, 30.0);
+  assert.equal(Ppad.get(rows[2]).shape, "round");
 
-  // 二極體模型驗證（含陰極標記白線）
-  const specDiode = resolveComponentSpec("SOD-323", "D1", 2);
-  const gDiode = buildComponent3DObject(THREE, specDiode, "semi");
-  assert.ok(gDiode.children.length >= 4, "二極體應包含本體、陰極帶與引腳");
-
-  // BGA 模型驗證（含 BT 載板與金屬蓋）
-  const specBga = resolveComponentSpec("BGA64-06-06", "U1", 64);
-  const gBga = buildComponent3DObject(THREE, specBga, "solid");
-  assert.ok(gBga.children.length >= 2, "BGA 應包含載板與上蓋");
+  const layoutRef = {
+    ...layoutPad,
+    level: "ref",
+    pinPad: {},
+    geom: { ...layoutPad.geom, pads: [{ x: 18.0, y: 22.0, w: 0.9, h: 0.9, s: "r" }, layoutPad.geom.pads[1], layoutPad.geom.pads[2]] }
+  };
+  const Pref = pos3D(rows, layoutRef);
+  assert.equal(Pref.get(rows[0]).x, 18.0);
+  assert.equal(Pref.get(rows[0]).est, true, "ref 級對應時 est 為 true");
+  assert.equal(Pref.get(rows[0]).layout, "ref");
+  assert.ok(ctx.T && ctx.T.pos && ctx.T.pos.layout === layoutRef);
 });
 
-test("3D 零件模擬三態切換：#seg3dCompMode 按鈕切換半透明/實心/隱藏", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+test("潔淨參考外框與嚴謹略過策略：buildComponent3DObject 與 buildComponentMeshes3D", () => {
+  const { resolveComponentSpec, buildComponent3DObject, buildComponentMeshes3D, THREE, ctx } = loadCompModules();
+
+  const spec0402 = resolveComponentSpec("R0402", "R1", 2);
+  const gSemi = buildComponent3DObject(THREE, spec0402, "semi");
+  assert.equal(gSemi.children.length, 2, "外框僅含薄型半透明盒體與邊緣線框，不猜引腳或假色");
+  assert.equal(gSemi.children[0].material.transparent, true);
+  assert.equal(gSemi.children[0].material.opacity, 0.22);
+
+  const gSolid = buildComponent3DObject(THREE, spec0402, "solid");
+  assert.equal(gSolid.children[0].material.opacity, 0.78);
+
+  const unkSpec = resolveComponentSpec("SOD-323", "D1", 2);
+  assert.equal(buildComponent3DObject(THREE, unkSpec, "semi"), null, "無參考依據規格不得建出 3D 模型");
+
+  const rows = [
+    { board: "B01", pad: "U1.1", comp: "U1", pkg: "QFN-8", x: 10, y: 10, w: 0.5, d: 0.5 },
+    { board: "B01", pad: "U1.2", comp: "U1", pkg: "QFN-8", x: 12, y: 11, w: 0.5, d: 0.5 },
+    { board: "B01", pad: "R1.1", comp: "R1", pkg: "R0402", componentX: 20, componentY: 20, componentRot: 90, dimAssumed: true },
+    { board: "B01", pad: "R1.2", comp: "R1", pkg: "R0402", componentX: 20, componentY: 20, componentRot: 90, dimAssumed: true },
+    { board: "B01", pad: "D1.1", comp: "D1", pkg: "SOD-323", componentX: 30, componentY: 30, componentRot: 0, dimAssumed: true },
+  ];
+  const P = ctx.pos3D(rows, null);
+
+  ctx.S.comp3dMode = "off";
+  const parentOff = new THREE.Group();
+  const resOff = buildComponentMeshes3D(rows, P, 0, 0, parentOff, null);
+  assert.equal(resOff.rendered, 0);
+  assert.equal(parentOff.children.length, 0);
+
+  ctx.S.comp3dMode = "semi";
+  const parentSemi = new THREE.Group();
+  const resSemi = buildComponentMeshes3D(rows, P, 0, 0, parentSemi, null);
+  assert.equal(resSemi.rendered, 2, "U1(實測焊墊外接框) 與 R1(標準 EIA) 應繪出");
+  assert.equal(resSemi.skipped, 1, "D1(非標準 SOD-323 且無實測/Gerber) 應略過並計數");
+  const compGroup = parentSemi.children[0];
+  assert.equal(compGroup.children.length, 2);
+  const r1Mesh = compGroup.children[1];
+  assert.ok(Math.abs(r1Mesh.rotation.y - Math.PI / 2) < 1e-6, "componentRot +90 應旋轉 +PI/2 rad");
+});
+
+test("build3D 整合驗證：Gerber 背景焊墊／板框與範圍縮小隱藏隔離", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const dom = createPage();
+  const H = await waitFor(() => dom.window.SPI_TEST_HOOK?.build3D && dom.window.SPI_TEST_HOOK);
+  const w = dom.window;
+
+  H.T.ok = true;
+  H.T.root = new w.THREE.Group();
+  H.T.cam = new w.THREE.PerspectiveCamera(45, 1, 0.1, 500);
+  H.T.fitSpan = null;
+
+  const r1 = { board: "B01", pad: "R1-1", comp: "R1", group: "CHIP", figure: "", area: 100, height: 120, volume: 100, dimAssumed: true };
+  const run = H.curRun();
+  run.rows = [r1];
+  run.info = run.info || {};
+  run.info.layout = {
+    level: "pad",
+    src: "paste",
+    tf: { o: 0, tx: 0, ty: 0 },
+    pinPad: { [JSON.stringify(["", "comp", "R1"])]: { "1": 0 } },
+    matched: { [JSON.stringify(["", "comp", "R1"])]: [0] },
+    geom: {
+      pads: [
+        { x: 10, y: 10, w: 0.6, h: 0.5, s: "r" },
+        { x: 25, y: 15, w: 0.8, h: 0.8, s: "c" }
+      ],
+      outline: [[0, 0, 40, 0], [40, 0, 40, 30]],
+      box: [0, 0, 40, 30]
+    }
+  };
+  H.S.rows = run.rows;
+  H.S.board = "B01";
+  H.S.group = "ALL";
+  H.S.comp = null;
+  H.T.pos = null;
+  H.build3D();
+
+  const namesAll = H.T.root.children.map((c) => c.name);
+  assert.ok(namesAll.includes("cuGerberBgRound"), "全板範圍應顯示未量測 Gerber 背景參考焊墊");
+  assert.ok(namesAll.includes("boardOutline"), "全板範圍應顯示 Gerber 板框輪廓線");
+  assert.equal(H.pos3DNote(), "", "pinPad 逐焊墊精準對應不應顯示位置警告");
+
+  H.S.group = "CHIP";
+  H.T.pos = null;
+  H.build3D();
+  const namesNarrow = H.T.root.children.map((c) => c.name);
+  assert.ok(!namesNarrow.includes("cuGerberBgRound"), "縮小分析範圍時不應顯示其他未量測 Gerber 焊墊");
+  assert.ok(!namesNarrow.includes("boardOutline"), "縮小分析範圍時不應繪製全板板框");
+});
+
+test("3D 零件模擬三態切換：#seg3dCompMode 預設隱藏並支援佔位外框與實心外框", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const dom = createPage();
   const w = dom.window, H = await waitFor(() => w.SPI_TEST_HOOK?.S && w.SPI_TEST_HOOK);
   const S = H.S;
 
-  assert.equal(S.comp3dMode, "semi", "預設零件模擬模式為半透明 semi");
+  assert.equal(S.comp3dMode, "off", "預設零件模擬模式為隱藏 off（符合 SPI 錫膏檢測定位）");
   const seg = w.document.getElementById("seg3dCompMode");
   assert.ok(seg, "頁面需存在 #seg3dCompMode 控制項");
 
   const btns = seg.querySelectorAll("button");
   assert.equal(btns.length, 3);
-  assert.equal(btns[0].textContent.trim(), "半透明");
-  assert.equal(btns[1].textContent.trim(), "實心");
-  assert.equal(btns[2].textContent.trim(), "隱藏");
+  assert.equal(btns[0].textContent.trim(), "隱藏");
+  assert.equal(btns[1].textContent.trim(), "佔位外框");
+  assert.equal(btns[2].textContent.trim(), "實心外框");
   assert.equal(btns[0].getAttribute("aria-pressed"), "true");
 
-  // 切換至「實心」
   btns[1].click();
-  assert.equal(S.comp3dMode, "solid");
+  assert.equal(S.comp3dMode, "semi");
   assert.equal(btns[1].getAttribute("aria-pressed"), "true");
   assert.equal(btns[0].getAttribute("aria-pressed"), "false");
 
-  // 切換至「隱藏」
   btns[2].click();
-  assert.equal(S.comp3dMode, "off");
+  assert.equal(S.comp3dMode, "solid");
   assert.equal(btns[2].getAttribute("aria-pressed"), "true");
   assert.equal(btns[1].getAttribute("aria-pressed"), "false");
 
-  // 切換回「半透明」
   btns[0].click();
-  assert.equal(S.comp3dMode, "semi");
+  assert.equal(S.comp3dMode, "off");
   assert.equal(btns[0].getAttribute("aria-pressed"), "true");
 });
