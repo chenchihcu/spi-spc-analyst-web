@@ -7389,9 +7389,8 @@
           "seed": 79,
           "verdict": "正常",
           "level": "ok",
-          "cats": [
-            "管制圖規則"
-          ]
+          "cats": [],
+          "changeReason": "filterFalseNelsonR2：判定不變；體積 i.i.d. 零偏移模擬 B05–B13 因中心線偏高（CL=100.25）誤觸發之假性資訊級 Nelson 規則 2 已過濾，類別 [\"管制圖規則\"]→[]"
         },
         {
           "seed": 80,
