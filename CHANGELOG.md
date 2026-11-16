@@ -2,6 +2,10 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.38.3 — 2026-11-16（修正自帶捲軸表格 Sticky 表頭偏移異常）
+
+- **統一內部捲動表格表頭定位與層級**：將 `.tbl:is(.tbl-scroll-md,.tbl-scroll-lg,.tbl-scroll-xl,[style*="max-height"]).sticky-head thead th` 統一設為 `top: 0!important; z-index: 3`（並將桌面版預設 `.tbl.sticky-head thead th` 的 `z-index` 調為 `3`），解決「本板不良焊墊（`#boardDefTbl`）」等固定高度捲動表格套用頁面級 `--stickyH`／`44px` 偏移而導致表頭浮在表格中段遮擋資料列的問題。
+
 ## v10.38.2 — 2026-11-16（問題偵測引擎盤點與規則誤報／矛盾修正）
 
 - **D-30 孤立極端焊墊與 M-18 FastMCD 2D 精確化**：`isoScan` 新增跨板同焊墊自身基準 `zSelf` 複核（規格內須 `|zSelf| ≥ 3`，超規處若 `|zSelf| < 2.5` 或屬慢性跨 ≥2 板擦邊超規且未達 5σ／`4·zSelf` 則不列為單板突發）、步驟 (b) 放寬跨項目 `pad` 卡排除並對 `pads` 清單去重；M-18 修正 `isoPadSet` 正確收集 `pad`／`repeated`／`iso` 焊墊與 `explained_pads`、優先配對 `hpct`（%），並依離群焊墊是否曾超規動態產生 `cause`。
