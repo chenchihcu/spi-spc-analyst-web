@@ -210,6 +210,13 @@ test('5. 觸控修正與無障礙樣式規範 (CSS 規則檢驗)', () => {
 
   // e. Sticky 表頭在手機下頂部避讓 44px + safe-top
   assert.match(htmlSource, /\.tbl\.sticky-head\s+thead\s+th\{[^}]*top:\s*calc\(44px\s*\+\s*env\(safe-area-inset-top,\s*0px\)\)/i, '表格 sticky 表頭需配合 44px 頂欄避讓');
+
+  // f. 自帶垂直捲軸的內部捲動表格，sticky 表頭須重設為 top: 0!important 與 z-index: 3
+  assert.match(
+    htmlSource,
+    /\.tbl:is\(\.tbl-scroll-md,\s*\.tbl-scroll-lg,\s*\.tbl-scroll-xl,\s*\[style\*="max-height"\]\)\.sticky-head\s+thead\s+th\{[^}]*top:\s*0!important;\s*z-index:\s*3/i,
+    '內部捲動表格的 sticky 表頭需固定於容器頂端 top: 0!important'
+  );
 });
 
 test('6. PWA 與進階無障礙 (Apple Touch Icon, scroll-margin, 44px 報告標籤, WCAG --warn 對比度)', () => {
