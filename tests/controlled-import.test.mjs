@@ -90,6 +90,27 @@ test('立榮錯位列只在第一板高度為焊墊號且量測欄空白時回�
   assert.equal(damaged.code, 'incomplete_measurement', '第一板已有量測值時不可猜測 PAD ID');
 });
 
+test('立榮格式略過檔尾統計列（Min./Max/Avg 與空行後無位號統計列），中間缺漏仍拒收', () => {
+  const place = validatePlacement(parseCsv('RefDes,X,Y,Layer\nB1,1,2,TOP\nC1,3,4,TOP\n'), { side: 'TOP', unit: 'mm' });
+  const head = 'Component ID,Height(%)1,Volume(%)1,Area(%)1,PAD ID,Result1,Height(%)2,Volume(%)2,Area(%)2,Result2\n';
+  const withNamedSummary = validateWideMeasurement(parseCsv(
+    head + 'B1_1,120,121,100,1,PASS,118,119,100,PASS\n\nMin.,83,83.5,86.25,,0,78.4,74.21,90,0\nMax,166,160,111,,0,134,133,105,0\nAvg,,,,,,,,,\n'
+  ), 'TOP', place);
+  assert.deepEqual([withNamedSummary.boards, withNamedSummary.pads, withNamedSummary.points, withNamedSummary.measuredRefs], [2, 1, 2, 1]);
+  assert.deepEqual(withNamedSummary.missing, []);
+
+  const withBlankTail = validateWideMeasurement(parseCsv(
+    head + 'B1_1,120,121,100,1,PASS,118,119,100,PASS\n\n,16.5,17.7,4.6,,,15.5,16.5,4.1,\n'
+  ), 'TOP', place);
+  assert.deepEqual([withBlankTail.boards, withBlankTail.pads, withBlankTail.points], [2, 1, 2]);
+
+  const middleMissing = validateWideMeasurement(parseCsv(
+    head + 'B1_1,120,121,100,1,PASS,118,119,100,PASS\n\n,16.5,17.7,4.6,,,15.5,16.5,4.1,\nC1_1,110,111,100,1,PASS,112,113,100,PASS\n'
+  ), 'TOP', place);
+  assert.equal(middleMissing.code, 'incomplete_measurement');
+  assert.equal(middleMissing.detail.line, 4);
+});
+
 test('樣本座標與 TOP 量測：20 板、7 個無座標位號、座標多出 79 個位號', { skip: !fs.existsSync(samplePlace) || !fs.existsSync(sampleSpi) }, () => {
   const place = validatePlacement(parseCsv(fs.readFileSync(samplePlace)), { side: 'BOTH', unit: 'mm' });
   assert.equal(place.items.length, 1000);

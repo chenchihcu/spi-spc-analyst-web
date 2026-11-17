@@ -189,7 +189,7 @@ table.show-all tr.more-row{display:table-row}
 .imp-apply-bar{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface2)}
 .imp-apply-opts{flex:1 1 auto;min-width:0}
 .imp-apply-bar #inRunName{flex:1 1 220px;min-width:min(100%,180px);max-width:340px}
-#impStep2Card #pasteIn{min-height:96px}
+#boxPickImport #pasteIn{min-height:84px}
 .spec-param-box{background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:12px;display:grid;gap:10px}
 .spec-ver-bar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;padding:10px 0 4px;border-top:1px solid var(--line);margin-top:12px}
 .spec-ver-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
@@ -1212,7 +1212,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
     <svg class="mitcorp-logo" viewBox="0 0 248 45" width="143" height="26" fill="currentColor" fill-rule="evenodd" role="img" aria-label="Mitcorp"><path d="M13.8,-0.0L28.5,-0.1L29.2,0.0L30.6,1.0L31.5,2.9L34.7,29.0L35.0,29.8L36.2,30.2L37.5,29.8L38.3,28.2L46.9,3.5L48.0,1.5L48.8,0.8L50.5,-0.1L66.3,0.0L67.6,1.0L68.4,3.2L68.4,30.8L68.3,32.2L67.7,33.8L66.0,34.8L62.8,35.0L59.2,34.8L57.7,33.8L57.3,31.5L57.3,5.8L56.7,4.5L55.2,4.0L53.0,4.7L52.0,6.5L43.5,31.5L42.2,33.3L41.2,34.1L38.2,34.8L28.8,34.8L26.0,34.0L24.6,32.5L24.0,29.8L20.9,5.8L20.2,4.5L18.5,4.0L17.0,4.5L16.5,5.2L12.3,26.8L11.3,30.0L10.5,31.5L8.4,33.8L6.3,35.0L2.2,35.7L1.2,35.7L0.0,35.0L0.0,30.2L1.2,29.6L4.5,28.9L5.4,28.0L6.2,26.2L10.7,3.0L11.9,1.0L13.8,-0.0ZM73.2,-0.0L83.8,0.0L84.6,1.3L84.5,4.2L83.8,5.4L82.8,5.7L75.5,5.8L73.2,5.5L72.7,4.8L72.5,2.8L72.6,1.0L73.2,-0.0ZM90.0,1.7L95.5,1.6L97.2,2.1L97.8,2.8L98.2,4.0L98.3,8.5L98.6,9.2L99.3,9.7L109.8,9.8L110.9,10.2L111.4,12.0L110.9,13.2L110.2,13.6L99.8,13.7L98.8,14.1L98.2,15.5L98.3,27.0L99.0,29.8L100.5,30.9L104.2,31.1L112.5,30.9L113.1,31.5L113.2,33.0L113.0,33.8L112.2,34.6L110.5,35.0L104.5,35.3L95.8,35.1L92.0,33.9L89.9,32.2L88.9,30.5L88.4,27.5L88.4,5.5L88.6,3.0L89.2,2.1L90.0,1.7ZM130.5,9.2L135.5,9.3L144.3,10.0L145.5,10.4L146.1,11.0L146.2,13.2L145.7,14.0L145.0,14.3L140.3,13.8L133.0,13.6L129.5,13.9L127.0,14.9L125.1,17.0L124.3,20.0L124.3,24.0L125.1,27.8L127.0,29.8L130.0,30.9L137.5,31.1L145.2,30.4L146.0,31.0L146.3,32.0L146.2,33.5L145.5,34.3L142.5,35.0L135.2,35.4L129.5,35.4L124.0,34.9L120.5,33.9L118.2,32.8L116.1,30.8L115.1,29.2L114.0,25.5L113.9,20.0L115.0,15.8L116.1,14.0L118.2,12.0L120.5,10.8L124.2,9.8L130.5,9.2ZM161.8,9.5L168.5,9.3L174.8,9.9L178.2,10.8L180.2,11.8L182.8,14.0L183.9,15.8L184.7,18.8L184.9,24.5L184.7,26.2L183.8,29.2L181.8,32.0L178.8,33.9L175.5,34.9L166.0,35.7L156.8,34.8L153.8,33.8L152.0,32.9L150.4,31.5L149.2,30.0L148.3,28.0L147.9,25.5L148.0,18.2L149.1,15.0L151.0,12.8L154.0,11.0L158.0,9.8L161.8,9.5ZM203.0,9.5L209.8,9.4L210.7,10.5L210.8,11.8L210.5,12.8L209.5,13.6L201.8,13.9L200.2,14.2L199.2,14.8L198.7,16.0L198.7,31.0L198.3,33.5L197.5,34.5L196.2,34.9L190.5,34.8L189.1,33.8L188.8,32.0L188.7,15.2L189.2,12.5L190.0,11.7L191.9,10.8L197.2,9.8L203.0,9.5ZM224.0,9.5L230.5,9.3L237.9,9.8L242.2,10.9L244.2,12.0L246.2,14.0L247.0,15.2L247.8,17.3L247.8,27.8L246.9,30.0L245.9,31.5L244.8,32.6L242.8,33.8L240.0,34.8L232.2,35.5L223.2,35.4L222.6,36.0L222.4,36.8L222.2,43.5L221.3,44.8L213.5,44.8L212.6,43.5L212.4,41.8L212.6,13.0L213.2,11.7L214.6,10.8L218.5,9.9L224.0,9.5ZM75.5,9.9L79.0,9.8L81.5,10.0L82.8,10.8L83.4,12.0L83.5,32.2L83.0,33.8L81.5,34.8L75.5,34.8L74.1,34.0L73.7,33.2L73.6,12.0L74.0,10.8L75.5,9.9ZM163.2,13.0L160.8,14.0L159.4,15.2L158.3,18.8L158.1,22.5L158.3,26.5L159.2,29.2L160.5,30.8L162.8,31.8L166.0,32.1L169.8,31.8L172.0,30.8L173.0,29.8L173.9,28.2L174.4,25.0L174.4,21.8L173.9,16.5L173.0,15.0L171.9,14.0L168.5,12.9L163.2,13.0ZM226.0,13.0L223.5,13.5L222.7,14.0L222.4,14.5L222.5,30.5L224.0,31.6L227.5,31.9L232.5,31.9L235.0,31.0L236.0,30.1L237.0,28.7L237.7,25.5L237.8,20.8L237.0,16.2L235.3,14.0L233.0,13.1L230.2,12.8L226.0,13.0Z"/></svg>
     <span class="brand-sep" aria-hidden="true"></span>
     <h1>SPI·SPC 分析台</h1>
-    <span class="ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.38.3</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
+    <span class="ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.38.4</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></span>
   </div>
   <div class="row toprow">
     <div class="db-capsule-group" role="group" aria-label="記錄庫與匯出">
@@ -2107,70 +2107,69 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
         <div class="card imp-flow-card">
           <h3>匯入 SPI 資料</h3>
           <ol class="imp-flow" id="impFlowSteps" aria-label="資料匯入步驟">
-            <li data-flow-step="format" data-state="current"><b>① 格式與座標</b><span class="imp-flow-status" data-flow-state>確認格式、面別與受控座標</span></li>
-            <li data-flow-step="file" data-state="pending"><b>② 選擇資料檔</b><span class="imp-flow-status" data-flow-state>選取或貼上量測資料</span></li>
-            <li data-flow-step="mapping" data-state="pending"><b>③ 欄位對應與預覽</b><span class="imp-flow-status" data-flow-state>讀取資料後檢查欄位與警示</span></li>
-            <li data-flow-step="metadata" data-state="pending"><b>④ 紀錄資料</b><span class="imp-flow-status" data-flow-state>填寫產品、版次與工單或日期</span></li>
-            <li data-flow-step="apply" data-state="pending"><b>⑤ 驗證與套用</b><span class="imp-flow-status" data-flow-state>執行既有驗證並保存</span></li>
+            <li data-flow-step="file" data-state="current"><b>① 選擇量測檔</b><span class="imp-flow-status" data-flow-state>選檔並自動辨識格式與面別</span></li>
+            <li data-flow-step="metadata" data-state="pending"><b>② 座標與料號資訊</b><span class="imp-flow-status" data-flow-state>確認受控座標、料號與厚度</span></li>
+            <li data-flow-step="apply" data-state="pending"><b>③ 匯入並分析</b><span class="imp-flow-status" data-flow-state>檢查摘要與套用</span></li>
           </ol>
-          <p id="impFlowStatus" class="note m-0" role="status" aria-live="polite">請依序完成各區段。</p>
+          <p id="impFlowStatus" class="note m-0" role="status" aria-live="polite">請依序完成 3 個步驟。</p>
           <div id="impValidationSummary" role="alert" aria-live="assertive" tabindex="-1" hidden>
             <span data-import-error></span>
             <button type="button" data-import-error-jump hidden>前往需修正欄位</button>
           </div>
         </div>
         <div class="card" id="impStep1Card">
-          <div class="imp-step-head"><h4 class="imp-step-title">① 格式、面別與受控座標</h4></div>
-          <div class="vendor" id="vendorBox" style="margin-bottom:0">
+          <div class="imp-step-head"><h4 class="imp-step-title">① 選擇量測檔（自動辨識格式與面別）</h4></div>
+          <div class="drop" id="drop">拖放 CSV 或 Excel（.xlsx）檔到這裡，或 <label for="fileIn" style="color:var(--rec-blue);cursor:pointer;text-decoration:underline"><input type="file" id="fileIn" accept=".csv,.txt,.tsv,.xlsx" class="sr" aria-label="選擇 SPI 量測檔案">選擇檔案</label></div>
+          <div class="vendor" id="vendorBox" style="margin-top:10px;margin-bottom:0">
             <div class="data-form-grid">
               <div class="field"><label for="selVendor">加工廠 SPI 格式</label><select id="selVendor"><option value="generic">通用格式（每列一筆量測）</option><option value="lirong">立榮電子（每列一焊墊、各板橫排）</option><option value="zsf">振順豐（絕對值橫排）</option></select></div>
               <div class="field" id="sideField"><label for="selSide">量測面別（必選）</label><select id="selSide" aria-describedby="selSideError selSideAuto"><option value="">請選擇</option><option value="TOP">TOP 面</option><option value="BOT">BOT 面</option></select><span class="note" id="selSideError" aria-live="polite"></span><span class="side-auto" id="selSideAuto" role="status" hidden></span></div>
             </div>
-            <div class="row imp-place-bar" id="placeRow" hidden>
-              <span class="lbl" style="align-self:center">受控座標檔（必選）</span>
-              <button type="button" id="btnSelectPlace" aria-describedby="btnSelectPlaceError">從資料庫選取</button><span class="note" id="btnSelectPlaceError" aria-live="polite"></span>
-              <button type="button" id="btnRegisterPlace">先登錄座標檔</button>
-              <button id="placeClear" hidden>移除座標檔</button>
-              <span class="note" id="placeState" role="status" aria-live="polite"></span>
-            </div>
-            <div id="placeChoices" role="group" aria-label="符合的座標檔"></div>
-            <div class="row" id="layoutRow" hidden><span class="lbl" style="align-self:center">Gerber 板面圖檔（選用）</span><button type="button" id="btnRegisterLayout">登錄板面圖檔</button><span class="note" id="layoutState" role="status" aria-live="polite"></span></div>
-            <p class="note" id="placeChoiceNote" style="margin:0">位號與原檔指紋於套用時由伺服器確認。</p>
             <p class="note" id="vendorNote" hidden style="margin:0">立榮格式每列一焊墊（各板橫排），TOP／BOT 分別匯入；高度 % 依<b>鋼板厚度（必填）</b>換算 µm，並由座標檔對應位置與封裝群組。</p>
           </div>
+          <details class="how" style="margin-top:8px">
+            <summary>或貼上 CSV 文字</summary>
+            <textarea id="pasteIn" aria-label="貼上 CSV 文字" placeholder="貼上 CSV 文字…" style="margin-top:8px"></textarea>
+            <div class="row" style="margin-top:8px"><button class="primary" id="btnRead">讀取欄位</button><details class="how demo-tools"><summary>範例資料</summary><button type="button" id="btnPhme">載入 PHME 格式範例</button></details></div>
+          </details>
+          <span class="err" id="parseErr" role="status" aria-live="polite" style="display:block;margin-top:6px"></span>
+          <div id="impDupNotice" class="note" role="status" hidden style="margin-top:8px;padding:8px 12px;border-radius:8px;background:var(--rec-blue-soft);color:var(--rec-blue-ink)"></div>
         </div>
         <div class="card" id="impStep2Card">
-          <div class="imp-step-head"><h4 class="imp-step-title">② 選擇量測檔或貼上資料</h4></div>
-          <div class="drop" id="drop">拖放 CSV 或 Excel（.xlsx）檔到這裡，或 <label for="fileIn" style="color:var(--rec-blue);cursor:pointer;text-decoration:underline"><input type="file" id="fileIn" accept=".csv,.txt,.tsv,.xlsx" class="sr" aria-label="選擇 SPI 量測檔案">選擇檔案</label></div>
-          <textarea id="pasteIn" aria-label="貼上 CSV 文字" placeholder="或直接貼上 CSV 文字…" style="margin-top:8px"></textarea>
-          <div class="row" style="margin-top:8px"><button class="primary" id="btnRead">讀取欄位</button><details class="how demo-tools"><summary>範例資料</summary><button id="btnPhme">載入 PHME 格式範例</button></details><span class="err" id="parseErr" role="status" aria-live="polite"></span></div>
-          <div id="impDupNotice" class="note" role="status" hidden style="margin-top:8px;padding:8px 12px;border-radius:8px;background:var(--rec-blue-soft);color:var(--rec-blue-ink)"></div>
+          <div class="imp-step-head"><h4 class="imp-step-title">② 確認受控座標與料號資訊</h4></div>
+          <div class="row imp-place-bar" id="placeRow" hidden>
+            <span class="lbl" style="align-self:center">受控座標檔（必選）</span>
+            <button type="button" id="btnSelectPlace" aria-describedby="btnSelectPlaceError">從資料庫選取</button><span class="note" id="btnSelectPlaceError" aria-live="polite"></span>
+            <button type="button" id="btnRegisterPlace">先登錄座標檔</button>
+            <button id="placeClear" hidden>移除座標檔</button>
+            <span class="note" id="placeState" role="status" aria-live="polite"></span>
+          </div>
+          <div id="placeChoices" role="group" aria-label="符合的座標檔" style="margin-top:8px"></div>
+          <div class="row" id="layoutRow" hidden style="margin-top:6px"><span class="lbl" style="align-self:center">Gerber 板面圖檔（選用）</span><button type="button" id="btnRegisterLayout">登錄板面圖檔</button><span class="note" id="layoutState" role="status" aria-live="polite"></span></div>
+          <p class="note" id="placeChoiceNote" style="margin:6px 0 10px">位號與原檔指紋於套用時由伺服器確認。</p>
+          <div class="data-form-grid recrow" id="recRow"><div class="field"><label for="inPart">產品料號（必填）</label><input type="text" id="inPart" class="mono" list="partList" autocomplete="off" maxlength="64" placeholder="例：301-000100124" aria-describedby="inPartHint inPartError"><span class="note" id="inPartHint" aria-live="polite"></span><span class="note" id="inPartError" aria-live="polite"></span></div><div class="field"><label for="inRev">正式版次（必填）</label><input type="text" id="inRev" maxlength="32" placeholder="例：V5" aria-describedby="inRevError"><span class="note" id="inRevError" aria-live="polite"></span></div><div class="field"><label for="inImpStencil">匯入鋼板厚度 µm（必填）</label><input type="number" id="inImpStencil" min="30" max="300" step="1" list="stencilList" placeholder="例：120" required aria-required="true" aria-describedby="inImpStencilError"><span class="note" id="inImpStencilError" aria-live="polite"></span></div><div class="field"><label for="inMeasuredDate">量測日期（與製令工單至少填一項）</label><input type="date" id="inMeasuredDate" aria-describedby="inMeasuredDateError"><span class="note" id="inMeasuredDateError" aria-live="polite"></span></div><div class="field"><label for="inWorkOrder">製令工單（與量測日期至少填一項）</label><input type="text" id="inWorkOrder" maxlength="64" aria-describedby="inWorkOrderError"><span class="note" id="inWorkOrderError" aria-live="polite"></span></div><div class="field"><label for="inLot">批號（選填）</label><input type="text" id="inLot" maxlength="64" placeholder="例：L2410-01"></div><div class="field"><label for="inSupplierWo">廠商工單號</label><input type="text" id="inSupplierWo" maxlength="64" placeholder="例：SWO-202410-01"></div><div class="field"><label for="inOutsourceWo">外包工單號</label><input type="text" id="inOutsourceWo" maxlength="64" placeholder="例：OWO-88912"></div><span class="note" id="recNote" role="status" aria-live="polite" style="align-self:center;max-width:52ch"></span></div>
+          <p class="note" id="impSaveNotice" style="margin:8px 0 0;max-width:70ch">正式匯入須連線登入、選取有效受控座標檔；待管理者判定的新檔不納入預設分析。</p>
         </div>
         <div id="mapBox" hidden style="display:grid;grid-template-columns:minmax(0,1fr);gap:16px;min-width:0">
           <div class="card" id="impStep3Card">
-            <div class="imp-step-head"><h4 class="imp-step-title">③ 欄位對應與資料預覽</h4></div>
+            <div class="imp-step-head"><h4 class="imp-step-title">③ 檢查預覽與套用</h4></div>
             <div id="impSourceSummary" hidden role="group" aria-label="匯入來源與資料脈絡"></div>
-            <div class="row" style="align-items:flex-end;margin:6px 0"><div class="field"><label for="selProfile">機台格式設定檔</label><select id="selProfile"></select></div>
-              <div class="field"><label for="inProfileName">另存為</label><input type="text" id="inProfileName" placeholder="例：供應商 A · KY8030"></div><button id="btnSaveProfile">儲存設定檔</button></div>
-            <div class="data-form-grid" style="margin-top:8px">
-              <div class="field"><label for="optOff">偏移單位</label><select id="optOff"><option value="um">µm</option><option value="pct">焊墊尺寸 %</option><option value="mm">mm</option></select></div>
-              <div class="field"><label for="optH">高度單位</label><select id="optH"><option value="unknown">來源未標示（需確認）</option><option value="um">µm</option><option value="mm">mm</option></select></div>
-              <div class="field"><label for="optVol">體積 % 的分母</label><select id="optVol"><option value="aperture">開孔體積（開孔面積 × 厚度）</option><option value="pad">焊墊面積 × 厚度（換算為開孔基準）</option></select></div>
-              <div class="field"><label for="inSub">子群組大小（無板號時）</label><input type="number" id="inSub" value="5" min="2" max="200"></div>
-              <div class="field"><label for="optDateFmt">日期格式</label><select id="optDateFmt"><option value="auto">自動判斷</option><option value="YMD">年/月/日 (YMD)</option><option value="DMY">日/月/年 (DMY)</option><option value="MDY">月/日/年 (MDY)</option></select></div>
-              <div class="field"><label for="optDupMode">重測重複列</label><select id="optDupMode"><option value="last">保留最後一筆（預設）</option><option value="keepAll">全部保留</option></select></div>
-              <div class="field" id="fldGrpFallback"><label for="optGrpFallback">無封裝欄時群組</label><select id="optGrpFallback"><option value="comp">以位號為群組（預設）</option><option value="prefix">以位號字首為群組</option></select></div>
-            </div>
-            <div class="tbl" style="max-height:300px;overflow:auto;margin-top:10px"><table id="mapTbl"></table></div>
-            <div id="mapPrev" class="note" style="margin-top:8px"></div>
-          </div>
-          <div class="card" id="impStep4Card">
-            <div class="imp-step-head"><h4 class="imp-step-title">④ 產品與量測中繼資料</h4></div>
-            <div class="data-form-grid recrow" id="recRow"><div class="field"><label for="inLot">批號（選填）</label><input type="text" id="inLot" maxlength="64" placeholder="例：L2410-01"></div><div class="field"><label for="inPart">產品料號（必填）</label><input type="text" id="inPart" class="mono" list="partList" autocomplete="off" maxlength="64" placeholder="例：301-000100124" aria-describedby="inPartHint inPartError"><span class="note" id="inPartHint" aria-live="polite"></span><span class="note" id="inPartError" aria-live="polite"></span></div><div class="field"><label for="inRev">正式版次（必填）</label><input type="text" id="inRev" maxlength="32" placeholder="例：V5" aria-describedby="inRevError"><span class="note" id="inRevError" aria-live="polite"></span></div><div class="field"><label for="inWorkOrder">製令工單（與量測日期至少填一項）</label><input type="text" id="inWorkOrder" maxlength="64" aria-describedby="inWorkOrderError"><span class="note" id="inWorkOrderError" aria-live="polite"></span></div><div class="field"><label for="inMeasuredDate">量測日期（與製令工單至少填一項）</label><input type="date" id="inMeasuredDate" aria-describedby="inMeasuredDateError"><span class="note" id="inMeasuredDateError" aria-live="polite"></span></div><div class="field"><label for="inImpStencil">匯入鋼板厚度 µm（必填）</label><input type="number" id="inImpStencil" min="30" max="300" step="1" list="stencilList" placeholder="例：120" required aria-required="true" aria-describedby="inImpStencilError"><span class="note" id="inImpStencilError" aria-live="polite"></span></div><div class="field"><label for="inSupplierWo">廠商工單號</label><input type="text" id="inSupplierWo" maxlength="64" placeholder="例：SWO-202410-01"></div><div class="field"><label for="inOutsourceWo">外包工單號</label><input type="text" id="inOutsourceWo" maxlength="64" placeholder="例：OWO-88912"></div><span class="note" id="recNote" role="status" aria-live="polite" style="align-self:center;max-width:52ch"></span></div>
-            <p class="note" id="impSaveNotice" style="margin:8px 0 0;max-width:70ch">正式匯入須連線登入、選取有效受控座標檔；待管理者判定的新檔不納入預設分析。</p>
-          </div>
-          <div class="card" id="impStep5Card">
-            <div class="imp-step-head"><h4 class="imp-step-title">⑤ 檢查預覽與套用</h4></div>
+            <div id="mapPrev" class="note" style="margin:8px 0"></div>
+            <details class="how" id="impAdvancedBox" style="margin:8px 0 12px">
+              <summary>進階設定（機台格式、單位換算與欄位對應表）</summary>
+              <div class="row" style="align-items:flex-end;margin:8px 0 6px"><div class="field"><label for="selProfile">機台格式設定檔</label><select id="selProfile"></select></div>
+                <div class="field"><label for="inProfileName">另存為</label><input type="text" id="inProfileName" placeholder="例：供應商 A · KY8030"></div><button id="btnSaveProfile">儲存設定檔</button></div>
+              <div class="data-form-grid" style="margin-top:8px">
+                <div class="field"><label for="optOff">偏移單位</label><select id="optOff"><option value="um">µm</option><option value="pct">焊墊尺寸 %</option><option value="mm">mm</option></select></div>
+                <div class="field"><label for="optH">高度單位</label><select id="optH"><option value="unknown">來源未標示（需確認）</option><option value="um">µm</option><option value="mm">mm</option></select></div>
+                <div class="field"><label for="optVol">體積 % 的分母</label><select id="optVol"><option value="aperture">開孔體積（開孔面積 × 厚度）</option><option value="pad">焊墊面積 × 厚度（換算為開孔基準）</option></select></div>
+                <div class="field"><label for="inSub">子群組大小（無板號時）</label><input type="number" id="inSub" value="5" min="2" max="200"></div>
+                <div class="field"><label for="optDateFmt">日期格式</label><select id="optDateFmt"><option value="auto">自動判斷</option><option value="YMD">年/月/日 (YMD)</option><option value="DMY">日/月/年 (DMY)</option><option value="MDY">月/日/年 (MDY)</option></select></div>
+                <div class="field"><label for="optDupMode">重測重複列</label><select id="optDupMode"><option value="last">保留最後一筆（預設）</option><option value="keepAll">全部保留</option></select></div>
+                <div class="field" id="fldGrpFallback"><label for="optGrpFallback">無封裝欄時群組</label><select id="optGrpFallback"><option value="comp">以位號為群組（預設）</option><option value="prefix">以位號字首為群組</option></select></div>
+              </div>
+              <div class="tbl" style="max-height:300px;overflow:auto;margin-top:10px"><table id="mapTbl"></table></div>
+            </details>
             <div class="imp-apply-bar">
               <div class="row imp-apply-opts">
                 <label class="row" style="font-size:var(--fs-ui)"><input type="radio" name="impMode" value="new" checked> 新增為新回合</label>
@@ -3856,6 +3855,48 @@ function layoutStatusText(L){if(!L)return"";const n=Object.keys(L.matched||{}).l
   return`${src} · ${how} · ${n} 顆零件對上${u?`，${u} 顆對不上`:""}${tf}${L.shared?" · 座標檔不分子板，各子板標在同一份焊墊":""}${L.source==="lookup"?" · 依料號版次套用":""}`}
 /* Number.isFinite：空白座標欄解析為 null，全域 isFinite(null) 會當成 0 */
 const realXY=r=>Boolean(r&&!r.gridPos&&Number.isFinite(r.x)&&Number.isFinite(r.y));
+const compXY=r=>Boolean(r&&Number.isFinite(r.componentX)&&Number.isFinite(r.componentY));
+const spatialXY=r=>realXY(r)?{x:r.x,y:r.y,level:"pad"}:compXY(r)?{x:r.componentX,y:r.componentY,level:"comp"}:null;
+const hasSpatialXY=r=>Boolean(spatialXY(r));
+function buildSpatialPoints(rows,metricKey,preRows){
+  const coordRows=preRows||[];
+  let hasPad=false;
+  if(!preRows){
+    for(const r of rows){
+      const v=r[metricKey];
+      if(v==null||!isFinite(v))continue;
+      const xy=spatialXY(r);
+      if(!xy)continue;
+      if(xy.level==="pad")hasPad=true;
+      coordRows.push({r,xy,v});
+    }
+  }else{
+    for(const item of coordRows)if(item.xy.level==="pad"){hasPad=true;break}
+  }
+  const coordLevel=hasPad?"pad":coordRows.length?"comp":"none";
+  const grpMeans={};
+  for(const{r,xy,v}of coordRows){
+    if(coordLevel==="pad"&&xy.level!=="pad")continue;
+    (grpMeans[r.group]=grpMeans[r.group]||[]).push(v);
+  }
+  for(const g in grpMeans){const a=grpMeans[g];grpMeans[g]=a.reduce((s,x)=>s+x,0)/a.length}
+  const ptMap=new Map();
+  for(const{r,xy,v}of coordRows){
+    if(coordLevel==="pad"&&xy.level!=="pad")continue;
+    const key=coordLevel==="pad"?r.pad:(r.comp||r.pad);
+    let p=ptMap.get(key);
+    if(!p)ptMap.set(key,p={pad:key,x:xy.x,y:xy.y,resSum:0,cnt:0});
+    p.resSum+=(v-(grpMeans[r.group]||0));
+    p.cnt++;
+  }
+  let pts=[];
+  for(const p of ptMap.values())pts.push({pad:p.pad,x:p.x,y:p.y,val:p.resSum/p.cnt});
+  if(pts.length>500){
+    const step=Math.ceil(pts.length/500);
+    pts=pts.filter((_,idx)=>idx%step===0);
+  }
+  return{coordRows,coordLevel,pts};
+}
 const S={rows:[],metrics:[],metric:"volume",group:ALL_GRP,comp:null,chart:"xbars",relChart:"specScatter",pad:null,board:null,specSrc:"sample",partSpec:null,specDraft:null,specsG:null,sqDir:"Y",specs:JSON.parse(JSON.stringify(DEF_SPECS)),stencil:120,heightUnit:"um",htol:{lo:75,hi:125},step:{on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]},selZone:1,wipe:5,aperture:{groups:{}},geometryPads:null,padCoverage:null,pendingVerify:false,runVendor:"generic",ovCapSnap:null,ovCapSnapKey:"",source:"範例資料",tab:"issues",sub:"import",issuesSub:"list",controlSub:"uni",improveSub:"compare",F:[],issLv:"all",issCat:"all",issEnt:null,pmapSelection:null,issGroup:"cases",ctx:null,colorMode:"status",heatMode:"avg",sim3dMode:"real",comp3dMode:"off",exag:20,ghost:true,bridgeWarn:true,csAxis:"X",selectedPad:null,A:null,ai:"",aiModel:"",duo:{active:false,posture:"folded",mode:"master-detail",leftTab:"issues",rightTab:"sim3d",thumbSide:"right",pinnedPad:null,dockOpen:false}};
 function metricUnit(k,st=S){return k==="height"&&st&&st.heightUnit==="unknown"?"單位未知":(METRICS[k]&&METRICS[k].unit)||""}
 loadSpiKbRules();
@@ -4195,11 +4236,22 @@ function analyzeBase(st){
   // 交叉
   const hv=st.rows.filter(r=>inS(r)&&r.height!=null&&r.area!=null);
   const msa=msaCheck(hv,st),rHA=msa?(msa.derived?msa.r:msa.rW):NaN;
-  const coordRows=rows.filter(r=>realXY(r)&&r[m]!=null&&isFinite(r[m]));
-  const coordN=coordRows.length;
-  const coordV=coordRows.map(r=>r[m]);   // 先取值：空間自相關延後計算時不受之後改寫 hpct 影響
-  const rX=coordN>=3?pearson(coordRows.map(r=>r.x),coordV):NaN;
-  const rY=coordN>=3?pearson(coordRows.map(r=>r.y),coordV):NaN;
+  const coordItems=[];
+  let coordHasPad=false;
+  for(const r of rows){
+    const v=r[m];
+    if(v==null||!isFinite(v))continue;
+    const xy=spatialXY(r);
+    if(!xy)continue;
+    if(xy.level==="pad")coordHasPad=true;
+    coordItems.push({r,xy,v});
+  }
+  const coordLevel=coordHasPad?"pad":coordItems.length?"comp":"none";
+  const coordFiltered=coordLevel==="pad"?coordItems.filter(x=>x.xy.level==="pad"):coordItems;
+  const coordN=coordFiltered.length;
+  const coordV=coordFiltered.map(x=>x.v);   // 先取值：空間自相關延後計算時不受之後改寫 hpct 影響
+  const rX=coordN>=3?pearson(coordFiltered.map(x=>x.xy.x),coordV):NaN;
+  const rY=coordN>=3?pearson(coordFiltered.map(x=>x.xy.y),coordV):NaN;
   const xOut=new Set(xs.pts.filter(p=>Math.abs(p.z)>3).map(p=>p.lab));
   const pOut=new Set(pc.pts.filter(p=>p.v>p.ucl||p.v<p.lcl).map(p=>p.lab));
   const worst=byBoard.reduce((w,b)=>!w||b.p>w.p||(b.p===w.p&&Math.abs(b.mean-gMean)>Math.abs(w.mean-gMean))?b:w,null);
@@ -4211,36 +4263,15 @@ function analyzeBase(st){
   const printerOf=()=>S0.printer!==undefined?S0.printer:(S0.printer=calcPrinterCorrection(st.rows));
   let saMemo=null;
   const spatialOf=()=>{if(saMemo)return saMemo;
-  let spatialAutocorr = { valid: false, reason: "有效座標數不足（需 ≥10）" };
+  let spatialAutocorr = { valid: false, reason: "有效座標數不足（需 ≥10）", coordLevel };
   if (coordN >= 10) {
-    const grpMeans = {};
-    for (let i = 0; i < coordN; i++) {
-      const r = coordRows[i];
-      (grpMeans[r.group] = grpMeans[r.group] || []).push(coordV[i]);
-    }
-    for (const g in grpMeans) {
-      const arr = grpMeans[g];
-      grpMeans[g] = arr.reduce((s, x) => s + x, 0) / arr.length;
-    }
-    const padMap = new Map();
-    for (let i = 0; i < coordN; i++) {
-      const r = coordRows[i];
-      let p = padMap.get(r.pad);
-      if (!p) padMap.set(r.pad, p = { pad: r.pad, x: r.x, y: r.y, resSum: 0, cnt: 0 });
-      p.resSum += (coordV[i] - (grpMeans[r.group] || 0));
-      p.cnt++;
-    }
-    let pts = [];
-    for (const p of padMap.values()) pts.push({ pad: p.pad, x: p.x, y: p.y, val: p.resSum / p.cnt });
-    if (pts.length > 500) {
-      const step = Math.ceil(pts.length / 500);
-      pts = pts.filter((_, idx) => idx % step === 0);
-    }
+    const { pts } = buildSpatialPoints(null, m, coordFiltered);
     spatialAutocorr = calcMoranAndLISA(pts, 6);
+    spatialAutocorr.coordLevel = coordLevel;
   }
   return saMemo=spatialAutocorr};
 
-  return{m,sp,rows,boards,byBoard,N,gMean,overallSd,sigmaW,sigmaLT,mixed,nbar,xs,xr,pc,ewma,cusum,cuz,nelX,stable,cap,hasSpec,unitMismatch,ad,sw,sk,groups,eta2,pareto,defRows,defSrc,rHA,msa,rX,rY,coordN,xOut,pOut,worst,pads,isZeroSd,
+  return{m,sp,rows,boards,byBoard,N,gMean,overallSd,sigmaW,sigmaLT,mixed,nbar,xs,xr,pc,ewma,cusum,cuz,nelX,stable,cap,hasSpec,unitMismatch,ad,sw,sk,groups,eta2,pareto,defRows,defSrc,rHA,msa,rX,rY,coordN,coordLevel,xOut,pOut,worst,pads,isZeroSd,
     nonNormalOf,pauseOf,printerOf,spatialOf,xv:null};
 }
 const nelZero=()=>({flag:new Set(),rules:NELSON.map(r=>({id:r.id,name:r.name,hint:r.hint,idx:[]}))});
@@ -4274,7 +4305,7 @@ function analyzeView(st,B){
   const mode=st.capDistMode||"auto",th=st.pauseThreshold||15,cap=Object.assign({},B.cap);
   lazy(cap,"nonNormal",()=>B.nonNormalOf(mode));
   const A={m,sp:B.sp,rows,boards,byBoard:B.byBoard,N:B.N,gMean:B.gMean,overallSd:B.overallSd,sigmaW:B.sigmaW,sigmaLT:B.sigmaLT,mixed:B.mixed,nbar:B.nbar,xs,xr,imr,pc,ewma,cusum:B.cusum,series,nel,chartRejected,chartReason,nelX:B.nelX,stable:B.stable,cap,hasSpec:B.hasSpec,unitMismatch:B.unitMismatch,
-    ad:B.ad,sw:B.sw,sk:B.sk,groups:B.groups,eta2:B.eta2,pareto:B.pareto,defRows:B.defRows,rHA:B.rHA,msa:B.msa,rX:B.rX,rY:B.rY,coordN:B.coordN,xOut:B.xOut,pOut:B.pOut,worst:B.worst,pads,sqDir:st.sqDir==="X"?"X":"Y"};
+    ad:B.ad,sw:B.sw,sk:B.sk,groups:B.groups,eta2:B.eta2,pareto:B.pareto,defRows:B.defRows,rHA:B.rHA,msa:B.msa,rX:B.rX,rY:B.rY,coordN:B.coordN,coordLevel:B.coordLevel,xOut:B.xOut,pOut:B.pOut,worst:B.worst,pads,sqDir:st.sqDir==="X"?"X":"Y"};
   lazy(A,"nonNormal",()=>B.nonNormalOf(mode));lazy(A,"pauseDecay",()=>B.pauseOf(th));lazy(A,"printerCorr",B.printerOf);lazy(A,"spatialAutocorr",B.spatialOf);
   A.xv=B.xv||(B.xv=crossValidate(A));   // 交叉驗證只讀量測層欄位（管制狀態用 nelX），與所選管制圖無關
   return A;
@@ -4306,7 +4337,7 @@ function crossValidate(A){
   else if(!isNaN(A.rHA))X.push({k:"量測一致性",src:"體積 vs 高度×面積（扣除群組平均）",st:A.rHA>=.9?"ok":A.rHA>=.75?"warn":"ng",
     ev:`組內殘差 r = ${A.rHA.toFixed(3)}（未扣除群組 r = ${A.msa.r.toFixed(3)}）${A.rHA<.9?"；三項量測相互不吻合，先確認 SPI 程式內的鋼板厚度（含階梯區）設定是否與此處一致，再確認基準面校正與 GR&R":"，三項量測互相佐證"}`});
   if(!isNaN(A.rX)&&!isNaN(A.rY))X.push({k:"空間分布",src:"熱圖 + 位置相關",st:Math.max(Math.abs(A.rX),Math.abs(A.rY||0))<.15?"ok":"warn",
-    ev:`與 X 座標 r = ${A.rX.toFixed(2)}、Y 座標 r = ${(A.rY||0).toFixed(2)}${[["X",A.rX],["Y",A.rY||0]].filter(([,r])=>Math.abs(r)>=.15).map(([ax])=>`；${ax} 方向有梯度（${ax===A.sqDir?"沿刮刀行程":"垂直刮刀行程"}）`).join("")}；使用筆數 n=${A.coordN}；未扣除元件群組差異，以問題偵測的空間分析為準`});
+    ev:`與 X 座標 r = ${A.rX.toFixed(2)}、Y 座標 r = ${(A.rY||0).toFixed(2)}${[["X",A.rX],["Y",A.rY||0]].filter(([,r])=>Math.abs(r)>=.15).map(([ax])=>`；${ax} 方向有梯度（${ax===A.sqDir?"沿刮刀行程":"垂直刮刀行程"}）`).join("")}；使用筆數 n=${A.coordN}${A.coordLevel==="comp"?"（依元件中心座標）":""}；未扣除元件群組差異，以問題偵測的空間分析為準`});
   else X.push({k:"空間分布",src:"熱圖 + 位置相關",st:"na",ev:spatialChartUnavailableText().short});
   const inter=[...A.xOut].filter(b=>A.pOut.has(b)),uni=new Set([...A.xOut,...A.pOut]);
   X.push({k:"板別交叉",src:"X̄ 圖 vs P′ 圖",st:uni.size===0?"ok":inter.length===uni.size?"ok":inter.length?"warn":"warn",
@@ -6556,46 +6587,23 @@ function detectIssues(st,onStage){
   }
 
   // 4. 空間自相關與群聚 (LISA)
-  const realPtsList=R.filter(r=>realXY(r)&&r.volume!=null&&isFinite(r.volume));
-  if(realPtsList.length>=10){
-    const grpMeans={};
-    for(let i=0;i<realPtsList.length;i++){
-      const r=realPtsList[i];
-      (grpMeans[r.group]=grpMeans[r.group]||[]).push(r.volume);
-    }
-    for(const g in grpMeans){
-      const arr=grpMeans[g];
-      grpMeans[g]=arr.reduce((s,x)=>s+x,0)/arr.length;
-    }
-    const padResMap=new Map();
-    for(let i=0;i<realPtsList.length;i++){
-      const r=realPtsList[i];
-      let it=padResMap.get(r.pad);
-      if(!it)padResMap.set(r.pad,it={pad:r.pad,x:r.x,y:r.y,resSum:0,cnt:0});
-      it.resSum+=(r.volume-(grpMeans[r.group]||0));
-      it.cnt++;
-    }
-    let padPoints=[];
-    for(const p of padResMap.values())padPoints.push({pad:p.pad,x:p.x,y:p.y,val:p.resSum/p.cnt});
-    if(padPoints.length>500){
-      const step=Math.ceil(padPoints.length/500);
-      padPoints=padPoints.filter((_,idx)=>idx%step===0);
-    }
-    if(padPoints.length>=10){
-      const sa=calcMoranAndLISA(padPoints,6);
-      if(sa.valid&&sa.isSignificant){   // 只依全域 Moran's I 出卡；LISA 象限只用來標出位置（未校正，個別焊墊約 5% 隨機標示）
-        add({lv:"warn",cat:"空間群聚",sig:{t:"spatial",k:"volume"},
-          title:`焊墊呈現顯著空間群聚效應（Moran's I = ${sa.moranI}，Z = ${sa.zScore}）`,
-          ents:[],score:2.5,
-          rule_id:"空間自相關 MoranLISA",rule_name:"局部空間聚集 (LISA)",metric:"體積 %",
-          boards:"全部板",subboard:subOf(R),group:"ALL",refdes:"多個元件",
-          pads:`高錫量熱區 (HH) ${sa.counts.HH} 處，低錫量冷區 (LL) ${sa.counts.LL} 處`,
-          observed:`全局 Moran's I = ${sa.moranI} (Z-score = ${sa.zScore} > 2.58，置換檢定 p = ${sa.pPerm})`,
-          limit:"Z ≤ 2.58 或置換檢定 p ≥ 0.005（無顯著群聚）",z:String(sa.zScore),p:`置換檢定 p = ${sa.pPerm}`,
-          facts:[`焊墊印刷體積在板面空間非隨機分佈：檢出 ${sa.counts.HH} 處高錫量相鄰熱區與 ${sa.counts.LL} 處低錫量相鄰冷區`],
-          cause:"PCB 局部壓合下陷或缺乏下頂針支撐（冷區），或載具局部鼓起/頂針過高頂起 PCB（熱區）",conf:"高",action:"對照進階分析頁之 LISA 空間聚類分佈圖，檢查冷區下方是否懸空未落頂針，或熱區頂針高度是否過高",
-           ev:(()=>{const top=padPoints.slice().sort((a,b)=>Math.abs(b.val)-Math.abs(a.val)).slice(0,10);return evBars("焊墊平均體積殘差（絕對值前 10，未依群聚分類）",top.map(p=>p.pad),top.map(p=>p.val),[],"%")})(),go:{tab:"adv"}})
-      }
+  const spVol=buildSpatialPoints(R,"volume");
+  if(spVol.coordRows.length>=10&&spVol.pts.length>=10){
+    const padPoints=spVol.pts;
+    const isComp=spVol.coordLevel==="comp";
+    const sa=calcMoranAndLISA(padPoints,6);
+    if(sa.valid&&sa.isSignificant){   // 只依全域 Moran's I 出卡；LISA 象限只用來標出位置（未校正，個別焊墊約 5% 隨機標示）
+      add({lv:"warn",cat:"空間群聚",sig:{t:"spatial",k:"volume"},
+        title:`${isComp?"元件":"焊墊"}呈現顯著空間群聚效應（Moran's I = ${sa.moranI}，Z = ${sa.zScore}）`,
+        ents:[],score:2.5,
+        rule_id:"空間自相關 MoranLISA",rule_name:"局部空間聚集 (LISA)",metric:"體積 %",
+        boards:"全部板",subboard:subOf(R),group:"ALL",refdes:"多個元件",
+        pads:`高錫量熱區 (HH) ${sa.counts.HH} 處，低錫量冷區 (LL) ${sa.counts.LL} 處${isComp?"（依元件中心座標）":""}`,
+        observed:`全局 Moran's I = ${sa.moranI} (Z-score = ${sa.zScore} > 2.58，置換檢定 p = ${sa.pPerm})`,
+        limit:"Z ≤ 2.58 或置換檢定 p ≥ 0.005（無顯著群聚）",z:String(sa.zScore),p:`置換檢定 p = ${sa.pPerm}`,
+        facts:[`${isComp?"元件（依中心座標）":"焊墊"}印刷體積在板面空間非隨機分佈：檢出 ${sa.counts.HH} 處高錫量相鄰熱區與 ${sa.counts.LL} 處低錫量相鄰冷區`],
+        cause:"PCB 局部壓合下陷或缺乏下頂針支撐（冷區），或載具局部鼓起/頂針過高頂起 PCB（熱區）",conf:"高",action:"對照進階分析頁之 LISA 空間聚類分佈圖，檢查冷區下方是否懸空未落頂針，或熱區頂針高度是否過高",
+         ev:(()=>{const top=padPoints.slice().sort((a,b)=>Math.abs(b.val)-Math.abs(a.val)).slice(0,10);return evBars(`${isComp?"元件":"焊墊"}平均體積殘差（絕對值前 10，未依群聚分類）`,top.map(p=>p.pad),top.map(p=>p.val),[],"%")})(),go:{tab:"adv"}})
     }
   }
 
@@ -6691,7 +6699,7 @@ function failureModes(st,F,c){
     c={R,boards,groups,MS,MC:groups,nb:boards.length,boardMeans:{},idx:{},gIdx:{}};
   }
   const{R,boards,groups,MS,nb}=c,sg=t=>F.filter(x=>x.sig&&x.sig.t===t).map(x=>({...x.sig,id:x.id})),gRows=g=>(c.gIdx&&c.gIdx[g])||R.filter(r=>r.group===g);
-  const tg=st.specs,has=k=>MS.includes(k),hasXY=R.some(realXY),f1=v=>f(v,1),gmed=(g,k)=>{const v=gRows(g).filter(r=>r[k]!=null).map(r=>r[k]);return v.length?med(v):NaN};
+  const tg=st.specs,has=k=>MS.includes(k),hasXY=R.some(hasSpatialXY),f1=v=>f(v,1),gmed=(g,k)=>{const v=gRows(g).filter(r=>r[k]!=null).map(r=>r[k]);return v.length?med(v):NaN};
   const ar={};for(const g of groups){const rs=padReps(gRows(g)).filter(r=>!geomAssumed(r,st));ar[g]=rs.length?Math.min(...rs.map(r=>areaRatio(r,st))):NaN}
   const lowAR=groups.filter(g=>ar[g]<.66),tightAR=groups.filter(g=>ar[g]<.75);
   const GM={};for(const g of groups)GM[g]={v:gmed(g,"volume"),a:gmed(g,"area"),h:gmed(g,"hpct"),n:gRows(g).length};
@@ -6705,7 +6713,7 @@ function failureModes(st,F,c){
   // 支撐／密合：焊墊體積殘差（扣群組平均）若與「鄰近其他元件群組焊墊」的殘差相關，代表偏差跟著位置走（局部縫隙、支撐不足、鋼板變形），
   // 而不是同一封裝內的設計差異（那種差異只會在同群組內重複，不會傳到旁邊的其他元件）
   let persist=null;
-  if(hasXY&&has("volume")){const acc={};for(const r of R)if(r.volume!=null&&realXY(r)){const a=acc[r.pad]||(acc[r.pad]={g:r.group,x:r.x,y:r.y,s:0,n:0});a.s+=r.volume;a.n++}
+  if(hasXY&&has("volume")){const hasPadXY=R.some(realXY);const acc={};for(const r of R)if(r.volume!=null){const xy=hasPadXY?(realXY(r)?{x:r.x,y:r.y}:null):spatialXY(r);if(!xy)continue;const k=hasPadXY?r.pad:(r.comp||r.pad);const a=acc[k]||(acc[k]={g:r.group,x:xy.x,y:xy.y,s:0,n:0});a.s+=r.volume;a.n++}
     let P=Object.values(acc).map(a=>({g:a.g,x:a.x,y:a.y,m:a.s/a.n}));
     if(P.length>=30&&groups.length>=3){const gm={};for(const p of P){const q=gm[p.g]||(gm[p.g]={s:0,n:0});q.s+=p.m;q.n++}P.forEach(p=>p.res=p.m-gm[p.g].s/gm[p.g].n);
       if(P.length>500){const st2=Math.ceil(P.length/500);P=P.filter((_,i)=>i%st2===0)}
@@ -8987,7 +8995,7 @@ function inkOn(rgb){const m=String(rgb).match(/\d+/g);if(!m||m.length<3)return"v
 function divColor(t){const lo=[61,110,143],mid=hex2rgb(css("--surface2")),hi=[200,90,40];const a=t<0?lo:hi,k=Math.min(1,Math.abs(t));return`rgb(${mid.map((m,i)=>Math.round(m+(a[i]-m)*k)).join(",")})`}
 function hex2rgb(h){h=h.replace("#","");if(h.length===3)h=h.split("").map(c=>c+c).join("");return[0,2,4].map(i=>parseInt(h.substr(i,2),16))}
 function drawHeat(){const A=S.A,cv=$("#heat"),ctx=cv.getContext("2d"),W=cv.width,H=cv.height,pad=24;
-  if(!hasValidSpatialXY(A.rows,realXY)){
+  if(!A||!hasValidSpatialXY(A.rows,hasSpatialXY)){
     const na=spatialChartUnavailableText();
     ctx.clearRect(0,0,W,H);ctx.fillStyle=css("--surface2");ctx.fillRect(0,0,W,H);
     ctx.fillStyle=css("--muted");ctx.font="20px IBM Plex Mono";ctx.textAlign="center";
@@ -8996,44 +9004,49 @@ function drawHeat(){const A=S.A,cv=$("#heat"),ctx=cv.getContext("2d"),W=cv.width
     $("#heatLeg").innerHTML=`<span class="note">${esc(na.long)}</span>`;
     return;
   }
-  const[xa,xb]=minMax(A.rows,r=>r.x),[ya,yb]=minMax(A.rows,r=>r.y),x0=xa-3,x1=xb+3,y0=ya-3,y1=yb+3,sc=Math.min((W-2*pad)/(x1-x0),(H-2*pad)/(y1-y0));
+  const hasPadXY=A.rows.some(realXY),isComp=!hasPadXY;
+  const hRows=A.rows.filter(r=>hasPadXY?realXY(r):compXY(r));
+  const xyOf=r=>hasPadXY?{x:r.x,y:r.y}:{x:r.componentX,y:r.componentY};
+  const[xa,xb]=minMax(hRows,r=>xyOf(r).x),[ya,yb]=minMax(hRows,r=>xyOf(r).y),x0=xa-3,x1=xb+3,y0=ya-3,y1=yb+3,sc=Math.min((W-2*pad)/(x1-x0),(H-2*pad)/(y1-y0));
   ctx.clearRect(0,0,W,H);ctx.fillStyle=css("--surface2");ctx.fillRect(0,0,W,H);
-  const badPads=new Set(A.defRows.map(d=>d.pad)),ngCol=css("--ng");   // 先建不良焊墊集合：不必每個焊墊重掃全部不良列
+  const badKeys=new Set(A.defRows.map(d=>isComp?(d.comp||d.pad):d.pad)),ngCol=css("--ng");   // 先建不良焊墊/元件集合：不必重掃全部不良列
   if(S.heatMode==="density"){
-    const dMap=computeLocalOosDensity(A.rows,r=>realXY(r)?r:null,clsOf(S));
+    const dMap=computeLocalOosDensity(hRows,r=>xyOf(r),clsOf(S));
     const byPadD=new Map();
-    for(const r of A.rows){
-      const d=dMap.get(r)||0,prev=byPadD.get(r.pad);
-      if(!prev||d>prev.d)byPadD.set(r.pad,{r,d});
+    for(const r of hRows){
+      const key=isComp?(r.comp||r.pad):r.pad;
+      const d=dMap.get(r)||0,prev=byPadD.get(key);
+      if(!prev||d>prev.d)byPadD.set(key,{r,d});
     }
     for(const[k,{r,d}]of byPadD){
-      const px=pad+(r.x-x0)*sc,py=pad+(y1-r.y)*sc,w=Math.max(r.w*sc*1.6,6),h=Math.max(r.d*sc*1.6,6);
+      const xy=xyOf(r);
+      const px=pad+(xy.x-x0)*sc,py=pad+(y1-xy.y)*sc,w=Math.max((r.w||0.7)*sc*1.6,6),h=Math.max((r.d||0.7)*sc*1.6,6);
       ctx.fillStyle=densityColor(d);if(r.shape==="round"){ctx.beginPath();ctx.arc(px,py,w/2,0,7);ctx.fill()}else ctx.fillRect(px-w/2,py-h/2,w,h);
-      if(badPads.has(k)){ctx.strokeStyle=ngCol;ctx.lineWidth=2;ctx.strokeRect(px-w/2-2,py-h/2-2,w+4,h+4)}
+      if(badKeys.has(k)){ctx.strokeStyle=ngCol;ctx.lineWidth=2;ctx.strokeRect(px-w/2-2,py-h/2-2,w+4,h+4)}
     }
   }else{
-    const byPad={};A.rows.forEach(r=>{(byPad[r.pad]=byPad[r.pad]||{r,v:[]}).v.push(r[A.m])});
+    const byPad={};hRows.forEach(r=>{const key=isComp?(r.comp||r.pad):r.pad;(byPad[key]=byPad[key]||{r,v:[]}).v.push(r[A.m])});
     const tgt=A.hasSpec?specTgtFallback(A.sp,A.gMean):A.gMean;
     const span=A.hasSpec?(hasTwoSpec(A.sp)?Math.max(Math.abs(A.sp.usl-tgt),Math.abs(tgt-A.sp.lsl)):(hasLsl(A.sp)?Math.max(1,Math.abs(tgt-A.sp.lsl)):hasUsl(A.sp)?Math.max(1,Math.abs(A.sp.usl-tgt)):3*A.overallSd)):3*A.overallSd;
-    for(const k in byPad){const{r,v}=byPad[k],m=mean(v),t=(m-tgt)/((span||1)*.6);const px=pad+(r.x-x0)*sc,py=pad+(y1-r.y)*sc,w=Math.max(r.w*sc*1.6,6),h=Math.max(r.d*sc*1.6,6);
+    for(const k in byPad){const{r,v}=byPad[k],m=mean(v),t=(m-tgt)/((span||1)*.6),xy=xyOf(r);const px=pad+(xy.x-x0)*sc,py=pad+(y1-xy.y)*sc,w=Math.max((r.w||0.7)*sc*1.6,6),h=Math.max((r.d||0.7)*sc*1.6,6);
       ctx.fillStyle=divColor(t);if(r.shape==="round"){ctx.beginPath();ctx.arc(px,py,w/2,0,7);ctx.fill()}else ctx.fillRect(px-w/2,py-h/2,w,h);
-      if(badPads.has(k)){ctx.strokeStyle=ngCol;ctx.lineWidth=2;ctx.strokeRect(px-w/2-2,py-h/2-2,w+4,h+4)}}
-    $("#heatSub").textContent=`各焊墊跨板平均 ${METRICS[A.m].short}`;
+      if(badKeys.has(k)){ctx.strokeStyle=ngCol;ctx.lineWidth=2;ctx.strokeRect(px-w/2-2,py-h/2-2,w+4,h+4)}}
+    $("#heatSub").textContent=`各${isComp?"元件":"焊墊"}跨板平均 ${METRICS[A.m].short}${isComp?"（依元件中心座標）":""}`;
     $("#heatLeg").innerHTML=`<span><i class="sq" style="background:${divColor(-1)}"></i>≤ ${f(tgt-(span||0)*.6,1)} ${METRICS[A.m].unit}（低）</span><span><i class="sq" style="background:${divColor(0)};outline:1px solid var(--line)"></i>目標 ${f(tgt,1)}</span><span><i class="sq" style="background:${divColor(1)}"></i>≥ ${f(tgt+(span||0)*.6,1)} ${METRICS[A.m].unit}（高）</span><span><i class="sq" style="background:transparent;outline:2px solid var(--ng)"></i>曾出現不良</span>`;
   }
   if(S.step.on)S.step.zones.forEach((z,i)=>{const R=zoneRect(z);if(!R)return;ctx.strokeStyle=ZCOL[i%ZCOL.length];ctx.lineWidth=2;ctx.setLineDash([7,5]);const ry=Math.max(R.y0,R.y1);ctx.strokeRect(pad+(R.x0-x0)*sc,pad+(y1-ry)*sc,(R.x1-R.x0)*sc,Math.abs(R.y1-R.y0)*sc);ctx.setLineDash([]);ctx.fillStyle=ZCOL[i%ZCOL.length];ctx.font="17px IBM Plex Mono";ctx.fillText(z.name+" "+z.t+"µm",pad+(R.x0-x0)*sc+4,pad+(y1-ry)*sc-5)});
-  ctx.fillStyle=css("--muted");ctx.font="20px IBM Plex Mono";ctx.fillText(`刮刀行程：沿 ${S.sqDir==="X"?"X ←→":"Y ↕"}　（CAD 座標，Y 向上）`,pad,H-6);
+  ctx.fillStyle=css("--muted");ctx.font="20px IBM Plex Mono";ctx.fillText(`刮刀行程：沿 ${S.sqDir==="X"?"X ←→":"Y ↕"}　（${isComp?"元件中心":"CAD"} 座標，Y 向上）`,pad,H-6);
   if(S.heatMode==="density"){
-    $("#heatSub").textContent="局部不良密度熱圖（不良聚集熱點）";
+    $("#heatSub").textContent=`局部不良密度熱圖（不良聚集熱點）${isComp?"（依元件中心座標）":""}`;
     $("#heatLeg").innerHTML=`<span><i class="sq" style="background:${densityColor(0)}"></i>低密度 0%</span><span><i class="sq" style="background:${densityColor(0.25)}"></i>中密度 25%</span><span><i class="sq" style="background:${densityColor(0.65)}"></i>高密度 ≥ 50%</span><span><i class="sq" style="background:transparent;outline:2px solid var(--ng)"></i>曾出現不良</span>`;
   }
 }
 if($("#segHeatMode"))$$("#segHeatMode button").forEach(b=>b.onclick=()=>{S.heatMode=b.dataset.hm==="density"?"density":"avg";$$("#segHeatMode button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));if(hasData())drawHeat()});
 
 /* ---------- 熱圖點選下鑽 ---------- */
-$("#heat").addEventListener("click",e=>{const A=S.A,cv=$("#heat"),rc=cv.getBoundingClientRect(),px=(e.clientX-rc.left)*cv.width/rc.width,py=(e.clientY-rc.top)*cv.height/rc.height;
-  const[xa,xb]=minMax(A.rows,r=>r.x),[ya,yb]=minMax(A.rows,r=>r.y),x0=xa-3,x1=xb+3,y0=ya-3,y1=yb+3,pad=24,sc=Math.min((cv.width-2*pad)/(x1-x0),(cv.height-2*pad)/(y1-y0));
-  let best=null,bd=1e9;for(const r of A.rows){const d=Math.hypot(pad+(r.x-x0)*sc-px,pad+(y1-r.y)*sc-py);if(d<bd){bd=d;best=r}}if(best&&bd<30)goPad(best.pad)});
+$("#heat").addEventListener("click",e=>{const A=S.A;if(!A||!hasValidSpatialXY(A.rows,hasSpatialXY))return;const hasPadXY=A.rows.some(realXY),hRows=A.rows.filter(r=>hasPadXY?realXY(r):compXY(r)),xyOf=r=>hasPadXY?{x:r.x,y:r.y}:{x:r.componentX,y:r.componentY},cv=$("#heat"),rc=cv.getBoundingClientRect(),px=(e.clientX-rc.left)*cv.width/rc.width,py=(e.clientY-rc.top)*cv.height/rc.height;
+  const[xa,xb]=minMax(hRows,r=>xyOf(r).x),[ya,yb]=minMax(hRows,r=>xyOf(r).y),x0=xa-3,x1=xb+3,y0=ya-3,y1=yb+3,pad=24,sc=Math.min((cv.width-2*pad)/(x1-x0),(cv.height-2*pad)/(y1-y0));
+  let best=null,bd=1e9;for(const r of hRows){const xy=xyOf(r),d=Math.hypot(pad+(xy.x-x0)*sc-px,pad+(y1-xy.y)*sc-py);if(d<bd){bd=d;best=r}}if(best&&bd<30)goPad(best.pad)});
 $("#heat").style.cursor="pointer";
 
 /* ---------- 進階分析 ---------- */
@@ -9344,7 +9357,7 @@ function renderLISAUI(){
   const boxEl = $("#lisaChartBox");
   const cv = $("#cLISA");
   if (!msgEl || !cv) return;
-  if (!A || !hasValidSpatialXY(A.rows, realXY)) {
+  if (!A || !hasValidSpatialXY(A.rows, hasSpatialXY)) {
     const na = spatialChartUnavailableText();
     const detail = na.long.replace(/^不適用[（(]([^）)]+)[）)]\s*[—-]?\s*/, "$1 — ");
     const noRows = !(S.rows && S.rows.length);
@@ -9371,9 +9384,11 @@ function renderLISAUI(){
   if (boxEl) boxEl.hidden = false;
 
   const isSig = sa.isSignificant;
-  if (subEl) subEl.textContent = `Moran's I = ${sa.moranI} · Z = ${sa.zScore}${sa.pPerm != null ? ` · 置換 p = ${sa.pPerm}` : ""} · ${isSig ? "空間顯著群聚" : "空間隨機分佈"}`;
+  const isComp = sa.coordLevel === "comp";
+  const coordTag = isComp ? " · 依元件中心座標" : "";
+  if (subEl) subEl.textContent = `Moran's I = ${sa.moranI} · Z = ${sa.zScore}${sa.pPerm != null ? ` · 置換 p = ${sa.pPerm}` : ""} · ${isSig ? "空間顯著群聚" : "空間隨機分佈"}${coordTag}`;
   msgEl.innerHTML = `<span class="pill ${isSig ? 'warn' : 'ok'}">${isSig ? `顯著空間群聚 (Z=${sa.zScore})` : '空間隨機無群聚'}</span> `
-    + `<span class="note">熱點 (HH): ${sa.counts.HH} 處 · 冷點 (LL): ${sa.counts.LL} 處 · 空間離群: ${sa.counts.LH + sa.counts.HL} 處（各焊墊雙尾 p &lt; 0.05，未做多重比較校正，只標示位置${isSig ? "" : "；整體未達顯著，標示點可能為隨機變異"}）</span>`;
+    + `<span class="note">${isComp ? "依元件中心座標 · " : ""}熱點 (HH): ${sa.counts.HH} 處 · 冷點 (LL): ${sa.counts.LL} 處 · 空間離群: ${sa.counts.LH + sa.counts.HL} 處（各${isComp ? "元件" : "焊墊"}雙尾 p &lt; 0.05，未做多重比較校正，只標示位置${isSig ? "" : "；整體未達顯著，標示點可能為隨機變異"}）</span>`;
 
   const ctx = cv.getContext("2d");
   if (!ctx) return;
@@ -11341,10 +11356,12 @@ function unpivotWide(tab,o={}){const w=wideCols(tab.head),R={};
     }
   }
 
-  const padsOf={};tab.data.forEach(c=>{const[ref]=split(c[iComp]),p=iPad>=0?safeId(c[iPad]):"";(padsOf[ref]=padsOf[ref]||[]);if(!padsOf[ref].includes(p))padsOf[ref].push(p)});
+  const WIDE_SUM_RE=/^(?:min|max|avg|average|mean|median|std|stdev|stddev|sd|total|sum|count|range|cp|cpk)\.?$/i;
+  const wideData=tab.data.filter(c=>{const raw=safeId(c[iComp]),p=iPad>=0?safeId(c[iPad]):"";return raw&&!(!p&&WIDE_SUM_RE.test(raw))});
+  const padsOf={};wideData.forEach(c=>{const[ref]=split(c[iComp]),p=iPad>=0?safeId(c[iPad]):"";(padsOf[ref]=padsOf[ref]||[]);if(!padsOf[ref].includes(p))padsOf[ref].push(p)});
   const head=["Board",...(useFig?["Figure"]:[]),"Component ID","Raw Component ID","PAD ID",...(P?["X","Y","Package"]:[]),...(R.h?["Height(um)"]:[]),...(R.v?["Volume(%)"]:[]),...(R.a?["Area(%)"]:[]),...(R.ox?["Offset X(um)"]:[]),...(R.oy?["Offset Y(um)"]:[]),...(R.r?["Result"]:[])];
   const data=[],missing=new Set(),other=new Set(),matched=new Set();
-  for(const c of tab.data){const[ref,fig]=split(c[iComp]),pad=iPad>=0?safeId(c[iPad]):"";if(!ref)continue;
+  for(const c of wideData){const[ref,fig]=split(c[iComp]),pad=iPad>=0?safeId(c[iPad]):"";if(!ref)continue;
     let xy=null,pkg="",it=null;
     if(P){
       it=byRef.get(ref)||null;
@@ -11538,6 +11555,8 @@ function syncPlaceToCurrentRun(opts={}){
   if(!PLACE){
     if(isPre){
       clearPlacePreviewFromRun(run);
+      AN_STORE.delete(run.rows);
+      if(run.rows===S.rows){F_SIG=null;detGen=-1;recompute()}
       T.pos=null;
       if(T.ok&&typeof build3D==="function")build3D();
       else if(S.rows)updateGrid3dWarn(pos3D(S.rows));
@@ -11550,6 +11569,8 @@ function syncPlaceToCurrentRun(opts={}){
   const res=applyPlacePreviewToRun(run,PLACE);
   LAST_PLACE_SYNC=res.ok?null:{runId:run.id,recId:PLACE.recId||null,reason:res.reason||""};
   if(res.ok){
+    AN_STORE.delete(run.rows);
+    if(run.rows===S.rows){F_SIG=null;detGen=-1;recompute()}
     T.pos=null;
     if(T.ok&&typeof build3D==="function")build3D();
     else if(S.rows)updateGrid3dWarn(pos3D(S.rows));
@@ -11742,31 +11763,26 @@ function updateImportWorkflow(){
     previewReady=!!(I&&I.res&&!$("#mapBox").hidden),heightUnitReady=!(I&&I.map&&I.map.height!=null)||!!(I.res&&I.res.info.heightUnit!=="unknown"),metadataReady=identityReady&&sideReady&&thicknessReady,
     applyReady=previewReady&&heightUnitReady&&metadataReady&&placeReady&&cloudReady&&!$("#btnApply").disabled;
   const set=(key,state,message)=>{const el=root.querySelector('[data-flow-step="'+key+'"]');if(!el)return;el.dataset.state=state;el.querySelector("[data-flow-state]").textContent=message};
-  if(IMPORT_FLOW_COMPLETE){["format","file","mapping","metadata","apply"].forEach(key=>set(key,"done","已完成"));summary.textContent=IMPORT_FLOW_RESULT||"匯入資料已完成。";return}
-  const placeText=record?"沿用來源紀錄的座標脈絡":OFFLINE?"離線版不需受控座標":placeReady?"受控座標符合料號、版次與面別":"待選取符合料號、版次與面別的有效座標";
-  set("format",sideReady&&(record||placeReady)?"done":part&&rev?"attention":"current",($("#selVendor")?.selectedOptions?.[0]?.textContent||"請選格式")+"；"+placeText);
-  const parseError=$("#parseErr")?.textContent||"";
+  if(IMPORT_FLOW_COMPLETE){["file","metadata","apply"].forEach(key=>set(key,"done","已完成"));summary.textContent=IMPORT_FLOW_RESULT||"匯入資料已完成。";return}
+  const parseError=$("#parseErr")?.textContent||"",previewError=I&&I.err||"",previewWarning=$("#mapPrev")?.querySelector(".err")?.textContent||"";
   set("file",parseError?"error":fileReady?"done":IMPORT_FLOW_PHASE==="read"?"current":"pending",
-    IMPORT_FLOW_PHASE==="read"?"正在讀取與解析檔案…":fileReady?"已讀取 "+(I.name||"資料"):parseError?"檔案無法讀取，請更換檔案或修正格式":"等待選擇檔案或貼上資料");
-  const previewError=I&&I.err||"",previewWarning=$("#mapPrev")?.querySelector(".err")?.textContent||"";
-  set("mapping",!fileReady?"pending":previewError?"error":previewReady&&previewWarning?"attention":previewReady?"done":"current",
-    !fileReady?"讀取來源檔後即可對應欄位":previewError?"欄位對應或資料驗證失敗："+previewError:
-      previewWarning?"預覽含需確認項目；請查看預覽警示":previewReady?I.res.rows.length.toLocaleString()+" 筆資料已完成預覽":"正在建立欄位對應與預覽");
-  const metadataMessage=demo?"範例資料不需正式中繼資料":!heightUnitReady?"來源未標示高度單位；請於欄位設定選擇 µm 或 mm":!identityReady?(OFFLINE?"請填產品料號":"請填產品料號、正式版次，以及製令工單或量測日期"):
-    !sideReady?"請選擇量測面別":!thicknessReady?"請確認鋼板厚度（30–300 µm）或料號預設厚度":
-      record?"沿用資料庫紀錄的批號與產品資訊":OFFLINE?"產品料號與鋼板厚度已填":"產品、版次、面別、工單／日期與鋼板厚度已填";
-  set("metadata",metadataReady?"done":previewReady?"current":"pending",metadataMessage);
+    IMPORT_FLOW_PHASE==="read"?"正在讀取與解析檔案…":fileReady?"已讀取 "+(I.name||"資料")+"（"+($("#selVendor")?.selectedOptions?.[0]?.textContent||"")+(side?" · "+side+" 面":"")+"）":parseError?"檔案無法讀取，請更換檔案或修正格式":"選擇或拖放量測資料檔");
+  const placeText=record?"沿用來源座標":OFFLINE?"離線不需座標":placeReady?"受控座標已就緒":"待選取符合料號、版次與面別的座標";
+  const metadataMessage=demo?"範例資料不需正式中繼資料":!heightUnitReady?"來源未標示高度單位；請於「進階設定」選擇 µm 或 mm":!identityReady?(OFFLINE?"請填產品料號":"請填產品料號、版次，以及製令工單或量測日期"):
+    !sideReady?"請選擇量測面別":!thicknessReady?"請確認鋼板厚度（30–300 µm）":!placeReady?placeText:
+      record?"沿用資料庫紀錄的產品資訊":OFFLINE?"產品料號與鋼板厚度已填":"座標與料號資訊已就緒";
+  set("metadata",(metadataReady&&placeReady&&heightUnitReady)?"done":fileReady?"current":"pending",metadataMessage);
   const note=$("#recNote")?.querySelector(".err")?.textContent||"",pending=record&&record.lifecycle==="pending_review",
-    state=IMPORT_FLOW_PHASE==="apply"?"current":note||pending||(!cloudReady&&!demo&&!record)?"attention":applyReady?"current":"pending",
-    message=IMPORT_FLOW_PHASE==="apply"?"正在依既有規則驗證與保存…":note||(OFFLINE&&applyReady?"可套用；資料只在記憶體分析，不會存檔":"")||
+    state=IMPORT_FLOW_PHASE==="apply"?"current":previewError?"error":note||pending||(!cloudReady&&!demo&&!record)?"attention":applyReady?"current":"pending",
+    message=IMPORT_FLOW_PHASE==="apply"?"正在依既有規則驗證與保存…":previewError?previewError:note||(OFFLINE&&applyReady?"可套用；資料只在記憶體分析，不會存檔":"")||
       (pending?"待判定紀錄不能套用至正式分析":!cloudReady&&!demo&&!record?"正式匯入需登入並連線至雲端資料庫":
-        applyReady?"可套用；系統仍會執行正式驗證":"完成前置資料後再套用");
+        applyReady?"可套用（"+I.res.rows.length.toLocaleString()+" 筆）；系統仍會執行正式驗證":"完成前置步驟後即可套用");
   set("apply",state,message);
-  summary.textContent=IMPORT_FLOW_PHASE==="read"?"正在讀取資料檔；完成後會顯示欄位對應與預覽。":
+  summary.textContent=IMPORT_FLOW_PHASE==="read"?"正在讀取資料檔；完成後會顯示預覽與套用。":
     IMPORT_FLOW_PHASE==="apply"?"正在依既有規則驗證並保存，請稍候。":
       note?"需要修正："+note:parseError?"需要修正："+parseError:previewError?"需要修正："+previewError:
         !cloudReady&&!demo&&!record?"正式匯入需登入並連線至雲端資料庫。":
-          previewReady?"請檢查欄位預覽與警示，再確認中繼資料後套用。":"請依序完成各區段；套用時會再執行正式驗證。";
+          previewReady?"請確認摘要後按「套用匯入」；必要時可展開進階設定。":"請依序完成 3 個步驟；套用時會再執行正式驗證。";
 }
 $("#impValidationSummary")?.querySelector("[data-import-error-jump]")?.addEventListener("click",()=>{const target=IMPORT_FLOW_ERROR_TARGET;if(target?.focus){target.focus();target.scrollIntoView?.({block:"center"})}});
 const impFlowHost=$("#boxPickImport")||$("#impFlowSteps")?.closest(".card");
@@ -14226,7 +14242,7 @@ function renderReport(){
       <tbody>${dfmData.map(d=>`<tr><td><b>${esc(d.group)}</b></td><td class="num mono">${esc(d.padDim)}</td><td class="num mono">${esc(d.apDim)}</td><td class="num mono">${d.thk}</td><td class="num mono">${f(d.ar,2)}</td><td class="num mono">${f(d.asp,2)}</td><td><span class="pill ${d.geomAssumed?'na':d.st}">${d.geomAssumed?'待確認':d.st==='ok'?'正常':d.st==='warn'?'注意':'風險'}</span></td><td class="num mono">${f(d.tmax,0)} µm</td></tr>`).join("")}</tbody>
     </table></div></div>`;
 
-  const hasXY=hasValidSpatialXY(S.rows,realXY),spEx=reportSpatialExclusionLines(hasXY);
+  const hasXY=hasValidSpatialXY(S.rows,hasSpatialXY),spEx=reportSpatialExclusionLines(hasXY);
   const s9=`<div class="rep-sec" id="repSec9">
     <h2 style="font-size:var(--fs-heading);border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">八、資料範圍揭露與未納入證據</h2>
     <div class="tbl" style="margin-bottom:16px"><table><tbody>

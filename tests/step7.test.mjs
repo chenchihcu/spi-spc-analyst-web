@@ -239,7 +239,7 @@ test('步驟 7 (D-53): 匯入流程狀態、錯誤導引、來源說明與共用
 
   hook.startImport(csv, 'incoming.csv');
   assert.equal(document.querySelector('[data-flow-step="file"]').dataset.state, 'done');
-  assert.equal(document.querySelector('[data-flow-step="mapping"]').dataset.state, 'done');
+  assert.ok(document.querySelector('[data-flow-step="metadata"]'));
   assert.match(document.getElementById('impSourceSummary').textContent, /伺服器指紋會在保存時建立並驗證/);
   assert.match(document.getElementById('impSourceSummary').textContent, /尚未形成歷史規格快照/);
   assert.equal(hook.importSearchMatch({ supplierWo: 'SUP-001', name: 'spi.csv' }, 'sup-001'), true);
@@ -267,7 +267,7 @@ test('步驟 7 (D-53): 匯入流程狀態、錯誤導引、來源說明與共用
   assert.match(document.getElementById('btnSelectPlaceError').textContent, /同料號、版次與面別/);
 
   hook.startImport('Board,Pad,Component\nB1,P1,U1\nB2,P1,U1', 'without-measurement.csv');
-  assert.equal(document.querySelector('[data-flow-step="mapping"]').dataset.state, 'error');
+  assert.equal(document.querySelector('[data-flow-step="apply"]').dataset.state, 'error');
   assert.equal(document.getElementById('btnApply').disabled, true);
   assert.match(document.getElementById('impFlowStatus').textContent, /找不到數值欄位/);
   dom.window.close();

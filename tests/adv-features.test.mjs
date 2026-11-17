@@ -188,3 +188,41 @@ test("進階整合測試：buildRows 解析形貌欄位並整合至 analyze 與 
   assert.ok(peakingIssue != null, "應偵測出拉尖超標問題卡");
   assert.equal(peakingIssue.lv, "warn");
 });
+
+test("TV-ADV-07: 僅有元件中心座標 (componentX/Y) 時支援空間自相關與問題偵測，且 gridPos 不納入", () => {
+  const core = loadCore();
+  const rows = [];
+  // 16 顆元件排列於 4x4 網格，每顆 2 個焊墊，左半熱區、右半冷區
+  for (let gx = 0; gx < 4; gx++) {
+    for (let gy = 0; gy < 4; gy++) {
+      const comp = `R${gx}_${gy}`;
+      const cx = gx * 10 + 5, cy = gy * 10 + 5;
+      const vol = gx < 2 ? 118 : 82;
+      for (let p = 1; p <= 2; p++) {
+        rows.push({
+          board: "B01", pad: `${comp}-${p}`, comp, pkg: "R0402", group: "R0402",
+          componentX: cx, componentY: cy, volume: vol + (p === 1 ? 0.5 : -0.5),
+          height: 120, area: 100, offx: 0, offy: 0, w: 0.7, d: 0.7,
+        });
+      }
+    }
+  }
+  const st = baseState(core, { rows });
+  const A = core.analyze(st);
+  assert.equal(A.coordLevel, "comp");
+  assert.equal(A.spatialAutocorr.valid, true, "componentX/Y 應可計算空間自相關");
+  assert.equal(A.spatialAutocorr.coordLevel, "comp");
+  assert.equal(A.spatialAutocorr.lisa.length, 16, "同元件多個焊墊應彙總為 1 個元件空間點");
+  assert.equal(A.spatialAutocorr.isSignificant, true);
+
+  const issues = core.detectIssues(st);
+  const lisaCard = issues.find(x => x.rule_id === "空間自相關 MoranLISA");
+  assert.ok(lisaCard != null, "僅具 componentX/Y 時 detectIssues 應產出 LISA 問題卡");
+  assert.match(lisaCard.pads, /依元件中心座標/);
+
+  // 僅 gridPos 時不可納入空間分析
+  const gridRows = rows.map((r, i) => ({ ...r, componentX: undefined, componentY: undefined, x: i % 8, y: Math.floor(i / 8), gridPos: true }));
+  const Agrid = core.analyze(baseState(core, { rows: gridRows }));
+  assert.equal(Agrid.coordLevel, "none");
+  assert.equal(Agrid.spatialAutocorr.valid, false);
+});

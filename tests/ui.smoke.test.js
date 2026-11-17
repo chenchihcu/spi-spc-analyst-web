@@ -226,18 +226,20 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
     assert.equal(hook.S.relChart, rk);
   }
 
-  // 記錄庫匯入資料分頁：匯入步驟拆為流程卡＋5張獨立卡片（無巢狀卡）、跨卡事件委派及空狀態呈現
+  // 記錄庫匯入資料分頁：簡化為流程卡＋3張獨立卡片（無巢狀卡）、進階設定預設收合、跨卡事件委派及空狀態呈現
   w.SPI_TEST_HOOK.setSub("import");
   const impSub = d.getElementById("boxPickImport");
   assert.ok(impSub && !impSub.hidden, "setSub('import') 應開啟記錄庫「匯入資料」分頁 #boxPickImport");
   assert.ok(impSub.querySelector(".imp-flow-card"), "應有頂部匯入流程總覽卡");
-  for (const cid of ["impStep1Card", "impStep2Card", "impStep3Card", "impStep4Card", "impStep5Card"]) {
+  for (const cid of ["impStep1Card", "impStep2Card", "impStep3Card"]) {
     const card = d.getElementById(cid);
     assert.ok(card && card.classList.contains("card") && impSub.contains(card), `#${cid} 應為獨立步驟卡片`);
     assert.equal(card.parentElement.closest(".card"), null, `#${cid} 不可巢狀包在另一張 .card 內`);
   }
+  const advBox = d.getElementById("impAdvancedBox");
+  assert.ok(advBox && advBox.tagName === "DETAILS" && !advBox.open, "#impAdvancedBox 進階設定應預設收合");
   $("#btnPhme").click();
-  assert.equal($("#mapBox").hidden, false, "讀取資料後應展開步驟 ③～⑤ 的 #mapBox");
+  assert.equal($("#mapBox").hidden, false, "讀取資料後應展開步驟 ③ 的 #mapBox");
   $("#inPart").value = "PART-X-01";
   $("#inPart").dispatchEvent(new w.Event("input", { bubbles: true }));
   assert.match($("#impSourceSummary").textContent, /PART-X-01/, "跨卡片修改 #inPart 應透過 #boxPickImport 委派更新來源摘要");
