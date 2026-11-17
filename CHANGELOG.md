@@ -2,6 +2,11 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.38.4 — 2026-11-16（修復立榮電子檔尾統計列匯入與簡化匯入 UI）
+
+- **立榮電子／橫排量測檔尾統計列過濾**：`lib/controlled-import.mjs`（`validateWideMeasurement`）與 `spi-spc.html`（`unpivotWide`）安全略過檔尾的 `Min.` / `Max` / `Avg` 等統計摘要列及空行分隔後的無位號統計列，同時保留中間資料列缺少 `Component ID` 或 `PAD ID` 的嚴格檢核。
+- **簡化匯入資料 UI（3 步驟＋進階設定折疊）**：將記錄庫「匯入資料」分頁（`#boxPickImport`）精簡為「① 選擇量測檔 → ② 確認受控座標與料號資訊 → ③ 檢查預覽與套用」，並將機台格式設定檔、單位換算選項與欄位對應表收合至 `#impAdvancedBox` 折疊區。
+
 ## v10.38.3 — 2026-11-16（修正自帶捲軸表格 Sticky 表頭偏移異常）
 
 - **統一內部捲動表格表頭定位與層級**：將 `.tbl:is(.tbl-scroll-md,.tbl-scroll-lg,.tbl-scroll-xl,[style*="max-height"]).sticky-head thead th` 統一設為 `top: 0!important; z-index: 3`（並將桌面版預設 `.tbl.sticky-head thead th` 的 `z-index` 調為 `3`），解決「本板不良焊墊（`#boardDefTbl`）」等固定高度捲動表格套用頁面級 `--stickyH`／`44px` 偏移而導致表頭浮在表格中段遮擋資料列的問題。

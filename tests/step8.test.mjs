@@ -419,3 +419,44 @@ test("2D 全板熱圖模式切換：#segHeatMode 在各板平均與不良密度�
   assert.equal(H.S.heatMode, "avg");
   assert.equal(btnAvg.getAttribute("aria-pressed"), "true");
 });
+
+test("後補套用座標檔 (syncPlaceToCurrentRun) 後即時重算並更新 LISA 空間自相關與 2D 熱圖", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const dom = createPage();
+  const w = dom.window, H = await waitFor(() => w.SPI_TEST_HOOK?.syncPlaceToCurrentRun && w.SPI_TEST_HOOK);
+  // 建立一個只有 gridPos 虛擬座標的回合（16 顆元件）
+  const gridRows = [];
+  const csvLines = ["RefDes,X,Y,Layer"];
+  for (let gx = 0; gx < 4; gx++) {
+    for (let gy = 0; gy < 4; gy++) {
+      const comp = `U${gx}${gy}`;
+      csvLines.push(`${comp},${gx * 10 + 5},${gy * 10 + 5},TOP`);
+      const vol = gx < 2 ? 120 : 80;
+      for (let p = 1; p <= 2; p++) {
+        gridRows.push({
+          board: "B01", pad: `${comp}-${p}`, comp, pkg: "R0402", group: "R0402",
+          x: 4 + gx * 5, y: 4 + gy * 5, gridPos: true,
+          volume: vol + (p === 1 ? 0.5 : -0.5), height: 120, area: 100, offx: 0, offy: 0, w: 0.7, d: 0.7,
+        });
+      }
+    }
+  }
+  const runId = H.addRun("test-grid.csv", gridRows, ["volume", "height", "area"], null, { side: "TOP", part: "TEST-PN" });
+  H.switchRun(runId);
+  H.S.specSrc = "part";
+  H.S.partSpec = { id: "ps-test", part: "TEST-PN", rev: "A", side: "TOP" };
+  H.recompute();
+  H.renderLISAUI();
+  H.drawHeat();
+  assert.match(w.document.getElementById("lisaMsg").textContent, /缺座標/, "套用座標檔前應顯示缺座標");
+  assert.match(w.document.getElementById("heatSub").textContent, /缺座標/, "套用座標檔前熱圖應顯示缺座標");
+
+  // 載入座標檔並同步至目前回合
+  H.setPlace({ part: "TEST-PN", rev: "A", name: "place.csv", tab: H.csvTable(csvLines.join("\n")), side: "TOP", unit: "mm" });
+  const syncRes = H.syncPlaceToCurrentRun();
+  assert.equal(syncRes.ok, true);
+  H.renderLISAUI();
+  H.drawHeat();
+  assert.doesNotMatch(w.document.getElementById("lisaMsg").textContent, /缺座標/, "套用座標檔後 LISA 不應再顯示缺座標");
+  assert.match(w.document.getElementById("lisaMsg").textContent, /依元件中心座標/, "應標註依元件中心座標");
+  assert.match(w.document.getElementById("heatSub").textContent, /依元件中心座標/, "熱圖副標應標註依元件中心座標");
+});
