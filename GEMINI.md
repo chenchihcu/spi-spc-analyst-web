@@ -12,3 +12,5 @@
 - 先 Audit + Plan，除非使用者明確要求直接實作。
 - 以 `IOS-XX` 規則、`P0/P1/P2` 及 Acceptance Gates 追溯修改。
 - 不破壞 API、資料結構、權限、業務邏輯、既有桌面版。
+- 雲端 Linux 容器無 Windows 本機路徑（如 `C:/...`、`website-ship.md`、`~/.agents/skills`）；規則若指到這些路徑，視為雲端不可用，不推測內容。
+- 專案技能位於 `.agents/skills/`（通用 UI/UX 規則同步本位於 `.cursor/rules/ui-ux-universal.mdc`）。

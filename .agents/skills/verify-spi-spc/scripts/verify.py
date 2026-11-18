@@ -104,11 +104,19 @@ def stage_project(scratch):
     (scratch / "wrangler.json").write_text(json.dumps(config), encoding="utf-8")
 
 
+def evidence_base():
+    if "LOCALAPPDATA" in os.environ:
+        return Path(os.environ["LOCALAPPDATA"]) / "spi-spc-verify/evidence"
+    state_home = os.environ.get("XDG_STATE_HOME")
+    base = Path(state_home) if state_home else (Path.home() / ".local/state")
+    return base / "spi-spc-verify/evidence"
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("feature", choices=["all", "doctor", *FEATURES], default="database", nargs="?")
     args = parser.parse_args()
-    evidence = Path(os.environ["LOCALAPPDATA"]) / "spi-spc-verify/evidence" / uuid4().hex
+    evidence = evidence_base() / uuid4().hex
     evidence.mkdir(parents=True)
     print(f"Evidence: {evidence}", flush=True)
     log = open(evidence / "events.jsonl", "x", encoding="utf-8")
@@ -163,8 +171,10 @@ def main():
                                       cwd=scratch, env=env, stdin=subprocess.DEVNULL, stdout=stream, stderr=subprocess.STDOUT)
             await_worker(worker, port)
             with sync_playwright() as pw:
-                context = pw.chromium.launch_persistent_context(str(scratch / "profile"), channel="chrome",
-                                                                viewport={"width": 1440, "height": 900})
+                launch_kwargs = {"viewport": {"width": 1440, "height": 900}}
+                if os.name == "nt" or shutil.which("google-chrome") or shutil.which("chrome"):
+                    launch_kwargs["channel"] = "chrome"
+                context = pw.chromium.launch_persistent_context(str(scratch / "profile"), **launch_kwargs)
                 try:
                     page = context.pages[0]
                     page.set_default_timeout(15000)
