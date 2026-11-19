@@ -38,3 +38,13 @@ test('高度 % 界限換算 µm 不四捨五入到 0.1 µm', () => {
   const st = core.partSpecToState({ specs: { volume: { lsl: 70, usl: 130 }, hpct: { lsl: 75, usl: 125, tgt: 100 }, area: { lsl: 70, usl: 130 }, offx: {}, offy: {} }, groups: {} }, 75);
   assert.equal(st.specs.height.lsl, 56.25, '75 µm × 75% = 56.25 µm，不可變成 56.3');
 });
+
+test('高度 % 去除浮點誤差：剛好在界限上的值不因浮點雜訊跨過界限', () => {
+  for (const [stencil, height, pct] of [[88, 89.76, 102], [80, 48.08, 60.1], [80, 81.6, 102], [80, 104, 130], [80, 56, 70], [120, 122.4, 102], [127, 165.1, 130]]) {
+    const rows = [{ board: 'B01', comp: 'U1', pad: 'U1-1', group: 'G', volume: 100, area: 100, height }];
+    for (let b = 2; b <= 6; b++) rows.push({ board: 'B0' + b, comp: 'U1', pad: 'U1-1', group: 'G', volume: 100, area: 100, height: stencil });
+    const st = baseState(core, { rows, metrics: ['volume', 'height', 'area'], metric: 'hpct', group: 'ALL', stencil, heightUnit: 'um' });
+    core.analyze(st);
+    assert.equal(st.rows[0].hpct, pct, `${height} µm ÷ ${stencil} µm 應為 ${pct}%`);
+  }
+});
