@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: empty-scope-not-a-bug
+expected_outcome: |
+  Recognises that returning [] for an empty scope is the specified behaviour (AGENTS.md 分析範圍一致 and the component-scope tests), cites that evidence, does not change product code to fall back to the whole board, and explains this to the user.

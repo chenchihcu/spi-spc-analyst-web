@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: clean-sweep
+expected_outcome: |
+  Establishes a full baseline with the project's required gates (release-check, test:slow, build), triages any findings with evidence, makes only evidence-backed minimal fixes, and ends with an honest verdict that lists checks run and areas NOT TESTED rather than claiming the project is completely problem-free.
