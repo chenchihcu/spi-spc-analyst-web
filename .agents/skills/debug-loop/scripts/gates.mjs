@@ -80,7 +80,7 @@ function fingerprint() {
 // ---------- 規則：檔案／關鍵字 → 測試與關卡（出處見 AGENTS.md 各條「檢查」） ----------
 // 每條：{ id, why, files?: RegExp（比對變更檔路徑）, html?: RegExp（比對 spi-spc.html 增刪行）, tests?: [], gates?: [], level }
 const RULES = [
-  { id: "scope", why: "分析範圍一致（scopeFilter／scopedFindings…）", html: /scopeFilter|inScopeS|scopedFindings|scopedDfmTable|issueScope|SCOPE_PANELS|SCOPE_BOARD_CARDS|compKeyOf|anKey|preSet/, tests: ["tests/component-scope.test.mjs"], gates: ["mutation"], level: "V2" },
+  { id: "scope", why: "分析範圍一致（scopeFilter／scopedFindings…）", html: /scopeFilter|inScopeS|scopedFindings|scopedDfmTable|issueScope|issueList|issueBoardList|issueCaseRows|\bsc\.(own|board)\b|normalizeScope|SCOPE_PANELS|SCOPE_BOARD_CARDS|compKeyOf|anKey|preSet/, tests: ["tests/component-scope.test.mjs"], gates: ["mutation"], level: "V2" },
   { id: "detect", why: "偵測規則／統計門檻（誤報率需 test:slow 校準）", html: /detectIssues|verdict|[Cc]pk|[Mm]oran|FastMCD|\bmcd|robust[Zz]|LISA|threshold/, tests: ["tests/golden.test.mjs", "tests/spi-audit-fixes.test.mjs", "tests/issue-detection-audit.test.mjs", "tests/stats.test.js"], gates: ["slow"], level: "V2" },
   { id: "toplist", why: "清單字串膨脹守衛 topList", html: /topList|\.join\("; "\)/, tests: ["tests/spi-audit-fixes.test.mjs"], level: "V1" },
   { id: "pos3d", why: "3D 座標優先序與虛擬網格揭露", html: /pos3D|gridPos|realXY|componentX|componentY|grid3dWarn|geomAssumed/, tests: ["tests/step8.test.mjs", "tests/reverse-traceability-5000.test.mjs", "tests/sim3d-realism.test.mjs"], level: "V1" },
@@ -162,6 +162,8 @@ function plan() {
 
   const eff = opt.level && (!level || LEVELS.indexOf(opt.level) > LEVELS.indexOf(level)) ? opt.level : level;
   if (eff === "V3") ["release", "slow", "build", "dryrun"].forEach((g) => gates.add(g));
+  // 主檔有改時，V3 一併跑 mutation-check：關鍵字規則可能漏掉範圍讀取端，完整套件綠燈不代表測試有鑑別力
+  if (eff === "V3" && htmlChanged) gates.add("mutation");
   if (eff && eff !== "V3") gates.add("scans"); // V3 的 release-check 已含掃描，不重複
   if (tests.size) gates.add("focused");
   let ordered = Object.keys(GATES).filter((g) => gates.has(g) && LEVELS.indexOf(GATES[g].level) <= LEVELS.indexOf(eff || "V0"));
