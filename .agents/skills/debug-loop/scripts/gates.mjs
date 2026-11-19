@@ -104,8 +104,29 @@ const py = () => {
   for (const c of IS_WIN ? ["python", "py"] : ["python3", "python"]) if (spawnSync(c, ["--version"]).status === 0) return c;
   return null;
 };
+const SYNTAX_CHECK = `
+const h = require("fs").readFileSync("spi-spc.html", "utf8");
+let n = 0, bad = 0;
+for (const m of h.matchAll(/<script(\\s[^>]*)?>([\\s\\S]*?)<\\/script>/g)) {
+  const attrs = m[1] || "";
+  if (/\\bsrc=/.test(attrs) || (/\\btype=/.test(attrs) && !/type="(text|application)\\/javascript"/.test(attrs))) continue;
+  n++;
+  const startLine = h.slice(0, m.index).split("\\n").length;
+  try { new Function(m[2]); }
+  catch (e) {
+    bad++;
+    const lines = m[2].split("\\n");
+    let at = lines.length;
+    for (let i = 0; i < lines.length; i++) { try { new Function(lines.slice(0, i + 1).join("\\n")); } catch (err) { if (String(err.message).includes("Unexpected end") || /missing|Invalid or unexpected token|Unterminated/.test(err.message) && i < lines.length - 1) continue; at = i + 1; break; } }
+    console.error("語法錯誤：<script" + attrs + ">（約 spi-spc.html 第 " + (startLine + at - 1) + " 行）" + e.message);
+  }
+}
+console.log(bad ? bad + " 個 script 有語法錯誤" : "OK：" + n + " 個內嵌 script 皆可解析");
+process.exit(bad ? 1 : 0);
+`;
 const GATES = {
-  syntax: { level: "V0", title: "主檔 script 語法", run: () => ({ bin: process.execPath, args: ["tools/check-spi-syntax.mjs"] }), judge: (r) => (r.code === 0 && r.out.trim() === "OK" ? "pass" : "fail") },
+  // 不用 tools/check-spi-syntax.mjs：它只檢查第一個無屬性的 <script>（184 字的回退程式），core 與主介面程式都沒檢查到
+  syntax: { level: "V0", title: "主檔全部內嵌 script 語法", run: () => ({ bin: process.execPath, args: ["-e", SYNTAX_CHECK] }) },
   scans: { level: "V0", title: "發布掃描（除錯殘留、機密、版本）", run: () => npm("run", "release-check:scans"), judge: (r) => (r.code === 0 ? "pass" : "fail") },
   smoke: { level: "V1", title: "SPA 啟動 smoke", run: () => ({ bin: process.execPath, args: ["--test", "--test-concurrency=1", "--test-reporter=tap", "tests/ui.smoke.test.js"] }) },
   focused: { level: "V1", title: "聚焦測試", run: (ctx) => ({ bin: process.execPath, args: ["--test", "--test-concurrency=1", "--test-reporter=tap", ...ctx.tests] }) },
@@ -242,7 +263,8 @@ for (const g of p.gates) {
   const pre = def.precheck?.();
   if (pre) { results.push({ gate: g, key, status: "not-run", reason: pre }); continue; }
   const prev = !opt.force && ledger.runs.findLast?.((r) => r.key === key && r.fingerprint === fp && (r.status === "pass" || r.status === "review"));
-  if (prev) { results.push({ gate: g, key, status: "reused", reason: `同一內容已於 ${prev.at} 通過（${prev.status}）` }); continue; }
+  // 沿用時保留 release-check 的 NEEDS REVIEW：不能因為沒重跑就把需要判讀的警告變成 PASS
+  if (prev) { results.push({ gate: g, key, status: "reused", review: prev.status === "review", tail: prev.status === "review" ? prev.tail : undefined, reason: `同一內容已於 ${prev.at} 通過（${prev.status}）` }); continue; }
   if (!opt.json) process.stdout.write(`▶ ${g}（${def.title}）… `);
   const r = exec(def.run({ tests: p.tests }));
   const status = def.judge ? def.judge(r) : r.code === 0 ? "pass" : "fail";
@@ -254,8 +276,9 @@ for (const g of p.gates) {
 }
 const anyFail = results.some((r) => r.status === "fail");
 const incomplete = results.some((r) => r.status === "blocked" || r.status === "not-run");
-const overall = anyFail ? "FAIL" : incomplete ? "INCOMPLETE" : results.some((r) => r.status === "review") ? "PASS_WITH_REVIEW" : "PASS";
-const summary = { overall, fingerprint: fp, head, level: p.level, files: p.files, tests: p.tests, results: results.map(({ gate, status, ms, reason, tail: t }) => ({ gate, status, ms, reason, tail: status === "fail" || status === "review" ? t : undefined })), ledger: LEDGER };
+const needsReview = (r) => r.status === "review" || r.review;
+const overall = anyFail ? "FAIL" : incomplete ? "INCOMPLETE" : results.some(needsReview) ? "PASS_WITH_REVIEW" : "PASS";
+const summary = { overall, fingerprint: fp, head, level: p.level, files: p.files, tests: p.tests, results: results.map((r) => ({ gate: r.gate, status: r.status, review: r.review || undefined, ms: r.ms, reason: r.reason, tail: r.status === "fail" || needsReview(r) ? r.tail : undefined })), ledger: LEDGER };
 if (opt.json) console.log(JSON.stringify(summary, null, 2));
 else {
   console.log(`\n整體：${overall}｜指紋 ${fp}｜HEAD ${head.slice(0, 12)}｜層級 ${p.level}`);
