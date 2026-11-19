@@ -176,9 +176,10 @@ test('reportMd 包含一至九完整標準章節，且與 renderReport 標題完
   assert.match(md, /IPC-7525 判定/);
 });
 
-test('260 項歷史問題資料在 issuesCsv、issuesXlsx、issuesMd 匯出皆順暢且資料完整', () => {
-  const csvPath = 'C:/Users/user/.gemini/antigravity/brain/e15e505d-5a29-4bba-beca-0d407eb91961/.user_uploaded/media_1793283978729_c775a8be.csv';
-  if (!fs.existsSync(csvPath)) return;
+// 樣本檔只在開發者本機；不存在時標為 SKIP，不以空測試回報 ok
+const ISSUES_260_CSV = 'C:/Users/user/.gemini/antigravity/brain/e15e505d-5a29-4bba-beca-0d407eb91961/.user_uploaded/media_1793283978729_c775a8be.csv';
+test('260 項歷史問題資料在 issuesCsv、issuesXlsx、issuesMd 匯出皆順暢且資料完整', { skip: !fs.existsSync(ISSUES_260_CSV) && '缺本機樣本檔' }, () => {
+  const csvPath = ISSUES_260_CSV;
 
   const content = fs.readFileSync(csvPath, 'utf8');
   // Simple CSV parser for user issues
