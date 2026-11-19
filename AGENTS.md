@@ -50,7 +50,7 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
 
 ## 分析範圍
 
-- **分析範圍一致（全部元件 → 元件群組 → 單一元件）**：讀取量測列的頁面、圖表、報告、匯出與 AI 摘要，一律經 `scopeFilter(st)`（介面端 `inScopeS(r)`）篩選，或使用已篩選的 `S.A`；問題清單與報告的問題用 `scopedFindings()`／`issueScope()`，DFM 表用 `scopedDfmTable()`。單一元件範圍鍵值 `st.comp` 一律使用 `compKeyOf(r)`；當篩選結果為 0 列時，`scopedFindings()` 與 `scopedDfmTable()` 必須回傳 `[]`，不得靜默退回全板資料。不寫行內 `r.group===S.group`。新分頁登記在 `SCOPE_PANELS`；仍以全板計算的區塊登記在 `SCOPE_BOARD_CARDS`，並放 `.scope-board-note`「全板分析，不隨元件範圍變動」。影響分析結果的範圍欄位要進 `anKey` 與 `preSet`。不對元件子集重跑偵測規則（小樣本誤報未經 `test:slow` 校準）。
+- **分析範圍一致（全部元件 → 元件群組 → 單一元件）**：讀取量測列的頁面、圖表、報告、匯出與 AI 摘要，一律經 `scopeFilter(st)`（介面端 `inScopeS(r)`）篩選，或使用已篩選的 `S.A`；問題清單與報告的問題用 `scopedFindings()`／`issueScope()`，DFM 表用 `scopedDfmTable()`。單一元件範圍鍵值 `st.comp` 一律使用 `compKeyOf(r)`；當篩選結果為 0 列時，`scopedDfmTable()` 必須回傳 `[]`；`scopedFindings()` 只能回傳規格 FR-8 的全板層級卡（批次、跨板、無法歸屬零件，列在「全板問題」區），兩者都不得靜默退回含其他元件卡或其他群組列的全板資料。不寫行內 `r.group===S.group`。新分頁登記在 `SCOPE_PANELS`；仍以全板計算的區塊登記在 `SCOPE_BOARD_CARDS`，並放 `.scope-board-note`「全板分析，不隨元件範圍變動」。影響分析結果的範圍欄位要進 `anKey` 與 `preSet`。不對元件子集重跑偵測規則（小樣本誤報未經 `test:slow` 校準）。
   - 檢查：`node --test tests/component-scope.test.mjs` 通過；改動範圍相關程式後跑 `node tools/mutation-check.mjs`，fixture 裡每項破壞都要讓測試變紅。新增讀取端時在 `tests/fixtures/mutations-component-scope.json` 加一項對應破壞。
   - 規格：`docs/spec-component-scope-rfc.md`。
   - 出處：v10.26.0（2026-11-13，群組範圍一致化）；PR #180（v10.33.0，2026-11-15，修正空範圍退回全板與 `dfmTable` 漏篩）。
