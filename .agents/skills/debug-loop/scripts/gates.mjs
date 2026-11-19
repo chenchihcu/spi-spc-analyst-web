@@ -105,20 +105,20 @@ const py = () => {
   return null;
 };
 const SYNTAX_CHECK = `
+const vm = require("vm");
 const h = require("fs").readFileSync("spi-spc.html", "utf8");
 let n = 0, bad = 0;
 for (const m of h.matchAll(/<script(\\s[^>]*)?>([\\s\\S]*?)<\\/script>/g)) {
   const attrs = m[1] || "";
   if (/\\bsrc=/.test(attrs) || (/\\btype=/.test(attrs) && !/type="(text|application)\\/javascript"/.test(attrs))) continue;
   n++;
-  const startLine = h.slice(0, m.index).split("\\n").length;
-  try { new Function(m[2]); }
+  const bodyStart = m.index + m[0].indexOf(">") + 1;
+  const lineOffset = h.slice(0, bodyStart).split("\\n").length - 1;
+  try { new vm.Script(m[2], { filename: "spi-spc.html", lineOffset }); }
   catch (e) {
     bad++;
-    const lines = m[2].split("\\n");
-    let at = lines.length;
-    for (let i = 0; i < lines.length; i++) { try { new Function(lines.slice(0, i + 1).join("\\n")); } catch (err) { if (String(err.message).includes("Unexpected end") || /missing|Invalid or unexpected token|Unterminated/.test(err.message) && i < lines.length - 1) continue; at = i + 1; break; } }
-    console.error("語法錯誤：<script" + attrs + ">（約 spi-spc.html 第 " + (startLine + at - 1) + " 行）" + e.message);
+    const at = (String(e.stack).match(/spi-spc\\.html:(\\d+)/) || [])[1] || "?";
+    console.error("語法錯誤：<script" + attrs + "> spi-spc.html 第 " + at + " 行：" + e.message);
   }
 }
 console.log(bad ? bad + " 個 script 有語法錯誤" : "OK：" + n + " 個內嵌 script 皆可解析");
