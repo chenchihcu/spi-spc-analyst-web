@@ -65,13 +65,23 @@ node .agents/skills/debug-loop/scripts/gates.mjs status          # 目前內容�
 
 - 先讀 `git status` 與目前分支；工作樹有不屬於本次的改動時，記下來並避開，不要一起修或一起提交。
 - 症狀模式：問清楚或從對話取得「預期／實際／資料來源」。AGENTS.md 要求用與使用者相同來源的資料重現（同一筆雲端紀錄或同一種匯入方式），用範例資料只能證明範例沒問題。
-- 巡檢模式：第一輪用 `gates.mjs run --level V3` 建立基準，再看 `code-review` 對近期提交的結果。
+- 巡檢模式：第一輪用 `gates.mjs run --level V3` 建立基準，再做下方「巡檢清單」。乾淨的工作樹上關卡多半全綠，綠燈只代表現有測試沒抓到東西，巡檢的價值在找測試沒覆蓋的地方。
 - 依 Institution 01 定級：碰到 `cloudflare/migrations/`、`auth`、`.github/workflows/`、規則檔（AGENTS.md、CLAUDE.md）或改動超過 5 個檔，屬 L3，先把規格與影響給使用者看，核准後才改。
 
 ### 1 發現
 
 依本輪的變更挑節點，不要每輪都把所有技能跑一遍：第一輪範圍最大，之後只看「上一輪改到的地方和它的直接使用者」。
 節點產出的每一條疑點都進下一步分診，不直接動手改。
+
+**巡檢清單**（巡檢模式第一輪；產品程式和驗證工具都要看，兩邊都可能藏錯）：
+
+1. **修了一半的修正**：讀最近 10 個 `fix` 提交，每個都問「同一類錯誤還有哪條平行路徑沒改到」。例：修了一般模式的精度誤差，階梯鋼板模式的同一段算式還在；修了同步偵測，背景 worker 的偵測沒跟上。
+2. **AGENTS.md 守則的違規搜尋**：每條有「檢查」的規則，用 grep 找違規寫法，不只信測試。例：清單欄位直接 `.join("; ")` 沒走 `topList`、讀取量測列沒經 `scopeFilter`、`.textContent` 指派的字串含 HTML 標籤。
+3. **API 輸入邊界**：Worker 路由（`cloudflare/`、`lib/repo.mjs` 等）的查詢參數用非整數、負數、超大值、空字串各打一次，期待 4xx 或被夾住的值，不是 5xx。
+4. **驗證工具自己有沒有在檢查**：關卡用的工具（語法檢查、mutation-check、release-check）各故意餵一次壞輸入，確認它真的會紅。測試在缺檔時直接 `return`（記成通過、而不是 SKIP）也算這一類。
+5. **`code-review`** 看近期提交，補上前四項沒涵蓋的正確性問題。
+
+清單每一項都要留下做了什麼、看了哪些位置；沒做的寫在報告的 `NOT TESTED`。
 
 ### 2 分診
 
@@ -89,8 +99,9 @@ node .agents/skills/debug-loop/scripts/gates.mjs status          # 目前內容�
 
 - 修之前的失敗證據（重現）。只有修後綠燈、沒有修前紅燈，不算修好。
 - 最小的修正，沿用既有寫法；不順手重構。
-- 一條修前會紅、修後會綠的回歸測試；同一類讀取端（例如範圍篩選）還要在 `tests/fixtures/mutations-component-scope.json` 加一項對應的破壞。
+- 一條修前會紅、修後會綠的回歸測試。既有測試已經會紅時可以沿用，但要再看同一個缺陷的鄰近路徑有沒有測到（例：單一元件測到了，元件群組、「依問題定義檢視」沒測到），沒測到的補上。同一類讀取端（例如範圍篩選）還要在 `tests/fixtures/mutations-component-scope.json` 加一項對應的破壞。
 - 不刪測試、不放寬斷言、不加固定休眠、不吞掉錯誤來換綠燈。測試預期真的要改時，寫明是哪個需求改變了它。
+- 改到產品程式時照 repo 慣例升 patch 版號：`package.json`、`package-lock.json`、`lib/version.mjs`、`spi-spc.html` 的 `#appVer`，並在 `CHANGELOG.md` 最上方加條目（`#appBuilt` 不動）。要在收尾關卡之前改，release-check 才會檢查到最終內容。只動測試或技能工具時不升版。
 
 ### 4 驗證
 
@@ -104,7 +115,7 @@ node .agents/skills/debug-loop/scripts/gates.mjs run
 
 | 狀況 | 下一步 |
 |---|---|
-| 關卡全綠，且本輪發現沒有新的 confirmed | 跑一次 `--level V3` 收尾；仍全綠且清單全部結案 → `CLEAN` |
+| 關卡全綠，且本輪發現沒有新的 confirmed | 依「收尾層級」跑最後一次；仍全綠且清單全部結案 → `CLEAN` |
 | 關卡全綠，但清單還有未結案項 | 下一輪，處理下一項 |
 | 關卡失敗、有新證據 | 依新證據調整做法，下一輪 |
 | 同一項失敗兩次，且沒有新證據 | 停下來重新檢查假設：回到重現，換診斷方法；不要再疊補丁 |
@@ -113,10 +124,18 @@ node .agents/skills/debug-loop/scripts/gates.mjs run
 | 需要憑證、migration 核准、刪資料、force push、付費操作 | `BLOCKED`，寫明需要的輸入 |
 | 已跑 6 輪 | 停下回報進度與剩餘清單，問使用者是否繼續；不要無限循環 |
 
+**收尾層級**：依最後的實際改動決定，不是一律 V3。完整套件約 16 分鐘，跑在沒有改動的程式上只花時間、不增加證據。
+
+- 改到產品程式（`spi-spc.html`、`lib/`、`cloudflare/`、`netlify/`）或巡檢模式：`--level V3`。
+- 只改測試或 fixture：`gates.mjs run` 的建議層級（聚焦測試；改到 mutation fixture 時含 mutation-check）。
+- 沒有任何改動（例如判定 `not-a-bug`）：不需要收尾關卡，報告引用支持判定的那次測試輸出即可。
+
 ### 6 學習（只在值得時）
 
 同一類錯在本次迴圈出現兩次以上，或修掉的問題很難被現有測試抓到，就把保護放在最窄的地方：一條測試、一項 mutation fixture，或 `gates.mjs` 的一條 RULES。
 要改 AGENTS.md 等規則檔時，屬 L3，只提草案給使用者核准。一次性的細節不升格成規則。
+
+改的是本技能自己的工具（`gates.mjs` 的規則漏抓等），和產品修正分開：另一個 commit，最好另一個 PR，報告裡也分開寫。混在同一個修正裡，審查的人會分不出哪行是修錯誤、哪行是改工具。
 
 ## 問題清單（findings.md）
 
