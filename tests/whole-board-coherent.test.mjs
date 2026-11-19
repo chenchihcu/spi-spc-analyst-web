@@ -41,3 +41,20 @@ test('只有部分群組偏移、其餘不動（同向焊墊 < 80%）→ 仍為�
   assert.equal(F.filter((x) => x.sig.t === 'board').length, 0, `不應有整板卡，實際：${F.map((x) => x.title).join('、')}`);
   assert.ok(F.some((x) => x.sig.t === 'local' && x.sig.g === 'G1'), '偏移的群組仍應各自成卡');
 });
+
+// 出處：2026-11-19 debug-loop 巡檢。整板卡的 group 欄直接 join 全部群組，違反 AGENTS.md 字串膨脹守則。
+test('整板卡的群組清單經 topList 截斷（超過 10 個群組顯示「另 N 個」）', () => {
+  let s = 7;
+  const u = () => { s = (s * 1103515245 + 12345) % 2147483648; return (s + 0.5) / 2147483648; };
+  const gauss = () => Math.sqrt(-2 * Math.log(u())) * Math.cos(2 * Math.PI * u());
+  const GS = Array.from({ length: 30 }, (_, i) => `K${String(i + 1).padStart(2, '0')}`), out = [];
+  for (let b = 1; b <= 20; b++) {
+    const board = 'B' + String(b).padStart(2, '0');
+    for (const g of GS) for (let p = 1; p <= 30; p++) out.push({ board, comp: `${g}R${p}`, pad: `${g}R${p}-1`, group: g, volume: 100 + 2 * gauss() + (board === 'B03' ? -10 : 0) });
+  }
+  const card = onB03(detect(out)).find((x) => x.sig.t === 'board');
+  assert.ok(card, '應有 B03 整板卡');
+  const n = card.group.split('; ').length;
+  assert.ok(/另 \d+ 個$/.test(card.group), `超過 10 個群組應截斷，實際 ${card.group}`);
+  assert.equal(n, 11, `應列 10 個群組加「另 N 個」，實際 ${n} 段`);
+});
