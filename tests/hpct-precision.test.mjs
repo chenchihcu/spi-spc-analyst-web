@@ -48,3 +48,28 @@ test('高度 % 去除浮點誤差：剛好在界限上的值不因浮點雜訊�
     assert.equal(st.rows[0].hpct, pct, `${height} µm ÷ ${stencil} µm 應為 ${pct}%`);
   }
 });
+
+// 出處：2026-11-19 debug-loop 巡檢。階梯鋼板模式的高度界限在 specFor 四捨五入到 0.1 µm，
+// 不良分類（specClassify）用完整精度：75 µm × 125% = 93.75 µm，specFor 給 93.8，
+// 93.78 µm 的焊墊在不良分類算過高、在偵測與能力頁算規格內。
+test('階梯鋼板高度界限：specFor 與不良分類用同一個界限，不四捨五入到 0.1 µm', () => {
+  const rows = [{ board: 'B01', comp: 'U1', pad: 'U1-1', group: 'G', volume: 100, area: 100, height: 93.78 },
+    { board: 'B01', comp: 'U2', pad: 'U2-1', group: 'H', volume: 100, area: 100, height: 120 }];
+  const st = baseState(core, { rows, metrics: ['volume', 'height', 'area'], metric: 'height', group: 'ALL', heightUnit: 'um',
+    stencil: 120, htol: { lo: 75, hi: 125 }, step: { on: true, zones: [{ mode: 'group', group: 'G', t: 75 }] } });
+  const sp = core.specFor(rows[0], 'height', st);
+  assert.equal(sp.usl, 93.75, `75 µm × 125% 應為 93.75 µm，實際 ${sp.usl}`);
+  assert.equal(sp.lsl, 56.25, `75 µm × 75% 應為 56.25 µm，實際 ${sp.lsl}`);
+  assert.ok(core.specClassify(rows[0], st.specs, st).includes('HIH'), '不良分類應為高度過高');
+  assert.ok(rows[0].height > sp.usl, '偵測用的上限也應判此焊墊過高');
+});
+
+// 出處：2026-11-19 debug-loop 巡檢。v10.38.6 用 hpctOf 統一高度 %，診斷頁 diagValue 仍直接相除，
+// 48.08 µm ÷ 80 µm 在診斷頁顯示 60.099999999999994%，分析頁為 60.1%。
+test('診斷頁高度 % 與分析頁同一算法（去除浮點誤差）', () => {
+  const rows = [{ board: 'B01', figure: '1', comp: 'U1', pad: 'U1-1', group: 'G', volume: 100, area: 100, height: 48.08 }];
+  const st = baseState(core, { rows, metrics: ['volume', 'height', 'area'], metric: 'hpct', group: 'ALL', stencil: 80, heightUnit: 'um' });
+  const M = core.buildDiagnosticModel(st, { metric: 'hpct' });
+  assert.equal(M.details[0].value, 60.1);
+  assert.equal(M.box[0].med, 60.1);
+});
