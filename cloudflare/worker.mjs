@@ -159,11 +159,19 @@ async function handleRecordsApi(req, repo, user, env) {
       return json({ entries, hasMore, next: hasMore ? entries.next : null });
     }
 
+    const parseCursorTs = (s) => {
+      const t = (s || '').trim();
+      if (!t) return null;
+      const n = Number(t);
+      return Number.isFinite(n) && n >= 0 ? n : null;
+    };
+
     // 關鍵字搜尋
     const q = url.searchParams.get('q');
     if (q) {
       const [created, id] = (url.searchParams.get('cursor') || '').split(',');
-      const results = await repo.searchRecords(q, 51, Number.isFinite(Number(created)) && id ? Number(created) : null, id || null);
+      const cTs = parseCursorTs(created);
+      const results = await repo.searchRecords(q, 51, cTs != null && id ? cTs : null, cTs != null && id ? id : null);
       const records = results.slice(0, 50), last = records[records.length - 1];
       return json({ records, next: results.length > 50 && last ? `${last.created},${last.id}` : null,
         me: user, isAdmin: admin, meta: { rows_read: results.length } });
@@ -175,8 +183,9 @@ async function handleRecordsApi(req, repo, user, env) {
     let cursorCreated = null, cursorId = null;
     if (cursor) {
       const parts = cursor.split(',');
-      if (parts.length === 2 && !isNaN(+parts[0])) {
-        cursorCreated = +parts[0];
+      const cTs = parts.length === 2 ? parseCursorTs(parts[0]) : null;
+      if (cTs != null && parts[1]) {
+        cursorCreated = cTs;
         cursorId = parts[1];
       }
     }

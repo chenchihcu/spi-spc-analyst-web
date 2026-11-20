@@ -28,3 +28,42 @@ test('repo 各清單查詢的 limit 夾成 1–100 的整數（搜尋、分享�
     }
   } finally { h.close(); }
 });
+
+test('cursor 含空白／空字串／Infinity 時忽略並從第一頁查詢，不當成 created=0', async () => {
+  const h = await createCloudHarness();
+  try {
+    await h.repo.createRecord({
+      id: 'rec_test_1', user: 'u',
+      kind: 'spi', lot: 'L1', part: 'P1', rev: 'A', side: 'TOP', name: 'a.csv',
+      sha256: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', bytes: 10,
+    }, new Uint8Array([1, 2, 3]));
+    for (const url of [
+      '/api/records?cursor=,abc',
+      '/api/records?cursor=%20%20,abc',
+      '/api/records?cursor=Infinity,abc',
+      '/api/records?q=P1&cursor=,abc',
+    ]) {
+      const res = await h.fetch(url);
+      assert.equal(res.status, 200, `${url} 應回 200`);
+      const body = await res.json();
+      assert.equal(body.records.length, 1, `${url} 應回傳既有紀錄（不應把空時間戳當成 0）`);
+      assert.equal(body.records[0].id, 'rec_test_1');
+    }
+  } finally { h.close(); }
+});
+
+test('audit beforeSeq 為空白、負數或小數時忽略游標（不寫入 WHERE a.seq < ?）', async () => {
+  const h = await createCloudHarness();
+  try {
+    await h.repo.createRecord({
+      id: 'rec_test_2', user: 'u',
+      kind: 'spi', lot: 'L1', part: 'P1', rev: 'A', side: 'TOP', name: 'a.csv',
+      sha256: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', bytes: 10,
+    }, new Uint8Array([1, 2, 3]));
+    for (const before of ['   ', '-5', '1.5', '0', 'Infinity']) {
+      const entries = await h.repo.listAuditLog(50, before);
+      assert.equal(entries.length, 1, `before=${JSON.stringify(before)} 應忽略無效游標並回傳最新紀錄`);
+    }
+  } finally { h.close(); }
+});
+
