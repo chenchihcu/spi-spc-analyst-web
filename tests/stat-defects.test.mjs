@@ -417,7 +417,8 @@ test("D-M03: |Cpk| > 50 即使規格中心未超過 10σ 也要產生單位不�
   assert.ok(Math.abs(A.cap.cpk - 633.3333) < 0.01, `反例需重現 Cpk 約 633.33，實得 ${A.cap.cpk}`);
   const issue = c.detectIssues(S).find(x => x.rule_id === "M-03 單位不符");
   assert.ok(issue, "|Cpk| > 50 必須觸發 M-03");
-  assert.match(issue.rule_name, /\|Cpk\|>50/);
+  assert.match(issue.rule_name, />10σ/);
+  assert.doesNotMatch(issue.rule_name, /\|Cpk\|>50/);
   assert.ok(issue.facts.some(x => /Cpk/.test(x)), "卡片需呈現觸發規則的 Cpk 證據");
 });
 
