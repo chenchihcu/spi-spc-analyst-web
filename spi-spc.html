@@ -13,7 +13,9 @@
 <meta name="apple-mobile-web-app-title" content="SPI·SPC">
 <title>SPI·SPC 分析台</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23A3521D'/><circle cx='16' cy='16' r='8' fill='%23FFFFFF'/></svg>">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='36' fill='%23A3521D'/><circle cx='90' cy='90' r='45' fill='%23FFFFFF'/></svg>">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAFN0lEQVR42u3dv4tcVRiH8flHbG2srVPbaqOFpV0aQdKksEotiARsTSEpUqxgESSdYZu1CUFEm4ABJU1EgyEszpHvjIuFybo/5t655z2fFx5YdmfvnHvmYTj3vOe8Z3Xr7dcaUIWVTgChAUIDhAYIDUIDhAYIDRAaIDQIDRAaIDRAaIDQIDRAaIDQAKEBQoPQAKEBQgOEBggNQgOEBggNEBogNAgNEBogNEBogNAgNEBogNAAoUFoHQFCA4QGCA0QGoTGRfn6o7fa/U8/bA/vfNYefftVe/LDUfv9l0ftxR9P21/HL1pr6w35Ob/L3/KavDb/k//NNfQloffC3evvtAe3P2m/Pjz8R9jdRK6Va+baeQ99TejJ+Objd9uPd2+1P58+aXNF3ivvmff2GRD60tx+/4323Rc32m8//9T2HWlD2pI2+WwIfS7ufPBm+/7g850OJ3Y5LEnb0kafFaFP5cv3Xt88pG0f4pYe601b02afHaH/w+HNa7OOj3c5zk7bfYaE3nBw9Up7fHSv9R65h9wLoQf/Vl7iOPky4+vRv62HFTrTYVUj90bogWYwkryoHrnHEWdChhI66eWknUeJ3OtoKfVhhE4qOesoRovc80hp9NUoMh8/f9ZGjdz7KFKvRhhmjPjN/LJv6hGGH6vqD4AjjZnPMqau/qBYWugRZjMuMvtBaPPM5qkJvd8MoDg9qmYUywmd9QyV0tlTpskrrv0oJ3SFhUZzLmgitKGGoQeh51mc3+N65iWsp660SaCM0NudJuIikb4j9MISKH1sm1pqrMskXEoInU2j4nKRPiT0QkoNmKbbzTRehRIJ3QudWhViN5G+JPSeWUIRmCqRviT0nstzid1G72XHuhbaAiQLl0oJLZEyTaKF0HvaViWmiZ63a3UrdGooi2kifUtou1HKRM+7WroVWjJl2iQLoWfeyS2mjV53iHcpdA7ZEdNG+pjQloqWiV6XlHYpdI5DE9NG+pjQM5Ez/sS0kT4m9EyohjR9pI8JPRNq1U0f6WNCm4M2F03o82P/4ByxJjShCU1oQw5DDg+FHgo9FJq2E6btJFYkVggt9S31TWiLk5YVFidZPloqLB+1wL9UWOBvLtocNKFtkl1i2CSrjEGpUMZAoZlSodCMUmBlQikwxRpLhWKNyumWCuV0FTwvEwqeO5KiVDiSwqFBpZIpDg1yrFuZcKybgzcLhYM3LSktFI5GXiAOr794IsXh9Qvl8OY1hp4z0meVHCgldHh8dI+lZ4z0VbXPv5zQB1evmMY74zRd+orQhh6GGoS2cMkCJELb1TJB9LwbZXihkyxQZenfSF9USaAMKfTJDnG18La16nrdyU3ol2zXOn7+bFiZc+89b6si9CukHvGbOvc8isxDCX0y/BhpTJ17HWGYMazQJw+KI8x+5B6rPwASepB56srzzIT+n4xipTR57qVqBpDQ51j7UWFBU+6h4toMQl/i27rH9dRp8+jfyoQ+ZZPAdudLD9u51pu2VlqcT+gJZ0KyaXSJ4+u0KW0bcQaD0DsokZBaFUsoZpM2pC0VSg0QeiFlxzIdNuc4O++V9+y9PBehO0ijp4Zykhe7HJbkWrlmrj1SuprQC0yp55CdPKTlOLSc8Ze0c9ZRbIVfb8jP+V3+ltfktfmf/O9oKWpCA4QGoQFCA4QGCA0QGoQGCA0QGiA0QGgQGiA0QGiA0AChQWiA0AChAUIDhAahAUIDhAYIDRAahAYIDRAaIDQIDRAaIDRAaIDQIDRAaIDQAKEBQoPQAKEBQgOEBl7J381wRBh2As2nAAAAAElFTkSuQmCC">
+<link rel="preload" href="vendor/fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="vendor/fonts/ibm-plex-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <style>
 /* 字型自帶（網站內 vendor/fonts）：英文標題與數字用 Barlow Condensed／IBM Plex Mono；中文使用系統字（微軟正黑體／蘋方），不需下載 */
 @font-face{font-family:"Barlow Condensed";font-weight:700;font-display:swap;src:url(vendor/fonts/barlow-condensed-latin-700-normal.woff2) format("woff2")}
@@ -15046,6 +15048,8 @@ syncMoreTools();
 function applyTheme(t, save){
   const mode=t==="dark"?"dark":"light";
   document.documentElement.setAttribute("data-theme",mode);
+  const tc=mode==="dark"?"#0F1311":"#F2F4F0";
+  document.querySelectorAll('meta[name="theme-color"]').forEach(m=>{m.content=tc});
   const lbl=mode==="dark"?"主題：深色（明亮模式）":"主題：明亮（深色模式）";
   if($("#btnThemeSettings"))$("#btnThemeSettings").textContent=lbl;
   if(save){try{localStorage.setItem("spi-theme",mode)}catch(e){}}

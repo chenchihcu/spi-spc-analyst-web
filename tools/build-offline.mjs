@@ -32,7 +32,8 @@ export async function buildOffline({ out = join(root, 'dist-offline'), now = new
   html = html.replace(/<head>/i, '<head>\n<script>window.SPI_OFFLINE=true</script>');
   if (!html.includes('window.SPI_OFFLINE=true')) throw new Error('離線打包：找不到 <head>');
 
-  // 2) 網頁字型改成 data URI
+  // 2) 網頁字型改成 data URI，並移除預先載入外部字型的 <link rel="preload">
+  html = html.replace(/<link\s+rel="preload"\s+href="vendor\/fonts\/[^"]+"\s+[^>]*>\r?\n?/gi, '');
   const fonts = [...new Set([...html.matchAll(/url\(vendor\/fonts\/([\w.-]+\.woff2)\)/g)].map((m) => m[1]))];
   for (const f of fonts) {
     const b64 = (await readFile(vendor(`fonts/${f}`))).toString('base64');
