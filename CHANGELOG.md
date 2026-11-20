@@ -2,6 +2,12 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.38.9 — 2026-11-20（問題清單截斷守衛、分頁游標邊界檢查、現代網頁安全與無障礙強化）
+
+- **問題偵測清單截斷（`topList`）**：`M-09`、`D-30`、`PauseDecay`、`fmtBoards` 與 `subOf0` 的 `boards`／`subboard`／`observed` 清單統一經由 `topList(..., 10)` 截斷，避免多板或多子板資料集造成卡片字串膨脹。
+- **API 分頁游標邊界檢查**：`GET /api/records` 的 `cursor` 時間戳與 `listAuditLog` 的 `before` 參數拒絕空字串、空白、非有限數值、負數與小數，改為安全忽略並回傳第一頁（HTTP 200）。
+- **現代網頁安全與無障礙**：補齊 3D/2D HUD 與不良表 `esc()` 跳脫、`<main id="mainContent">` 與跳至主要內容連結、`overscroll-behavior: contain`、PNG `apple-touch-icon`、字型預載、動態 `theme-color` 同步與 `Permissions-Policy`/`COOP`/`CORP` 安全標頭。
+
 ## v10.38.8 — 2026-11-20（大群組解析度、多群組單位旗標、M-03 名稱、LISA 對比、稽核分頁）
 
 - **大群組解析度不再步長抽樣（BUG-01）**：`resolutionOf` 在群組超過 2000 筆時改對全部數值去重後取最小正間距。固定步長會把週期排列的 0.01 間距混疊成 0 與 100，孤立焊墊的穩健 |z| 被解析度下限壓掉。2000 筆以內的計算與先前相同。
