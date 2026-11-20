@@ -6,6 +6,8 @@
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#F2F4F0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0F1311" media="(prefers-color-scheme: dark)">
+<meta name="description" content="SPI·SPC 分析台：錫膏印刷檢測數據的問題偵測、製程能力與試產分析">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="SPI·SPC">
@@ -102,8 +104,11 @@ header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-
 .menuwrap{position:relative}
 .menu{position:absolute;right:0;top:calc(100% + 6px);z-index:30;min-width:200px;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.14);padding:6px;display:grid;gap:2px}
 .menu[hidden]{display:none}
+.skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:200}
+.skip-link:focus,.skip-link:focus-visible{position:fixed;left:max(12px,var(--safe-l));top:max(12px,var(--safe-t));width:auto;height:auto;min-height:44px;padding:10px 16px;display:inline-flex;align-items:center;background:var(--accent);color:var(--on-strong);font-weight:700;font-size:var(--fs-ui);border-radius:8px;text-decoration:none;outline:2px solid var(--ink);outline-offset:2px;box-shadow:0 4px 16px rgba(0,0,0,.2)}
 .menu button,.menu a{all:unset;box-sizing:border-box;display:block;padding:9px 12px;border-radius:7px;font-size:var(--fs-ui);cursor:pointer;color:var(--ink)}
 .menu button:hover,.menu a:hover,.menu button:focus-visible,.menu a:focus-visible{background:var(--surface2)}
+.menu button:focus-visible,.menu a:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .menu button[hidden],.menu a[hidden]{display:none}
 .menu-user{margin:0;padding:8px 12px 6px;font-size:var(--fs-caption);color:var(--muted);border-bottom:1px solid var(--line)}
 .specbtn{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-ui);align-self:center}
@@ -550,7 +555,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     cursor:pointer;
   }
   .rail-sheet-modal:not(.open){display:none!important}
-  .rail-sheet-modal.open{display:flex!important;position:fixed;inset:calc(var(--navbar-h) + var(--safe-t)) 0 calc(var(--tabbar-h) + var(--safe-b)) 0;z-index:35;flex-direction:column;background:var(--bg);overflow-y:auto}
+  .rail-sheet-modal.open{display:flex!important;position:fixed;inset:calc(var(--navbar-h) + var(--safe-t)) 0 calc(var(--tabbar-h) + var(--safe-b)) 0;z-index:35;flex-direction:column;background:var(--bg);overflow-y:auto;overscroll-behavior:contain}
   .rail-sheet-modal .sheet-backdrop{display:none!important}
   .rail-sheet-modal .sheet-handle,.rail-sheet-modal .sheet-head{display:flex}
   .rail-fields{display:flex;flex-direction:column;gap:14px;align-items:stretch}
@@ -599,7 +604,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   .mtab-btn[aria-selected="true"],.mtab-btn.active{color:var(--accent)}
 
   .sheet-modal:not(.open){display:none!important}
-  .sheet-modal.open{display:flex!important;position:fixed;inset:calc(var(--navbar-h) + var(--safe-t)) 0 calc(var(--tabbar-h) + var(--safe-b)) 0;z-index:35;flex-direction:column;background:var(--bg);overflow-y:auto}
+  .sheet-modal.open{display:flex!important;position:fixed;inset:calc(var(--navbar-h) + var(--safe-t)) 0 calc(var(--tabbar-h) + var(--safe-b)) 0;z-index:35;flex-direction:column;background:var(--bg);overflow-y:auto;overscroll-behavior:contain}
   .sheet-backdrop{display:none!important}
   .sheet-panel{
     position:relative;
@@ -609,6 +614,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
     border-radius:0;
     padding:12px max(20px,var(--safe-r)) calc(24px + var(--safe-b)) max(20px,var(--safe-l));
     overflow-y:auto;
+    overscroll-behavior:contain;
     display:flex;
     flex-direction:column;
     gap:12px;
@@ -617,6 +623,7 @@ input[aria-invalid="true"]{border-color:var(--ng);border-width:2px}
   .sheet-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:8px;border-bottom:0.5px solid var(--c-hairline)}
   .sheet-head h3{font-size:var(--fs-heading);font-weight:700;margin:0}
   .sheet-close{all:unset;cursor:pointer;font-size:var(--fs-icon);min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted)}
+  .sheet-close:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
   .sheet-sec-title{font-size:var(--fs-ui)!important;font-weight:700;color:var(--muted);letter-spacing:0.04em;padding:10px 4px 4px}
   .sheet-list{display:flex;flex-direction:column;background:var(--surface2);border-radius:var(--r-card);overflow:hidden}
   .sheet-row{
@@ -853,6 +860,8 @@ body.duo-mode .duo-thumb-dock{display:flex!important}
   width:100%;
   max-width:960px;
   max-height:86vh;
+  max-height:86dvh;
+  overscroll-behavior:contain;
   display:flex;
   flex-direction:column;
   overflow:hidden;
@@ -1206,6 +1215,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
 <button id="toTop" hidden aria-label="回到頂端" title="回到頂端">↑</button>
 <div id="busy" role="status" aria-live="polite" hidden><span class="spin" aria-hidden="true"></span><span id="busyMsg">計算中…</span></div>
 <div class="wrap">
+<a class="skip-link" href="#mainContent">跳至主要內容</a>
 <div class="printHead" id="printHead" aria-hidden="true"></div>
 <header class="top">
   <div class="brand">
@@ -1266,16 +1276,16 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
 <div class="tabs-bar">
 <button type="button" class="tab-scroll" id="tabScrollL" aria-label="向左捲動頁籤" hidden>‹</button>
 <nav class="tabs" role="tablist" aria-label="分析頁籤">
-  <button class="tab" role="tab" data-tab="data" aria-selected="false">資料與規格</button>
-  <button class="tab" role="tab" data-tab="issues" aria-selected="true">問題偵測</button>
-  <button class="tab" role="tab" data-tab="overview">總覽</button>
-  <button class="tab" role="tab" data-tab="control">管制圖</button>
-  <button class="tab" role="tab" data-tab="capability">製程能力</button>
-  <button class="tab" role="tab" data-tab="sim3d">3D 錫膏模擬</button>
-  <button class="tab" role="tab" data-tab="deep">製程跡象</button>
-  <button class="tab" role="tab" data-tab="improve">比較與行動</button>
-  <button class="tab" role="tab" data-tab="ai">AI 診斷</button>
-  <button class="tab" role="tab" data-tab="report">分析報告</button>
+  <button class="tab" role="tab" data-tab="data" aria-controls="p-data" aria-selected="false" tabindex="-1">資料與規格</button>
+  <button class="tab" role="tab" data-tab="issues" aria-controls="p-issues" aria-selected="true" tabindex="0">問題偵測</button>
+  <button class="tab" role="tab" data-tab="overview" aria-controls="p-overview" aria-selected="false" tabindex="-1">總覽</button>
+  <button class="tab" role="tab" data-tab="control" aria-controls="p-control" aria-selected="false" tabindex="-1">管制圖</button>
+  <button class="tab" role="tab" data-tab="capability" aria-controls="p-capability" aria-selected="false" tabindex="-1">製程能力</button>
+  <button class="tab" role="tab" data-tab="sim3d" aria-controls="p-sim3d" aria-selected="false" tabindex="-1">3D 錫膏模擬</button>
+  <button class="tab" role="tab" data-tab="deep" aria-controls="p-deep" aria-selected="false" tabindex="-1">製程跡象</button>
+  <button class="tab" role="tab" data-tab="improve" aria-controls="p-improve" aria-selected="false" tabindex="-1">比較與行動</button>
+  <button class="tab" role="tab" data-tab="ai" aria-controls="p-ai" aria-selected="false" tabindex="-1">AI 診斷</button>
+  <button class="tab" role="tab" data-tab="report" aria-controls="p-report" aria-selected="false" tabindex="-1">分析報告</button>
 </nav>
 <button type="button" class="tab-scroll" id="tabScrollR" aria-label="向右捲動頁籤" hidden>›</button>
 </div>
@@ -1283,6 +1293,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
 <div class="ctxbar" id="ctxBar" hidden role="status"><span id="ctxText"></span><button class="linkbtn" id="ctxBack">← 回到問題清單</button><button class="linkbtn" id="ctxClose" aria-label="關閉來源提示">關閉</button></div>
 </div>
 
+<main id="mainContent" tabindex="-1">
 <section class="panel" id="p-issues" role="tabpanel">
   <div class="iss-top">
     <div class="iss-top-main">
@@ -1890,6 +1901,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
     </div>
   </div>
 </section>
+</main>
 </div>
 
 <!-- 人體工學底部微型操控 Dock (DUO-GAP-04) -->
@@ -10135,7 +10147,7 @@ function selectPadForProfile(r){
     if(spec&&spec.grounded)envTxt=`（EIA ${f(spec.bodyL,2)}×${f(spec.bodyW,2)} mm）`;
   }
   const specTxt = pkgName ? ` · 封裝 <b>${esc(pkgName)}</b>${envTxt}` : (envTxt ? ` · ${envTxt.replace(/^[（(]|[）)]$/g,"")}` : "");
-  $("#hud").innerHTML=`<b>${r.board} · ${r.pad}</b>（${r.group}）${compTxt}${specTxt}<br>體積 <b>${f(r.volume,1)}%</b> · 高度 <b>${f(r.height,1)} ${METRICS.height.unit}</b> · 面積 <b>${f(r.area,1)}%</b><br>偏移 X <b>${f(r.offx,0)}</b> / Y <b>${f(r.offy,0)}</b> µm<br>鋼板 <b>${padThk(r,S)} µm</b>${zoneOf(r,S)?"（"+zoneOf(r,S).name+"）":""} · 高度 ${S.heightUnit==="unknown"?"單位未確認，厚度比不計算":`<b>${f(r.height/padThk(r,S)*100,0)}%</b> 厚度`}${morphTxt}<br>${d.length?d.map(c=>DEFECTS[c]).join("、"):"規格內"}`;
+  $("#hud").innerHTML=`<b>${esc(r.board)} · ${esc(r.pad)}</b>（${esc(r.group)}）${compTxt}${specTxt}<br>體積 <b>${f(r.volume,1)}%</b> · 高度 <b>${f(r.height,1)} ${METRICS.height.unit}</b> · 面積 <b>${f(r.area,1)}%</b><br>偏移 X <b>${f(r.offx,0)}</b> / Y <b>${f(r.offy,0)}</b> µm<br>鋼板 <b>${padThk(r,S)} µm</b>${zoneOf(r,S)?"（"+esc(zoneOf(r,S).name)+"）":""} · 高度 ${S.heightUnit==="unknown"?"單位未確認，厚度比不計算":`<b>${f(r.height/padThk(r,S)*100,0)}%</b> 厚度`}${morphTxt}<br>${d.length?d.map(c=>DEFECTS[c]).join("、"):"規格內"}`;
   if($("#csPadTitle"))$("#csPadTitle").innerHTML=`${esc(r.pad)} <span class="note">（${esc(r.group)}）</span>`;
   drawCrossSectionProfile(r);
   if(typeof highlightSelectedPad3D==="function")highlightSelectedPad3D(r);
@@ -10145,9 +10157,9 @@ function renderBoard2D(){
   const rows=S.rows.filter(r=>r.board===S.board&&inScopeS(r));
   const bd=A.byBoard.find(b=>b.board===S.board),defs=A.defRows.filter(r=>r.board===S.board);
   const kV=A.msa&&isFinite(A.msa.med)&&A.msa.med>0?A.msa.med:1,vc=S.heightUnit==="unknown"?[]:rows.filter(r=>r.volume!=null&&r.area!=null&&r.height!=null),vBad=vc.filter(r=>Math.abs(r.volume-kV*r.area*(r.height/padThk(r,S)*100)/100)>10).length;
-  $("#hud").innerHTML=`<b>${S.board}</b> · ${rows.length} 焊墊 · 不良 <b>${defs.length}</b>${bd?` · 平均${METRICS[A.m].short} <b>${f(bd.mean,1)}</b>`:""}${vc.length?`<br>體積 vs 面積×高度：${vBad?`<b style="color:var(--ng)">${vBad} 處不吻合（差 > 10%）</b>`:"一致"}`:""}<br><span class="note">點選錫膏查看量測值 · 錫膏位置含 X／Y 偏移</span>`;
+  $("#hud").innerHTML=`<b>${esc(S.board)}</b> · ${rows.length} 焊墊 · 不良 <b>${defs.length}</b>${bd?` · 平均${METRICS[A.m].short} <b>${f(bd.mean,1)}</b>`:""}${vc.length?`<br>體積 vs 面積×高度：${vBad?`<b style="color:var(--ng)">${vBad} 處不吻合（差 > 10%）</b>`:"一致"}`:""}<br><span class="note">點選錫膏查看量測值 · 錫膏位置含 X／Y 偏移</span>`;
   $("#boardDefSub").textContent=`${S.board} · ${defs.length} 處`;
-  $("#boardDefTbl").innerHTML=defs.length?`<thead><tr><th>焊墊</th><th class="num">體積%</th><th class="num">高度 ${METRICS.height.unit}</th><th class="num">面積%</th><th class="num">偏移X/Y</th><th>判定</th></tr></thead><tbody>`+defs.map(r=>`<tr data-pad="${esc(r.pad)}" style="cursor:pointer"><td class="mono">${r.pad}</td><td class="num mono">${f(r.volume,1)}</td><td class="num mono">${f(r.height,1)}</td><td class="num mono">${f(r.area,1)}</td><td class="num mono">${f(r.offx,0)}/${f(r.offy,0)}</td><td>${r.codes.map(c=>`<span class="pill ${c==="OFF"||c==="LOWH"||c==="HIH"?"warn":"ng"}">${DEFECTS[c].replace(/（.*）/,"")}</span>`).join(" ")}</td></tr>`).join("")+"</tbody>":'<tbody><tr><td class="note">本板無超規焊墊</td></tr></tbody>';
+  $("#boardDefTbl").innerHTML=defs.length?`<thead><tr><th>焊墊</th><th class="num">體積%</th><th class="num">高度 ${METRICS.height.unit}</th><th class="num">面積%</th><th class="num">偏移X/Y</th><th>判定</th></tr></thead><tbody>`+defs.map(r=>`<tr data-pad="${esc(r.pad)}" style="cursor:pointer"><td class="mono">${esc(r.pad)}</td><td class="num mono">${f(r.volume,1)}</td><td class="num mono">${f(r.height,1)}</td><td class="num mono">${f(r.area,1)}</td><td class="num mono">${f(r.offx,0)}/${f(r.offy,0)}</td><td>${r.codes.map(c=>`<span class="pill ${c==="OFF"||c==="LOWH"||c==="HIH"?"warn":"ng"}">${DEFECTS[c].replace(/（.*）/,"")}</span>`).join(" ")}</td></tr>`).join("")+"</tbody>":'<tbody><tr><td class="note">本板無超規焊墊</td></tr></tbody>';
   $$("#boardDefTbl tbody tr[data-pad]").forEach(tr=>{
     tr.onclick=()=>{
       const padId=tr.dataset.pad;

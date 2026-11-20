@@ -123,8 +123,10 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   }
   assert.equal(d.querySelector('#p-data div[data-sub="settings"]'), null, "不再留合併的規格面板");
   const wrap = d.querySelector(".wrap");
+  const main = d.getElementById("mainContent");
+  assert.ok(main && main.tagName === "MAIN" && main.parentElement === wrap, "#mainContent (<main>) 應在 .wrap 內");
   for (const id of ["p-overview", "p-control", "p-capability", "p-sim3d", "p-deep", "p-improve", "p-ai", "p-report", "p-gate", "p-data", "p-share", "p-shares", "p-mail"]) {
-    assert.equal(d.getElementById(id).parentElement, wrap, `#${id} 應在 .wrap 內`);
+    assert.equal(d.getElementById(id).parentElement, main, `#${id} 應在 #mainContent 內`);
   }
   assert.equal(d.querySelector("nav.mtab").parentElement, d.body, "底部導覽留在 .wrap 外");
   assert.equal(d.querySelector("#exportCenterModal").parentElement, d.body, "匯出對話框留在 .wrap 外");
