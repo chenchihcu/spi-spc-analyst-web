@@ -274,3 +274,43 @@ test("BUG-05: 稽核面板截斷提示與載入更多", async () => {
   assert.deepEqual(calls, ["/api/records?audit=1", "/api/records?audit=1&before=11"]);
   dom.window.close();
 });
+
+test("M-09、D-30 與 PauseDecay 的 boards／observed 清單經 topList(10) 截斷，不無界限展開", () => {
+  const rows = [];
+  const t0 = Date.UTC(2026, 10, 1, 8, 0, 0);
+  // 30 片板：偶數板發生停線後首片板體積下降（PauseDecay），P_REP 在 12 片板超規（M-09），14 片奇數板各有不同焊墊極端超規（D-30）
+  for (let b = 0; b < 30; b++) {
+    const board = `B${String(b + 1).padStart(2, "0")}`;
+    const isPausePost = b >= 2 && b % 2 === 0;
+    const ts = t0 + b * 2 * 60000 + Math.floor(b / 2) * 25 * 60000;
+    for (let p = 0; p < 30; p++) {
+      const pad = p === 0 ? "P_REP" : `P${p}`;
+      let vol = 100 + ((p % 5) - 2) * 1.5;
+      if (isPausePost) vol = 88;
+      if (p === 0 && b < 12) vol = 50; // M-09 跨 12 板超規
+      if (b % 2 === 1 && b < 28 && p === ((b - 1) / 2) + 2) vol = 160; // D-30 跨 14 片奇數板、不同焊墊的孤立極端
+      rows.push({
+        board, pad, group: "0402", comp: `C${p + 1}`,
+        volume: vol, height: 120, area: 100, offx: 0, offy: 0,
+        ts, figure: (b % 24) + 1,
+      });
+    }
+  }
+  const s = st(rows);
+  const A = c.analyze(s);
+  const cards = c.detectIssues(s, A);
+  const m09 = cards.find((x) => /M-09/.test(x.rule_id || ""));
+  const d30 = cards.find((x) => /孤立極端/.test(x.cat || ""));
+  const pause = cards.find((x) => /PauseDecay/.test(x.rule_id || ""));
+  assert.ok(m09, "應觸發 M-09");
+  assert.ok(d30, "應觸發 D-30");
+  assert.ok(pause, "應觸發 PauseDecay");
+  for (const [name, card] of [["M-09", m09], ["D-30", d30], ["PauseDecay", pause]]) {
+    const parts = String(card.boards).split("; ");
+    assert.ok(parts.length <= 11, `${name} boards 不應超過 10 個 + 另 N 個，實際 ${parts.length}: ${card.boards}`);
+    assert.match(String(card.boards), /另 \d+ 個/, `${name} boards 應包含截斷標記`);
+    assert.match(String(card.subboard), /另 \d+ 個/, `${name} subboard 應包含截斷標記`);
+  }
+  assert.match(String(pause.observed), /另 \d+ 個/, "PauseDecay observed 應包含截斷標記");
+});
+

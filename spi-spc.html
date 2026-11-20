@@ -5932,10 +5932,10 @@ function detectIssues(st,onStage){
   const idx={};for(const r of R)((idx[r.board]=idx[r.board]||{})[r.group]=idx[r.board][r.group]||[]).push(r);
   const brC={},boardRows=b=>brC[b]||(brC[b]=Object.values(idx[b]||{}).flat());
   const badM=new Map(),bad=r=>{let v=badM.get(r);if(v===undefined){v=classify(r,st.specs,st).length>0;badM.set(r,v)}return v};
-  const fmtBoards=idxs=>{const s=[...new Set(idxs)].sort((a,b)=>a-b);if(!s.length)return"不適用";let con=s.length>=2;for(let i=1;i<s.length;i++)if(s[i]!==s[i-1]+1){con=false;break}return con?`${boards[s[0]]}–${boards[s[s.length-1]]}`:s.map(i=>boards[i]).join("; ")};
+  const fmtBoards=idxs=>{const s=[...new Set(idxs)].sort((a,b)=>a-b);if(!s.length)return"不適用";let con=s.length>=2;for(let i=1;i<s.length;i++)if(s[i]!==s[i-1]+1){con=false;break}return con?`${boards[s[0]]}–${boards[s[s.length-1]]}`:topList(s.map(i=>boards[i]),10)};
   const topList=(arr,max=10)=>arr.length<=max?arr.join("; "):arr.slice(0,max).join("; ")+`; 另 ${arr.length-max} 個`;
   const refOf=rs=>{const cs=[...new Set(rs.map(r=>r.comp||(r.pad&&r.pad.includes("-")?r.pad.split("-")[0]:null)).filter(Boolean))];return cs.length?topList(cs,10):"不適用（無元件位號欄）"};
-  const subOf0=rs=>{const fs=[...new Set(rs.map(r=>r.figure).filter(x=>x!=null))];return fs.length?fs.map(x=>"子板 "+x).join("; "):"不適用（單板或無子板欄）"};
+  const subOf0=rs=>{const fs=[...new Set(rs.map(r=>r.figure).filter(x=>x!=null))];return fs.length?topList(fs.map(x=>"子板 "+x),10):"不適用（單板或無子板欄）"};
   let subAll=null;const subOf=rs=>rs===R?(subAll===null?(subAll=subOf0(R)):subAll):subOf0(rs); /* 全部列的子板清單只算一次 */
   const ACT={
     unit:"檢查匯入欄位的量測單位與規格設定（LSL／目標／USL）是否一致",
@@ -6269,7 +6269,7 @@ function detectIssues(st,onStage){
         title:dirTitle,
         ents:offenders.map(o=>"p:"+o.pad),score:3.8+Math.min(2,offenders.length*0.2),
         rule_id:"跨板重複不良焊墊（M-09）",rule_name:"同一焊墊在 ≥ 3 片板發生不良（依規格判定）",metric:"全部量測項目",
-        boards:allOffBoards.join("; "),subboard:subOf(allOffRows),
+        boards:topList(allOffBoards,10),subboard:subOf(allOffRows),
         group:topList([...new Set(offenders.map(o=>o.group))],10),
         refdes:topList([...new Set(offenders.map(o=>o.refdes).filter(Boolean))],10),
         pads:topList(offenders.map(o=>o.pad),10),
@@ -6315,7 +6315,7 @@ function detectIssues(st,onStage){
         c.cmpStr=c.over?(hasLsl(c.sp)&&c.x<c.sp.lsl?`${f(c.x,1)} < LSL ${f(c.sp.lsl,0)}`:`${f(c.x,1)} > USL ${f(c.sp.usl,0)}`):`${f(c.x,1)}（群組中位 ${f(c.S.m,1)}）`});
       ks.sort((a,b)=>((a.lv==="ng")!==(b.lv==="ng")?(a.lv==="ng"?-1:1):Math.abs(b.z)-Math.abs(a.z)));   // 嚴重子項在前，同等級再依 |z|（括號不可省：=== 與 !== 同優先序、由左至右結合）
       const cardLv=ks.some(c=>c.lv==="ng")?"ng":"warn",zmax=Math.max(...ks.map(c=>Math.abs(c.z)));
-      const bIdxs=[...new Set(ks.map(c=>boards.indexOf(c.r.board)).filter(i=>i>=0))],bStr=bIdxs.map(i=>boards[i]).join("; ");
+      const bIdxs=[...new Set(ks.map(c=>boards.indexOf(c.r.board)).filter(i=>i>=0))],bStr=topList(bIdxs.map(i=>boards[i]),10);
       const gList=[...new Set(ks.map(c=>c.g))],ents=[...bIdxs.map(i=>"b:"+boards[i]),...gList.map(g=>"g:"+g),...ks.map(c=>"p:"+c.r.pad)];
       const rowFacts=ks.slice(0,10).map(c=>`${lab(k)}｜${c.r.board}｜${c.g}｜${c.r.pad}｜${c.cmpStr}｜z = ${f(c.z,2)}（${c.lv==="ng"?"嚴重":"警示"}）`);
       if(ks.length>10)rowFacts.push(`另 ${ks.length-10} 筆極端焊墊（共 ${ks.length} 筆）`);
@@ -6611,9 +6611,9 @@ function detectIssues(st,onStage){
       title:`停線後首片印刷品質顯著衰退（平均體積下降 ${pauseDecayRes.avgVolumeDropPct}%）`,
       ents:postB.map(b=>"b:"+b),score:2.6,
       rule_id:"停線時效 PauseDecay",rule_name:"停線首片揮發衰退",metric:"體積 %",
-      boards:postB.join("; "),subboard:subOf(R),group:"ALL",refdes:"全部元件",
-      pads:`停線後首片板（${postB.join("、")}），共 ${pauseDecayRes.events.length} 次停線`,
-      observed:pauseDecayRes.events.map(e=>`前板 ${e.prevBoard} 停線 ${e.pauseDurationMin} 分鐘 → 首板 ${e.postBoard}`).join("; "),
+      boards:topList(postB,10),subboard:subOf(R),group:"ALL",refdes:"全部元件",
+      pads:`停線後首片板（${topList(postB,10)}），共 ${pauseDecayRes.events.length} 次停線`,
+      observed:topList(pauseDecayRes.events.map(e=>`前板 ${e.prevBoard} 停線 ${e.pauseDurationMin} 分鐘 → 首板 ${e.postBoard}`),10),
       limit:`建議安全靜置上限 ≤ ${pauseDecayRes.safeDwellLimitMin} 分鐘`,z:"不適用",p:"不適用",
       facts:[`檢出 ${pauseDecayRes.events.length} 次停線（≥ 15 分鐘），停線後首片焊墊平均體積較正常穩態板下降 ${pauseDecayRes.avgVolumeDropPct}%`],
       cause:"錫膏長時間暴露於鋼網表面，溶劑揮發使黏度上升，導致脫模轉移效率驟降",conf:"高",action:`停線超過 ${pauseDecayRes.safeDwellLimitMin} 分鐘時，強制執行印刷機自動溶劑濕擦（Wet Wipe）與試刮印`,
