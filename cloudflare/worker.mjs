@@ -155,7 +155,8 @@ async function handleRecordsApi(req, repo, user, env) {
     if (url.searchParams.get('audit') === '1') {
       const beforeSeq = url.searchParams.get('before') || null;
       const entries = await repo.listAuditLog(100, beforeSeq);
-      return json({ entries });
+      const hasMore = entries.hasMore === true;
+      return json({ entries, hasMore, next: hasMore ? entries.next : null });
     }
 
     // 關鍵字搜尋

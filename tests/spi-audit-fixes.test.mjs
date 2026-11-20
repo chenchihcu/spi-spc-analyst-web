@@ -2,7 +2,12 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import fs from "node:fs";
 import path from "node:path";
-import { loadCore, baseState, HTML } from "./_load.js";
+import { createRequire } from "node:module";
+import { loadCore, baseState, HTML, withIdb } from "./_load.js";
+import { createCloudHarness } from "./_cloud-harness.mjs";
+
+const require = createRequire(import.meta.url);
+const { JSDOM } = require("jsdom");
 
 const c = loadCore();
 
@@ -126,4 +131,146 @@ test("v10.14.3: 全板級與重複不良卡 group 支援 topList 截斷防膨脹
   assert.doesNotMatch(html, /group:groups\.join\("; "\)/, "全板級問題卡不得直接 groups.join 造成數百群組傾印");
   assert.ok(html.includes("group:topList(groups,10)"), "全板級問題卡應採用 topList(groups,10)");
   assert.ok(html.includes("group:topList([...new Set(offenders.map(o=>o.group))],10)"), "M-09 重複不良卡應採用 topList 截斷群組");
+});
+
+test("BUG-01: n>2000 不用固定步長，孤立點 |z| 不被解析度下限壓掉", () => {
+  const small = [0, 0.5, 1.5, 1.5];
+  assert.equal(c.resolutionOf(small), 0.5);
+  assert.equal(c.resolutionOf([7, 7, 7]), 0);
+  assert.equal(c.resolutionOf([3]), 0);
+  const nSmall = 2000;
+  const under = new Array(nSmall).fill(100);
+  for (let i = 0; i < nSmall; i++) if (i % 3 !== 0) under[i] = i % 2 === 0 ? 100 : 100.25;
+  under[0] = 0;
+  assert.equal(c.resolutionOf(under), 0.25, "n≤2000 仍用全部數值的最小正間距");
+
+  const n = 4002;
+  const v = new Array(n).fill(100);
+  for (let i = 0; i < n; i++) if (i % 3 !== 0) v[i] = i % 2 === 0 ? 100 : 100.01;
+  v[0] = 0;
+  v[3] = 100;
+  v[1] = 100.5;
+  const step = Math.ceil(n / 2000);
+  const sampled = v.filter((_, i) => i % step === 0);
+  const uniq = Float64Array.from(new Set(sampled));
+  uniq.sort();
+  let aliased = Infinity;
+  for (let i = 1; i < uniq.length; i++) {
+    const d = uniq[i] - uniq[i - 1];
+    if (d > 1e-9 && d < aliased) aliased = d;
+  }
+  assert.equal(aliased, 100, "這組資料的固定步長抽樣會把解析度看成 100");
+  const stat = c.isoStat(v);
+  assert.ok(Math.abs(stat.res - 0.01) < 1e-12, `resolutionOf 應為 0.01，實得 ${stat.res}`);
+  const z = Math.abs(100.5 - stat.m) / stat.sg;
+  assert.ok(z >= 5, `偏離中位數 0.5 的 |z| 應 ≥ 5，實得 ${z}`);
+});
+
+test("BUG-02: 非最差群組 |Cpk|>50 時 unitMismatch 與 M-03 同時成立", () => {
+  const rows = [];
+  for (let b = 1; b <= 12; b++) {
+    const board = `B${String(b).padStart(2, "0")}`;
+    rows.push({ board, pad: "T1", comp: "T1", group: "Tight", volume: 100, height: 120, area: 100 });
+    rows.push({ board, pad: "T2", comp: "T2", group: "Tight", volume: 100.01, height: 120, area: 100 });
+    rows.push({ board, pad: "W1", comp: "W1", group: "Wide", volume: 90, height: 120, area: 100 });
+    rows.push({ board, pad: "W2", comp: "W2", group: "Wide", volume: 110, height: 120, area: 100 });
+  }
+  const S = st(rows);
+  const A = c.analyze(S);
+  assert.equal(A.cap.mixed, true);
+  assert.ok(Math.abs(A.cap.cpk) <= 50, `最差群組 Cpk 應 ≤ 50，實得 ${A.cap.cpk}（${A.cap.worst}）`);
+  assert.ok(A.cap.groups.some((g) => Number.isFinite(g.cpk) && Math.abs(g.cpk) > 50), "另一群組 |Cpk| 應 > 50");
+  const center = (A.sp.usl + A.sp.lsl) / 2;
+  assert.ok(Math.abs(center - A.gMean) <= 10 * A.overallSd, "此例不得靠規格中心偏移觸發旗標");
+  assert.equal(A.unitMismatch, true);
+  const issue = c.detectIssues(S).find((x) => x.rule_id === "M-03 單位不符");
+  assert.ok(issue, "M-03 單位不符卡應出現");
+  assert.ok(issue.facts.some((x) => /Cpk/.test(x)), "卡片需呈現 Cpk 證據");
+  const html = fs.readFileSync(HTML, "utf8");
+  assert.match(html, /A\.unitMismatch \? `<div class="pill warn"/, "能力頁警示藥丸綁定 A.unitMismatch");
+});
+
+test("BUG-05: 稽核 API 超過 50 筆回 hasMore 與 next，舊 entries 仍在", async () => {
+  const h = await createCloudHarness();
+  try {
+    const ins = h.db.prepare("INSERT INTO audit_log (seq, at, by, action, target_type, target_id, detail) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    for (let i = 1; i <= 60; i++) {
+      ins.run(i, 1700000000000 + i, "u", "create", "record", `rec_${i}`, JSON.stringify({ kind: "spi", lot: "L1", part: "P1", name: "a.csv", sha256: "ab", done: true }));
+    }
+    const p1res = await h.fetch("/api/records?audit=1");
+    assert.equal(p1res.status, 200);
+    const p1 = await p1res.json();
+    assert.equal(Array.isArray(p1.entries), true);
+    assert.equal(p1.entries.length, 50);
+    assert.equal(p1.hasMore, true);
+    assert.equal(p1.next, p1.entries[p1.entries.length - 1].seq);
+    assert.equal(p1.entries[0].seq, 60);
+    assert.equal(p1.entries[0].action, "create");
+    assert.equal(p1.entries[0].part, "P1");
+    const seen = new Set(p1.entries.map((e) => e.seq));
+    const p2res = await h.fetch(`/api/records?audit=1&before=${p1.next}`);
+    assert.equal(p2res.status, 200);
+    const p2 = await p2res.json();
+    assert.equal(p2.entries.length, 10);
+    assert.equal(p2.hasMore, false);
+    assert.equal(p2.next, null);
+    assert.ok(p2.entries.every((e) => !seen.has(e.seq)));
+    assert.equal(p2.entries[p2.entries.length - 1].seq, 1);
+    assert.equal(p1.entries.length + p2.entries.length, 60);
+  } finally {
+    h.close();
+  }
+});
+
+test("BUG-05: 稽核面板截斷提示與載入更多", async () => {
+  const html = fs.readFileSync(HTML, "utf8").replace(/<script src=[^>]+><\/script>/g, "");
+  const dom = new JSDOM(html, {
+    runScripts: "dangerously",
+    url: "https://example.test/",
+    beforeParse(w) {
+      w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, {
+        get: (t, k) => (k === "measureText" ? () => ({ width: 1 }) : t[k] ?? (() => {})),
+        set: (t, k, v) => { t[k] = v; return true; },
+      });
+      w.Element.prototype.scrollIntoView = () => {};
+      w.matchMedia = () => ({ matches: false, addEventListener() {}, removeEventListener() {} });
+      w.ResizeObserver = class { observe() {} unobserve() {} disconnect() {} };
+      w.scrollTo = () => {};
+      w.Chart = class { constructor() {} destroy() {} static register() {} };
+      w.fetch = async () => new w.Response("{}", { status: 404 });
+      withIdb(w);
+      w.SPI_TEST_HOOK = { bootSample: false };
+    },
+  });
+  const w = dom.window;
+  const hook = w.SPI_TEST_HOOK;
+  assert.equal(typeof hook.renderAudit, "function");
+  const page = (from, count) => Array.from({ length: count }, (_, i) => {
+    const seq = from - i;
+    return { seq, at: 1700000000000 + seq, by: "u", action: "create", target_type: "record", kind: "spi", lot: "L1", part: "P1", rev: "", name: "a.csv", sha256: "0123456789abcdef", ok: true, status: "已存檔" };
+  });
+  const calls = [];
+  hook.RecDB.mode = "cloud";
+  hook.RecDB.isAdmin = false;
+  hook.RecDB.ready = Promise.resolve();
+  hook.RecDB.jfetch = async (url) => {
+    calls.push(url);
+    if (!url.includes("before=")) return { entries: page(60, 50), hasMore: true, next: 11 };
+    assert.match(url, /before=11/);
+    return { entries: page(10, 10), hasMore: false, next: null };
+  };
+  await hook.renderAudit();
+  const box = w.document.querySelector("#recAudit");
+  assert.equal(box.querySelectorAll("tbody tr").length, 50);
+  assert.match(box.textContent, /只顯示最新 50 筆紀錄/);
+  const btn = box.querySelector("#auditMore");
+  assert.ok(btn, "應有載入更多");
+  assert.equal(btn.textContent, "載入更多");
+  btn.click();
+  for (let i = 0; i < 50 && box.querySelectorAll("tbody tr").length !== 60; i++) await new Promise((r) => setImmediate(r));
+  assert.equal(box.querySelectorAll("tbody tr").length, 60);
+  assert.doesNotMatch(box.textContent, /只顯示最新 50 筆紀錄/);
+  assert.equal(box.querySelector("#auditMore"), null);
+  assert.deepEqual(calls, ["/api/records?audit=1", "/api/records?audit=1&before=11"]);
+  dom.window.close();
 });

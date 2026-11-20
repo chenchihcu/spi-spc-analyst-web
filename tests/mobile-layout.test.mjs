@@ -452,3 +452,74 @@ test('8h. 問題地圖板面焊墊圖：固定 CSS 尺寸、點陣依顯示尺�
   assert.match(draw, /devicePixelRatio/, '需依 devicePixelRatio 設定點陣');
   assert.match(draw, /setTransform\(dpr,0,0,dpr,0,0\)/, '需以 setTransform 換算（不可累積 scale）');
 });
+
+test('8i. 明亮主題 LISA 的 LH、HL 對白底 ≥ 3:1，且與 LL、HH 可區分', () => {
+  function lin(c) { return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; }
+  function lum(hex) {
+    const ch = hex.match(/\w{2}/g).map((v) => lin(parseInt(v, 16) / 255));
+    return ch[0] * 0.2126 + ch[1] * 0.7152 + ch[2] * 0.0722;
+  }
+  function contrast(a, b) {
+    const L1 = lum(a), L2 = lum(b);
+    return (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+  }
+  function xyz(hex) {
+    const ch = hex.match(/\w{2}/g).map((v) => lin(parseInt(v, 16) / 255));
+    return {
+      x: ch[0] * 0.4124 + ch[1] * 0.3576 + ch[2] * 0.1805,
+      y: ch[0] * 0.2126 + ch[1] * 0.7152 + ch[2] * 0.0722,
+      z: ch[0] * 0.0193 + ch[1] * 0.1192 + ch[2] * 0.9505,
+    };
+  }
+  function lab(hex) {
+    const { x, y, z } = xyz(hex);
+    const f = (t) => (t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116);
+    const fx = f(x / 0.95047), fy = f(y), fz = f(z / 1.08883);
+    return { L: 116 * fy - 16, a: 500 * (fx - fy), b: 200 * (fy - fz) };
+  }
+  function deltaE(a, b) {
+    const A = lab(a), B = lab(b);
+    return Math.hypot(A.L - B.L, A.a - B.a, A.b - B.b);
+  }
+  function hue(hex) {
+    const [r, g, b] = hex.match(/\w{2}/g).map((v) => parseInt(v, 16) / 255);
+    const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+    if (!d) return 0;
+    let h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    h *= 60;
+    return h < 0 ? h + 360 : h;
+  }
+  function hueDelta(a, b) {
+    const d = Math.abs(hue(a) - hue(b));
+    return Math.min(d, 360 - d);
+  }
+  const root = htmlSource.match(/:root\{([^}]*)\}/)?.[1] || '';
+  const token = (name) => {
+    const m = root.match(new RegExp(`${name}:#([0-9A-Fa-f]{6})`));
+    assert.ok(m, `明亮 :root 需定義 ${name}`);
+    return `#${m[1].toUpperCase()}`;
+  };
+  const surface = token('--surface');
+  assert.equal(surface, '#FFFFFF');
+  const swatch = {
+    HH: token('--lisa-hh'),
+    LL: token('--lisa-ll'),
+    LH: token('--lisa-lh'),
+    HL: token('--lisa-hl'),
+  };
+  for (const name of ['LH', 'LL', 'HL', 'HH']) {
+    const ratio = contrast(swatch[name], surface);
+    assert.ok(ratio >= 3, `${name} ${swatch[name]} 對白底 ${ratio.toFixed(2)}:1 應 ≥ 3`);
+  }
+  assert.notEqual(swatch.LH, swatch.LL);
+  assert.notEqual(swatch.HL, swatch.HH);
+  const lhHue = hueDelta(swatch.LH, swatch.LL);
+  const hlHue = hueDelta(swatch.HL, swatch.HH);
+  assert.ok(lhHue >= 30, `LH 與 LL 色相差 ${lhHue.toFixed(1)}° 應 ≥ 30`);
+  assert.ok(hlHue >= 30, `HL 與 HH 色相差 ${hlHue.toFixed(1)}° 應 ≥ 30`);
+  assert.ok(deltaE(swatch.LH, swatch.LL) >= 40, 'LH 與 LL 的 CIE76 ΔE 應 ≥ 40');
+  assert.ok(deltaE(swatch.HL, swatch.HH) >= 40, 'HL 與 HH 的 CIE76 ΔE 應 ≥ 40');
+  const lisa = htmlSource.slice(htmlSource.indexOf('function renderLISAUI()'), htmlSource.indexOf('function renderRelChartUI('));
+  assert.match(lisa, /onLight \? \(css\("--ink"\)/, '白底非 NS 點描邊改用文字色，避免白線溶進白底');
+  assert.match(lisa, /: "#ffffff"/, '暗色底仍用白描邊');
+});
