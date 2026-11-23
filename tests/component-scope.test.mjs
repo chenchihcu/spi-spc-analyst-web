@@ -210,8 +210,10 @@ test("選元件 → 提示列、分析、問題清單、報告、AI、匯出與�
   click("issues");
   const sc = H.issueScope();
   assert.ok(sc && sc.own.size > 0, "樣本資料中 U2 應有歸屬發現");
-  const listed = [...d.querySelectorAll("#issList > h3 ~ details.iss-card")].map((e) => +e.dataset.id);
+  const listed = [...d.querySelectorAll("#issList > .iss-focus details.iss-card")].map((e) => +e.dataset.id);
+  assert.ok(listed.length > 0, "窄範圍焦點問題證據區應列出 U2 的統計發現");
   for (const id of listed) assert.ok(sc.own.has(id), `#${id} 不屬於 U2 卻列在清單`);
+  assert.ok(d.querySelectorAll("#issBoardScope .iss-focus").length > 0, "全板問題區亦應以焦點問題卡收斂呈現");
   const boardIds = [...d.querySelectorAll("#issBoardScope .iss-card")].map((e) => +e.dataset.id);
   for (const id of boardIds) assert.ok(sc.board.has(id));
   const other = S.F.filter((x) => !sc.own.has(x.id) && !sc.board.has(x.id));
@@ -219,8 +221,9 @@ test("選元件 → 提示列、分析、問題清單、報告、AI、匯出與�
   const shown = new Set([...d.querySelectorAll("#issList .iss-card")].map((e) => +e.dataset.id));
   for (const x of other) assert.ok(!shown.has(x.id), `其他元件的發現 #${x.id} 不應出現`);
   const own = S.F.filter((x) => sc.own.has(x.id));
-  const sev = { ng: 0, warn: 0, info: 0 }; own.forEach((x) => sev[x.lv]++);
-  assert.match($("#issHead").textContent, new RegExp(`^元件 U2（群組 U2 BGA）：${own.length} 項統計發現：嚴重 ${sev.ng}、警示 ${sev.warn}、資訊 ${sev.info}$`));
+  const fg = H.buildFocusedProblems(own);
+  const sev = { ng: 0, warn: 0, info: 0 }; fg.forEach((g) => sev[g.lv]++);
+  assert.match($("#issHead").textContent, new RegExp(`^元件 U2（群組 U2 BGA）：${fg.length} 個焦點問題：嚴重 ${sev.ng}、警示 ${sev.warn}、資訊 ${sev.info}$`));
   const SF = H.scopedFindings();
   assert.ok(SF.every((x) => sc.own.has(x.id) || sc.board.has(x.id)));
 

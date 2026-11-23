@@ -43,20 +43,14 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   assert.ok(vp && vp.content.includes("width=device-width") && vp.content.includes("viewport-fit=cover"), "需含正確的 viewport meta (D-01)");
   assert.equal($("#pmapDetails").open, false, "首頁問題地圖預設收合");
   assert.equal(d.querySelectorAll("#issList .iss-case").length, 0, "首頁不再顯示問題定義折疊外殼");
-  assert.ok(d.querySelectorAll("#issList .sevhead").length >= 2, "首頁直接依嚴重度分段顯示統計發現");
-  assert.ok(d.querySelectorAll("#issList .iss-card").length > 0, "首頁預設應列出統計問題卡");
+  assert.ok(d.querySelectorAll("#issList > .iss-focus").length >= 1 && d.querySelectorAll("#issList > .iss-focus").length <= 6, "首頁直接以最多 6 張焦點問題卡呈現");
+  assert.equal(d.querySelectorAll("#issList details.iss-ev-fold[open]").length, 0, "焦點問題底部的統計證據折疊區預設收合");
+  assert.ok(d.querySelectorAll("#issList .iss-card").length > 0, "焦點問題證據區內應包含統計發現問題卡");
   assert.equal(d.querySelectorAll("#issList details.iss-card[open]").length, 0, "問題卡片預設收合");
   assert.ok($("#railSheet .rail-states #stateSpi"), "量測狀態應在分析設定列右側／行動設定面板內");
   assert.ok($("#railSheet .rail-states #statePlace"), "座標狀態應在分析設定列右側／行動設定面板內");
   assert.equal(d.querySelector("header.top #stateSpi"), null, "頂欄不再重複擺放量測狀態膠囊");
-  const catSel = $("#selIssCat");
-  assert.ok(catSel, "面向篩選應為單一精簡下拉選單");
-  const firstCat = [...catSel.options].find((o) => o.value !== "all");
-  if (firstCat) {
-    change(catSel, firstCat.value);
-    assert.equal(w.SPI_TEST_HOOK.S.issCat, firstCat.value);
-    change($("#selIssCat"), "all");
-  }
+  assert.equal($("#selIssCat"), null, "篩選列不再顯示 #selIssCat 面向下拉選單");
   $("#pmapDetails").open = true;
   assert.match($("#pmap").textContent, /這批沒有座標/);
   assert.equal($("#pmap svg"), null);
@@ -67,11 +61,11 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
   $("#pmapClear").click();
   $("#pmapDetails").open = false;
 
-  // 以「抓出問題」為目的的介面要素：問題地圖、證據迷你圖、嚴重度分段、來源提示
+  // 以「抓出問題」為目的的介面要素：問題地圖、證據迷你圖、焦點問題卡、來源提示
   assert.ok(d.querySelectorAll(".iss-card svg.ev").length === d.querySelectorAll(".iss-card").length, "每個問題卡片都應有證據迷你圖");
   assert.equal(d.querySelector('#issFilter [data-group]'), null, "篩選列不再顯示依問題定義／依統計規則切換");
   assert.equal(d.querySelectorAll("#issList .iss-case").length, 0, "清單不再包覆問題定義折疊外殼");
-  // 嚴重度篩選鈕上的數字＝點下去顯示的統計發現卡片數
+  // 嚴重度篩選鈕上的數字＝點下去顯示的焦點問題卡片數
   const chipCheck = (sel) => {
     for (const lv of ["ng", "warn", "info", "all"]) {
       const chip = d.querySelector(`#issFilter [data-lv="${lv}"]`);
@@ -80,26 +74,31 @@ test("所有頁籤與主要流程無執行錯誤", { skip: !JSDOM && "未安裝 
       assert.equal(d.querySelectorAll(sel).length, n, `${chip.textContent} 點下去應顯示 ${n} 項（${sel}）`);
     }
   };
-  assert.match($("#issHead").textContent, /^\d+ 項統計發現：嚴重 \d+、警示 \d+、資訊 \d+$/);
+  assert.match($("#issHead").textContent, /^\d+ 個焦點問題：嚴重 \d+、警示 \d+、資訊 \d+$/);
   const headN = $("#issHead").textContent.match(/\d+/g).map(Number);
-  assert.equal(headN[1] + headN[2] + headN[3], headN[0], "嚴重度加總等於統計發現總數");
-  chipCheck("#issList .iss-card");
-  // flashIssue 跨嚴重度篩選跳轉時，應切回全部並展開目標卡片
+  assert.equal(headN[1] + headN[2] + headN[3], headN[0], "嚴重度加總等於焦點問題總數");
+  chipCheck("#issList > .iss-focus");
+  // flashIssue 跨嚴重度篩選跳轉時，應切回全部並同時展開證據折疊區與目標卡片
   const firstNg = w.SPI_TEST_HOOK.S.F.find((x) => x.lv === "ng");
   if (firstNg) {
     d.querySelector('#issFilter [data-lv="info"]').click();
     w.SPI_TEST_HOOK.flashIssue(firstNg.id);
     assert.equal(w.SPI_TEST_HOOK.S.issLv, "all", "flashIssue 應切回全部嚴重度");
-    assert.equal(d.querySelector(`#iss-${firstNg.id}`)?.open, true, "flashIssue 應展開目標卡片");
+    const targetCard = d.querySelector(`#iss-${firstNg.id}`);
+    assert.equal(targetCard?.open, true, "flashIssue 應展開目標卡片");
+    assert.equal(targetCard?.closest("details.iss-ev-fold")?.open, true, "flashIssue 應展開外層統計證據折疊區");
     $("#issCollapse").click();
   }
-  // 問題卡片預設收合成一行，可全部展開／收合
+  // 證據折疊區與問題卡片預設收合，可全部展開／收合
+  assert.equal(d.querySelectorAll("#issList details.iss-ev-fold[open]").length, 0, "證據折疊區預設收合");
   assert.equal(d.querySelectorAll("#issList details.iss-card[open]").length, 0, "問題卡片預設收合");
   assert.ok(d.querySelectorAll("#issList details.iss-card > summary .iss-sum-t b").length === d.querySelectorAll(".iss-card").length, "每張卡片的摘要列有標題");
   $("#issExpand").click();
-  assert.equal(d.querySelectorAll("#issList details.iss-card:not([open])").length, 0, "全部展開");
+  assert.equal(d.querySelectorAll("#issList details.iss-ev-fold:not([open])").length, 0, "全部展開證據折疊區");
+  assert.equal(d.querySelectorAll("#issList details.iss-card:not([open])").length, 0, "全部展開問題卡片");
   $("#issCollapse").click();
-  assert.equal(d.querySelectorAll("#issList details.iss-card[open]").length, 0, "全部收合");
+  assert.equal(d.querySelectorAll("#issList details.iss-ev-fold[open]").length, 0, "全部收合證據折疊區");
+  assert.equal(d.querySelectorAll("#issList details.iss-card[open]").length, 0, "全部收合問題卡片");
   // 頂端不再重複規格輸入；資料與規格頁分為 3 個子分頁（鋼板規格、錫膏印刷規格、回合管理），匯入資料收斂至記錄庫對話框 (#boxPickImport)
   assert.equal(d.querySelector("#inLsl"), null, "規格輸入只保留在資料與規格頁");
   assert.deepEqual([...d.querySelectorAll("#p-data .subtab")].map((b) => b.textContent.trim()), ["鋼板規格設定", "錫膏印刷規格設定", "回合管理"]);

@@ -437,8 +437,8 @@ test("11. 主頁精簡：狀態移入 rail、問題地圖預設收合、子視�
   const issTopBlock = htmlSource.slice(htmlSource.indexOf('<div class="iss-top">'), htmlSource.indexOf('<div class="issues-subviews"'));
   assert.match(issTopBlock, /data-subnav-issues="list"/, '子視圖切換鈕應整合在 .iss-top 標題列且位於 issues-subviews 之前');
   assert.match(htmlSource, /#p-issues>\.iss-top\{order:1;[\s\S]*?#p-issues>\.issues-subviews\{order:2\}/, '手機格線下 .iss-top 必須排在 .issues-subviews 之前');
-  assert.match(htmlSource, /<select id="selIssCat" class="iss-cat-sel"/, '面向篩選應使用 #selIssCat 下拉選單');
-  assert.match(htmlSource, /@media\(pointer:coarse\)\{[^}]*\.subtabs button,\.iss-cat-sel[^}]*min-height:44px/, '觸控下子視圖切換與面向下拉需有 44px 熱區');
+  assert.doesNotMatch(htmlSource, /id="selIssCat"/, '篩選列已收斂為焦點問題，不再顯示 #selIssCat 下拉選單');
+  assert.match(htmlSource, /@media\(pointer:coarse\)\{[^}]*\.subtabs button,\.iss-ev-fold>summary[^}]*min-height:44px/, '觸控下子視圖切換與統計證據折疊列需有 44px 熱區');
 });
 
 test('8h. 問題地圖板面焊墊圖：固定 CSS 尺寸、點陣依顯示尺寸 × dpr、縮放鍵 44px（v10.30.0）', () => {
