@@ -2,6 +2,12 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.38.11 — 2026-11-23（問題清單簡化為單一統計發現視圖）
+
+- **單一統計規則視圖**：問題頁移除「依問題定義／依統計規則」切換、`.iss-case` 折疊外殼與雙重計數，主標題統一顯示 `N 項統計發現：嚴重 a、警示 b、資訊 c`（窄元件範圍附加範圍前綴），卡片依嚴重度分區平鋪並保留面向下拉篩選。
+- **匯出與 AI 摘要同步精簡**：Markdown 匯出（`issuesMd`）移除 `## 問題定義` 段落與卡片標題尾端案號；AI 摘要輸入（`aiPayload`）不再送出 `問題定義` 欄位。底層 `buildProblemCases`、`F.meta.cases`、CSV／XLSX 末兩欄（`case_id`、`case_title`）與 `/api/analyze` 白名單維持向後相容。
+- **跳轉按鈕狀態同步**：`flashIssue()` 展開目標卡片後同步呼叫 `issToolsState()`，修正跳轉後「全部收合」鈕仍停用的問題，並清除 `beforePrint()` 內殘留的 `cases` 展開迴圈。
+
 ## v10.38.10 — 2026-11-23（cursor 整數與空白 ID 驗證統一、對位問題卡標題截斷）
 
 - **API `cursor` 驗證統一**：`cloudflare/worker.mjs` 將關鍵字搜尋與一般列表的游標解析合併為 `parseCursor()`，要求剛好兩欄、非負安全整數時間戳（`Number.isSafeInteger(n) && n >= 0`）與非空白 `id`，與 `listAuditLog` 的 `before` 驗證一致。
