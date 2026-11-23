@@ -159,36 +159,30 @@ async function handleRecordsApi(req, repo, user, env) {
       return json({ entries, hasMore, next: hasMore ? entries.next : null });
     }
 
-    const parseCursorTs = (s) => {
-      const t = (s || '').trim();
-      if (!t) return null;
+    const parseCursor = (raw) => {
+      if (!raw) return [null, null];
+      const parts = raw.split(',');
+      if (parts.length !== 2) return [null, null];
+      const t = parts[0].trim();
+      const id = parts[1].trim();
+      if (!t || !id) return [null, null];
       const n = Number(t);
-      return Number.isFinite(n) && n >= 0 ? n : null;
+      return Number.isSafeInteger(n) && n >= 0 ? [n, id] : [null, null];
     };
 
     // 關鍵字搜尋
     const q = url.searchParams.get('q');
     if (q) {
-      const [created, id] = (url.searchParams.get('cursor') || '').split(',');
-      const cTs = parseCursorTs(created);
-      const results = await repo.searchRecords(q, 51, cTs != null && id ? cTs : null, cTs != null && id ? id : null);
+      const [cTs, cId] = parseCursor(url.searchParams.get('cursor'));
+      const results = await repo.searchRecords(q, 51, cTs, cId);
       const records = results.slice(0, 50), last = records[records.length - 1];
       return json({ records, next: results.length > 50 && last ? `${last.created},${last.id}` : null,
         me: user, isAdmin: admin, meta: { rows_read: results.length } });
     }
 
     // 分頁列表
-    const cursor = url.searchParams.get('cursor');
     const limit = +url.searchParams.get('limit') || 50;
-    let cursorCreated = null, cursorId = null;
-    if (cursor) {
-      const parts = cursor.split(',');
-      const cTs = parts.length === 2 ? parseCursorTs(parts[0]) : null;
-      if (cTs != null && parts[1]) {
-        cursorCreated = cTs;
-        cursorId = parts[1];
-      }
-    }
+    const [cursorCreated, cursorId] = parseCursor(url.searchParams.get('cursor'));
     // 依料號查對應座標檔清單
     const placesFor = url.searchParams.get('places_for');
     if (placesFor) {
