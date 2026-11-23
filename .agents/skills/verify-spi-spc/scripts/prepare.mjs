@@ -18,7 +18,8 @@ const authUsers = { [user]: await hashPasswordRecord(digest, pepper, iterations)
 const bindings = {
   AUTH_USERS: "'" + JSON.stringify(authUsers) + "'",
   AUTH_PEPPER: pepper,
-  AUTH_SECRET: secret
+  AUTH_SECRET: secret,
+  INITIAL_ADMIN_USER: user
 };
 const vars = Object.entries(bindings).map(([name, value]) => name + '=' + value);
 await writeFile('.dev.vars', vars.join('\n'), { flag: 'wx', mode: 0o600 });
