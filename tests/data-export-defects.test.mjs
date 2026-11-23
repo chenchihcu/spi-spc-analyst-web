@@ -34,11 +34,21 @@ test('issuesMd, fmMd 已匯出於核心模組，可在無 DOM 環境下直接呼
       observed: 'Cpk 0.5', limit: '70–130 %', z: '等效 1.5σ', p: '不適用',
       facts: ['事實 1', '事實 2'], inference: '推論原因', cause: '推論原因',
       confidence: '高', conf: '高', action: '建議動作', corroborated_by: [], corrob: [],
-      same_phenomenon: [], explained_pads: [], spec_source: '測試規格'
+      same_phenomenon: [], explained_pads: [], spec_source: '測試規格',
+      case_id: 1, case_title: '測試問題定義案'
     }
   ];
+  F.meta = {
+    cases: [{
+      id: 1, lv: 'ng', title: '測試問題定義案', shape: '偏低', scope: '0402', time: '每片板',
+      status: '直接原因候選', cause: '推論原因', action: '建議動作', card_ids: [1], evidence_card_ids: []
+    }]
+  };
   const md = c.issuesMd(F, { source: '單元測試', stencil: 120 });
   assert.match(md, /# SPI 問題偵測清單/);
+  assert.ok(md.includes('## 統計發現清單'), 'issuesMd 應包含統計發現清單段落');
+  assert.ok(!md.includes('## 問題定義'), 'issuesMd 不應再輸出問題定義段落');
+  assert.ok(!md.includes('問題定義案'), 'issuesMd 卡片標題不應再附帶問題定義案號');
   assert.match(md, /## #1［嚴重］測試問題標題/);
   assert.match(md, /面向：系統性能力｜規則：R001（能力不足）/);
   assert.match(md, /建議動作：建議動作/);
