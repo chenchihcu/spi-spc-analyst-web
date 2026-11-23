@@ -314,3 +314,25 @@ test("M-09、D-30 與 PauseDecay 的 boards／observed 清單經 topList(10) 截
   assert.match(String(pause.observed), /另 \d+ 個/, "PauseDecay observed 應包含截斷標記");
 });
 
+test("對位問題卡（addAl）多片板觸發時 title 截斷不無界限展開", () => {
+  const rows = [];
+  for (let b = 0; b < 12; b++) {
+    const board = `AL${String(b + 1).padStart(2, "0")}`;
+    for (let p = 0; p < 12; p++) {
+      rows.push({
+        board, pad: `P${p + 1}`, group: "0402", comp: `C${p + 1}`,
+        x: (p % 4) * 20, y: Math.floor(p / 4) * 20,
+        volume: 100, height: 120, area: 100, offx: 40, offy: 0,
+      });
+    }
+  }
+  const s = st(rows);
+  const A = c.analyze(s);
+  const cards = c.detectIssues(s, A);
+  const trCard = cards.find((x) => /對位分解：平移/.test(x.rule_id || ""));
+  assert.ok(trCard, "應觸發整板平移對位卡");
+  assert.match(String(trCard.title), /等 12 片板/, `title 應截斷顯示板數，實際：${trCard.title}`);
+  assert.ok(!String(trCard.title).includes("AL12"), `title 不應列出超過上限的板號，實際：${trCard.title}`);
+});
+
+

@@ -41,12 +41,17 @@ test('cursor 含空白／空字串／Infinity 時忽略並從第一頁查詢，�
       '/api/records?cursor=,abc',
       '/api/records?cursor=%20%20,abc',
       '/api/records?cursor=Infinity,abc',
+      '/api/records?cursor=1.5,abc',
+      '/api/records?cursor=100,%20%20%20',
       '/api/records?q=P1&cursor=,abc',
+      '/api/records?q=P1&cursor=1.5,abc',
+      '/api/records?q=P1&cursor=100,%20%20%20',
+      '/api/records?q=P1&cursor=100,abc,extra',
     ]) {
       const res = await h.fetch(url);
       assert.equal(res.status, 200, `${url} 應回 200`);
       const body = await res.json();
-      assert.equal(body.records.length, 1, `${url} 應回傳既有紀錄（不應把空時間戳當成 0）`);
+      assert.equal(body.records.length, 1, `${url} 應回傳既有紀錄（不應套用無效游標）`);
       assert.equal(body.records[0].id, 'rec_test_1');
     }
   } finally { h.close(); }
