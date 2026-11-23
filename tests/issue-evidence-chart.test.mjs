@@ -46,7 +46,6 @@ test("問題卡證據小圖：內容與說明一致、軸文字不在拉伸的 S
     assert.doesNotMatch(x.ev.title, /各板平均/);
   }
 
-  d.querySelector('#issFilter [data-group="rules"]').click();
   const cards = [...d.querySelectorAll("#issList details.iss-card")];
   assert.ok(cards.length > 0);
   for (const c of cards) {
