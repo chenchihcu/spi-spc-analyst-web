@@ -105,6 +105,7 @@ test("AI 提示詞限定 SPI 製程範圍與名詞定義，兩邊一致；小模
 test("AI 摘要：每項問題附量測項目、對位與面積比尺寸揭露資料狀態；重複犯焊墊卡不歸因吸嘴／供料且信心為中", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
   const { dom } = page(); const w = dom.window; await ready(w);
   const p = w.SPI_TEST_HOOK.aiPayload();
+  assert.equal("問題定義" in p, false, "aiPayload 不應再送出問題定義欄位");
   const iss = p["系統偵測問題清單"];
   assert.ok(iss.length && iss.every((x) => typeof x["量測項目"] === "string" && x["量測項目"]), "每項問題都有量測項目");
   const sys = iss.find((x) => x["面向"] === "系統性能力");
