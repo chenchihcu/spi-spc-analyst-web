@@ -284,7 +284,7 @@ def records(page, evidence, note, *, scratch=None):
 
     # 4. Reload page & reopen SPI record from cloud D1 + R2
     page.reload()
-    expect(page.locator("#appVer")).to_be_visible()
+    expect(page.locator("#btnOpenRecModal")).to_be_visible()
     page.locator("#btnOpenRecModal").click()
     expect(page.locator("#recPickerModal")).to_be_visible()
     expect(page.locator("#countPickSpi")).to_have_text("1")
@@ -798,7 +798,7 @@ def accuracy(page, evidence, note, *, scratch=None):
 
     # 8. Cleanup: reload and delete ACC-VERIFY-01 SPI and Placement records so D1 returns to 0
     page.reload()
-    expect(page.locator("#appVer")).to_be_visible()
+    expect(page.locator("#btnOpenRecModal")).to_be_visible()
     page.locator("#btnOpenRecModal").click()
     expect(page.locator("#recPickerModal")).to_be_visible()
     for tab_btn_sel, tbl_id, count_sel in (
