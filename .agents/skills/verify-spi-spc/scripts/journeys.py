@@ -1,3 +1,5 @@
+import csv
+import math
 import re
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
@@ -487,9 +489,340 @@ def report(page, evidence, note, **_kwargs):
     note("report preview", summary_restored=True)
 
 
+def _write_accuracy_fixtures(fixture_dir: Path):
+    """Generate deterministic SPI + placement CSVs with engineered in-spec and OOS values."""
+    fixture_dir.mkdir(parents=True, exist_ok=True)
+    place_csv = fixture_dir / "accuracy-place-top.csv"
+    place_csv.write_text(
+        "\n".join([
+            "RefDes,Center-X(mm),Center-Y(mm),Layer,Footprint",
+            "R1,10.00,15.00,TOP,0402",
+            "R2,25.00,15.00,TOP,0402",
+            "C1,10.00,30.00,TOP,0603",
+            "U1,30.00,30.00,TOP,QFN16",
+        ]) + "\n",
+        encoding="utf-8",
+    )
+    spi_csv = fixture_dir / "accuracy-spi-top.csv"
+    base_vols = [95.0, 96.5, 97.5, 99.0, 100.5, 102.0, 103.5, 105.0]
+    comps = [("R1", "0402"), ("R2", "0402"), ("C1", "0603"), ("U1", "QFN16")]
+    rows = ["PanelID,ComponentID,PinNumber,Package,Volume(%),Height(um),Area(%),OffsetX(um),OffsetY(um)"]
+    for b_idx in range(1, 5):
+        board_id = f"B{b_idx:03d}"
+        pad_idx = 0
+        for comp, pkg in comps:
+            for pin in (1, 2):
+                vol = base_vols[pad_idx] + (b_idx - 2.5) * 0.4
+                # Engineer exactly 2 Volume OOS defects under default spec (70-130%):
+                # B002/R1-1 -> 62.0% (< 70 LSL) and B004/U1-2 -> 138.0% (> 130 USL)
+                if board_id == "B002" and comp == "R1" and pin == 1:
+                    vol = 62.0
+                elif board_id == "B004" and comp == "U1" and pin == 2:
+                    vol = 138.0
+                h = 118.0 + (pad_idx % 4) * 1.0  # strictly within 90-150 um
+                area = 97.0 + (pad_idx % 5) * 1.5  # strictly within 70-130 %
+                ox = (pin - 1.5) * 8.0  # strictly within +/-75 um
+                oy = (b_idx - 2.5) * 4.0
+                rows.append(f"{board_id},{comp},{pin},{pkg},{vol:.1f},{h:.1f},{area:.1f},{ox:.1f},{oy:.1f}")
+                pad_idx += 1
+    spi_csv.write_text("\n".join(rows) + "\n", encoding="utf-8")
+    return place_csv, spi_csv
+
+
+def _compute_ground_truth(spi_csv: Path, *, vol_lsl: float, vol_usl: float):
+    """Independently compute exact SPC metrics from the raw CSV file and specification."""
+    with spi_csv.open("r", encoding="utf-8", newline="") as fh:
+        records_raw = list(csv.DictReader(fh))
+
+    def _mean(xs):
+        return sum(xs) / len(xs)
+
+    def _sd(xs):
+        m = _mean(xs)
+        return math.sqrt(sum((x - m) ** 2 for x in xs) / (len(xs) - 1))
+
+    vols = [float(r["Volume(%)"]) for r in records_raw]
+    n = len(vols)
+    mu = _mean(vols)
+    sd = _sd(vols)
+
+    def is_oos(r):
+        v = float(r["Volume(%)"])
+        h = float(r["Height(um)"])
+        a = float(r["Area(%)"])
+        ox = float(r["OffsetX(um)"])
+        oy = float(r["OffsetY(um)"])
+        return (
+            v < vol_lsl or v > vol_usl
+            or h < 90.0 or h > 150.0
+            or a < 70.0 or a > 130.0
+            or ox < -75.0 or ox > 75.0
+            or oy < -75.0 or oy > 75.0
+        )
+
+    defects = [r for r in records_raw if is_oos(r)]
+    ppm = round(len(defects) / n * 1_000_000)
+
+    g0402 = [float(r["Volume(%)"]) for r in records_raw if r["Package"] == "0402"]
+    mu_0402 = _mean(g0402)
+    sd_0402 = _sd(g0402)
+    ppk_0402 = min((vol_usl - mu_0402) / (3.0 * sd_0402), (mu_0402 - vol_lsl) / (3.0 * sd_0402))
+
+    by_board = {}
+    for r in records_raw:
+        by_board.setdefault(r["PanelID"], []).append(r)
+    board_stats = {
+        b: {
+            "n": len(rs),
+            "mean_vol": _mean([float(x["Volume(%)"]) for x in rs]),
+            "defects": sum(1 for x in rs if is_oos(x)),
+        }
+        for b, rs in by_board.items()
+    }
+    return {
+        "n": n,
+        "boards": len(by_board),
+        "pads": len({(r["ComponentID"], r["PinNumber"]) for r in records_raw}),
+        "mean_vol": mu,
+        "sd_vol": sd,
+        "defects": defects,
+        "defect_count": len(defects),
+        "ppm": ppm,
+        "g0402": {"n": len(g0402), "mean": mu_0402, "sd": sd_0402, "ppk": ppk_0402},
+        "board_stats": board_stats,
+    }
+
+
+def accuracy(page, evidence, note, *, scratch=None):
+    """Verify UI calculations, 3D HUD, Control Chart CL, exported CSVs, and spec-change
+    recomputation against independent ground truth derived from raw CSV + specification.
+    """
+    fixture_dir = (Path(scratch) if scratch else evidence) / "fixtures-accuracy"
+    place_csv, spi_csv = _write_accuracy_fixtures(fixture_dir)
+    gt_v1 = _compute_ground_truth(spi_csv, vol_lsl=70.0, vol_usl=130.0)
+    gt_v2 = _compute_ground_truth(spi_csv, vol_lsl=98.0, vol_usl=130.0)
+    assert gt_v1["defect_count"] == 2, f"Expected 2 engineered defects in v1, got {gt_v1['defect_count']}"
+    assert gt_v2["defect_count"] > gt_v1["defect_count"], "Spec v2 tightening must increase defects"
+
+    # 1. Upload controlled placement + SPI measurement file and save Spec v1 (70-130%)
+    page.locator("#btnOpenRecModal").click()
+    expect(page.locator("#recPickerModal")).to_be_visible()
+    page.locator("#btnPickPlace").click()
+    page.locator("#btnShowPlaceForm").click()
+    expect(page.locator("#uploadRefModal")).to_be_visible()
+    page.locator("#upPlaceFile").set_input_files(str(place_csv))
+    page.locator("#upPlacePart").fill("ACC-VERIFY-01")
+    page.locator("#upPlaceRev").fill("V1")
+    page.locator("#upPlaceSide").select_option("TOP")
+    page.locator("#upPlaceUnit").select_option("mm")
+    with page.expect_response(
+        lambda r: urlsplit(r.url).path == "/api/records" and r.request.method == "POST"
+    ) as post_place:
+        page.locator("#btnSubmitRef").click()
+    if post_place.value.status not in (200, 201):
+        raise RuntimeError(f"Accuracy placement upload failed: HTTP {post_place.value.status}")
+    expect(page.locator("#uploadRefModal")).to_be_hidden()
+
+    page.locator("#btnPickImport").click()
+    page.locator("#fileIn").set_input_files(str(spi_csv))
+    expect(page.locator("#mapBox")).to_be_visible()
+    page.locator("#selSide").select_option("TOP")
+    page.locator("#inPart").fill("ACC-VERIFY-01")
+    page.locator("#inRev").fill("V1")
+    page.locator("#inImpStencil").fill("120")
+    page.locator("#inWorkOrder").fill("WO-ACC-01")
+    place_choice = page.locator("#placeChoices button[data-pick-place]").first
+    expect(place_choice).to_be_visible()
+    with page.expect_response(
+        lambda r: urlsplit(r.url).path == "/api/records"
+        and "id" in parse_qs(urlsplit(r.url).query)
+        and r.request.method == "GET"
+    ):
+        place_choice.click()
+    expect(page.locator("#placeState")).to_contain_text("ACC-VERIFY-01")
+    with page.expect_response(
+        lambda r: urlsplit(r.url).path == "/api/records" and r.request.method == "POST"
+    ) as post_spi:
+        page.locator("#btnApply").click()
+    if post_spi.value.status not in (200, 201):
+        raise RuntimeError(f"Accuracy SPI upload failed: HTTP {post_spi.value.status}")
+    expect(page.locator("#impDoneBanner")).to_be_visible()
+    page.locator("#btnImpDoneInspect").click()
+    expect(page.locator("#recPickerModal")).to_be_hidden()
+
+    # Save default Spec v1 (Volume 70-130%)
+    open_tab(page, "data", note)
+    page.locator('#p-data button.subtab[data-sub="paste-spec"]').click()
+    page.locator("#btnSpecSave").click()
+    expect(page.locator("#specSaveModal")).to_be_visible()
+    page.locator("#specSaveDefault").check()
+    with page.expect_response(
+        lambda r: urlsplit(r.url).path == "/api/records" and r.request.method == "POST"
+    ):
+        page.locator("#specSaveOk").click()
+    expect(page.locator("#specSaveModal")).to_be_hidden()
+
+    def _assert_close(label, text, pattern, expected, tol):
+        m = re.search(pattern, text)
+        if not m:
+            raise RuntimeError(f"Could not parse {label} from text: {text[:300]}")
+        actual = float(m.group(1))
+        if abs(actual - expected) > tol:
+            raise RuntimeError(f"{label} mismatch: UI={actual}, raw={expected:.4f} (tol={tol})")
+        return actual
+
+    # 2. Verify Overview KPIs (Full board) against raw CSV + Spec v1
+    open_tab(page, "overview", note)
+    expect(page.locator("#kpis")).to_contain_text(f"{gt_v1['boards']} 片板 · {gt_v1['pads']} 個焊墊位置")
+    kpis_v1 = page.locator("#kpis").inner_text()
+    ui_mean_v1 = _assert_close("full-board mean", kpis_v1, r"平均\s*體積\s*([-+]?\d+(?:\.\d+)?)", gt_v1["mean_vol"], 0.1)
+    ui_sd_v1 = _assert_close("full-board overall sd", kpis_v1, r"σ\s*整體\s*([-+]?\d+(?:\.\d+)?)", gt_v1["sd_vol"], 0.015)
+    expect(page.locator("#kpis")).to_contain_text(f"{gt_v1['ppm']:,}")
+    expect(page.locator("#kpis")).to_contain_text(f"不良焊墊 {gt_v1['defect_count']} 處")
+    note(
+        "accuracy overview v1 verified",
+        ui_mean=ui_mean_v1,
+        raw_mean=round(gt_v1["mean_vol"], 4),
+        ui_sd=ui_sd_v1,
+        raw_sd=round(gt_v1["sd_vol"], 4),
+        defects=gt_v1["defect_count"],
+        ppm=gt_v1["ppm"],
+    )
+    page.screenshot(path=evidence / "accuracy-overview-v1.png")
+
+    # 3. Verify Single-Group (0402, n=16) Mean, Overall σ, and exact Ppk
+    page.locator("#selGroup").select_option("0402")
+    expect(page.locator("#kpis")).to_contain_text("4 片板 · 4 個焊墊位置")
+    g = gt_v1["g0402"]
+    kpis_g = page.locator("#kpis").inner_text()
+    ui_g_mean = _assert_close("0402 mean", kpis_g, r"平均\s*體積\s*([-+]?\d+(?:\.\d+)?)", g["mean"], 0.1)
+    ui_g_sd = _assert_close("0402 overall sd", kpis_g, r"σ\s*整體\s*([-+]?\d+(?:\.\d+)?)", g["sd"], 0.015)
+    ui_g_ppk = _assert_close("0402 Ppk", kpis_g, r"Ppk\s*([-+]?\d+(?:\.\d+)?)", g["ppk"], 0.015)
+    note(
+        "accuracy group 0402 ppk verified",
+        ui_mean=ui_g_mean,
+        raw_mean=round(g["mean"], 4),
+        ui_sd=ui_g_sd,
+        raw_sd=round(g["sd"], 4),
+        ui_ppk=ui_g_ppk,
+        raw_ppk=round(g["ppk"], 4),
+    )
+    page.locator("#selGroup").select_option("ALL")
+
+    # 4. Verify Control Chart CL matches ground-truth mean
+    open_tab(page, "control", note)
+    ctrl_sub = page.locator("#ctrlSub").inner_text()
+    ui_cl = _assert_close("control CL", ctrl_sub, r"CL\s*([-+]?\d+(?:\.\d+)?)", gt_v1["mean_vol"], 0.05)
+    note("accuracy control CL verified", ui_cl=ui_cl, raw_mean=round(gt_v1["mean_vol"], 4))
+
+    # 5. Verify 3D HUD per-board stats for B002 against raw CSV
+    open_tab(page, "sim3d", note)
+    page.locator("#selBoard").select_option("B002")
+    b2 = gt_v1["board_stats"]["B002"]
+    expect(page.locator("#hud")).to_contain_text("B002")
+    expect(page.locator("#hud")).to_contain_text(f"{b2['n']} 焊墊")
+    expect(page.locator("#hud")).to_contain_text(f"不良 {b2['defects']}")
+    hud_text = page.locator("#hud").inner_text()
+    ui_b2_mean = _assert_close("3D HUD B002 mean", hud_text, r"平均體積\s*([-+]?\d+(?:\.\d+)?)", b2["mean_vol"], 0.1)
+    note("accuracy 3d HUD B002 verified", board="B002", ui_mean=ui_b2_mean, raw_mean=round(b2["mean_vol"], 4), defects=b2["defects"])
+
+    # 6. Verify Exported CSVs (def-csv and board-csv) against raw CSV + Spec v1
+    page.locator("#btnOpenExportModal").click()
+    expect(page.locator("#exportCenterModal")).to_be_visible()
+
+    with page.expect_download() as dl_def:
+        page.locator('#exportCenterModal button[data-exp-act="def-csv"]').click()
+    def_text = Path(dl_def.value.path()).read_text(encoding="utf-8-sig")
+    def_rows = [r for r in csv.reader(def_text.splitlines()) if any(c.strip() for c in r)]
+    if len(def_rows) - 1 != gt_v1["defect_count"]:
+        raise RuntimeError(f"def-csv row count mismatch: expected {gt_v1['defect_count']}, got {len(def_rows) - 1}")
+    def_body = "\n".join(",".join(r) for r in def_rows[1:])
+    for needle in ("B002", "R1-1", "少錫（體積 < LSL）", "B004", "U1-2", "多錫（體積 > USL）", "ACC-VERIFY-01 v1"):
+        if needle not in def_body:
+            raise RuntimeError(f"Expected {needle!r} in exported def-csv, got:\n{def_body}")
+    def_vols = sorted(float(r[4]) for r in def_rows[1:])
+    if def_vols != [62.0, 138.0]:
+        raise RuntimeError(f"def-csv volumes mismatch: expected [62.0, 138.0], got {def_vols}")
+
+    with page.expect_download() as dl_brd:
+        page.locator('#exportCenterModal button[data-exp-act="board-csv"]').click()
+    brd_text = Path(dl_brd.value.path()).read_text(encoding="utf-8-sig")
+    brd_rows = [r for r in csv.reader(brd_text.splitlines()) if any(c.strip() for c in r)]
+    if len(brd_rows) - 1 != gt_v1["boards"]:
+        raise RuntimeError(f"board-csv row count mismatch: expected {gt_v1['boards']}, got {len(brd_rows) - 1}")
+    brd_map = {r[0]: r for r in brd_rows[1:]}
+    for b_id, b_gt in gt_v1["board_stats"].items():
+        cols = brd_map.get(b_id)
+        if not cols:
+            raise RuntimeError(f"Missing board {b_id} in exported board-csv")
+        # Check that at least one numeric column matches the board's exact ground-truth mean volume
+        nums = []
+        for c in cols[1:]:
+            try:
+                nums.append(float(c))
+            except ValueError:
+                pass
+        if not any(abs(v - b_gt["mean_vol"]) <= 0.1 for v in nums):
+            raise RuntimeError(f"board-csv mean mismatch for {b_id}: expected {b_gt['mean_vol']:.2f}, row={cols}")
+    note("accuracy exported CSVs verified", def_rows=len(def_rows) - 1, board_rows=len(brd_rows) - 1)
+    page.locator("#exportCenterClose").click()
+    expect(page.locator("#exportCenterModal")).to_be_hidden()
+
+    # 7. Specification Sensitivity: tighten Volume LSL from 70 -> 98 (Spec v2) and verify recomputation
+    open_tab(page, "data", note)
+    page.locator('#p-data button.subtab[data-sub="paste-spec"]').click()
+    vol_lsl_in = page.locator("#sp-volume-lsl")
+    expect(vol_lsl_in).to_be_visible()
+    vol_lsl_in.fill("98")
+    vol_lsl_in.dispatch_event("change")
+    expect(page.locator("#btnSpecSave")).to_be_enabled()
+    page.locator("#btnSpecSave").click()
+    expect(page.locator("#specSaveModal")).to_be_visible()
+    with page.expect_response(
+        lambda r: urlsplit(r.url).path == "/api/records" and r.request.method == "POST"
+    ):
+        page.locator("#specSaveOk").click()
+    expect(page.locator("#specSaveModal")).to_be_hidden()
+
+    open_tab(page, "overview", note)
+    expect(page.locator("#kpis")).to_contain_text(f"不良焊墊 {gt_v2['defect_count']} 處")
+    expect(page.locator("#kpis")).to_contain_text(f"{gt_v2['ppm']:,}")
+    note(
+        "accuracy spec v2 sensitivity verified",
+        lsl_v2=98.0,
+        defects_v1=gt_v1["defect_count"],
+        defects_v2=gt_v2["defect_count"],
+        ppm_v2=gt_v2["ppm"],
+    )
+    page.screenshot(path=evidence / "accuracy-overview-v2.png")
+
+    # 8. Cleanup: reload and delete ACC-VERIFY-01 SPI and Placement records so D1 returns to 0
+    page.reload()
+    expect(page.locator("#appVer")).to_be_visible()
+    page.locator("#btnOpenRecModal").click()
+    expect(page.locator("#recPickerModal")).to_be_visible()
+    for tab_btn_sel, tbl_id, count_sel in (
+        ("#btnPickSpi", "tblPickSpi", "#countPickSpi"),
+        ("#btnPickPlace", "tblPickPlace", "#countPickPlace"),
+    ):
+        expect(page.locator("#recPickerProgress")).to_be_hidden()
+        page.locator(tab_btn_sel).click()
+        row_chk = page.locator(f"#{tbl_id} input[type='checkbox']").first
+        expect(row_chk).to_be_visible()
+        row_chk.check()
+        page.locator("#btnRecBatchDelete").click()
+        expect(page.locator("#confirmModal")).to_be_visible()
+        page.locator("#confirmOk").click()
+        expect(page.locator("#confirmModal")).to_be_hidden()
+        expect(page.locator(count_sel)).to_have_text("0")
+    page.locator("#recPickerClose").click()
+    expect(page.locator("#recPickerModal")).to_be_hidden()
+
+
 FEATURES = {
     "database": database,
     "records": records,
+    "accuracy": accuracy,
     "control": control,
     "sim3d": sim3d,
     "tabs": tabs,

@@ -34,7 +34,7 @@ python3 -B .agents/skills/verify-spi-spc/scripts/verify.py all
 `python3 -B $verify doctor` 重建一個乾淨實例並透過 `#loginForm` 登入。每次功能流程在同一個執行中的實例亦自動執行 doctor。確認埠的擁有程序、登入頁和主頁的版本及建置時間、相同 Chrome session 的 `/__me` 帳號及 `/api/records` HTTP 200 和 records 陣列。
 
 ## Drive
-- 單項功能：`database`、`records`、`control`、`sim3d`、`tabs`、`scope`、`export`、`report`
+- 單項功能：`database`、`records`、`accuracy`、`control`、`sim3d`、`tabs`、`scope`、`export`、`report`
 - 全部功能流程：`python3 -B $verify all`
 - 多視窗與深色模式 UI 矩陣：`python3 -B $verify ui-matrix`
 - 全套驗證（全部功能＋UI 矩陣）：`python3 -B $verify full`
