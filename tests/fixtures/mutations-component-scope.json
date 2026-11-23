@@ -125,6 +125,11 @@
       "name": "報告預覽五大項目沒篩元件範圍",
       "from": "const scRows=S.rows.filter(inScopeS),spGrp=scopeSpecGroup(S);return [\"volume\"",
       "to": "const scRows=S.rows,spGrp=scopeSpecGroup(S);return [\"volume\""
+    },
+    {
+      "name": "焦點問題標題計數沒篩元件範圍",
+      "from": "focusedAll=buildFocusedProblems(F)",
+      "to": "focusedAll=buildFocusedProblems(F0)"
     }
   ]
 }

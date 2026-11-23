@@ -52,7 +52,7 @@ test("介面整理：空白狀態、範例資料、KPI 寫法、管制界限數�
   });
 
   d.querySelector("#issList [data-load-sample]").click();
-  await until(() => S.A && S.rows && S.rows.length && /問題定義|統計發現/.test(d.querySelector("#issHead").textContent), "範例資料分析與問題清單完成");
+  await until(() => S.A && S.rows && S.rows.length && /焦點問題|統計發現/.test(d.querySelector("#issHead").textContent), "範例資料分析與問題清單完成");
 
   await t.test("載入後：分析設定列與問題地圖恢復", () => {
     assert.ok(!d.querySelector(".rail").classList.contains("rail--empty"));
