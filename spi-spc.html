@@ -1206,7 +1206,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
   #recPickerModal .rec-foot button,#recPickerModal .rec-batch-bar button,.rec-dialog-themed .sheet-foot--db button{min-height:44px}
 }
 @media(pointer:coarse){
-  #recPickerModal .rec-tabs .seg-btn,#recPickerModal .rec-filter-toggle,#recPickerModal .rec-acts button,#recPickerModal .rec-menu>summary,#recPickerModal .rec-batch-bar button,#recPickerModal .rec-foot button,#recPickerModal .rec-filter-chk,.rec-dialog-themed .sheet-foot--db button{min-height:44px}
+  #recPickerModal .rec-tabs .seg-btn,#recPickerModal .rec-picker-search input,#recPickerModal .rec-picker-search select,#recPickerModal .rec-filters select,#recPickerModal .rec-filter-toggle,#recPickerModal .rec-acts button,#recPickerModal .rec-menu>summary,#recPickerModal .rec-batch-bar button,#recPickerModal .rec-foot button,#recPickerModal .rec-filter-chk,.rec-dialog-themed .sheet-foot--db button{min-height:44px}
 }
 </style>
 <!-- 開機期間：瀏覽器可能在主程式執行前先畫出空的問題頁，之後清單填入會把下方內容整片推走（CLS）；主程式跑完才顯示 -->
@@ -11700,9 +11700,12 @@ function recPartNote(){const n=$("#recNote");if(!IMP||IMP.demo){n.textContent=""
 function renderPlaceChoices(){const box=$("#placeChoices");if(!box)return;
   const part=safeId($("#inPart")?.value||""),rev=($("#inRev")?.value||"").trim(),side=$("#selSide")?.value||"";
   const all=((typeof RecDB==="undefined"||!RecDB?null:RecDB.cache)||[]).filter(p=>p.kind==="place"&&p.lifecycle==="active"&&p.validation_source==="server_verified");
-  if(!part||!rev||!side){box.innerHTML=`<span class="note">填好料號、版次與面別後，這裡列出符合的座標檔。</span>`;return}
-  const rows=all.filter(p=>p.part===part&&p.rev===rev&&placeSideHolds(p.side,side));
-  box.innerHTML=rows.length?rows.map(p=>`<button type="button" data-pick-place="${esc(p.id)}">${esc(p.part)} ${esc(p.rev)} ${esc(p.side==="BOTH"?"TOP＋BOT":p.side)}${PLACE&&PLACE.recId===p.id?"（已選）":""}</button>`).join(""):`<span class="note">沒有符合 ${esc(part)} ${esc(rev)} ${esc(side)} 的有效座標檔。</span>`}
+  const nextHtml=(!part||!rev||!side)
+    ?`<span class="note">填好料號、版次與面別後，這裡列出符合的座標檔。</span>`
+    :(rows=>{return rows.length?rows.map(p=>`<button type="button" data-pick-place="${esc(p.id)}">${esc(p.part)} ${esc(p.rev)} ${esc(p.side==="BOTH"?"TOP＋BOT":p.side)}${PLACE&&PLACE.recId===p.id?"（已選）":""}</button>`).join(""):`<span class="note">沒有符合 ${esc(part)} ${esc(rev)} ${esc(side)} 的有效座標檔。</span>`})(all.filter(p=>p.part===part&&p.rev===rev&&placeSideHolds(p.side,side)));
+  if(box.dataset.renderedHtml===nextHtml)return;
+  box.dataset.renderedHtml=nextHtml;
+  box.innerHTML=nextHtml}
 function syncIdentityHints(){const set=(id,msg)=>{const hint=$("#"+id+"Error"),el=$("#"+id);if(!hint||!el)return;
   if(!msg){if(hint.dataset.pair==="1"){hint.textContent="";hint.classList.remove("err");hint.dataset.pair="";el.removeAttribute("aria-invalid")}return}
   hint.dataset.pair="1";hint.classList.add("err");hint.textContent=msg;el.setAttribute("aria-invalid","true")};
