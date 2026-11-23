@@ -5920,6 +5920,68 @@ function issueCaseCounts(F,cases){const cards={ng:0,warn:0,info:0},byCase={ng:0,
   for(const x of F||[])if(x.lv in cards)cards[x.lv]++;
   for(const c of cases||(F&&F.meta&&F.meta.cases)||[])if(c.lv in byCase)byCase[c.lv]++;
   return {cards,cases:byCase};}
+const FOCUS_DOMAINS=[
+  {key:"aperture",name:"元件開孔與能力不足",what:"製程能力不足",act:"檢查鋼板開孔與厚度"},
+  {key:"align",name:"印刷對位偏移",what:"印刷偏移",act:"校正鋼板對位"},
+  {key:"process",name:"錫量趨勢與擦拭／停線",what:"錫量隨時間變化",act:"檢查擦拭週期與停線"},
+  {key:"squeegee",name:"刮刀與板面均勻性",what:"板面錫量不均",act:"檢查刮刀壓力與速度"},
+  {key:"spike",name:"單板與局部突發異常",what:"局部突發異常",act:"追查該板與該位置"},
+  {key:"measurement",name:"量測與規格設定",what:"量測或規格待確認",act:"確認量測設定與規格"}
+];
+function focusDomainOf(x){
+  const s=x&&x.sig,t=s&&s.t;
+  if(t==="unit"||t==="msa")return"measurement";
+  if(t==="align"||((t==="board"||t==="local")&&s.off)||((t==="nelson"||t==="iso")&&(s.k==="offx"||s.k==="offy")))return"align";
+  if(t==="sys"||t==="pad"||t==="dfm"||t==="lowte"||t==="mcd"||t==="repeated")return"aperture";
+  if(t==="drift"||t==="wipe"||t==="pause"||(t==="nelson"&&s.ruleId!==1&&s.ruleId!==4))return"process";
+  if(t==="stroke"||t==="grad"||t==="fig"||t==="spatial"||(t==="nelson"&&s.ruleId===4))return"squeegee";
+  return"spike";
+}
+function buildFocusedProblems(F){
+  if(!Array.isArray(F)||!F.length)return[];
+  const byKey=new Map();
+  for(const x of F){if(!x)continue;const k=focusDomainOf(x);if(!byKey.has(k))byKey.set(k,[]);byKey.get(k).push(x)}
+  const lvRank={ng:0,warn:1,info:2};
+  const isPh=v=>{const s=String(v||"").trim();return!s||s==="—"||s==="全部"||s==="全部板"||s==="全部元件"||s==="ALL"||s==="ALL（全部元件）"||s==="不適用"||/^全部/.test(s)||/^另\s*\d+\s*(?:個|項|片)/.test(s)};
+  const splitTokens=v=>String(v||"").split(/\s*[;；、,，]\s*/).map(s=>s.trim()).filter(s=>!isPh(s));
+  const out=[];
+  for(const d of FOCUS_DOMAINS){
+    const raw=byKey.get(d.key);if(!raw||!raw.length)continue;
+    const members=raw.slice().sort((a,b)=>(lvRank[a.lv]??3)-(lvRank[b.lv]??3)||(a.id??0)-(b.id??0));
+    const lv=members[0].lv,gSet=new Set(),bSet=new Set(),mSet=new Set(),hSet=new Set(),aSet=new Set();
+    const addG=v=>{for(const t of splitTokens(v))gSet.add(t)},addB=v=>{for(const t of splitTokens(v))bSet.add(t)};
+    for(const m of members){
+      const s=m.sig||{};
+      if(s.g)addG(s.g);if(Array.isArray(s.gs))s.gs.forEach(addG);addG(m.group);
+      if(s.b)addB(s.b);if(Array.isArray(s.bs))s.bs.forEach(addB);if(Array.isArray(s.boards))s.boards.forEach(addB);addB(m.boards);
+      const met=String(m.metric||"").trim();if(met&&met!=="—")mSet.add(met);
+      const ti=String(m.title||"").trim();if(ti&&hSet.size<2)hSet.add(ti);
+      const ac=String(m.action||"").trim();if(ac&&aSet.size<2)aSet.add(ac);
+    }
+    const allG=[...gSet],allB=[...bSet];
+    const groups=allG.slice(0,6),moreGroups=Math.max(0,allG.length-6);
+    const boards=allB.slice(0,6),moreBoards=Math.max(0,allB.length-6);
+    const where=allG.length>1?`${allG[0]} 等 ${allG.length} 群組`:allG.length===1?`${allG[0]} `:allB.length>1?`${allB[0]} 等 ${allB.length} 片板`:allB.length===1?`${allB[0]} `:"";
+    const title=`${where}${d.what} → ${d.act}`;
+    const ids=members.map(m=>m.id!=null?m.id:m.no);
+    out.push({key:d.key,name:d.name,title,lv,members,count:members.length,ids,groups,moreGroups,boards,moreBoards,metrics:[...mSet],highlights:[...hSet],actions:[...aSet]});
+  }
+  return out.sort((a,b)=>(lvRank[a.lv]??3)-(lvRank[b.lv]??3)||b.count-a.count);
+}
+function focusedProblemsMd(F,headingPrefix="##"){
+  if(!Array.isArray(F)||!F.length)return"";
+  const focused=buildFocusedProblems(F),lvMap={ng:"嚴重",warn:"警示",info:"資訊"};
+  const hasMsa=F.some(x=>x&&x.sig&&x.sig.t==="msa");
+  const rows=focused.map(g=>{
+    const sc=[];
+    if(g.groups.length)sc.push("群組："+g.groups.join("、")+(g.moreGroups?` 另 ${g.moreGroups} 個`:""));
+    if(g.boards.length)sc.push("板號："+g.boards.join("、")+(g.moreBoards?` 另 ${g.moreBoards} 個`:""));
+    if(!sc.length&&g.metrics.length)sc.push("項目："+g.metrics.join("、"));
+    const ev=g.ids.slice(0,10).map(i=>"#"+i).join("、")+(g.ids.length>10?` 另 ${g.ids.length-10} 項`:"");
+    return`| ${lvMap[g.lv]||g.lv} | ${g.title}（${g.name}） | ${sc.join("；")||"全板"} | ${g.actions.join("；")||"—"} | ${ev} |`;
+  }).join("\n");
+  return`${headingPrefix} 焦點問題摘要（共 ${focused.length} 項）\n${hasMsa?"\n- 量測系統變異偏大，以下判讀可信度降低\n":""}\n| 嚴重度 | 焦點問題 | 影響範圍 | 建議動作 | 統計證據 |\n|---|---|---|---|---|\n${rows}\n\n`;
+}
 /* onStage(i,n,名稱)：可選的進度回呼（背景計算時回報進度），不影響結果 */
 function detectIssues(st,onStage){
   const R=st.rows;if(!R.length)return[];
@@ -7276,7 +7338,7 @@ function issuesMd(F, st){
 - 資料來源：${src}；鋼板 ${sten} µm${stepOn?"（階梯）":""}
 - 分析範圍：${typeof scopeLabel==="function"?scopeLabel(st):"全部元件"}
 
-## 統計發現清單
+`+focusedProblemsMd(F,"##")+`## 統計發現清單
 
 `+F.map(x=>`## #${x.no!=null?x.no:x.id}［${x.level||(typeof LVL_MAP!=="undefined"&&LVL_MAP[x.lv])||x.lv}］${x.title}
 
@@ -7392,7 +7454,7 @@ function computeLocalOosDensity(rows,coordGetter,clsFn){
   }
   return out;
 }
-if(typeof module!=="undefined")module.exports={specFor,buildDiagnosticModel,diagnosticSource,diagnosticMatch,diagRowClass,compKeyOf,compKeyParse,scopeFilter,scopeParts,scopePart,scopeSpecGroup,scopeLabel,normalizeScope,scopeIsNarrow,SCOPE_PANELS,SCOPE_BOARD_CARDS,SCOPE_BOARD_NOTE,issuesMd,fmMd,rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,adSample,adSampleHash,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,geomAssumed,areaRatio,aspectRatio,maxThkForAR,apVolNL,detectIssues,buildProblemCases,issueCaseCounts,overallVerdict,compareRuns,dfmTable,scopedDfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,groupBasisOfRow,groupBasisForRows,groupBasisLabel,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,withScopeCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,GERBER,layoutPartsFromRows,layoutPadSet,buildLayoutInfo,layoutStatusText};
+if(typeof module!=="undefined")module.exports={specFor,buildDiagnosticModel,diagnosticSource,diagnosticMatch,diagRowClass,compKeyOf,compKeyParse,scopeFilter,scopeParts,scopePart,scopeSpecGroup,scopeLabel,normalizeScope,scopeIsNarrow,SCOPE_PANELS,SCOPE_BOARD_CARDS,SCOPE_BOARD_NOTE,issuesMd,fmMd,rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,adSample,adSampleHash,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,geomAssumed,areaRatio,aspectRatio,maxThkForAR,apVolNL,detectIssues,buildProblemCases,issueCaseCounts,focusDomainOf,buildFocusedProblems,focusedProblemsMd,overallVerdict,compareRuns,dfmTable,scopedDfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,groupBasisOfRow,groupBasisForRows,groupBasisLabel,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,withScopeCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,GERBER,layoutPartsFromRows,layoutPadSet,buildLayoutInfo,layoutStatusText};
 </script>
 <script>
 
@@ -11971,7 +12033,7 @@ ${act5.length?act5.map(x=>`| #${x.no!=null?x.no:x.id} | ${x.level||(typeof LVL_M
 ${S.ai?`\n### AI 品質工程診斷摘要\n\n${S.ai}\n`:""}
 ## 二、問題偵測清單（共 ${scopedFindings().length} 項）
 
-${scopedFindings().map(x=>`- #${x.no!=null?x.no:x.id}［${x.level||(typeof LVL_MAP!=="undefined"&&LVL_MAP[x.lv])||x.lv}］${x.title}（規則：${x.rule_id} ${x.rule_name}）
+${focusedProblemsMd(scopedFindings(),"###")}${scopedFindings().map(x=>`- #${x.no!=null?x.no:x.id}［${x.level||(typeof LVL_MAP!=="undefined"&&LVL_MAP[x.lv])||x.lv}］${x.title}（規則：${x.rule_id} ${x.rule_name}）
   - 面向：${x.category||x.cat}；量測項目：${x.metric}；板號：${x.boards}；焊墊：${x.pads}；群組：${x.group}；位號：${x.refdes}
   - 觀測值：${x.observed}；界限：${x.limit}；z：${x.z}；p：${x.p}
   - 事實：${(x.facts||[]).join("；")}
@@ -14188,9 +14250,11 @@ function renderReport(){
       <tbody>${act5.length?act5.map(x=>`<tr><td class="mono">#${x.id}</td><td><span class="pill ${x.lv}">${LVL[x.lv]}</span></td><td><b>${esc(x.title)}</b><div class="note">${esc(x.cat)}</div></td><td style="font-size:var(--fs-caption)">${esc(x.facts[0]||"—")}</td><td style="font-size:var(--fs-caption)"><b>推論：</b>${esc(x.cause)}<br><b>動作：</b>${esc(x.action)}</td></tr>`).join(""):'<tr><td colspan="5" class="note">未偵測到需優先處置之問題</td></tr>'}</tbody>
     </table></div>${S.ai?`<h3 style="font-size:var(--fs-ui);margin:12px 0 6px">AI 品質工程診斷摘要（${esc(aiRepModel)}）</h3><div class="ai-out" style="padding:10px 14px;background:var(--surface2);border-radius:8px;border:1px solid var(--line);margin-bottom:16px">${mdLite(S.ai)}</div>`:""}</div>`;
 
+  const focusedRep=buildFocusedProblems(F),hasMsaRep=F.some(x=>x&&x.sig&&x.sig.t==="msa");
+  const focusedRepHtml=focusedRep.length?`<h3 style="font-size:var(--fs-ui);margin:8px 0 6px">焦點問題摘要（共 ${focusedRep.length} 項）</h3>${hasMsaRep?'<p class="note" style="margin:0 0 6px;color:var(--warn)">量測系統變異偏大，以下判讀可信度降低</p>':""}<div class="tbl" style="margin-bottom:14px"><table><thead><tr><th>嚴重度</th><th>焦點問題</th><th>影響範圍</th><th>建議動作</th><th>統計證據</th></tr></thead><tbody>${focusedRep.map(g=>{const sc=[];if(g.groups.length)sc.push("群組："+g.groups.join("、")+(g.moreGroups?` 另 ${g.moreGroups} 個`:""));if(g.boards.length)sc.push("板號："+g.boards.join("、")+(g.moreBoards?` 另 ${g.moreBoards} 個`:""));if(!sc.length&&g.metrics.length)sc.push("項目："+g.metrics.join("、"));const ev=g.ids.slice(0,10).map(i=>"#"+i).join("、")+(g.ids.length>10?` 另 ${g.ids.length-10} 項`:"");return`<tr><td><span class="pill ${g.lv}">${LVL[g.lv]}</span></td><td><b>${esc(g.title)}</b><div class="note">${esc(g.name)}</div></td><td style="font-size:var(--fs-caption)">${esc(sc.join("；")||"全板")}</td><td style="font-size:var(--fs-caption)">${esc(g.actions.join("；")||"—")}</td><td class="mono" style="font-size:var(--fs-caption)">${esc(ev)}</td></tr>`}).join("")}</tbody></table></div>`:"";
   const s3=`<div class="rep-sec" id="repSec3">
     <h2 style="font-size:var(--fs-heading);border-bottom:1px solid var(--line);padding-bottom:6px;margin:20px 0 12px">二、問題偵測清單（共 ${F.length} 項）</h2>
-    <div class="tbl" style="margin-bottom:16px"><table>
+    ${focusedRepHtml}<div class="tbl" style="margin-bottom:16px"><table>
       <thead><tr><th>#</th><th>等級</th><th>面向</th><th>規則 ID 與名稱</th><th>量測項目</th><th>板號／群組</th><th>焊墊</th><th>觀測值與界限</th><th>統計量 (z, p)</th><th>事實與推論</th><th>佐證／已解釋</th></tr></thead>
       <tbody>${F.length?F.map(x=>`<tr>
         <td class="mono">#${x.id}</td><td><span class="pill ${x.lv}">${LVL[x.lv]}</span></td><td>${esc(x.cat)}</td>
@@ -17185,7 +17249,7 @@ function pdfFileName(){
 function specDownloadInfo(rec){const raw=rec&&rec.ver!=null?String(rec.ver).trim():"",hasVersion=!!raw&&!/^(?:undefined|null)$/i.test(raw),version=hasVersion?safeFn(raw):"",filename="料號規格_"+safeFn(rec&&rec.part)+"_"+(hasVersion?"v"+version:"版本未知")+".json";
   return{filename,warning:hasVersion?"":"這筆規格紀錄沒有版本號；匯出檔名已標示「版本未知」"}}
 if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")window.SPI_TEST_HOOK.specDownloadInfo=specDownloadInfo;
-if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{setCompFromShortcut,attachLayoutToRun,refreshLayoutRow,pmapLayout,layoutIdsFor,evSvg,overallVerdict,renderIssues,flashIssue,sharePack,issueScope,scopedFindings,issueBoardList,compSearch,compCandidates,setComp,syncScopeUI,scopeLabel,scopeParts,buildPrintHeadHtml,getPlace:()=>PLACE,setPlace:s=>{PLACE={recId:s.recId||null,part:s.part||"",rev:s.rev||"",name:s.name,tab:s.tab,side:s.side,unit:s.unit,res:parsePlacement(s.tab,s.unit,s.side)};placeShow()},S,RecDB,renderAudit,loadSample,clearRuns,purgeLegacyData,renderIssues,renderPmap,renderOverview,renderLISAUI,renderRelChartUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,aiFallbackModels,saveAiGoodModel,recompute,switchRun,setTab,setSub,updateSettingsUi,scrollSettingsAnchor,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,pick,drawHeat,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,calcShapeFactor,getSolderGrainTexture,getRealPasteMat,createSolderPasteGeometry,selectPadForProfile,highlightSelectedPad3D,focusPad3D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,getReportChapters,renderMailChapterSummary,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,setupRecPicker,renderRecPicker,openRecord,openRecPickerModal,switchPickerTab,openPlaceUploadDialog,openLayoutUploadDialog,recordView,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus,setupExportCenter,openExportCenterModal,closeExportCenterModal,triggerExportByType,downloadDeliverablesQueue,applyPlacePreviewToRun,clearPlacePreviewFromRun,syncPlaceToCurrentRun,pos3DNote,usePlaceRec,loadStateModel,updateLoadStates,resolveComponentSpec,calcPadOffsetAndGeom,buildComponent3DObject,buildComponentMeshes3D});
+if(window.SPI_TEST_HOOK&&typeof window.SPI_TEST_HOOK==="object")Object.assign(window.SPI_TEST_HOOK,{setCompFromShortcut,attachLayoutToRun,refreshLayoutRow,pmapLayout,layoutIdsFor,evSvg,overallVerdict,focusDomainOf,buildFocusedProblems,focusedProblemsMd,renderIssues,flashIssue,sharePack,issueScope,scopedFindings,issueBoardList,compSearch,compCandidates,setComp,syncScopeUI,scopeLabel,scopeParts,buildPrintHeadHtml,getPlace:()=>PLACE,setPlace:s=>{PLACE={recId:s.recId||null,part:s.part||"",rev:s.rev||"",name:s.name,tab:s.tab,side:s.side,unit:s.unit,res:parsePlacement(s.tab,s.unit,s.side)};placeShow()},S,RecDB,renderAudit,loadSample,clearRuns,purgeLegacyData,renderIssues,renderPmap,renderOverview,renderLISAUI,renderRelChartUI,renderGeomPadStatus,issueList,addRun,LocalRec,sha256js,auditFp,reportMd,issuesMd,issuesCsv,curRun,aiPayload,apiPayload,aiFallbackModels,saveAiGoodModel,recompute,switchRun,setTab,setSub,updateSettingsUi,scrollSettingsAnchor,updateLayout,PHONE_MQ,TABLET_MQ,updateRailSummary,syncMobileTabs,T,init3D,render3D,build3D,renderBoard2D,dispose3D,diag3D,check3DRender,safeBoard2D,pick,drawHeat,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,calcShapeFactor,getSolderGrainTexture,getRealPasteMat,createSolderPasteGeometry,selectPadForProfile,highlightSelectedPad3D,focusPad3D,placeSizeErr,placeUnitWarn,parsePlacement,headerPlaceUnit,pos3D,spreadOffset,pos3DNote,realXY,ext3D,fit3D,size3DNote,wrapCanvasText,toast,tabFade,limitTables,baseOpts,startImport,capture3DImage,renderReport,generateReportPdfBlob,pdfFileName,beforePrint,afterPrint,drawPareto,renderOffscreenChart,ensureJsPdf,ensurePdfFonts,updatePrint3D,buildMailSummary,buildMailtoUrl,validateEmailList,isAppleDevice,initMailPage,updateMailPdf,getMailChapters,getReportChapters,renderMailChapterSummary,csvTable,parseAOI,aoiCorr,normPadKey,unpivotWide,buildRows,zonesChanged,setStep,applyStencil,renderZones,syncControls,fastMcd2D,passFailMatrix,buildStatsData,statsDataCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,setupRecPicker,renderRecPicker,openRecord,openRecPickerModal,switchPickerTab,openPlaceUploadDialog,openLayoutUploadDialog,recordView,useSpec,savePartSpec,defaultSpecFor,loadSpecRec,specDraft,specEdit,renderSpecTbl,renderSpecVers,newRunCfg,sampleCfg,gateOn,runPart,toggleDuoMode,setDuoTab,swapDuoPanes,changeDuoBoard,cycleDuoRightTab,setupDuoPostureDetector,setDuoPosture,suspendDuoSim3D,setupDuoEventBus,setupExportCenter,openExportCenterModal,closeExportCenterModal,triggerExportByType,downloadDeliverablesQueue,applyPlacePreviewToRun,clearPlacePreviewFromRun,syncPlaceToCurrentRun,pos3DNote,usePlaceRec,loadStateModel,updateLoadStates,resolveComponentSpec,calcPadOffsetAndGeom,buildComponent3DObject,buildComponentMeshes3D});
 if($("#geomPadFile"))$("#geomPadFile").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{const p=parseGeometryPadListCsv(rd.result);if(!p.ok){toast("幾何焊墊清單："+p.error);e.target.value="";return}S.geometryPads=p.pads;persist();updatePadCoverageState();recompute();renderGeomPadStatus();toast(`已匯入 ${p.pads.length} 個幾何焊墊`);e.target.value=""};rd.readAsText(f)});
 if($("#geomPadClear"))$("#geomPadClear").onclick=()=>{S.geometryPads=null;S.padCoverage=null;S.pendingVerify=false;persist();updatePadCoverageState();recompute();renderGeomPadStatus()};
 const initHash=(location.hash||"").slice(1);
