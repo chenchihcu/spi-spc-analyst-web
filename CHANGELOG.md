@@ -2,6 +2,14 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.39.0 — 2026-11-24（SPI 進階統計圖表階段一：G 圖、Laney U′、板序自相關、Ca×Cp 四象限、滑動 Cpk）
+
+- **獨立純統計模組 `lib/spi-stats-ext.mjs`**：實作無 DOM 單趟 O(N) 純函式（`calcGChart`、`calcLaneyUChart`、`calcAcfPacf`、`calcCaCpQuadrant`、`calcRollingCpk`），以 `tools/sync-spi-stats-ext.mjs` 同步內嵌至 `spi-spc.html` `<script id="core">`（相容主執行緒、>20,000 筆 Web Worker 與 VM 沙箱），並建立 `extStatsCache` 按需快取。
+- **管制圖分頁擴充**：單變量選單新增 **G 圖**（Benneyan 幾何分布精確界線、線性／對數 Y 軸、僅保留 Nelson Rule 1）與 **U′ 圖**（Laney 每千焊墊缺點數，原生接入總覽與多視角診斷）；新增 **`自相關`** 子分頁（`control/acf`）呈現板序 ACF／PACF 與 Ljung-Box Q 檢定，並更新 `isAnalysisScopeTab()` 維持頂部指標與元件範圍連動。
+- **製程能力分頁擴充**：新增 **製程能力四象限圖（Ca × Cp）**（規格中點恆等式、動態軟上限、依範圍自動下鑽群組→元件→焊墊）與 **滑動視窗 Cpk 趨勢圖**（3／5／10／20 板可調），同步通過 `component-scope` 與變異守衛檢查。
+- **正交偵測規則與穩定製程校準**：新增 `M-22`（板序自相關 ACF，歸入 `"process"` 並與既有階躍 `drift` 卡正交去重）與 `M-23`（高良率 ≥ 99% G 圖不良叢發，歸入 `"spike"`，5 萬筆零配置預篩）；通過 `npm run test:slow` 800 seed 校準（穩定製程 0/400 零誤報）。
+- **分析報告與 AI 診斷整合**：`lib/analyze-core.mjs` 白名單新增 `"進階統計診斷"`；PDF 分析報告 Ch.4 補入 G／U′／ACF 統計摘要、Ch.5 離屏嵌入 Ca×Cp 與滑動 Cpk 圖、Ch.10 補齊公式附錄。
+
 ## v10.38.14 — 2026-11-23（焦點問題證據折疊列 CJK 雙字重合規修正）
 
 - **CJK 雙字重標準修正**：將 `.iss-ev-fold>summary`（統計證據折疊標題列）字重由 `600` 修正為 `700`，符合全站 CJK 雙字重（僅使用 `400` 與 `700`）排版規範與 `tests/type-scale.test.mjs` 檢查。
