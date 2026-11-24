@@ -1,9 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { loadCore, baseState } = require("./_load.js");
+const { loadCore, baseState, HTML, withIdb } = require("./_load.js");
+let JSDOM, VirtualConsole;
+try { ({ JSDOM, VirtualConsole } = require("jsdom")); } catch {}
 
 test("buildFocusedProblems 與 focusedProblemsMd：空陣列回傳空結果", () => {
   const core = loadCore();
@@ -228,4 +231,105 @@ test("issuesMd 與 focusedProblemsMd：在原統計發現清單前輸出焦點�
   assert.match(md, /G1 等 12 群組製程能力不足 → 檢查鋼板開孔與厚度/);
   assert.match(md, /另 6 個/, "超過 6 個群組應截斷為『另 6 個』");
   assert.match(md, /另 2 項/, "超過 10 個證據編號應截斷為『另 2 項』");
+});
+
+test("reportMd 與 renderReport：第二章在原清單前輸出焦點問題摘要；0 筆時不輸出；窄範圍全板區與分頁跳轉正常", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const html = fs.readFileSync(HTML, "utf8").replace(/<script src=[^>]+><\/script>/g, "");
+  const vc = new VirtualConsole();
+  const dom = new JSDOM(html, {
+    runScripts: "dangerously",
+    virtualConsole: vc,
+    url: "https://example.test/",
+    beforeParse(w) {
+      w.HTMLCanvasElement.prototype.getContext = () => new Proxy({}, { get: (t, k) => (k === "measureText" ? () => ({ width: 1 }) : t[k] ?? (() => {})), set: (t, k, v) => ((t[k] = v), true) });
+      w.Element.prototype.scrollIntoView = () => {};
+      w.matchMedia = () => ({ matches: false, addEventListener() {} });
+      w.ResizeObserver = class { observe() {} };
+      w.scrollTo = () => {};
+      w.Chart = class { constructor() {} destroy() {} static register() {} };
+      withIdb(w);
+      w.SPI_TEST_HOOK = { bootSample: true };
+    },
+  });
+  try {
+    const w = dom.window, d = w.document, H = w.SPI_TEST_HOOK;
+    for (let i = 0; i < 200 && !(H.S?.F?.length && !H.S.F.pending); i++) await new Promise((r) => setTimeout(r, 20));
+    const S = H.S;
+    assert.ok(S.F.length > 0);
+
+    // 1. reportMd 與 renderReport：摘要段在清單之前
+    const md = H.reportMd();
+    const sec2Idx = md.indexOf("## 二、問題偵測清單");
+    const sumIdx = md.indexOf("### 焦點問題摘要");
+    const itemIdx = md.indexOf("\n- #", sumIdx);
+    assert.ok(sec2Idx > 0 && sumIdx > sec2Idx && itemIdx > sumIdx, "reportMd 第二章中『### 焦點問題摘要』須位於問題清單之前");
+
+    H.renderReport();
+    const repSec3 = d.querySelector("#repSec3");
+    const h3 = repSec3.querySelector("h3");
+    const tables = repSec3.querySelectorAll("table");
+    assert.ok(h3 && /焦點問題摘要/.test(h3.textContent), "renderReport #repSec3 應含『焦點問題摘要』標題");
+    assert.equal(tables.length, 2, "#repSec3 應含摘要表與明細表兩張表");
+    assert.match(tables[0].textContent, /焦點問題/, "第一張表應為焦點問題摘要表");
+    assert.match(tables[1].textContent, /規則 ID 與名稱/, "第二張表應為原統計發現明細表");
+
+    // 2. 0 筆時不輸出焦點問題摘要
+    const origF = S.F;
+    S.F = [];
+    const emptyMd = H.reportMd();
+    assert.equal(emptyMd.includes("焦點問題摘要"), false, "0 筆時 reportMd 不應輸出焦點問題摘要");
+    H.renderReport();
+    assert.equal(d.querySelector("#repSec3").textContent.includes("焦點問題摘要"), false, "0 筆時 renderReport 不應輸出焦點問題摘要");
+    S.F = origF;
+
+    // 3. 窄範圍只有全板問題（0 own）且先前 S.issLv="ng" 時，仍應重設 S.issLv="all" 並顯示 #issBoardScope
+    const sc = H.issueScope();
+    assert.equal(sc, null);
+    S.issLv = "ng";
+    const warnBoardCard = {
+      ...origF[0],
+      id: 9001,
+      lv: "warn",
+      sig: { t: "fig" },
+      ents: [],
+      corrob: [],
+      same_phenomenon: [],
+      title: "跨子板均勻性警示",
+    };
+    const manyBoard = Array.from({ length: 160 }, (_, idx) => ({
+      ...warnBoardCard,
+      id: 9002 + idx,
+      title: `全板背景警示 ${idx + 1}`,
+    }));
+    H.setComp(H.compCandidates("")[0].key);
+    S.F = manyBoard;
+    S.issLv = "ng";
+    H.renderIssues();
+    assert.equal(S.issLv, "all", "窄範圍無 own 問題時應重設 S.issLv 為 all 以免隱藏全板問題");
+    assert.ok(d.querySelectorAll("#issBoardScope .iss-focus").length > 0, "應顯示 #issBoardScope 焦點問題");
+    assert.ok(d.querySelector("#issMore"), "全板問題超過 150 項時即使 own 為 0 也應顯示 #issMore 按鈕");
+
+    // 4. flashIssue 跳轉至 #issBoardScope 內第 155 張（超過 ISS_PAGE=150）卡片時應自動翻頁並展開
+    const targetId = manyBoard[155].id;
+    assert.equal(d.querySelector(`#iss-${targetId}`), null, "跳轉前第 156 張尚未渲染");
+    H.flashIssue(targetId);
+    const jumped = d.querySelector(`#iss-${targetId}`);
+    assert.ok(jumped, "flashIssue 應將 #issBoardScope 翻頁至目標卡片");
+    assert.equal(jumped.open, true, "目標卡片應展開");
+    assert.equal(jumped.closest("details.iss-ev-fold")?.open, true, "外層證據折疊區應展開");
+    assert.equal(d.querySelector("#issBoardScope")?.open, true, "外層 #issBoardScope 應展開");
+
+    // 5. 窄範圍列印：不重複列出全板問題，且展開 #issBoardScope 後還原
+    d.querySelector("#issBoardScope").open = false;
+    d.querySelector("#issBoardScope").dispatchEvent(new w.Event("toggle"));
+    H.beforePrint();
+    const boardScope = d.querySelector("#issBoardScope");
+    assert.equal(boardScope.open, true, "列印時應展開 #issBoardScope");
+    const ownAreaIds = [...d.querySelectorAll("#issList > .iss-focus .iss-card")].map((e) => +e.dataset.id);
+    assert.equal(ownAreaIds.length, 0, "列印時窄範圍主區不應重複塞入全板問題");
+    H.afterPrint();
+    assert.equal(d.querySelector("#issBoardScope").open, false, "列印後應還原 #issBoardScope 收合狀態");
+  } finally {
+    dom.window.close();
+  }
 });
