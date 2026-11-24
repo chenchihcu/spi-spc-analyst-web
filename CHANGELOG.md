@@ -2,6 +2,11 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.38.15 — 2026-11-23（焦點問題邊界補齊：全板區分頁跳轉、空範圍篩選重設與列印工具狀態）
+
+- **全板問題區分頁跳轉與空範圍篩選**：`flashIssue()` 在主清單找不到目標 ID 時接續搜尋 `issueBoardList("all")` 並自動翻頁至 `#issBoardScope` 內的目標卡片；`renderIssues()` 於窄範圍無歸屬問題（`focusedAll.length === 0`）時自動重設 `S.issLv = "all"`，避免隱藏篩選列後 `#issBoardScope` 仍被舊嚴重度遮蔽。
+- **列印還原與回歸測試**：`afterPrint()` 還原折疊與卡片開合後同步更新 `issToolsState()`；新增 `reportMd`／`renderReport` 摘要段排序與 0 筆不輸出測試、`.iss-ev-fold` 列印展開還原測試。
+
 ## v10.38.14 — 2026-11-23（焦點問題證據折疊列 CJK 雙字重合規修正）
 
 - **CJK 雙字重標準修正**：將 `.iss-ev-fold>summary`（統計證據折疊標題列）字重由 `600` 修正為 `700`，符合全站 CJK 雙字重（僅使用 `400` 與 `700`）排版規範與 `tests/type-scale.test.mjs` 檢查。
