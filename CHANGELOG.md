@@ -2,6 +2,13 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.40.0 — 2026-11-24（SPI 進階統計圖表階段二：變異數分解與多變異圖、二維偏移靶心圖、板面 X／Y 邊際剖面、開孔方向效應）
+
+- **純統計核心擴充（`lib/spi-stats-ext.mjs`）**：新增 `calcVarianceComponents`（群組去中心後巢狀平方和分解，百分比總和 100%）、`calcMultiVari`（板內分層均值與 P10–P90 跨度，超過 30 板等距取樣揭露）、`calcOffsetEllipse`（2D 偏移 95% 信賴橢圓、前／後行程雙橢圓與精確 `F(2, df-1)` Hotelling T² 背隙檢定）、`calcBoardProfileXY`（實體座標優先、虛擬網格 fail-visible 阻斷與單線座標防呆）與 `calcApertureOrientation`（0° 平行 vs 90° 垂直刮刀 Welch t 檢定、Cohen's d、AR 分層與無方向性欄位防呆）。
+- **製程跡象（`#p-deep`）三子頁重構與 4 組進階圖表**：拆分「變異與開孔（`deep/var`）」、「空間與偏移（`deep/spatial`）」、「形貌與異常（`deep/morph`）」三子視圖，全面納入元件範圍篩選（`deepScopeRows()` + 變異守衛檢查）與無嵌套 `.card` 行動版規範。
+- **正交偵測規則 `M-24` 與 `M-25`**：`detectIssues()` 新增 `M-24`（前／後行程二維偏移背隙，歸入 `"align"`）與 `M-25`（0° vs 90° 開孔方向體積差異，歸入 `"aperture"`），前置零配置快速預篩並通過 `npm run test:slow` 全量穩定製程校準（0 誤報）。
+- **分析報告與 AI 診斷整合**：擴充 `extDiagnosticsSummary(A)` 納入變異來源佔比、雙行程偏移背隙與開孔方向差異；PDF 分析報告 Ch.7 離屏嵌入變異數分解、二維偏移靶心、板面 X／Y 邊際剖面與開孔方向摘要表，Ch.10 補齊階段二公式附錄。
+
 ## v10.39.0 — 2026-11-24（SPI 進階統計圖表階段一：G 圖、Laney U′、板序自相關、Ca×Cp 四象限、滑動 Cpk）
 
 - **獨立純統計模組 `lib/spi-stats-ext.mjs`**：實作無 DOM 單趟 O(N) 純函式（`calcGChart`、`calcLaneyUChart`、`calcAcfPacf`、`calcCaCpQuadrant`、`calcRollingCpk`），以 `tools/sync-spi-stats-ext.mjs` 同步內嵌至 `spi-spc.html` `<script id="core">`（相容主執行緒、>20,000 筆 Web Worker 與 VM 沙箱），並建立 `extStatsCache` 按需快取。

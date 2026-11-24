@@ -358,3 +358,30 @@ test("製程能力四象限與滑動 Cpk 依元件範圍篩選且不混入範圍
   assert.match(d.querySelector("#rollCpkSub").textContent, /U2/, "滑動 Cpk 副標應反映元件範圍");
 });
 
+test("製程跡象三子頁與變異數分解／偏移靶心／板面剖面隨元件範圍篩選", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { d, H } = await openPage();
+  H.setTab("deep/var");
+  assert.equal(d.querySelector('#p-deep [data-deep-sub="var"]').hidden, false);
+  assert.equal(d.querySelector('#p-deep [data-deep-sub="spatial"]').hidden, true);
+  assert.equal(d.querySelector('#p-deep [data-deep-sub="morph"]').hidden, true);
+  assert.ok(d.querySelector("#varSub").textContent.includes("主導變異"), "全板變異數分解應顯示主導變異");
+
+  H.setTab("deep/spatial");
+  assert.equal(d.querySelector('#p-deep [data-deep-sub="spatial"]').hidden, false);
+  const fullNMatch = d.querySelector("#offBullSub").textContent.match(/n=(\d+)/);
+  assert.ok(fullNMatch && Number(fullNMatch[1]) > 0, "全板偏移靶心副標應含 n");
+  const fullN = Number(fullNMatch[1]);
+
+  H.setComp(key("U1"));
+  H.setTab("deep/spatial");
+  const u1NMatch = d.querySelector("#offBullSub").textContent.match(/n=(\d+)/);
+  assert.ok(u1NMatch && Number(u1NMatch[1]) > 0 && Number(u1NMatch[1]) < fullN, "單一元件偏移靶心 n 應小於全板 n");
+  assert.ok(d.querySelector("#profSub").textContent.includes("U1"), "板面剖面副標應反映元件範圍");
+
+  H.setTab("deep/var");
+  assert.ok(!d.querySelector("#varSub").textContent.includes("元件群組間"), "單一元件變異數分解不應含元件群組間層");
+  H.setTab("deep/morph");
+  assert.equal(d.querySelector('#p-deep [data-deep-sub="morph"]').hidden, false);
+});
+
+

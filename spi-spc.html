@@ -1249,7 +1249,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
         <button role="menuitem" id="btnMyShares" hidden title="檢視與管理自己建立的分享連結">我的分享</button>
         <a role="menuitem" id="offlineLink" href="/download/offline" hidden title="下載單一 HTML 檔，不連網也能分析；資料不會存檔">下載離線版</a>
         <a role="menuitem" id="logoutLink" href="/__logout" hidden>登出</a>
-        <p class="menu-ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.39.0</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></p>
+        <p class="menu-ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.40.0</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></p>
       </div>
     </div>
   </div>
@@ -1577,87 +1577,144 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
 </section>
 
 <section class="panel" id="p-deep" role="tabpanel" hidden>
-  <div class="deep-body" style="display:grid;gap:12px;grid-template-columns:minmax(0,1fr);min-width:0">
-<div class="card">
-    <h3>面積比 × 轉移效率 <small id="arSub"></small></h3>
+  <nav class="subtabs" aria-label="製程跡象子視圖">
+    <button type="button" class="subtab" data-subnav-deep="var" aria-current="page">變異與開孔</button>
+    <button type="button" class="subtab" data-subnav-deep="spatial">空間與偏移</button>
+    <button type="button" class="subtab" data-subnav-deep="morph">形貌與異常</button>
+  </nav>
+  <div class="deep-subviews stack-md">
+    <div data-deep-sub="var" class="stack-md">
+      <div class="card" id="cardVariance">
+        <h3>變異數分解與多變異圖 <small id="varSub"></small></h3>
+        <div id="varMsg" class="note my-8" hidden></div>
+        <div class="chartbox" style="height:120px"><canvas id="cVarPct" role="img" aria-label="變異數分解百分比圖"></canvas></div>
+        <div class="chartbox" style="margin-top:10px"><canvas id="cMultiVari" role="img" aria-label="多變異圖"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>面積比 × 轉移效率 <small id="arSub"></small></h3>
         <div class="legend" id="arLeg"></div>
-    <p id="arNote" hidden style="margin:6px 0"></p>
-    <div class="chartbox tall"><canvas id="cAR" role="img" aria-label="面積比與轉移效率散佈圖"></canvas></div>
-    <div class="tbl" style="margin-top:10px"><table id="arTbl"></table></div>
-  </div>
-  
-    
-  <div class="card"><h3>量測項目相關矩陣 <small id="corrSub"></small></h3>
-            <div class="tbl"><table class="corr" id="corrTbl"></table></div></div>
-  <div class="card" id="cardAlign">
-    <h3>對位分解 </h3>
-        <div class="toolbar" id="alignToolbar"><div class="field"><label for="selAlignBoard">板號</label><select id="selAlignBoard"></select></div><div class="field" id="alignVecField"><label for="inVec">箭頭放大 <span class="num" id="vecOut">40×</span></label><input type="range" id="inVec" min="10" max="150" value="40" step="5"></div></div>
-    <div id="alignEmpty" style="margin:8px 0" hidden></div>
-    <div class="grid2" id="alignGrid" style="margin-top:10px;align-items:start">
-      <div id="alignVecWrap">
-        <canvas class="vec" id="vecCv" width="900" height="600" role="img" aria-label="偏移向量圖"></canvas>
-        <div id="alignVecEmpty" class="empty-state" style="padding:24px 16px" hidden></div>
+        <p id="arNote" hidden style="margin:6px 0"></p>
+        <div class="chartbox tall"><canvas id="cAR" role="img" aria-label="面積比與轉移效率散佈圖"></canvas></div>
+        <div class="tbl" style="margin-top:10px"><table id="arTbl"></table></div>
       </div>
-      <div class="tbl" style="max-height:380px;overflow:auto"><table id="alignTbl"></table></div>
+      <div class="card" id="cardOrient">
+        <h3>開孔方向效應圖 <small id="orientSub"></small></h3>
+        <div class="toolbar" style="margin-bottom:6px">
+          <div class="field"><label for="selOrientMode">分層方式</label>
+            <select id="selOrientMode">
+              <option value="all" selected>全體比較</option>
+              <option value="ar">按面積比區間分層</option>
+            </select>
+          </div>
+        </div>
+        <div id="orientMsg" class="note my-8" hidden></div>
+        <div class="chartbox short"><canvas id="cOrient" role="img" aria-label="開孔方向效應圖"></canvas></div>
+      </div>
+      <div class="grid2">
+        <div class="card"><h3>刮刀前 / 後行程比較 <small id="strokeSub"></small></h3>
+          <div class="chartbox short"><canvas id="cStroke" role="img" aria-label="刮刀前後比較"></canvas></div><p id="strokeTxt" style="margin:8px 0 0"></p></div>
+        <div class="card"><h3>鋼板擦拭週期 <small id="wipeSub"></small></h3>
+          <div class="row" style="margin-top:8px;align-items:center;flex-wrap:wrap;gap:8px">
+            <span class="lbl">每幾片擦拭一次</span>
+            <span id="wipeDisplay" class="num" aria-live="polite"></span>
+            <button type="button" class="linkbtn" id="btnGoWipeSpec">前往設定</button>
+          </div>
+          <div class="chartbox short" style="margin-top:8px"><canvas id="cWipe" role="img" aria-label="擦拭週期分析"></canvas></div><p id="wipeTxt" style="margin:8px 0 0"></p></div>
+      </div>
     </div>
-  </div>
-  <div class="grid2">
-    <div class="card"><h3>刮刀前 / 後行程比較 <small id="strokeSub"></small></h3>
-            <div class="chartbox short"><canvas id="cStroke" role="img" aria-label="刮刀前後比較"></canvas></div><p id="strokeTxt" style="margin:8px 0 0"></p></div>
-    <div class="card"><h3>鋼板擦拭週期 <small id="wipeSub"></small></h3>
-            <div class="row" style="margin-top:8px;align-items:center;flex-wrap:wrap;gap:8px">
-              <span class="lbl">每幾片擦拭一次</span>
-              <span id="wipeDisplay" class="num" aria-live="polite"></span>
-              <button type="button" class="linkbtn" id="btnGoWipeSpec">前往設定</button>
-            </div>
-            <div class="chartbox short" style="margin-top:8px"><canvas id="cWipe" role="img" aria-label="擦拭週期分析"></canvas></div><p id="wipeTxt" style="margin:8px 0 0"></p></div></div>
-  <div class="card" id="cardMorph">
-    <h3>形貌指標 <small id="morphSub"></small></h3>
-    <p class="note scope-board-note" hidden>全板分析，不隨元件範圍變動</p>
-        <div class="kpis" id="morphKpis" style="margin-top:10px"></div>
-    <div class="tbl" style="margin-top:10px;max-height:280px;overflow:auto"><table id="morphTbl"></table></div>
-  </div>
 
-  <div class="grid2" id="advPauseLisaGrid" style="align-items:start">
-    <div class="card" id="cardPause">
-      <h3>停線時效與鋼板壽命衰退 <small id="pauseSub"></small></h3>
-            <div id="pauseMsg" style="margin:8px 0"></div>
-      <div class="tbl" id="pauseTblWrap" style="max-height:260px;overflow:auto"><table id="pauseTbl"></table></div>
-    </div>
-    <div class="card" id="cardLISA">
-      <h3>空間自相關與局部聚類 <small id="lisaSub"></small></h3>
-            <div id="lisaMsg" style="margin:8px 0"></div>
-      <div class="legend" id="lisaLeg">
-        <span><i class="sq" style="background:var(--lisa-hh)"></i>HH 熱點</span>
-        <span><i class="sq" style="background:var(--lisa-ll)"></i>LL 冷點</span>
-        <span><i class="sq" style="background:var(--lisa-lh)"></i>LH 空間離群</span>
-        <span><i class="sq" style="background:var(--lisa-hl)"></i>HL 空間離群</span>
-        <span><i class="sq" style="background:var(--lisa-ns)"></i>NS 無顯著</span>
+    <div data-deep-sub="spatial" class="stack-md" hidden>
+      <div class="card" id="cardOffsetBullseye">
+        <h3>二維偏移靶心圖 <small id="offBullSub"></small></h3>
+        <div id="offBullMsg" class="note my-8" hidden></div>
+        <div class="chartbox tall"><canvas id="cOffBull" role="img" aria-label="二維偏移靶心圖"></canvas></div>
       </div>
-      <div class="chartbox" id="lisaChartBox" style="height:320px;position:relative"><canvas id="cLISA" role="img" aria-label="LISA 空間聚類分佈圖" style="display:block;width:100%;height:100%"></canvas></div>
+      <div class="card" id="cardBoardProfile">
+        <h3>板面 X / Y 邊際剖面梯度圖 <small id="profSub"></small></h3>
+        <div class="toolbar" style="margin-bottom:6px;flex-wrap:wrap">
+          <div class="field"><label for="selProfBins">區帶數</label>
+            <select id="selProfBins">
+              <option value="8">8 區帶</option>
+              <option value="10" selected>10 區帶</option>
+              <option value="15">15 區帶</option>
+            </select>
+          </div>
+          <label class="chk" for="chkProfStroke"><input type="checkbox" id="chkProfStroke"> 依前／後行程分線</label>
+        </div>
+        <div id="profMsg" class="note my-8" hidden></div>
+        <div class="grid2" id="profGrid">
+          <div>
+            <div class="fact" style="margin-bottom:4px">沿 X 軸剖面（左 → 右）</div>
+            <div class="chartbox short"><canvas id="cProfX" role="img" aria-label="沿 X 軸邊際剖面圖"></canvas></div>
+          </div>
+          <div>
+            <div class="fact" style="margin-bottom:4px">沿 Y 軸剖面（前 → 後）</div>
+            <div class="chartbox short"><canvas id="cProfY" role="img" aria-label="沿 Y 軸邊際剖面圖"></canvas></div>
+          </div>
+        </div>
+      </div>
+      <div class="card" id="cardAlign">
+        <h3>對位分解 </h3>
+        <div class="toolbar" id="alignToolbar"><div class="field"><label for="selAlignBoard">板號</label><select id="selAlignBoard"></select></div><div class="field" id="alignVecField"><label for="inVec">箭頭放大 <span class="num" id="vecOut">40×</span></label><input type="range" id="inVec" min="10" max="150" value="40" step="5"></div></div>
+        <div id="alignEmpty" style="margin:8px 0" hidden></div>
+        <div class="grid2" id="alignGrid" style="margin-top:10px;align-items:start">
+          <div id="alignVecWrap">
+            <canvas class="vec" id="vecCv" width="900" height="600" role="img" aria-label="偏移向量圖"></canvas>
+            <div id="alignVecEmpty" class="empty-state" style="padding:24px 16px" hidden></div>
+          </div>
+          <div class="tbl" style="max-height:380px;overflow:auto"><table id="alignTbl"></table></div>
+        </div>
+      </div>
+      <div class="card" id="cardLISA">
+        <h3>空間自相關與局部聚類 <small id="lisaSub"></small></h3>
+        <div id="lisaMsg" style="margin:8px 0"></div>
+        <div class="legend" id="lisaLeg">
+          <span><i class="sq" style="background:var(--lisa-hh)"></i>HH 熱點</span>
+          <span><i class="sq" style="background:var(--lisa-ll)"></i>LL 冷點</span>
+          <span><i class="sq" style="background:var(--lisa-lh)"></i>LH 空間離群</span>
+          <span><i class="sq" style="background:var(--lisa-hl)"></i>HL 空間離群</span>
+          <span><i class="sq" style="background:var(--lisa-ns)"></i>NS 無顯著</span>
+        </div>
+        <div class="chartbox" id="lisaChartBox" style="height:320px;position:relative"><canvas id="cLISA" role="img" aria-label="LISA 空間聚類分佈圖" style="display:block;width:100%;height:100%"></canvas></div>
+      </div>
     </div>
-  </div>
-  <div class="card" id="cardRelChart">
-    <h3>關係圖 <small id="relChartSub"></small></h3>
-    <div class="toolbar"><div class="field"><label for="selRelChart">圖種</label>
-      <select id="selRelChart"><option value="specScatter">規格散點（體積 × 高度）</option><option value="parallel">平行座標</option><option value="radar">Radar（體積／面積／高度）</option></select></div></div>
-    <div id="relChartMsg" class="note" style="margin:8px 0"></div>
-    <div id="relChartEmpty" class="empty-state" style="padding:24px 16px" hidden></div>
-    <div class="chartbox tall" id="relChartBox"><canvas id="cRelChart" role="img" aria-label="關係圖"></canvas></div>
-  </div>
-<div class="card">
-    <h3>統計異常點集中清單 <small id="statsSub"></small></h3>
-    <div class="tbl" style="max-height:420px;overflow:auto">
-      <table id="statsTbl"></table>
-    </div>
-  </div>
-  <div class="card" id="cardMatrix">
-    <h3>板號 × 元件群組 不良品矩陣 <small id="matrixSub"></small></h3>
-    <p class="note scope-board-note" hidden>全板分析，不隨元件範圍變動</p>
+
+    <div data-deep-sub="morph" class="stack-md" hidden>
+      <div class="card" id="cardMorph">
+        <h3>形貌指標 <small id="morphSub"></small></h3>
+        <p class="note scope-board-note" hidden>全板分析，不隨元件範圍變動</p>
+        <div class="kpis" id="morphKpis" style="margin-top:10px"></div>
+        <div class="tbl" style="margin-top:10px;max-height:280px;overflow:auto"><table id="morphTbl"></table></div>
+      </div>
+      <div class="card" id="cardPause">
+        <h3>停線時效與鋼板壽命衰退 <small id="pauseSub"></small></h3>
+        <div id="pauseMsg" style="margin:8px 0"></div>
+        <div class="tbl" id="pauseTblWrap" style="max-height:260px;overflow:auto"><table id="pauseTbl"></table></div>
+      </div>
+      <div class="card"><h3>量測項目相關矩陣 <small id="corrSub"></small></h3>
+        <div class="tbl"><table class="corr" id="corrTbl"></table></div></div>
+      <div class="card" id="cardRelChart">
+        <h3>關係圖 <small id="relChartSub"></small></h3>
+        <div class="toolbar"><div class="field"><label for="selRelChart">圖種</label>
+          <select id="selRelChart"><option value="specScatter">規格散點（體積 × 高度）</option><option value="parallel">平行座標</option><option value="radar">Radar（體積／面積／高度）</option></select></div></div>
+        <div id="relChartMsg" class="note" style="margin:8px 0"></div>
+        <div id="relChartEmpty" class="empty-state" style="padding:24px 16px" hidden></div>
+        <div class="chartbox tall" id="relChartBox"><canvas id="cRelChart" role="img" aria-label="關係圖"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>統計異常點集中清單 <small id="statsSub"></small></h3>
         <div class="tbl" style="max-height:420px;overflow:auto">
-      <table id="matrixTbl"></table>
+          <table id="statsTbl"></table>
+        </div>
+      </div>
+      <div class="card" id="cardMatrix">
+        <h3>板號 × 元件群組 不良品矩陣 <small id="matrixSub"></small></h3>
+        <p class="note scope-board-note" hidden>全板分析，不隨元件範圍變動</p>
+        <div class="tbl" style="max-height:420px;overflow:auto">
+          <table id="matrixTbl"></table>
+        </div>
+      </div>
     </div>
-  </div>
   </div>
 </section>
 
@@ -3716,6 +3773,598 @@ function calcRollingCpk(boardGroups, spec, windowSize = 5) {
     pts,
   };
 }
+
+/* ==================== 階段二純統計引擎 ==================== */
+
+function _extErfc(x) {
+  const z = Math.abs(x);
+  const t = 1 / (1 + 0.5 * z);
+  const r = t * Math.exp(
+    -z * z - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 +
+    t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 +
+    t * (-0.82215223 + t * 0.17087277))))))))
+  );
+  return x >= 0 ? r : 2 - r;
+}
+
+function _extTwoTailNormalP(z) {
+  if (!Number.isFinite(z)) return 1;
+  return Math.max(0, Math.min(1, _extErfc(Math.abs(z) / Math.SQRT2)));
+}
+
+function _extTwoTailTP(tAbs, df) {
+  if (!Number.isFinite(tAbs) || df <= 0) return 1;
+  if (df >= 120) return _extTwoTailNormalP(tAbs);
+  // Hill / Cornish-Fisher 精確近似（誤差 < 1e-4）
+  const a = df - 0.5;
+  const b = 48 * a * a;
+  const z2 = a * Math.log(1 + (tAbs * tAbs) / df);
+  const z = Math.sqrt(Math.max(0, z2)) * (1 + (((-0.4 * z2 - 3.3) * z2 - 24.0) * z2 - 85.5) / (0.8 * z2 * z2 + 100 + b));
+  return _extTwoTailNormalP(z);
+}
+
+function _extStrokeNorm(r) {
+  if (!r || r.stroke == null) return null;
+  const s = String(r.stroke).trim().toUpperCase();
+  if (!s) return null;
+  if (/^(F|FWD|FORWARD|FRONT|1|A|前|正|去|\+)$/.test(s)) return "F";
+  if (/^(R|REV|REVERSE|BACK|BWD|2|B|後|反|回|-)$/.test(s)) return "R";
+  return s;
+}
+
+function _extPhysXY(r) {
+  if (!r) return null;
+  if (r.x != null && r.y != null && Number.isFinite(r.x) && Number.isFinite(r.y) && !r.gridPos) {
+    return { x: r.x, y: r.y, level: "pad" };
+  }
+  if (r.componentX != null && r.componentY != null && Number.isFinite(r.componentX) && Number.isFinite(r.componentY)) {
+    return { x: r.componentX, y: r.componentY, level: "comp" };
+  }
+  return null;
+}
+
+/**
+ * 2.1a 變異數分解（序列型群組調整＋巢狀 板間 → 子板間 → 板內殘差，單趟 O(N)）
+ */
+function calcVarianceComponents(rows, metric) {
+  const valid = [];
+  for (let i = 0; i < (rows ? rows.length : 0); i++) {
+    const r = rows[i];
+    const v = r && r[metric];
+    if (v != null && Number.isFinite(v)) valid.push(r);
+  }
+  const N = valid.length;
+  if (N < 6) {
+    return { insufficient: true, reason: "有效樣本少於 6 筆，無法進行變異數分解", n: N, layers: [], dominant: null };
+  }
+
+  // Step 1: 統計群組均值與總均值
+  let totSum = 0;
+  const gStat = new Map();
+  for (let i = 0; i < N; i++) {
+    const r = valid[i];
+    const v = r[metric];
+    totSum += v;
+    const g = r.group != null && String(r.group).trim() ? String(r.group).trim() : "未分類";
+    let gs = gStat.get(g);
+    if (!gs) { gs = { n: 0, sum: 0 }; gStat.set(g, gs); }
+    gs.n += 1;
+    gs.sum += v;
+  }
+  const grandMean = totSum / N;
+  let ssTotal = 0;
+  for (let i = 0; i < N; i++) {
+    const d = valid[i][metric] - grandMean;
+    ssTotal += d * d;
+  }
+  if (ssTotal <= 1e-12) {
+    return { insufficient: true, reason: "範圍內量測值無變異，無法分解變異來源", n: N, layers: [], dominant: null };
+  }
+
+  const hasMultiGroup = gStat.size > 1;
+  const gMeanMap = new Map();
+  let ssGroup = 0;
+  for (const [g, gs] of gStat.entries()) {
+    const mu = gs.sum / gs.n;
+    gMeanMap.set(g, mu);
+    if (hasMultiGroup) {
+      const d = mu - grandMean;
+      ssGroup += gs.n * d * d;
+    }
+  }
+
+  // Step 2: 對群組去中心後之殘差做嚴格巢狀分解：板間 → 子板間（若同板具 >1 子板）→ 板內焊墊殘差
+  const bMap = new Map();
+  const bfMap = new Map();
+  const figPerBoard = new Map();
+  for (let i = 0; i < N; i++) {
+    const r = valid[i];
+    const g = r.group != null && String(r.group).trim() ? String(r.group).trim() : "未分類";
+    const e = hasMultiGroup ? (r[metric] - gMeanMap.get(g)) : (r[metric] - grandMean);
+    const b = r.board != null ? String(r.board) : "";
+    const fig = r.figure != null && String(r.figure).trim() ? String(r.figure).trim() : "";
+
+    let bs = bMap.get(b);
+    if (!bs) { bs = { n: 0, sum: 0 }; bMap.set(b, bs); }
+    bs.n += 1;
+    bs.sum += e;
+
+    if (fig) {
+      let fset = figPerBoard.get(b);
+      if (!fset) { fset = new Set(); figPerBoard.set(b, fset); }
+      fset.add(fig);
+    }
+    const bfk = b + "\x1f" + fig;
+    let bfs = bfMap.get(bfk);
+    if (!bfs) { bfs = { b, fig, n: 0, sum: 0 }; bfMap.set(bfk, bfs); }
+    bfs.n += 1;
+    bfs.sum += e;
+  }
+
+  let hasMultiFigure = false;
+  for (const fset of figPerBoard.values()) {
+    if (fset.size > 1) { hasMultiFigure = true; break; }
+  }
+  const hasMultiBoard = bMap.size > 1;
+
+  let ssBoard = 0;
+  const bMeanMap = new Map();
+  for (const [b, bs] of bMap.entries()) {
+    const mu = bs.sum / bs.n;
+    bMeanMap.set(b, mu);
+    if (hasMultiBoard) ssBoard += bs.n * mu * mu;
+  }
+
+  let ssFigure = 0;
+  if (hasMultiFigure) {
+    for (const bfs of bfMap.values()) {
+      const bMu = bMeanMap.get(bfs.b) || 0;
+      const fMu = bfs.sum / bfs.n;
+      const d = fMu - bMu;
+      ssFigure += bfs.n * d * d;
+    }
+  }
+
+  const ssWithin = Math.max(0, ssTotal - ssGroup - ssBoard - ssFigure);
+
+  const layers = [];
+  const pushLayer = (key, label, ss) => {
+    const pct = (ss / ssTotal) * 100;
+    layers.push({ key, label, ss, pct });
+  };
+  if (hasMultiGroup) pushLayer("group", "元件群組間（開孔／設計）", ssGroup);
+  if (hasMultiBoard) pushLayer("board", "板間（製程漂移）", ssBoard);
+  if (hasMultiFigure) pushLayer("figure", "子板間（拼板／支撐）", ssFigure);
+  pushLayer("within", "板內焊墊殘差（位置／脫模）", ssWithin);
+
+  // 確保百分比總和精確為 100%
+  const rawSum = layers.reduce((s, l) => s + l.pct, 0) || 1;
+  for (let i = 0; i < layers.length; i++) layers[i].pct = (layers[i].pct / rawSum) * 100;
+  const dominant = layers.reduce((best, cur) => (!best || cur.pct > best.pct ? cur : best), null);
+
+  return {
+    insufficient: false,
+    n: N,
+    ssTotal,
+    hasMultiGroup,
+    hasMultiBoard,
+    hasMultiFigure,
+    layers,
+    dominant,
+  };
+}
+
+/**
+ * 2.1b 多變異圖（Multi-Vari：各板內分層平均與 P10–P90 跨度）
+ */
+function calcMultiVari(rows, metric, boardOrder, maxBoards = 30) {
+  const valid = [];
+  for (let i = 0; i < (rows ? rows.length : 0); i++) {
+    const r = rows[i];
+    const v = r && r[metric];
+    if (v != null && Number.isFinite(v)) valid.push(r);
+  }
+  if (valid.length < 6) return { insufficient: true, reason: "有效樣本不足，無法繪製多變異圖", boards: [], strata: [] };
+
+  const byBoard = new Map();
+  const figSet = new Set();
+  const grpCounts = new Map();
+  for (let i = 0; i < valid.length; i++) {
+    const r = valid[i];
+    const b = r.board != null ? String(r.board) : "";
+    let list = byBoard.get(b);
+    if (!list) { list = []; byBoard.set(b, list); }
+    list.push(r);
+    if (r.figure != null && String(r.figure).trim()) figSet.add(String(r.figure).trim());
+    const g = r.group != null && String(r.group).trim() ? String(r.group).trim() : "未分類";
+    grpCounts.set(g, (grpCounts.get(g) || 0) + 1);
+  }
+
+  let boards = Array.isArray(boardOrder) && boardOrder.length
+    ? boardOrder.filter((b) => byBoard.has(String(b))).map(String)
+    : [...byBoard.keys()];
+  for (const b of byBoard.keys()) if (!boards.includes(b)) boards.push(b);
+  if (!boards.length) return { insufficient: true, reason: "無有效板序資料", boards: [], strata: [] };
+
+  let subsampled = false;
+  if (boards.length > maxBoards) {
+    subsampled = true;
+    const picked = [];
+    for (let i = 0; i < maxBoards; i++) {
+      const idx = Math.min(boards.length - 1, Math.round((i * (boards.length - 1)) / (maxBoards - 1)));
+      if (!picked.includes(boards[idx])) picked.push(boards[idx]);
+    }
+    boards = picked;
+  }
+
+  // 分層優先序：子板（>1）→ 前 3 大群組（>1）→ 全板單層
+  let strataBy = "board";
+  let strataKeys = ["全板"];
+  if (figSet.size > 1) {
+    strataBy = "figure";
+    strataKeys = [...figSet].sort().slice(0, 6);
+  } else if (grpCounts.size > 1) {
+    strataBy = "group";
+    strataKeys = [...grpCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map((x) => x[0]);
+  }
+
+  const quantOf = (sorted, q) => {
+    if (!sorted.length) return null;
+    const pos = (sorted.length - 1) * q;
+    const lo = Math.floor(pos), hi = Math.ceil(pos);
+    return sorted[lo] + (sorted[hi] - sorted[lo]) * (pos - lo);
+  };
+
+  const strata = strataKeys.map((sk) => {
+    const pts = boards.map((b) => {
+      const rs = byBoard.get(b) || [];
+      const vals = [];
+      let sum = 0;
+      for (let i = 0; i < rs.length; i++) {
+        const r = rs[i];
+        const match = strataBy === "board" ? true
+          : strataBy === "figure" ? String(r.figure ?? "").trim() === sk
+            : (String(r.group ?? "").trim() || "未分類") === sk;
+        if (!match) continue;
+        const v = r[metric];
+        if (v != null && Number.isFinite(v)) { vals.push(v); sum += v; }
+      }
+      if (!vals.length) return { board: b, n: 0, mean: null, p10: null, p90: null };
+      vals.sort((a, b2) => a - b2);
+      return { board: b, n: vals.length, mean: sum / vals.length, p10: quantOf(vals, 0.1), p90: quantOf(vals, 0.9) };
+    });
+    return { key: sk, pts };
+  });
+
+  return { insufficient: false, strataBy, subsampled, totalBoards: byBoard.size, boards, strata };
+}
+
+/**
+ * 2.2 二維偏移靶心圖與 95% 信賴橢圓（含前／後行程雙橢圓與雙變量 Hotelling T² 背隙檢定）
+ */
+function calcOffsetEllipse(rows, specs, opts = {}) {
+  const coreOnly = Boolean(opts && opts.coreOnly);
+  const maxScatter = (opts && opts.maxScatter) || 4000;
+  const pts = [];
+  for (let i = 0; i < (rows ? rows.length : 0); i++) {
+    const r = rows[i];
+    if (r && r.offx != null && r.offy != null && Number.isFinite(r.offx) && Number.isFinite(r.offy)) {
+      pts.push({ x: r.offx, y: r.offy, s: _extStrokeNorm(r) });
+    }
+  }
+  const N = pts.length;
+  if (N < 5) {
+    return { insufficient: true, reason: "有效 X／Y 偏移量測少於 5 筆，無法繪製二維偏移靶心圖", n: N };
+  }
+
+  const fit2D = (arr) => {
+    const n = arr.length;
+    if (n < 3) return null;
+    let sx = 0, sy = 0;
+    for (let i = 0; i < n; i++) { sx += arr[i].x; sy += arr[i].y; }
+    const mx = sx / n, my = sy / n;
+    let sxx = 0, syy = 0, sxy = 0;
+    for (let i = 0; i < n; i++) {
+      const dx = arr[i].x - mx, dy = arr[i].y - my;
+      sxx += dx * dx; syy += dy * dy; sxy += dx * dy;
+    }
+    const denom = Math.max(1, n - 1);
+    const cxx = sxx / denom, cyy = syy / denom, cxy = sxy / denom;
+    const det = cxx * cyy - cxy * cxy;
+    const singular = !Number.isFinite(det) || det <= 1e-12;
+    const ellipse = [];
+    if (!coreOnly && !singular) {
+      const tr = cxx + cyy;
+      const disc = Math.sqrt(Math.max(0, (cxx - cyy) * (cxx - cyy) + 4 * cxy * cxy));
+      const l1 = Math.max(0, (tr + disc) / 2);
+      const l2 = Math.max(0, (tr - disc) / 2);
+      const a = Math.sqrt(5.9914645 * l1);
+      const b = Math.sqrt(5.9914645 * l2);
+      const theta = 0.5 * Math.atan2(2 * cxy, cxx - cyy);
+      const ct = Math.cos(theta), st = Math.sin(theta);
+      const segs = 64;
+      for (let i = 0; i <= segs; i++) {
+        const ang = (i / segs) * Math.PI * 2;
+        const ex = a * Math.cos(ang), ey = b * Math.sin(ang);
+        ellipse.push({ x: mx + ex * ct - ey * st, y: my + ex * st + ey * ct });
+      }
+    }
+    return { n, mx, my, cxx, cyy, cxy, det, singular, ellipse };
+  };
+
+  const overall = fit2D(pts);
+  const fwd = pts.filter((p) => p.s === "F");
+  const rev = pts.filter((p) => p.s === "R");
+  let strokeSplit = { valid: false, backlashUm: null, p: null, t2: null, fwd: null, rev: null };
+
+  if (fwd.length >= 5 && rev.length >= 5) {
+    const fFit = fit2D(fwd);
+    const rFit = fit2D(rev);
+    const dx = fFit.mx - rFit.mx;
+    const dy = fFit.my - rFit.my;
+    const backlashUm = Math.hypot(dx, dy);
+    // Pooled 2x2 covariance for 2-sample Hotelling T²
+    const df = fFit.n + rFit.n - 2;
+    const pxx = ((fFit.n - 1) * fFit.cxx + (rFit.n - 1) * rFit.cxx) / df;
+    const pyy = ((fFit.n - 1) * fFit.cyy + (rFit.n - 1) * rFit.cyy) / df;
+    const pxy = ((fFit.n - 1) * fFit.cxy + (rFit.n - 1) * rFit.cxy) / df;
+    const pDet = pxx * pyy - pxy * pxy;
+    let t2 = null, p = null;
+    if (Number.isFinite(pDet) && pDet > 1e-12 && df > 2) {
+      const invXX = pyy / pDet, invYY = pxx / pDet, invXY = -pxy / pDet;
+      const quad = dx * dx * invXX + 2 * dx * dy * invXY + dy * dy * invYY;
+      t2 = ((fFit.n * rFit.n) / (fFit.n + rFit.n)) * quad;
+      const Fstat = ((df - 1) / (2 * df)) * t2;
+      // 精確 F(2, df-1) 上尾機率：P(F_{2, v} > x) = (1 + 2x/v)^(-v/2)
+      const v = df - 1;
+      p = Fstat > 0 ? Math.pow(1 + (2 * Fstat) / v, -v / 2) : 1;
+    }
+    strokeSplit = { valid: true, backlashUm, dx, dy, t2, p, fwd: fFit, rev: rFit };
+  }
+
+  // 散點抽樣（僅供繪點，統計與橢圓採 100% 全量）
+  let scatter = [];
+  let sampled = false;
+  if (!coreOnly) {
+    if (N <= maxScatter) {
+      scatter = pts;
+    } else {
+      sampled = true;
+      const step = N / maxScatter;
+      for (let i = 0; i < maxScatter; i++) scatter.push(pts[Math.floor(i * step)]);
+    }
+  }
+
+  const spX = specs && specs.offx ? specs.offx : null;
+  const spY = specs && specs.offy ? specs.offy : null;
+
+  return {
+    insufficient: false,
+    n: N,
+    sampled,
+    shownCount: scatter.length,
+    overall,
+    strokeSplit,
+    scatter,
+    specBox: spX && spY && spX.lsl != null && spX.usl != null && spY.lsl != null && spY.usl != null
+      ? { x0: spX.lsl, x1: spX.usl, y0: spY.lsl, y1: spY.usl }
+      : null,
+  };
+}
+
+/**
+ * 2.3 板面 X / Y 邊際剖面梯度圖（嚴格遵守實體座標優先與虛擬網格 fail-visible 守則）
+ */
+function calcBoardProfileXY(rows, metric, opts = {}) {
+  const binCount = Math.max(4, Math.min(20, Math.floor((opts && opts.bins) || 10)));
+  const phys = [];
+  let padCount = 0, compCount = 0;
+  for (let i = 0; i < (rows ? rows.length : 0); i++) {
+    const r = rows[i];
+    const v = r && r[metric];
+    if (v == null || !Number.isFinite(v)) continue;
+    const xy = _extPhysXY(r);
+    if (!xy) continue;
+    if (xy.level === "pad") padCount++; else compCount++;
+    phys.push({ x: xy.x, y: xy.y, v, s: _extStrokeNorm(r) });
+  }
+  if (phys.length < 6) {
+    return {
+      insufficient: true,
+      reason: "virtual_grid",
+      message: "無實際物理座標（或僅有虛擬網格示意排列），無法計算板面 X／Y 邊際梯度",
+      n: phys.length,
+    };
+  }
+
+  const analyzeAxis = (coordKey) => {
+    let lo = Infinity, hi = -Infinity;
+    let sx = 0, sy = 0;
+    for (let i = 0; i < phys.length; i++) {
+      const c = phys[i][coordKey];
+      if (c < lo) lo = c;
+      if (c > hi) hi = c;
+      sx += c;
+      sy += phys[i].v;
+    }
+    const span = hi - lo;
+    const n = phys.length;
+    if (!Number.isFinite(span) || span <= 1e-6) {
+      const mu = sy / n;
+      return {
+        degenerate: true,
+        min: lo,
+        max: hi,
+        span: 0,
+        slopePer100mm: null,
+        p: null,
+        bins: [{ center: lo, lo, hi, n, mean: mu, ciLo: mu, ciHi: mu, fwdMean: null, revMean: null }],
+      };
+    }
+
+    // 全量線性迴歸斜率與雙尾 t 檢定 p 值
+    const mx = sx / n, my = sy / n;
+    let sxx = 0, sxy = 0, syy = 0;
+    for (let i = 0; i < n; i++) {
+      const dx = phys[i][coordKey] - mx, dy = phys[i].v - my;
+      sxx += dx * dx; sxy += dx * dy; syy += dy * dy;
+    }
+    const slope = sxx > 0 ? sxy / sxx : 0;
+    const slopePer100mm = slope * 100;
+    const sse = Math.max(0, syy - slope * sxy);
+    const seSlope = n > 2 && sxx > 0 ? Math.sqrt((sse / (n - 2)) / sxx) : NaN;
+    const tStat = Number.isFinite(seSlope) && seSlope > 1e-12 ? Math.abs(slope / seSlope) : 0;
+    const p = n > 2 ? _extTwoTailTP(tStat, n - 2) : 1;
+
+    // 等寬區帶統計（含前／後行程分線）
+    const acc = Array.from({ length: binCount }, (_, idx) => ({
+      lo: lo + (idx * span) / binCount,
+      hi: lo + ((idx + 1) * span) / binCount,
+      n: 0, sum: 0, sum2: 0,
+      fN: 0, fSum: 0, rN: 0, rSum: 0,
+    }));
+    for (let i = 0; i < n; i++) {
+      const c = phys[i][coordKey], v = phys[i].v;
+      const bi = Math.min(binCount - 1, Math.max(0, Math.floor(((c - lo) / span) * binCount)));
+      const b = acc[bi];
+      b.n++; b.sum += v; b.sum2 += v * v;
+      if (phys[i].s === "F") { b.fN++; b.fSum += v; }
+      else if (phys[i].s === "R") { b.rN++; b.rSum += v; }
+    }
+    const bins = acc.map((b) => {
+      const center = (b.lo + b.hi) / 2;
+      if (!b.n) return { center, lo: b.lo, hi: b.hi, n: 0, mean: null, ciLo: null, ciHi: null, fwdMean: null, revMean: null };
+      const mu = b.sum / b.n;
+      const vr = b.n > 1 ? Math.max(0, (b.sum2 - (b.sum * b.sum) / b.n) / (b.n - 1)) : 0;
+      const se = b.n > 1 ? Math.sqrt(vr / b.n) : 0;
+      const half = 1.96 * se;
+      return {
+        center, lo: b.lo, hi: b.hi, n: b.n,
+        mean: mu, ciLo: mu - half, ciHi: mu + half,
+        fwdMean: b.fN > 0 ? b.fSum / b.fN : null,
+        revMean: b.rN > 0 ? b.rSum / b.rN : null,
+      };
+    });
+    return { degenerate: false, min: lo, max: hi, span, slopePer100mm, p, bins };
+  };
+
+  const hasStroke = phys.some((p) => p.s === "F") && phys.some((p) => p.s === "R");
+  return {
+    insufficient: false,
+    n: phys.length,
+    coordLevel: padCount >= compCount ? "pad" : "comp",
+    hasStroke,
+    xAxis: analyzeAxis("x"),
+    yAxis: analyzeAxis("y"),
+  };
+}
+
+/**
+ * 2.4 鋼板開孔方向效應（0° 平行 vs 90° 垂直刮刀方向，含無方向性欄位防呆與面積比分層）
+ */
+function calcApertureOrientation(rows, metric, sqDir = "Y", opts = {}) {
+  const thkUm = (opts && opts.stencilUm) || 120;
+  const thkMm = thkUm / 1000;
+  const par = [], perp = [], sq = [];
+  const buckets = {
+    low: { par: [], perp: [], label: "AR < 0.66" },
+    mid: { par: [], perp: [], label: "0.66 ≤ AR ≤ 0.75" },
+    high: { par: [], perp: [], label: "AR > 0.75" },
+  };
+  let usedAperture = 0, usedPad = 0;
+  for (let i = 0; i < (rows ? rows.length : 0); i++) {
+    const r = rows[i];
+    const v = r && r[metric];
+    if (v == null || !Number.isFinite(v)) continue;
+    let lx = null, ly = null;
+    if (r.apl != null && r.apw != null && r.apl > 0 && r.apw > 0) { lx = r.apl; ly = r.apw; usedAperture++; }
+    else if (r.padl != null && r.padw != null && r.padl > 0 && r.padw > 0) { lx = r.padl; ly = r.padw; usedPad++; }
+    if (lx == null || ly == null) continue;
+
+    const ar = (lx * ly) / (2 * (lx + ly) * thkMm);
+    const bk = ar < 0.66 ? buckets.low : ar <= 0.75 ? buckets.mid : buckets.high;
+    const ratio = Math.max(lx, ly) / Math.min(lx, ly);
+    if (ratio < 1.25) {
+      sq.push(v);
+    } else {
+      const longIsX = lx > ly;
+      const isParallel = (sqDir === "X" && longIsX) || (sqDir !== "X" && !longIsX);
+      if (isParallel) { par.push(v); bk.par.push(v); }
+      else { perp.push(v); bk.perp.push(v); }
+    }
+  }
+
+  const total = par.length + perp.length + sq.length;
+  if (total < 6) {
+    return { insufficient: true, reason: "缺少開孔或焊墊長寬尺寸（apl/apw 或 padl/padw），無法分析開孔方向效應", total };
+  }
+
+  const statOf = (arr) => {
+    const n = arr.length;
+    if (!n) return { n: 0, mean: null, sd: null, ciHalf: null };
+    let s = 0, s2 = 0;
+    for (let i = 0; i < n; i++) { s += arr[i]; s2 += arr[i] * arr[i]; }
+    const mu = s / n;
+    const vr = n > 1 ? Math.max(0, (s2 - (s * s) / n) / (n - 1)) : 0;
+    const sd = Math.sqrt(vr);
+    return { n, mean: mu, sd, ciHalf: n > 1 ? 1.96 * (sd / Math.sqrt(n)) : 0 };
+  };
+
+  const sPar = statOf(par), sPerp = statOf(perp), sSq = statOf(sq);
+  const singleAxisOnly = (par.length === 0 && perp.length > 0) || (perp.length === 0 && par.length > 0);
+  if (singleAxisOnly || (par.length < 2 && perp.length < 2)) {
+    return {
+      insufficient: false,
+      singleAxisOnly: true,
+      message: "僅偵測到單一長軸方向，可能因匯入欄位為不分軸向的長／寬而非 X／Y 軸尺寸",
+      dimSource: usedAperture >= usedPad ? "開孔尺寸" : "焊墊尺寸",
+      sqDir: sqDir === "X" ? "X" : "Y",
+      parallel: sPar,
+      perpendicular: sPerp,
+      square: sSq,
+      diff: null,
+      p: null,
+      cohenD: null,
+      arBuckets: [],
+    };
+  }
+
+  // Welch t-test & Cohen's d
+  const diff = sPar.mean - sPerp.mean;
+  const v1 = (sPar.sd * sPar.sd) / sPar.n;
+  const v2 = (sPerp.sd * sPerp.sd) / sPerp.n;
+  const se = Math.sqrt(v1 + v2);
+  let p = 1;
+  if (se > 1e-12) {
+    const t = Math.abs(diff) / se;
+    const dfNum = (v1 + v2) * (v1 + v2);
+    const dfDen = (v1 * v1) / Math.max(1, sPar.n - 1) + (v2 * v2) / Math.max(1, sPerp.n - 1);
+    const df = dfDen > 0 ? dfNum / dfDen : sPar.n + sPerp.n - 2;
+    p = _extTwoTailTP(t, df);
+  }
+  const pooledSd = Math.sqrt((((sPar.n - 1) * sPar.sd * sPar.sd) + ((sPerp.n - 1) * sPerp.sd * sPerp.sd)) / Math.max(1, sPar.n + sPerp.n - 2));
+  const cohenD = pooledSd > 1e-12 ? diff / pooledSd : 0;
+
+  const arBuckets = Object.values(buckets).map((bk) => ({
+    label: bk.label,
+    parallel: statOf(bk.par),
+    perpendicular: statOf(bk.perp),
+  })).filter((b) => b.parallel.n > 0 || b.perpendicular.n > 0);
+
+  return {
+    insufficient: false,
+    singleAxisOnly: false,
+    dimSource: usedAperture >= usedPad ? "開孔尺寸" : "焊墊尺寸",
+    sqDir: sqDir === "X" ? "X" : "Y",
+    parallel: sPar,
+    perpendicular: sPerp,
+    square: sSq,
+    diff,
+    p,
+    cohenD,
+    arBuckets,
+  };
+}
 /* @spi-stats-ext END */
 /* @gerber-pads START */
 const GERBER=(()=>{
@@ -4476,7 +5125,7 @@ function buildSpatialPoints(rows,metricKey,preRows){
   }
   return{coordRows,coordLevel,pts};
 }
-const S={rows:[],metrics:[],metric:"volume",group:ALL_GRP,comp:null,chart:"xbars",relChart:"specScatter",pad:null,board:null,specSrc:"sample",partSpec:null,specDraft:null,specsG:null,sqDir:"Y",specs:JSON.parse(JSON.stringify(DEF_SPECS)),stencil:120,heightUnit:"um",htol:{lo:75,hi:125},step:{on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]},selZone:1,wipe:5,aperture:{groups:{}},geometryPads:null,padCoverage:null,pendingVerify:false,runVendor:"generic",ovCapSnap:null,ovCapSnapKey:"",source:"範例資料",tab:"issues",sub:"import",issuesSub:"list",controlSub:"uni",improveSub:"compare",F:[],issLv:"all",issEnt:null,pmapSelection:null,ctx:null,colorMode:"status",heatMode:"avg",sim3dMode:"real",comp3dMode:"off",exag:20,ghost:true,bridgeWarn:true,csAxis:"X",selectedPad:null,A:null,ai:"",aiModel:"",duo:{active:false,posture:"folded",mode:"master-detail",leftTab:"issues",rightTab:"sim3d",thumbSide:"right",pinnedPad:null,dockOpen:false}};
+const S={rows:[],metrics:[],metric:"volume",group:ALL_GRP,comp:null,chart:"xbars",relChart:"specScatter",pad:null,board:null,specSrc:"sample",partSpec:null,specDraft:null,specsG:null,sqDir:"Y",specs:JSON.parse(JSON.stringify(DEF_SPECS)),stencil:120,heightUnit:"um",htol:{lo:75,hi:125},step:{on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]},selZone:1,wipe:5,aperture:{groups:{}},geometryPads:null,padCoverage:null,pendingVerify:false,runVendor:"generic",ovCapSnap:null,ovCapSnapKey:"",source:"範例資料",tab:"issues",sub:"import",issuesSub:"list",controlSub:"uni",deepSub:"var",improveSub:"compare",F:[],issLv:"all",issEnt:null,pmapSelection:null,ctx:null,colorMode:"status",heatMode:"avg",sim3dMode:"real",comp3dMode:"off",exag:20,ghost:true,bridgeWarn:true,csAxis:"X",selectedPad:null,A:null,ai:"",aiModel:"",duo:{active:false,posture:"folded",mode:"master-detail",leftTab:"issues",rightTab:"sim3d",thumbSide:"right",pinnedPad:null,dockOpen:false}};
 function metricUnit(k,st=S){return k==="height"&&st&&st.heightUnit==="unknown"?"單位未知":(METRICS[k]&&METRICS[k].unit)||""}
 loadSpiKbRules();
 
@@ -7282,8 +7931,8 @@ function detectIssues(st,onStage){
     }
   }
 
-  // 5. 階段一正交規則：M-22 板序自相關（ACF）與 M-23 G 圖高良率不良叢發
-  const extCore={acf:{},gChart:null};
+  // 5. 階段一／二正交規則：M-22 板序自相關（ACF）、M-23 G 圖高良率不良叢發、M-24 雙行程偏移背隙、M-25 開孔方向效應
+  const extCore={acf:{},gChart:null,offsetEllipse:null,orientation:null};
   const acfAlpha=0.0005/Math.max(1,MS.length);
   for(const k of MS){
     const bm=boardMeans(k);
@@ -7349,6 +7998,70 @@ function detectIssues(st,onStage){
       cause:"局部鋼板堵孔、異物附著、單次印刷異常或特定連續焊墊脫模失效",conf:"高",
       action:"切換至「管制圖 → G 圖」定位叢發板號與對應 3D 焊墊位置，檢查鋼板開孔清潔度",
       ev:null,go:{tab:"control"}});
+  }
+  // M-24 雙行程偏移背隙：快速預篩雙行程 X/Y 偏移皆 ≥ 15 筆後，以雙變量 Hotelling T² 檢定
+  if(MS.includes("offx")&&MS.includes("offy")){
+    let m24F=0,m24R=0;
+    for(let i=0;i<R.length;i++){
+      const r=R[i];
+      if(r.offx==null||r.offy==null||!Number.isFinite(r.offx)||!Number.isFinite(r.offy))continue;
+      const stN=_extStrokeNorm(r);
+      if(stN==="F")m24F++;else if(stN==="R")m24R++;
+      if(m24F>=15&&m24R>=15)break;
+    }
+    if(m24F>=15&&m24R>=15){
+      const offRes=calcOffsetEllipse(R,st.specs,{coreOnly:true});
+      extCore.offsetEllipse=offRes;
+      if(offRes&&!offRes.insufficient&&offRes.strokeSplit&&offRes.strokeSplit.valid&&offRes.strokeSplit.p!=null){
+        const spX=st.specs&&st.specs.offx,spY=st.specs&&st.specs.offy;
+        const hwX=spX&&spX.usl!=null&&spX.lsl!=null?Math.abs(spX.usl-spX.lsl)/2:null;
+        const hwY=spY&&spY.usl!=null&&spY.lsl!=null?Math.abs(spY.usl-spY.lsl)/2:null;
+        const halfW=hwX&&hwY?Math.min(hwX,hwY):(hwX||hwY);
+        const thr=halfW?Math.max(8,halfW*0.20):15;
+        if(offRes.strokeSplit.p<0.005&&offRes.strokeSplit.backlashUm>=thr){
+          const ss=offRes.strokeSplit;
+          add({lv:"warn",cat:"對位偏移",sig:{t:"backlash"},
+            title:`前／後行程二維偏移具顯著背隙（Δ = ${f(ss.backlashUm,1)} µm）`,
+            ents:[],score:2.5,
+            rule_id:"M-24 雙行程偏移背隙",rule_name:"雙變量 Hotelling T² 行程背隙檢定",metric:"X／Y 偏移",
+            boards:"全部板",subboard:subOf(R),group:"ALL",refdes:"全部元件",
+            pads:`前行程 ${ss.fwd.n} 筆、後行程 ${ss.rev.n} 筆`,
+            observed:`質心距離 ${f(ss.backlashUm,1)} µm（ΔX = ${f(ss.dx,1)} µm，ΔY = ${f(ss.dy,1)} µm，Hotelling T² = ${f(ss.t2,1)}，p = ${ss.p<0.001?"<0.001":f(ss.p,4)}）`,
+            limit:`背隙 < ${f(thr,1)} µm 或雙變量檢定 p ≥ 0.005`,z:"不適用",p:ss.p<0.001?"<0.001":f(ss.p,4),
+            facts:[`前行程質心 (${f(ss.fwd.mx,1)}, ${f(ss.fwd.my,1)}) µm 與後行程質心 (${f(ss.rev.mx,1)}, ${f(ss.rev.my,1)}) µm 顯著分離`],
+            cause:"鋼板夾持鬆動、網框張力衰退、PCB 夾板背隙或刮刀前後行程機構偏移",conf:"高",
+            action:"至「製程跡象 → 空間與偏移」檢視二維偏移靶心圖，檢查鋼板夾具與 PCB 支撐頂針",
+            ev:null,go:{tab:"deep/spatial"}});
+        }
+      }
+    }
+  }
+  // M-25 開孔方向效應（0° 平行 vs 90° 垂直刮刀）：快速預篩是否具開孔／焊墊長寬
+  if(MS.includes("volume")){
+    let hasDim=false;
+    for(let i=0;i<R.length;i++){
+      const r=R[i];
+      if((r.apl>0&&r.apw>0)||(r.padl>0&&r.padw>0)){hasDim=true;break;}
+    }
+    if(hasDim){
+      const oriRes=calcApertureOrientation(R,"volume",st.sqDir==="X"?"X":"Y",{stencilUm:st.stencil||120});
+      extCore.orientation=oriRes;
+      if(oriRes&&!oriRes.insufficient&&!oriRes.singleAxisOnly&&oriRes.parallel.n>=20&&oriRes.perpendicular.n>=20&&oriRes.p!=null&&oriRes.p<0.005&&Math.abs(oriRes.diff)>=3&&Math.abs(oriRes.cohenD)>=0.4){
+        const dirWord=oriRes.diff>0?"平行（0°）高於垂直（90°）":"垂直（90°）高於平行（0°）";
+        add({lv:"warn",cat:"開孔方向",sig:{t:"orient",k:"volume"},
+          title:`開孔方向效應顯著：${dirWord} ${f(Math.abs(oriRes.diff),1)}%`,
+          ents:[],score:2.3,
+          rule_id:"M-25 開孔方向效應",rule_name:"0° 平行 vs 90° 垂直刮刀 Welch t 檢定",metric:lab("volume"),
+          boards:"全部板",subboard:subOf(R),group:"ALL",refdes:"全部元件",
+          pads:`0° 平行 ${oriRes.parallel.n} 筆、90° 垂直 ${oriRes.perpendicular.n} 筆（來源：${oriRes.dimSource}）`,
+          observed:`0° 平均 ${f(oriRes.parallel.mean,1)}%、90° 平均 ${f(oriRes.perpendicular.mean,1)}%（差值 ${oriRes.diff>=0?"+":""}${f(oriRes.diff,2)}%，Cohen's d = ${f(oriRes.cohenD,2)}，p = ${oriRes.p<0.001?"<0.001":f(oriRes.p,4)}）`,
+          limit:"方向差值 < 3% 或 |d| < 0.4 或 p ≥ 0.005",z:"不適用",p:oriRes.p<0.001?"<0.001":f(oriRes.p,4),
+          facts:[`刮刀沿 ${oriRes.sqDir} 軸印刷時，長軸平行與垂直開孔的體積轉移率出現顯著差異`],
+          cause:"刮刀刃口挖錫效應（scooping）、刮刀壓力或角度偏高、開孔長邊方向受印刷壓力不均",conf:"中",
+          action:"至「製程跡象 → 變異與開孔」檢視開孔方向效應圖與面積比分層，調整刮刀角度／壓力或評估開孔寬度補償",
+          ev:null,go:{tab:"deep/var"}});
+      }
+    }
   }
 
   stage(11,"佐證整理");
@@ -8101,7 +8814,7 @@ function computeLocalOosDensity(rows,coordGetter,clsFn){
   }
   return out;
 }
-if(typeof module!=="undefined")module.exports={specFor,buildDiagnosticModel,diagnosticSource,diagnosticMatch,diagRowClass,compKeyOf,compKeyParse,scopeFilter,scopeParts,scopePart,scopeSpecGroup,scopeLabel,normalizeScope,scopeIsNarrow,SCOPE_PANELS,SCOPE_BOARD_CARDS,SCOPE_BOARD_NOTE,issuesMd,fmMd,rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,adSample,adSampleHash,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,geomAssumed,areaRatio,aspectRatio,maxThkForAR,apVolNL,detectIssues,buildProblemCases,issueCaseCounts,focusDomainOf,buildFocusedProblems,focusedProblemsMd,overallVerdict,compareRuns,dfmTable,scopedDfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,groupBasisOfRow,groupBasisForRows,groupBasisLabel,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,withScopeCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,GERBER,layoutPartsFromRows,layoutPadSet,buildLayoutInfo,layoutStatusText,calcGChart,calcLaneyUChart,calcAcfPacf,calcCaCpQuadrant,calcRollingCpk};
+if(typeof module!=="undefined")module.exports={specFor,buildDiagnosticModel,diagnosticSource,diagnosticMatch,diagRowClass,compKeyOf,compKeyParse,scopeFilter,scopeParts,scopePart,scopeSpecGroup,scopeLabel,normalizeScope,scopeIsNarrow,SCOPE_PANELS,SCOPE_BOARD_CARDS,SCOPE_BOARD_NOTE,issuesMd,fmMd,rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,adSample,adSampleHash,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,geomAssumed,areaRatio,aspectRatio,maxThkForAR,apVolNL,detectIssues,buildProblemCases,issueCaseCounts,focusDomainOf,buildFocusedProblems,focusedProblemsMd,overallVerdict,compareRuns,dfmTable,scopedDfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,groupBasisOfRow,groupBasisForRows,groupBasisLabel,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,withScopeCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,GERBER,layoutPartsFromRows,layoutPadSet,buildLayoutInfo,layoutStatusText,calcGChart,calcLaneyUChart,calcAcfPacf,calcCaCpQuadrant,calcRollingCpk,calcVarianceComponents,calcMultiVari,calcOffsetEllipse,calcBoardProfileXY,calcApertureOrientation};
 </script>
 <script>
 
@@ -9051,7 +9764,7 @@ function renderGate(){const part=runPart();$("#gateMsg").textContent=part
 $("#btnGateSpec").onclick=()=>{setTab("data");gotoSpecCard();const el=$("#btnSpecSave");if(el&&!el.disabled)el.focus({preventScroll:true})};
 $("#btnGateRuns").onclick=()=>{setTab("data");setSub("runs")};
 function renderTab(){if(RENDER_HOLD)return;if(typeof syncScopeUI==="function")syncScopeUI();if(showPanels(S.tab))return;perfSpan("render:"+S.tab,renderTabInner);nextFrame(enhancePanel)}
-function renderDeepPanel(){renderAdv();renderStats()}
+function renderDeepPanel(){const sub=S.deepSub||"var";if(sub==="var"){renderVarianceUI();renderOrientationUI();renderAdv();}else if(sub==="spatial"){renderOffsetBullseyeUI();renderBoardProfileXYUI();renderAdv();}else{renderAdv();renderStats();}}
 function renderImprovePanel(){if(S.improveSub==="compare")renderCompare();else if(S.improveSub==="dfm")renderDfm();else renderLab()}
 const DIAG={rows:null,run:null,findings:null,source:null,board:null,entity:null,metric:null,page:0,boardPage:0,boxPage:0,factorPage:0,detailPage:0,matrixBy:"comp",boxBy:"group",factor:"pressure",back:null,cache:null,analysis:null};
 function syncDiagnostic(){
@@ -9251,21 +9964,21 @@ function parseTabTarget(raw){
   const parts=s.split("/"),root=parts[0],sub=parts[1]||null;
   if(root==="issues"){const issuesSub=sub&&["list","cross","diagnostic"].includes(sub)?sub:"list";return{tab:"issues",issuesSub}}
   if(root==="control"){const controlSub=sub&&["uni","multi","acf"].includes(sub)?sub:"uni";return{tab:"control",controlSub}}
-  if(root==="deep"){if(sub==="cross")return{tab:"issues",issuesSub:"cross"};return{tab:"deep"}}
+  if(root==="deep"){if(sub==="cross")return{tab:"issues",issuesSub:"cross"};const deepSub=sub&&["var","spatial","morph"].includes(sub)?sub:"var";return{tab:"deep",deepSub}}
   if(root==="improve"){const improveSub=sub&&["compare","dfm","lab"].includes(sub)?sub:"compare";return{tab:"improve",improveSub}}
   if(LEGACY_ROOTS.has(root)){
     if(root==="cross")return{tab:"issues",issuesSub:"cross"};
     if(root==="compare"||root==="dfm"||root==="lab")return{tab:"improve",improveSub:root};
-    return{tab:root==="adv"||root==="stats"?"deep":"issues",issuesSub:"list"};
+    return{tab:root==="adv"||root==="stats"?"deep":"issues",issuesSub:"list",deepSub:root==="stats"?"morph":"var"};
   }
   if(!ALL_TABS.includes(root))return{tab:"issues"};
   return{tab:root}
 }
-function tabHashFor(tab,issuesSub,controlSub,improveSub){
+function tabHashFor(tab,issuesSub,controlSub,improveSub,deepSub){
   if(tab==="issues")return issuesSub==="diagnostic"?"issues/diagnostic":issuesSub==="cross"?"issues/cross":"issues";
   if(tab==="control")return controlSub==="multi"?"control/multi":controlSub==="acf"?"control/acf":"control";
   if(tab==="improve")return"improve/"+(improveSub||"compare");
-  if(tab==="deep")return"deep";
+  if(tab==="deep")return deepSub&&deepSub!=="var"?"deep/"+deepSub:"deep";
   return tab;
 }
 function duoPanelId(tab){
@@ -9279,6 +9992,7 @@ function applyIssuesControlImproveSubnav(){
   const syncBar=(barSel,attr,val)=>{$$(`${barSel} [${attr}]`).forEach(b=>{const on=b.getAttribute(attr)===val;b.tabIndex=on?0:-1;if(on)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")})};
   if(S.tab==="issues"){$$("#p-issues [data-issues-sub]").forEach(el=>{el.hidden=el.dataset.issuesSub!==(S.issuesSub||"list")});syncBar("#p-issues .subtabs","data-subnav-issues",S.issuesSub||"list")}
   if(S.tab==="control"){$$("#p-control [data-control-sub]").forEach(el=>{el.hidden=el.dataset.controlSub!==(S.controlSub||"uni")});syncBar("#p-control .subtabs","data-subnav-control",S.controlSub||"uni")}
+  if(S.tab==="deep"){$$("#p-deep [data-deep-sub]").forEach(el=>{el.hidden=el.dataset.deepSub!==(S.deepSub||"var")});syncBar("#p-deep .subtabs","data-subnav-deep",S.deepSub||"var")}
   if(S.tab==="improve"){$$("#p-improve [data-subview]").forEach(el=>{el.hidden=el.dataset.subview!==(S.improveSub||"compare")});syncBar("#p-improve .subtabs","data-subnav-improve",S.improveSub||"compare")}
 }
 function applyDeepImproveSubnav(){applyIssuesControlImproveSubnav()}
@@ -9287,12 +10001,14 @@ function setTab(t,fromHistory=false){
   let tab=parsed.tab;
   if(parsed.issuesSub)S.issuesSub=parsed.issuesSub;
   if(parsed.controlSub)S.controlSub=parsed.controlSub;
+  if(parsed.deepSub)S.deepSub=parsed.deepSub;
   if(parsed.improveSub)S.improveSub=parsed.improveSub;
   if(tab==="issues"&&!parsed.issuesSub)S.issuesSub=S.issuesSub||"list";
   if(tab==="control"&&!parsed.controlSub)S.controlSub=S.controlSub||"uni";
+  if(tab==="deep"&&!parsed.deepSub)S.deepSub=S.deepSub||"var";
   if(tab==="improve"&&!parsed.improveSub)S.improveSub=S.improveSub||"compare";
   if(S.tab&&S.tab!==tab)SCROLL[S.tab]=scrollY;
-  const changed=S.tab!==tab||(tab==="issues"&&parsed.issuesSub)||(tab==="control"&&parsed.controlSub)||(tab==="improve"&&parsed.improveSub);
+  const changed=S.tab!==tab||(tab==="issues"&&parsed.issuesSub)||(tab==="control"&&parsed.controlSub)||(tab==="deep"&&parsed.deepSub)||(tab==="improve"&&parsed.improveSub);
   S.tab=tab;
   $$(".tab").forEach(x=>{const sel=x.dataset.tab===tab;x.setAttribute("aria-selected",sel);x.tabIndex=sel?0:-1});
   applyDeepImproveSubnav();
@@ -9309,7 +10025,7 @@ function setTab(t,fromHistory=false){
   else if(tab==="ai")initAiPage();
   else renderTab();
   if(changed)scrollTo(0,Math.min(SCROLL[tab]||0,document.documentElement.scrollHeight));
-  if(!fromHistory){const h=tabHashFor(tab,S.issuesSub,S.controlSub,S.improveSub);try{if(location.hash!=="#"+h){history.pushState({tab:h}, "", "#"+h);location.hash="#"+h}}catch(e){}}
+  if(!fromHistory){const h=tabHashFor(tab,S.issuesSub,S.controlSub,S.improveSub,S.deepSub);try{if(location.hash!=="#"+h){history.pushState({tab:h}, "", "#"+h);location.hash="#"+h}}catch(e){}}
 }
 
 /* ---------- 總覽 ---------- */
@@ -9960,6 +10676,327 @@ $("#heat").addEventListener("click",e=>{const A=S.A;if(!A||!hasValidSpatialXY(A.
 $("#heat").style.cursor="pointer";
 
 /* ---------- 進階分析 ---------- */
+function deepScopeRows(){return S.A&&Array.isArray(S.A.rows)?S.A.rows:[]}
+function extPal(){
+  return{
+    ink:css("--muted"),grid:css("--grid"),ng:css("--ng"),ok:css("--ok"),
+    warn:css("--warn"),acc:css("--accent"),s1:css("--series1")||css("--accent"),
+    s2:css("--series2"),s3:css("--series3")||css("--ok"),s4:css("--series4")||css("--warn")
+  };
+}
+function buildVarianceChartCfg(vc,pal){
+  const cols={group:pal.s1,board:pal.s2,figure:pal.warn,within:pal.s3};
+  return{
+    type:"bar",
+    data:{
+      labels:["變異佔比"],
+      datasets:vc.layers.map(l=>({
+        label:`${l.label} ${f(l.pct,1)}%`,
+        data:[Number(l.pct.toFixed(2))],
+        backgroundColor:cols[l.key]||pal.s2,
+        borderWidth:0,
+        barThickness:28
+      }))
+    },
+    options:baseOpts({
+      indexAxis:"y",
+      scales:{
+        x:{stacked:true,min:0,max:100,ticks:{color:pal.ink,callback:v=>v+"%"},grid:{color:pal.grid}},
+        y:{stacked:true,ticks:{display:false},grid:{display:false}}
+      },
+      plugins:{
+        legend:{display:true,position:"bottom",labels:{color:pal.ink,boxWidth:10,font:{size:chartCaptionFontPx()}}},
+        tooltip:{callbacks:{label:i=>`${i.dataset.label}`}}
+      }
+    })
+  };
+}
+function buildMultiVariChartCfg(mv,unit,pal){
+  const palette=[pal.s1,pal.s2,pal.warn,pal.s3,pal.ng,pal.acc];
+  const datasets=[];
+  mv.strata.forEach((st,idx)=>{
+    const col=palette[idx%palette.length];
+    datasets.push({
+      type:"bar",
+      label:`${st.key}（P10–P90）`,
+      data:st.pts.map(p=>p.p10!=null&&p.p90!=null?[p.p10,p.p90]:null),
+      backgroundColor:col+"44",
+      borderColor:col,
+      borderWidth:1,
+      barPercentage:0.65
+    });
+    datasets.push({
+      type:"line",
+      label:`${st.key} 均值`,
+      data:st.pts.map(p=>p.mean),
+      borderColor:col,
+      backgroundColor:col,
+      borderWidth:1.6,
+      pointRadius:2.5,
+      spanGaps:true
+    });
+  });
+  return{
+    type:"bar",
+    data:{labels:mv.boards,datasets},
+    options:baseOpts({
+      scales:{
+        x:{ticks:{color:pal.ink,maxRotation:45,autoSkip:true},grid:{display:false}},
+        y:{ticks:{color:pal.ink},grid:{color:pal.grid},title:{display:!!unit,text:unit,color:pal.ink,font:{size:chartCaptionFontPx()}}}
+      },
+      plugins:{
+        legend:{display:true,position:"bottom",labels:{color:pal.ink,boxWidth:10,font:{size:chartCaptionFontPx()}}},
+        tooltip:{callbacks:{label:i=>Array.isArray(i.raw)?`${i.dataset.label}: ${f(i.raw[0],2)} – ${f(i.raw[1],2)} ${unit}`:`${i.dataset.label}: ${f(i.raw,2)} ${unit}`}}
+      }
+    })
+  };
+}
+function renderVarianceUI(){
+  const sub=$("#varSub"),msg=$("#varMsg"),c1=$("#cVarPct"),c2=$("#cMultiVari");
+  if(!hasData()||!S.A){
+    if(sub)sub.textContent="";
+    if(msg){msg.hidden=false;msg.className="empty-state my-8";msg.textContent="尚未載入量測資料。";}
+    if(c1&&c1.parentElement)c1.parentElement.hidden=true;
+    if(c2&&c2.parentElement)c2.parentElement.hidden=true;
+    return;
+  }
+  const rows=deepScopeRows(),m=S.A.m,u=metricUnit(m,S),pal=extPal();
+  const vc=getExtStats("variance",()=>calcVarianceComponents(rows,m));
+  const mv=getExtStats("multivari",()=>calcMultiVari(rows,m,S.A.boards,30));
+  if(!vc||vc.insufficient){
+    if(sub)sub.textContent=`${METRICS[m].label} · ${scopeLabel(S)}`;
+    if(msg){msg.hidden=false;msg.className="empty-state my-8";msg.textContent=(vc&&vc.reason)||"樣本不足，無法計算變異數分解";}
+    if(c1&&c1.parentElement)c1.parentElement.hidden=true;
+    if(c2&&c2.parentElement)c2.parentElement.hidden=true;
+    return;
+  }
+  if(msg)msg.hidden=true;
+  if(c1&&c1.parentElement)c1.parentElement.hidden=false;
+  const subNote=mv&&mv.subsampled?` · 多變異圖等距顯示 ${mv.boards.length}/${mv.totalBoards} 板`:"";
+  if(sub)sub.textContent=`${METRICS[m].label} · ${scopeLabel(S)} · 主導變異：${vc.dominant.label}（${f(vc.dominant.pct,1)}%）${subNote}`;
+  mk("cVarPct",buildVarianceChartCfg(vc,pal));
+  if(!mv||mv.insufficient){
+    if(c2&&c2.parentElement)c2.parentElement.hidden=true;
+  }else{
+    if(c2&&c2.parentElement)c2.parentElement.hidden=false;
+    mk("cMultiVari",buildMultiVariChartCfg(mv,u,pal));
+  }
+}
+function buildOrientationChartCfg(oRes,mode,unit,pal){
+  if(mode==="ar"&&oRes.arBuckets&&oRes.arBuckets.length){
+    return{
+      type:"bar",
+      data:{
+        labels:oRes.arBuckets.map(b=>b.label),
+        datasets:[
+          {label:"0° 平行刮刀",data:oRes.arBuckets.map(b=>b.parallel.mean),backgroundColor:pal.s1,borderRadius:3},
+          {label:"90° 垂直刮刀",data:oRes.arBuckets.map(b=>b.perpendicular.mean),backgroundColor:pal.s2,borderRadius:3}
+        ]
+      },
+      options:baseOpts({
+        scales:{
+          x:{ticks:{color:pal.ink},grid:{display:false}},
+          y:{ticks:{color:pal.ink},grid:{color:pal.grid},title:{display:!!unit,text:unit,color:pal.ink,font:{size:chartCaptionFontPx()}}}
+        },
+        plugins:{
+          legend:{display:true,position:"bottom",labels:{color:pal.ink,boxWidth:10}},
+          tooltip:{callbacks:{label:i=>{
+            const bk=oRes.arBuckets[i.dataIndex],st=i.datasetIndex===0?bk.parallel:bk.perpendicular;
+            return st&&st.n?`${i.dataset.label}: ${f(st.mean,2)} ± ${f(st.ciHalf,2)} ${unit} (n=${st.n})`:`${i.dataset.label}: —`;
+          }}}
+        }
+      })
+    };
+  }
+  const items=[
+    {lab:`0° 平行刮刀 (n=${oRes.parallel.n})`,st:oRes.parallel,col:pal.s1},
+    {lab:`90° 垂直刮刀 (n=${oRes.perpendicular.n})`,st:oRes.perpendicular,col:pal.s2}
+  ];
+  if(oRes.square&&oRes.square.n>0)items.push({lab:`方形開孔 (n=${oRes.square.n})`,st:oRes.square,col:pal.s3});
+  return{
+    type:"bar",
+    data:{
+      labels:items.map(x=>x.lab),
+      datasets:[{label:"平均值",data:items.map(x=>x.st.mean),backgroundColor:items.map(x=>x.col),borderRadius:4,maxBarThickness:64}]
+    },
+    options:baseOpts({
+      scales:{
+        x:{ticks:{color:pal.ink},grid:{display:false}},
+        y:{ticks:{color:pal.ink},grid:{color:pal.grid},title:{display:!!unit,text:unit,color:pal.ink,font:{size:chartCaptionFontPx()}}}
+      },
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:i=>{
+          const st=items[i.dataIndex].st;
+          return`均值 ${f(st.mean,2)} ± ${f(st.ciHalf,2)} ${unit}（SD ${f(st.sd,2)}，n=${st.n}）`;
+        }}}
+      }
+    })
+  };
+}
+function renderOrientationUI(){
+  const sub=$("#orientSub"),msg=$("#orientMsg"),cv=$("#cOrient"),sel=$("#selOrientMode");
+  if(!hasData()||!S.A){
+    if(sub)sub.textContent="";
+    if(msg){msg.hidden=false;msg.className="empty-state my-8";msg.textContent="尚未載入量測資料。";}
+    if(cv&&cv.parentElement)cv.parentElement.hidden=true;
+    return;
+  }
+  const rows=deepScopeRows(),m=S.A.m,u=metricUnit(m,S),sqDir=S.sqDir==="X"?"X":"Y",pal=extPal();
+  const oRes=getExtStats("orient",()=>calcApertureOrientation(rows,m,sqDir,{stencilUm:S.stencil||120}));
+  if(!oRes||oRes.insufficient){
+    if(sub)sub.textContent=`${METRICS[m].label} · ${scopeLabel(S)}`;
+    if(msg){msg.hidden=false;msg.className="empty-state my-8";msg.textContent=(oRes&&oRes.reason)||"缺少開孔長寬尺寸，無法分析開孔方向效應";}
+    if(cv&&cv.parentElement)cv.parentElement.hidden=true;
+    return;
+  }
+  if(oRes.singleAxisOnly){
+    if(sub)sub.textContent=`${METRICS[m].label} · ${scopeLabel(S)} · 來源：${oRes.dimSource}`;
+    if(msg){msg.hidden=false;msg.className="note my-8";msg.textContent=oRes.message;}
+    if(cv&&cv.parentElement)cv.parentElement.hidden=true;
+    return;
+  }
+  if(msg)msg.hidden=true;
+  if(cv&&cv.parentElement)cv.parentElement.hidden=false;
+  const pTxt=oRes.p<0.001?"<0.001":f(oRes.p,3);
+  if(sub)sub.textContent=`${METRICS[m].label} · ${scopeLabel(S)} · 刮刀 ${oRes.sqDir} 軸 · 0°−90° = ${oRes.diff>=0?"+":""}${f(oRes.diff,2)} ${u} · p=${pTxt} · d=${f(oRes.cohenD,2)}`;
+  const mode=(sel&&sel.value)||"all";
+  mk("cOrient",buildOrientationChartCfg(oRes,mode,u,pal));
+}
+function buildOffsetBullseyeCfg(oRes,pal){
+  let maxAbs=20;
+  const bump=(x,y)=>{if(Number.isFinite(x))maxAbs=Math.max(maxAbs,Math.abs(x));if(Number.isFinite(y))maxAbs=Math.max(maxAbs,Math.abs(y));};
+  if(oRes.specBox){bump(oRes.specBox.x0,oRes.specBox.y0);bump(oRes.specBox.x1,oRes.specBox.y1);}
+  for(const p of oRes.scatter)bump(p.x,p.y);
+  if(oRes.overall&&oRes.overall.ellipse)for(const p of oRes.overall.ellipse)bump(p.x,p.y);
+  if(oRes.strokeSplit&&oRes.strokeSplit.valid){
+    if(oRes.strokeSplit.fwd&&oRes.strokeSplit.fwd.ellipse)for(const p of oRes.strokeSplit.fwd.ellipse)bump(p.x,p.y);
+    if(oRes.strokeSplit.rev&&oRes.strokeSplit.rev.ellipse)for(const p of oRes.strokeSplit.rev.ellipse)bump(p.x,p.y);
+  }
+  const lim=Math.ceil(maxAbs*1.12);
+  const datasets=[];
+  if(oRes.specBox){
+    const b=oRes.specBox;
+    datasets.push({
+      label:"規格框",
+      type:"line",
+      data:[{x:b.x0,y:b.y0},{x:b.x1,y:b.y0},{x:b.x1,y:b.y1},{x:b.x0,y:b.y1},{x:b.x0,y:b.y0}],
+      borderColor:pal.ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0,fill:false,order:1
+    });
+  }
+  if(oRes.strokeSplit&&oRes.strokeSplit.valid){
+    const fwdPts=oRes.scatter.filter(p=>p.s==="F"),revPts=oRes.scatter.filter(p=>p.s==="R");
+    datasets.push({label:"前行程散點",data:fwdPts,backgroundColor:pal.s1+"40",pointRadius:2,order:4});
+    datasets.push({label:"後行程散點",data:revPts,backgroundColor:pal.warn+"40",pointRadius:2,order:4});
+    if(oRes.strokeSplit.fwd&&oRes.strokeSplit.fwd.ellipse.length){
+      datasets.push({label:"前行程 95% 橢圓",type:"line",data:oRes.strokeSplit.fwd.ellipse,borderColor:pal.s1,borderWidth:1.8,pointRadius:0,fill:false,order:2});
+    }
+    if(oRes.strokeSplit.rev&&oRes.strokeSplit.rev.ellipse.length){
+      datasets.push({label:"後行程 95% 橢圓",type:"line",data:oRes.strokeSplit.rev.ellipse,borderColor:pal.warn,borderWidth:1.8,pointRadius:0,fill:false,order:2});
+    }
+    datasets.push({label:"前行程質心",data:[{x:oRes.strokeSplit.fwd.mx,y:oRes.strokeSplit.fwd.my}],backgroundColor:pal.s1,borderColor:"#fff",borderWidth:1.5,pointRadius:6,pointStyle:"crossRot",order:0});
+    datasets.push({label:"後行程質心",data:[{x:oRes.strokeSplit.rev.mx,y:oRes.strokeSplit.rev.my}],backgroundColor:pal.warn,borderColor:"#fff",borderWidth:1.5,pointRadius:6,pointStyle:"crossRot",order:0});
+  }else{
+    datasets.push({label:"偏移散點",data:oRes.scatter,backgroundColor:pal.s1+"44",pointRadius:2,order:4});
+    if(oRes.overall&&oRes.overall.ellipse.length){
+      datasets.push({label:"95% 信賴橢圓",type:"line",data:oRes.overall.ellipse,borderColor:pal.s1,borderWidth:2,pointRadius:0,fill:false,order:2});
+    }
+    if(oRes.overall){
+      datasets.push({label:"整體質心",data:[{x:oRes.overall.mx,y:oRes.overall.my}],backgroundColor:pal.ng,borderColor:"#fff",borderWidth:1.5,pointRadius:6,pointStyle:"crossRot",order:0});
+    }
+  }
+  return{
+    type:"scatter",
+    data:{datasets},
+    options:baseOpts({
+      aspectRatio:1,
+      scales:{
+        x:{type:"linear",min:-lim,max:lim,ticks:{color:pal.ink},grid:{color:pal.grid},title:{display:true,text:"X 偏移 (µm)",color:pal.ink,font:{size:chartCaptionFontPx()}}},
+        y:{type:"linear",min:-lim,max:lim,ticks:{color:pal.ink},grid:{color:pal.grid},title:{display:true,text:"Y 偏移 (µm)",color:pal.ink,font:{size:chartCaptionFontPx()}}}
+      },
+      plugins:{
+        legend:{display:true,position:"bottom",labels:{color:pal.ink,boxWidth:10,font:{size:chartCaptionFontPx()}}},
+        tooltip:{callbacks:{label:i=>`${i.dataset.label}: (${f(i.raw.x,1)}, ${f(i.raw.y,1)}) µm`}}
+      }
+    })
+  };
+}
+function renderOffsetBullseyeUI(){
+  const sub=$("#offBullSub"),msg=$("#offBullMsg"),cv=$("#cOffBull");
+  if(!hasData()||!S.A){
+    if(sub)sub.textContent="";
+    if(msg){msg.hidden=false;msg.className="empty-state my-8";msg.textContent="尚未載入量測資料。";}
+    if(cv&&cv.parentElement)cv.parentElement.hidden=true;
+    return;
+  }
+  const rows=deepScopeRows(),pal=extPal();
+  const oRes=getExtStats("offsetEllipse",()=>calcOffsetEllipse(rows,S.specs));
+  if(!oRes||oRes.insufficient){
+    if(sub)sub.textContent=scopeLabel(S);
+    if(msg){msg.hidden=false;msg.className="empty-state my-8";msg.textContent=(oRes&&oRes.reason)||"無有效 X／Y 偏移資料";}
+    if(cv&&cv.parentElement)cv.parentElement.hidden=true;
+    return;
+  }
+  if(msg)msg.hidden=true;
+  if(cv&&cv.parentElement)cv.parentElement.hidden=false;
+  const sampTxt=oRes.sampled?`（散點抽樣 ${oRes.shownCount} 點，橢圓為全量計算）`:"";
+  const bkTxt=oRes.strokeSplit&&oRes.strokeSplit.valid
+    ?` · 前／後背隙 ${f(oRes.strokeSplit.backlashUm,1)} µm (p=${oRes.strokeSplit.p!=null?(oRes.strokeSplit.p<0.001?"<0.001":f(oRes.strokeSplit.p,3)):"—"})`
+    :` · 質心 (${f(oRes.overall.mx,1)}, ${f(oRes.overall.my,1)}) µm`;
+  if(sub)sub.textContent=`${scopeLabel(S)} · n=${oRes.n}${sampTxt}${bkTxt}`;
+  mk("cOffBull",buildOffsetBullseyeCfg(oRes,pal));
+}
+function buildBoardProfileCfg(axisRes,axisLabel,unit,showStroke,pal){
+  const labels=axisRes.bins.map(b=>f(b.center,1)+" mm");
+  const datasets=[
+    {label:"95% CI 上界",data:axisRes.bins.map(b=>b.ciHi),borderColor:pal.s1+"66",borderDash:[4,4],borderWidth:1,pointRadius:0,spanGaps:true},
+    {label:"95% CI 下界",data:axisRes.bins.map(b=>b.ciLo),borderColor:pal.s1+"66",borderDash:[4,4],borderWidth:1,pointRadius:0,spanGaps:true},
+    {label:"區帶均值",data:axisRes.bins.map(b=>b.mean),borderColor:pal.s1,backgroundColor:pal.s1,borderWidth:2,pointRadius:3,spanGaps:true}
+  ];
+  if(showStroke){
+    datasets.push({label:"前行程",data:axisRes.bins.map(b=>b.fwdMean),borderColor:pal.s2,borderWidth:1.5,borderDash:[5,3],pointRadius:2,spanGaps:true});
+    datasets.push({label:"後行程",data:axisRes.bins.map(b=>b.revMean),borderColor:pal.warn,borderWidth:1.5,borderDash:[2,2],pointRadius:2,spanGaps:true});
+  }
+  return{
+    type:"line",
+    data:{labels,datasets},
+    options:baseOpts({
+      scales:{
+        x:{ticks:{color:pal.ink,maxRotation:45,autoSkip:true},grid:{display:false},title:{display:true,text:axisLabel,color:pal.ink,font:{size:chartCaptionFontPx()}}},
+        y:{ticks:{color:pal.ink},grid:{color:pal.grid},title:{display:!!unit,text:unit,color:pal.ink,font:{size:chartCaptionFontPx()}}}
+      },
+      plugins:{
+        legend:{display:true,position:"bottom",labels:{color:pal.ink,boxWidth:10,font:{size:chartCaptionFontPx()}}},
+        tooltip:{callbacks:{label:i=>`${i.dataset.label}: ${f(i.raw,2)} ${unit}`}}
+      }
+    })
+  };
+}
+function renderBoardProfileXYUI(){
+  const sub=$("#profSub"),msg=$("#profMsg"),grid=$("#profGrid"),selBins=$("#selProfBins"),chkStroke=$("#chkProfStroke");
+  if(!hasData()||!S.A){
+    if(sub)sub.textContent="";
+    if(msg){msg.hidden=false;msg.className="empty-state my-8";msg.textContent="尚未載入量測資料。";}
+    if(grid)grid.hidden=true;
+    return;
+  }
+  const rows=deepScopeRows(),m=S.A.m,u=metricUnit(m,S),pal=extPal();
+  const bins=Math.max(4,Math.min(20,Number(selBins&&selBins.value)||10));
+  const prof=getExtStats("profileXY",()=>calcBoardProfileXY(rows,m,{bins}),"b"+bins);
+  if(!prof||prof.insufficient){
+    if(sub)sub.textContent=`${METRICS[m].label} · ${scopeLabel(S)}`;
+    if(msg){msg.hidden=false;msg.className="empty-state my-8";msg.textContent=(prof&&prof.message)||"無實際物理座標，無法計算板面 X／Y 邊際梯度";}
+    if(grid)grid.hidden=true;
+    return;
+  }
+  if(msg)msg.hidden=true;
+  if(grid)grid.hidden=false;
+  const fmtSl=ax=>ax.degenerate?"—":`${ax.slopePer100mm>=0?"+":""}${f(ax.slopePer100mm,2)} ${u}/100mm (p=${ax.p<0.001?"<0.001":f(ax.p,3)})`;
+  if(sub)sub.textContent=`${METRICS[m].label} · ${scopeLabel(S)} · 座標：${prof.coordLevel==="pad"?"實體焊墊":"元件中心"} · X 斜率 ${fmtSl(prof.xAxis)} · Y 斜率 ${fmtSl(prof.yAxis)}`;
+  const showStroke=Boolean(chkStroke&&chkStroke.checked&&prof.hasStroke);
+  mk("cProfX",buildBoardProfileCfg(prof.xAxis,"X 座標 (mm)",u,showStroke,pal));
+  mk("cProfY",buildBoardProfileCfg(prof.yAxis,"Y 座標 (mm)",u,showStroke,pal));
+}
 let V=null;
 function renderAdv(){
   if(!hasData()){
@@ -12993,6 +14030,10 @@ function setupSubtabs(barSel,attr,onPick){
 setupSubtabs("#p-issues .subtabs","data-subnav-issues",v=>v==="diagnostic"?enterDiagnostic():setTab("issues/"+v));
 setupSubtabs("#p-control .subtabs","data-subnav-control",v=>setTab(v==="multi"?"control/multi":v==="acf"?"control/acf":"control"));
 if($("#selGScale"))$("#selGScale").onchange=()=>{if(S.tab==="control"&&S.chart==="g")renderControl()};
+setupSubtabs("#p-deep .subtabs","data-subnav-deep",v=>setTab("deep/"+v));
+if($("#selOrientMode"))$("#selOrientMode").onchange=()=>{if(S.tab==="deep")renderOrientationUI()};
+if($("#selProfBins"))$("#selProfBins").onchange=()=>{if(S.tab==="deep")renderBoardProfileXYUI()};
+if($("#chkProfStroke"))$("#chkProfStroke").onchange=()=>{if(S.tab==="deep")renderBoardProfileXYUI()};
 setupSubtabs("#p-improve .subtabs","data-subnav-improve",v=>setTab("improve/"+v));
 function openAppSettings(section){
   const m=$("#appSettingsModal");if(!m)return;
@@ -13040,11 +14081,17 @@ function extDiagnosticsSummary(A){
   const gc=getExtStats("gchart",()=>calcGChart(A.rows,r=>classify(r,S.specs,S),A.boards));
   const{keyFn,unitLbl}=caCpScopeSpec();
   const cacp=getExtStats("cacp",()=>calcCaCpQuadrant(A.rows,A.m,A.sp,keyFn),unitLbl);
+  const vc=getExtStats("variance",()=>calcVarianceComponents(A.rows,A.m));
+  const offE=getExtStats("offsetEllipse",()=>calcOffsetEllipse(A.rows,S.specs));
+  const ori=getExtStats("orient",()=>calcApertureOrientation(A.rows,A.m,S.sqDir==="X"?"X":"Y",{stencilUm:S.stencil||120}));
   const zMap={healthy:"健康",offCenter:"偏心可調",highVar:"變異大",both:"雙失控"};
   return{
     板序自相關:acf&&!acf.insufficient?{r1:+f(acf.acf[0],3),p:+f(acf.lbP,4),顯著落後期:acf.sigLags.slice(0,5)}:null,
     高良率間隔:gc&&!gc.insufficient?{良率:+f(gc.yieldPct,2),平均間隔:+f(gc.gMean,1),叢發次數:gc.burstCount}:null,
-    能力四象限重點:cacp&&!cacp.insufficient?cacp.pts.filter(p=>p.cpk!=null&&p.cpk<1.33).slice(0,5).map(p=>({名稱:p.key,Ca:+f(p.ca,1),Cp:+f(p.cp,2),Cpk:+f(p.cpk,2),歸類:zMap[p.zone]||""})):[]
+    能力四象限重點:cacp&&!cacp.insufficient?cacp.pts.filter(p=>p.cpk!=null&&p.cpk<1.33).slice(0,5).map(p=>({名稱:p.key,Ca:+f(p.ca,1),Cp:+f(p.cp,2),Cpk:+f(p.cpk,2),歸類:zMap[p.zone]||""})):[],
+    變異來源佔比:vc&&!vc.insufficient?{主導:vc.dominant.label,各層:vc.layers.map(l=>`${l.label}:${f(l.pct,1)}%`)}:null,
+    雙行程偏移背隙:offE&&!offE.insufficient&&offE.strokeSplit&&offE.strokeSplit.valid?{背隙um:+f(offE.strokeSplit.backlashUm,1),p:offE.strokeSplit.p!=null?+f(offE.strokeSplit.p,4):null}:null,
+    開孔方向差異:ori&&!ori.insufficient&&!ori.singleAxisOnly?{刮刀軸:ori.sqDir,差值:+f(ori.diff,2),d:+f(ori.cohenD,2),p:+f(ori.p,4)}:null
   };
 }
 function advSummary(A){const W=advAnalyze(S,A);return{EWMA越界:A.ewma.filter(p=>p.v>p.ucl||p.v<p.lcl).map(p=>p.lab),CUSUM訊號:A.cusum.pts.filter(p=>p.cp>A.cusum.h||p.cm>A.cusum.h).map(p=>p.lab),
@@ -14889,6 +15936,8 @@ function beforePrint(){
     ||(S.tab==="issues"&&S.issuesSub==="cross"?"交叉驗證":null)
     ||(S.tab==="control"&&S.controlSub==="multi"?"多變量管制圖":null)
     ||(S.tab==="control"&&S.controlSub==="acf"?"板序自相關分析":null)
+    ||(S.tab==="deep"&&S.deepSub==="spatial"?"空間與偏移":null)
+    ||(S.tab==="deep"&&S.deepSub==="morph"?"形貌與異常":null)
     ||({share:"分享設定",shares:"我的分享",mail:"轉寄報告",deep:"製程跡象",improve:"回合比較",ai:"AI 診斷"}[S.tab])
     ||S.tab||"";
   const ph=$("#printHead");
@@ -15544,6 +16593,58 @@ async function generateReportPdfBlob(opts={}){
     }catch(e){}
     printText("失效模式交叉比對規則庫：整合 R001–R030 規則，需 ≥2 個獨立面向佐證始判定為可能",14,curY,{size:8,color:[100,100,100]});
     curY+=6;
+    const printPal2={ink:"#4A5568",grid:"#D8DCE2",ng:"#B8332A",ok:"#1F7A4C",warn:"#B5652B",acc:"#2B5A7A",s1:"#2B5A7A",s2:"#3E7CB1",s3:"#1F7A4C",s4:"#B5652B"};
+    const uRep=metricUnit(A.m,S);
+    try{
+      const vc=getExtStats("variance",()=>calcVarianceComponents(A.rows,A.m));
+      if(vc&&!vc.insufficient){
+        const cfg=buildVarianceChartCfg(vc,printPal2);
+        const url=renderOffscreenChart(cfg.type,cfg.data,cfg.options);
+        checkBreak(44);
+        printText(`變異數分解（${METRICS[A.m].label} · 主導：${vc.dominant.label} ${f(vc.dominant.pct,1)}%）`,14,curY,{size:8});
+        curY+=4;
+        doc.addImage(url,opts.lite?"JPEG":"PNG",14,curY,182,34);
+        curY+=38;
+      }
+    }catch(e){}
+    try{
+      const offE=getExtStats("offsetEllipse",()=>calcOffsetEllipse(A.rows,S.specs));
+      if(offE&&!offE.insufficient){
+        const cfg=buildOffsetBullseyeCfg(offE,printPal2);
+        const url=renderOffscreenChart(cfg.type,cfg.data,cfg.options);
+        checkBreak(66);
+        const bkInfo=offE.strokeSplit&&offE.strokeSplit.valid?` · 前／後背隙 ${f(offE.strokeSplit.backlashUm,1)} µm`:"";
+        printText(`二維偏移靶心圖與 95% 信賴橢圓（n=${offE.n}${bkInfo}）`,14,curY,{size:8});
+        curY+=4;
+        doc.addImage(url,opts.lite?"JPEG":"PNG",14,curY,182,58);
+        curY+=62;
+      }
+    }catch(e){}
+    try{
+      const prof=getExtStats("profileXY",()=>calcBoardProfileXY(A.rows,A.m,{bins:10}),"b10");
+      if(prof&&!prof.insufficient){
+        const cfgX=buildBoardProfileCfg(prof.xAxis,"X 座標 (mm)",uRep,false,printPal2);
+        const cfgY=buildBoardProfileCfg(prof.yAxis,"Y 座標 (mm)",uRep,false,printPal2);
+        const uX=renderOffscreenChart(cfgX.type,cfgX.data,cfgX.options);
+        const uY=renderOffscreenChart(cfgY.type,cfgY.data,cfgY.options);
+        checkBreak(56);
+        printText(`板面 X／Y 邊際剖面梯度（來源：${prof.coordLevel==="pad"?"實體焊墊":"元件中心"}）`,14,curY,{size:8});
+        curY+=4;
+        doc.addImage(uX,opts.lite?"JPEG":"PNG",14,curY,88,46);
+        doc.addImage(uY,opts.lite?"JPEG":"PNG",108,curY,88,46);
+        curY+=50;
+      }
+    }catch(e){}
+    try{
+      const ori=getExtStats("orient",()=>calcApertureOrientation(A.rows,A.m,S.sqDir==="X"?"X":"Y",{stencilUm:S.stencil||120}));
+      if(ori&&!ori.insufficient&&!ori.singleAxisOnly){
+        drawTable(["開孔方向","樣本數","均值","標準差","95% CI"],[
+          ["0° 平行刮刀",String(ori.parallel.n),`${f(ori.parallel.mean,2)} ${uRep}`,f(ori.parallel.sd,2),`±${f(ori.parallel.ciHalf,2)}`],
+          ["90° 垂直刮刀",String(ori.perpendicular.n),`${f(ori.perpendicular.mean,2)} ${uRep}`,f(ori.perpendicular.sd,2),`±${f(ori.perpendicular.ciHalf,2)}`],
+          ["檢定摘要",`刮刀 ${ori.sqDir} 軸`,`差值 ${ori.diff>=0?"+":""}${f(ori.diff,2)} ${uRep}`,`d=${f(ori.cohenD,2)}`,`p=${ori.p<0.001?"<0.001":f(ori.p,3)}`]
+        ],[42,26,38,38,38]);
+      }
+    }catch(e){}
   }
 
   // 8. DFM 開孔建議
@@ -15576,10 +16677,12 @@ async function generateReportPdfBlob(opts={}){
     curY+=5;
     printText("4. 擴充統計模型：G 圖採 Benneyan 幾何分布精確界線；Laney U′ 圖以 σz 修正板間過度離散；板序自相關以 Ljung-Box Q 檢定；四象限採規格中點準度 Ca 與精密度 Cp 滿足 Cpk = Cp(1 − |Ca|/100)。",14,curY,{size:8.5});
     curY+=5;
+    printText("5. 變異與空間進階模型：變異數分解採群組去中心後之巢狀平方和分解；二維偏移採 95% 信賴橢圓（χ²₂=5.991）與雙變量 Hotelling T² 檢定行程背隙；板面 X／Y 剖面僅於具備實體座標時計算；開孔方向效應以 Welch t 檢定與 Cohen's d 比較 0° 平行與 90° 垂直刮刀。",14,curY,{size:8.5});
+    curY+=5;
     if(missingGlyphs.size>0){
-      printText(`5. 缺字檢核紀錄（已自動轉換為向量／點陣圖形嵌入，未產生豆腐塊）：${[...missingGlyphs].join("、")}`,14,curY,{size:8.5,color:[180,80,20]});
+      printText(`6. 缺字檢核紀錄（已自動轉換為向量／點陣圖形嵌入，未產生豆腐塊）：${[...missingGlyphs].join("、")}`,14,curY,{size:8.5,color:[180,80,20]});
     }else{
-      printText("5. 缺字檢核紀錄：全文字元皆符合 Noto Sans TC 嵌入字型，無缺字。",14,curY,{size:8.5,color:[40,140,60]});
+      printText("6. 缺字檢核紀錄：全文字元皆符合 Noto Sans TC 嵌入字型，無缺字。",14,curY,{size:8.5,color:[40,140,60]});
     }
     curY+=6;
   }
