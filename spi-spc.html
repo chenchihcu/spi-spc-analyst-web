@@ -1249,7 +1249,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
         <button role="menuitem" id="btnMyShares" hidden title="檢視與管理自己建立的分享連結">我的分享</button>
         <a role="menuitem" id="offlineLink" href="/download/offline" hidden title="下載單一 HTML 檔，不連網也能分析；資料不會存檔">下載離線版</a>
         <a role="menuitem" id="logoutLink" href="/__logout" hidden>登出</a>
-        <p class="menu-ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.40.0</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></p>
+        <p class="menu-ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.41.0</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></p>
       </div>
     </div>
   </div>
@@ -1767,6 +1767,11 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
         <div class="row"><div class="field"><label for="doeResp">反應變數</label><select id="doeResp"></select></div><details class="how demo-tools"><summary>範例資料</summary><button id="btnDoeSample">載入 DOE 範例回合</button></details><span class="note" id="doeState"></span></div>
     <div id="doeOut" class="mt-10"></div>
     <div class="grid2 mt-10" id="doeCharts"></div>
+    <div class="mt-12" id="doeInterSection" hidden>
+      <div class="fact" style="margin-bottom:6px">雙因子交互作用圖 <small id="doeInterSub"></small></div>
+      <div id="doeInterMsg" class="note my-8" hidden></div>
+      <div class="grid2" id="doeInterCharts"></div>
+    </div>
   </div>
   <div class="card">
     <h3>簡易 GR&amp;R </h3>
@@ -4363,6 +4368,225 @@ function calcApertureOrientation(rows, metric, sqDir = "Y", opts = {}) {
     p,
     cohenD,
     arBuckets,
+  };
+}
+
+function _extLgamma(z) {
+  const c = [
+    76.18009172947146, -86.50532032941677, 24.01409824083091,
+    -1.231739572450155, 0.001208650973866179, -0.000005395239384953,
+  ];
+  let y = z;
+  let tmp = z + 5.5;
+  tmp -= (z + 0.5) * Math.log(tmp);
+  let ser = 1.000000000190015;
+  for (let j = 0; j < 6; j++) ser += c[j] / ++y;
+  return -tmp + Math.log((2.5066282746310005 * ser) / z);
+}
+
+function _extBetacf(a, b, x) {
+  const maxIt = 200;
+  const eps = 3e-12;
+  const fpMin = 1e-30;
+  const qab = a + b, qap = a + 1, qam = a - 1;
+  let c = 1;
+  let d = 1 - (qab * x) / qap;
+  if (Math.abs(d) < fpMin) d = fpMin;
+  d = 1 / d;
+  let h = d;
+  for (let m = 1; m <= maxIt; m++) {
+    const m2 = 2 * m;
+    let aa = (m * (b - m) * x) / ((qam + m2) * (a + m2));
+    d = 1 + aa * d;
+    if (Math.abs(d) < fpMin) d = fpMin;
+    c = 1 + aa / c;
+    if (Math.abs(c) < fpMin) c = fpMin;
+    d = 1 / d;
+    h *= d * c;
+    aa = (-(a + m) * (qab + m) * x) / ((a + m2) * (qap + m2));
+    d = 1 + aa * d;
+    if (Math.abs(d) < fpMin) d = fpMin;
+    c = 1 + aa / c;
+    if (Math.abs(c) < fpMin) c = fpMin;
+    d = 1 / d;
+    const del = d * c;
+    h *= del;
+    if (Math.abs(del - 1) < eps) break;
+  }
+  return h;
+}
+
+function _extIbeta(x, a, b) {
+  if (x <= 0) return 0;
+  if (x >= 1) return 1;
+  const bt = Math.exp(_extLgamma(a + b) - _extLgamma(a) - _extLgamma(b) + a * Math.log(x) + b * Math.log(1 - x));
+  if (x < (a + 1) / (a + b + 2)) return (bt * _extBetacf(a, b, x)) / a;
+  return 1 - (bt * _extBetacf(b, a, 1 - x)) / b;
+}
+
+function _extFUpperP(fStat, d1, d2) {
+  if (!Number.isFinite(fStat) || fStat <= 0 || d1 <= 0 || d2 <= 0) return 1;
+  const x = d2 / (d2 + d1 * fStat);
+  return Math.max(0, Math.min(1, _extIbeta(x, d2 / 2, d1 / 2)));
+}
+
+/**
+ * 3.1 DOE 雙因子交互作用圖（2-Way Interaction Plot & 2-Way ANOVA 交互檢定）
+ * @param {Array<{fv: Record<string, number>, y?: Record<string, number>, val?: number}>} boards
+ * @param {string} resp
+ * @param {string[]} factorKeys
+ */
+function calcDoeInteraction(boards, resp = "vol", factorKeys = ["pressure", "speed", "sep"]) {
+  const valid = [];
+  for (let i = 0; i < (boards ? boards.length : 0); i++) {
+    const b = boards[i];
+    if (!b || !b.fv) continue;
+    const v = b.y != null ? b.y[resp] : b.val;
+    if (v != null && Number.isFinite(v)) valid.push({ fv: b.fv, v });
+  }
+
+  const activeFactors = [];
+  for (let fi = 0; fi < factorKeys.length; fi++) {
+    const fk = factorKeys[fi];
+    const lvSet = new Set();
+    for (let i = 0; i < valid.length; i++) {
+      const lv = valid[i].fv[fk];
+      if (lv != null && Number.isFinite(lv)) lvSet.add(lv);
+    }
+    if (lvSet.size >= 2) {
+      activeFactors.push({ key: fk, levels: [...lvSet].sort((a, b) => a - b) });
+    }
+  }
+
+  if (activeFactors.length < 2) {
+    return {
+      insufficient: true,
+      reason: "有效水準 ≥ 2 的因子不足 2 個，無法繪製雙因子交互作用圖",
+      factors: activeFactors.map((f) => f.key),
+      pairs: [],
+    };
+  }
+
+  const pairs = [];
+  for (let i = 0; i < activeFactors.length; i++) {
+    for (let j = i + 1; j < activeFactors.length; j++) {
+      const fa = activeFactors[i];
+      const fb = activeFactors[j];
+      const aLen = fa.levels.length;
+      const bLen = fb.levels.length;
+      const cells = Array.from({ length: aLen }, () => Array.from({ length: bLen }, () => []));
+
+      let totalN = 0;
+      for (let r = 0; r < valid.length; r++) {
+        const va = valid[r].fv[fa.key];
+        const vb = valid[r].fv[fb.key];
+        const ai = fa.levels.indexOf(va);
+        const bi = fb.levels.indexOf(vb);
+        if (ai >= 0 && bi >= 0) {
+          cells[ai][bi].push(valid[r].v);
+          totalN++;
+        }
+      }
+
+      let hasMissingCells = false;
+      let invSum = 0;
+      let ssErr = 0;
+      const cellMeans = Array.from({ length: aLen }, () => Array(bLen).fill(null));
+      const cellCounts = Array.from({ length: aLen }, () => Array(bLen).fill(0));
+
+      for (let ai = 0; ai < aLen; ai++) {
+        for (let bi = 0; bi < bLen; bi++) {
+          const arr = cells[ai][bi];
+          const n = arr.length;
+          cellCounts[ai][bi] = n;
+          if (n === 0) {
+            hasMissingCells = true;
+          } else {
+            invSum += 1 / n;
+            let s = 0;
+            for (let k = 0; k < n; k++) s += arr[k];
+            const mu = s / n;
+            cellMeans[ai][bi] = mu;
+            for (let k = 0; k < n; k++) {
+              const d = arr[k] - mu;
+              ssErr += d * d;
+            }
+          }
+        }
+      }
+
+      const nCells = aLen * bLen;
+      const dfAB = (aLen - 1) * (bLen - 1);
+      const dfErr = totalN - nCells;
+      let F = null;
+      let p = null;
+      let noTestReason = null;
+
+      if (hasMissingCells) {
+        noTestReason = "部分格子缺資料，僅供視覺判讀";
+      } else if (dfErr <= 0) {
+        noTestReason = "無重複樣本，僅供視覺判讀";
+      } else if (dfAB > 0) {
+        const rowMeans = Array(aLen).fill(0);
+        const colMeans = Array(bLen).fill(0);
+        let grandMean = 0;
+        for (let ai = 0; ai < aLen; ai++) {
+          for (let bi = 0; bi < bLen; bi++) {
+            const m = cellMeans[ai][bi];
+            rowMeans[ai] += m / bLen;
+            colMeans[bi] += m / aLen;
+            grandMean += m / nCells;
+          }
+        }
+        const nHarm = nCells / invSum;
+        let ssAB = 0;
+        for (let ai = 0; ai < aLen; ai++) {
+          for (let bi = 0; bi < bLen; bi++) {
+            const inter = cellMeans[ai][bi] - rowMeans[ai] - colMeans[bi] + grandMean;
+            ssAB += inter * inter;
+          }
+        }
+        ssAB *= nHarm;
+        const msAB = ssAB / dfAB;
+        const msErr = ssErr / dfErr;
+        if (msErr > 1e-12) {
+          F = msAB / msErr;
+          p = _extFUpperP(F, dfAB, dfErr);
+        } else {
+          F = msAB > 1e-12 ? Infinity : 0;
+          p = msAB > 1e-12 ? 0 : 1;
+        }
+      }
+
+      // 建立供繪圖的各條折線（每條對應因子 B 的一個水準，X 軸為因子 A 的各水準）
+      const series = fb.levels.map((lvB, bi) => ({
+        levelB: lvB,
+        means: fa.levels.map((_, ai) => cellMeans[ai][bi]),
+        counts: fa.levels.map((_, ai) => cellCounts[ai][bi]),
+      }));
+
+      pairs.push({
+        a: fa.key,
+        b: fb.key,
+        levelsA: fa.levels,
+        levelsB: fb.levels,
+        series,
+        n: totalN,
+        dfAB,
+        dfErr,
+        F,
+        p,
+        significant: p != null && p < 0.05,
+        hasMissingCells,
+        noTestReason,
+      });
+    }
+  }
+
+  return {
+    insufficient: false,
+    factors: activeFactors.map((f) => f.key),
+    pairs,
   };
 }
 /* @spi-stats-ext END */
@@ -8399,7 +8623,7 @@ function doeAnalyze(st,resp){const R=st.rows,facs=Object.keys(FACT).filter(k=>R.
   const cmb={};ok.forEach(x=>{const key=facs.map(k=>x.fv[k]).join("|");(cmb[key]=cmb[key]||{fv:x.fv,ys:[]}).ys.push(x.y)});
   const combos=Object.values(cmb).map(c=>{const g=k=>mean(c.ys.map(y=>y[k]));const vol=g("vol"),cv=g("cv"),def=g("def");
     return{fv:c.fv,n:c.ys.length,vol,cv,def,hp:g("hp"),resp:mean(c.ys.map(y=>y[resp])),score:Math.abs(vol-tv)/10+(isFinite(cv)?cv/5:0)+def}}).sort((a,b)=>a.score-b.score);
-  return{facs,eff,combos,n:ok.length}}
+  return{facs,eff,combos,n:ok.length,interaction:calcDoeInteraction(ok,resp,facs)}}
 
 /* ============ 簡易 GR&R（交叉 ANOVA 法） ============ */
 function parseGRR(text){const tab=csvTable(text),n=tab.head.map(normH),fi=al=>n.findIndex(h=>al.includes(h));
@@ -8814,7 +9038,7 @@ function computeLocalOosDensity(rows,coordGetter,clsFn){
   }
   return out;
 }
-if(typeof module!=="undefined")module.exports={specFor,buildDiagnosticModel,diagnosticSource,diagnosticMatch,diagRowClass,compKeyOf,compKeyParse,scopeFilter,scopeParts,scopePart,scopeSpecGroup,scopeLabel,normalizeScope,scopeIsNarrow,SCOPE_PANELS,SCOPE_BOARD_CARDS,SCOPE_BOARD_NOTE,issuesMd,fmMd,rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,adSample,adSampleHash,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,geomAssumed,areaRatio,aspectRatio,maxThkForAR,apVolNL,detectIssues,buildProblemCases,issueCaseCounts,focusDomainOf,buildFocusedProblems,focusedProblemsMd,overallVerdict,compareRuns,dfmTable,scopedDfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,groupBasisOfRow,groupBasisForRows,groupBasisLabel,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,withScopeCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,GERBER,layoutPartsFromRows,layoutPadSet,buildLayoutInfo,layoutStatusText,calcGChart,calcLaneyUChart,calcAcfPacf,calcCaCpQuadrant,calcRollingCpk,calcVarianceComponents,calcMultiVari,calcOffsetEllipse,calcBoardProfileXY,calcApertureOrientation};
+if(typeof module!=="undefined")module.exports={specFor,buildDiagnosticModel,diagnosticSource,diagnosticMatch,diagRowClass,compKeyOf,compKeyParse,scopeFilter,scopeParts,scopePart,scopeSpecGroup,scopeLabel,normalizeScope,scopeIsNarrow,SCOPE_PANELS,SCOPE_BOARD_CARDS,SCOPE_BOARD_NOTE,issuesMd,fmMd,rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,adSample,adSampleHash,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,geomAssumed,areaRatio,aspectRatio,maxThkForAR,apVolNL,detectIssues,buildProblemCases,issueCaseCounts,focusDomainOf,buildFocusedProblems,focusedProblemsMd,overallVerdict,compareRuns,dfmTable,scopedDfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,groupBasisOfRow,groupBasisForRows,groupBasisLabel,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,withScopeCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,GERBER,layoutPartsFromRows,layoutPadSet,buildLayoutInfo,layoutStatusText,calcGChart,calcLaneyUChart,calcAcfPacf,calcCaCpQuadrant,calcRollingCpk,calcVarianceComponents,calcMultiVari,calcOffsetEllipse,calcBoardProfileXY,calcApertureOrientation,calcDoeInteraction};
 </script>
 <script>
 
@@ -11832,9 +12056,37 @@ $("#aoiFile").onchange=e=>{const fl=e.target.files[0];if(!fl)return;if(!curRun()
 $("#btnAoiSample").onclick=()=>{if(!curRun()){toast(NO_DATA_MSG);return}curRun().aoi=parseAOI(sampleAOI(S));saveRunsSoon();renderAOI()};
 $("#aoiM").onchange=e=>{S.aoiM=e.target.value;renderAOI()};$("#aoiBw").onchange=e=>{const v=+e.target.value;if(v>0){S.aoiBw=v;renderAOI()}};
 
+function buildDoeInteractionChartCfg(pair,respLabel,pal){
+  const fa=FACT[pair.a]||{label:pair.a,unit:""},fb=FACT[pair.b]||{label:pair.b,unit:""};
+  const palette=[pal.s1,pal.s2,pal.warn,pal.s3,pal.ng,pal.acc];
+  const labels=pair.levelsA.map(l=>`${l}${fa.unit?" "+fa.unit:""}`);
+  const datasets=pair.series.map((s,idx)=>({
+    label:`${fb.label} ${s.levelB}${fb.unit?" "+fb.unit:""}`,
+    data:s.means,
+    borderColor:palette[idx%palette.length],
+    backgroundColor:palette[idx%palette.length],
+    borderWidth:2,
+    pointRadius:4,
+    spanGaps:false
+  }));
+  return{
+    type:"line",
+    data:{labels,datasets},
+    options:baseOpts({
+      scales:{
+        x:{ticks:{color:pal.ink,font:{size:chartCaptionFontPx()}},grid:{display:false},title:{display:true,text:fa.label,color:pal.ink,font:{size:chartCaptionFontPx()}}},
+        y:{ticks:{color:pal.ink,font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{color:pal.grid},title:{display:true,text:respLabel,color:pal.ink,font:{size:chartCaptionFontPx()}}}
+      },
+      plugins:{
+        legend:{display:true,position:"bottom",labels:{color:pal.ink,boxWidth:10,font:{size:chartCaptionFontPx()}}},
+        tooltip:{callbacks:{label:i=>`${i.dataset.label}: ${f(i.raw,2)}`}}
+      }
+    })
+  };
+}
 function renderDOE(){fillSelect($("#doeResp"),Object.entries(RESP).map(([k,v])=>[k,v.label]),S.doeResp||"vol");S.doeResp=$("#doeResp").value;
-  const D=doeAnalyze(S,S.doeResp),box=$("#doeCharts");
-  if(!D){$("#doeState").textContent="";$("#doeOut").innerHTML='<p class="note">目前回合沒有印刷參數欄位（壓力、速度、分離速度）。可載入 DOE 範例回合，或匯入含參數欄位的資料。</p>';box.innerHTML="";return}
+  const D=doeAnalyze(S,S.doeResp),box=$("#doeCharts"),interSec=$("#doeInterSection"),interBox=$("#doeInterCharts"),interMsg=$("#doeInterMsg"),interSub=$("#doeInterSub");
+  if(!D){$("#doeState").textContent="";$("#doeOut").innerHTML='<p class="note">目前回合沒有印刷參數欄位（壓力、速度、分離速度）。可載入 DOE 範例回合，或匯入含參數欄位的資料。</p>';box.innerHTML="";if(interSec)interSec.hidden=true;if(interBox)interBox.innerHTML="";return}
   $("#doeState").textContent=`${D.n} 片板 · ${D.facs.length} 個因子`;
   const best=D.combos[0],fv=x=>D.facs.map(k=>`${FACT[k].label} ${x.fv[k]} ${FACT[k].unit}`).join("、");
   $("#doeOut").innerHTML=`<div class="tbl"><table><thead><tr><th>因子</th><th>水準</th><th class="num">各水準平均</th><th class="num">主效應</th><th class="num">p</th><th>判讀</th></tr></thead><tbody>${D.eff.map(e=>`<tr><td>${FACT[e.k].label}</td><td class="mono">${e.lv.join(" / ")} ${FACT[e.k].unit}</td><td class="num mono">${e.means.map(m=>f(m,2)).join(" / ")}</td><td class="num mono">${e.effect>0?"+":""}${f(e.effect,2)}</td><td class="num mono">${e.p<.001?"< 0.001":f(e.p,3)}</td><td>${e.p<.05?'<span class="pill warn">顯著</span>':'<span class="pill na">不顯著</span>'}</td></tr>`).join("")}</tbody></table></div>
@@ -11845,6 +12097,26 @@ function renderDOE(){fillSelect($("#doeResp"),Object.entries(RESP).map(([k,v])=>
   const all=D.eff.flatMap(e=>e.means),lo=Math.min(...all),hi=Math.max(...all),pad=(hi-lo)*.25||1;
   D.eff.forEach(e=>mk("cDoe-"+e.k,{type:"line",data:{labels:e.lv.map(l=>l+" "+FACT[e.k].unit),datasets:[{data:e.means,borderColor:e.p<.05?css("--accent"):css("--muted"),pointRadius:5,borderWidth:2}]},
     options:baseOpts({plugins:{legend:{display:false},tooltip:{callbacks:{label:i=>`${RESP[S.doeResp].label} ${f(i.raw,2)}`}}},scales:{x:{ticks:{color:css("--muted"),font:{size:chartCaptionFontPx()}},grid:{display:false}},y:{min:lo-pad,max:hi+pad,ticks:{color:css("--muted"),font:{family:"IBM Plex Mono",size:chartCaptionFontPx()}},grid:{color:css("--grid")}}}})}));
+  if(interSec&&interBox){
+    const inter=D.interaction;
+    interSec.hidden=false;
+    if(!inter||inter.insufficient){
+      if(interSub)interSub.textContent="";
+      if(interMsg){interMsg.hidden=false;interMsg.textContent=(inter&&inter.reason)||"有效因子不足 2 個，無法繪製雙因子交互作用圖";}
+      interBox.innerHTML="";
+    }else{
+      if(interMsg)interMsg.hidden=true;
+      const sigPairs=inter.pairs.filter(p=>p.significant);
+      if(interSub)interSub.textContent=sigPairs.length?` · ${sigPairs.length} 組顯著交互（p < 0.05）`:" · 未檢出顯著交互";
+      interBox.innerHTML=inter.pairs.map(p=>{
+        const fa=FACT[p.a].label,fb=FACT[p.b].label;
+        const statTxt=p.noTestReason?p.noTestReason:`F=${f(p.F,2)}, p=${p.p<0.001?"<0.001":f(p.p,3)}${p.significant?" · 顯著交互":""}`;
+        return`<div><div class="fact" style="margin-bottom:4px">${fa} × ${fb} <small class="${p.significant?"warn":"note"}">(${statTxt})</small></div><div class="chartbox short"><canvas id="cDoeInter-${p.a}-${p.b}" role="img" aria-label="${fa}與${fb}交互作用圖"></canvas></div></div>`;
+      }).join("");
+      const pal=extPal();
+      inter.pairs.forEach(p=>mk(`cDoeInter-${p.a}-${p.b}`,buildDoeInteractionChartCfg(p,RESP[S.doeResp].label,pal)));
+    }
+  }
 }
 $("#doeResp").onchange=e=>{S.doeResp=e.target.value;renderDOE()};
 $("#btnDoeSample").onclick=()=>{const ex=S.runs.find(r=>r.name.startsWith("DOE"));const id=ex?ex.id:addRun("DOE · 印刷參數 2³ 全因子",sampleData({variant:"DOE"}),["volume","height","area","offx","offy"],sampleCfg());if(!ex)S.runs.find(r=>r.id===id).sample=true;switchRun(id);setTab("improve/lab")};
@@ -14084,6 +14356,7 @@ function extDiagnosticsSummary(A){
   const vc=getExtStats("variance",()=>calcVarianceComponents(A.rows,A.m));
   const offE=getExtStats("offsetEllipse",()=>calcOffsetEllipse(A.rows,S.specs));
   const ori=getExtStats("orient",()=>calcApertureOrientation(A.rows,A.m,S.sqDir==="X"?"X":"Y",{stencilUm:S.stencil||120}));
+  const doeD=getExtStats("doeInter",()=>doeAnalyze(S,S.doeResp||"vol"),S.doeResp||"vol");
   const zMap={healthy:"健康",offCenter:"偏心可調",highVar:"變異大",both:"雙失控"};
   return{
     板序自相關:acf&&!acf.insufficient?{r1:+f(acf.acf[0],3),p:+f(acf.lbP,4),顯著落後期:acf.sigLags.slice(0,5)}:null,
@@ -14091,7 +14364,8 @@ function extDiagnosticsSummary(A){
     能力四象限重點:cacp&&!cacp.insufficient?cacp.pts.filter(p=>p.cpk!=null&&p.cpk<1.33).slice(0,5).map(p=>({名稱:p.key,Ca:+f(p.ca,1),Cp:+f(p.cp,2),Cpk:+f(p.cpk,2),歸類:zMap[p.zone]||""})):[],
     變異來源佔比:vc&&!vc.insufficient?{主導:vc.dominant.label,各層:vc.layers.map(l=>`${l.label}:${f(l.pct,1)}%`)}:null,
     雙行程偏移背隙:offE&&!offE.insufficient&&offE.strokeSplit&&offE.strokeSplit.valid?{背隙um:+f(offE.strokeSplit.backlashUm,1),p:offE.strokeSplit.p!=null?+f(offE.strokeSplit.p,4):null}:null,
-    開孔方向差異:ori&&!ori.insufficient&&!ori.singleAxisOnly?{刮刀軸:ori.sqDir,差值:+f(ori.diff,2),d:+f(ori.cohenD,2),p:+f(ori.p,4)}:null
+    開孔方向差異:ori&&!ori.insufficient&&!ori.singleAxisOnly?{刮刀軸:ori.sqDir,差值:+f(ori.diff,2),d:+f(ori.cohenD,2),p:+f(ori.p,4)}:null,
+    DOE交互作用:doeD&&doeD.interaction&&!doeD.interaction.insufficient?doeD.interaction.pairs.map(p=>({配對:`${FACT[p.a].label}×${FACT[p.b].label}`,p:p.p!=null?+f(p.p,4):null,顯著:p.significant})):null
   };
 }
 function advSummary(A){const W=advAnalyze(S,A);return{EWMA越界:A.ewma.filter(p=>p.v>p.ucl||p.v<p.lcl).map(p=>p.lab),CUSUM訊號:A.cusum.pts.filter(p=>p.cp>A.cusum.h||p.cm>A.cusum.h).map(p=>p.lab),
@@ -16645,6 +16919,21 @@ async function generateReportPdfBlob(opts={}){
         ],[42,26,38,38,38]);
       }
     }catch(e){}
+    try{
+      const doeD=getExtStats("doeInter",()=>doeAnalyze(S,S.doeResp||"vol"),S.doeResp||"vol");
+      if(doeD&&doeD.interaction&&!doeD.interaction.insufficient&&doeD.interaction.pairs.length){
+        const pick=doeD.interaction.pairs.find(p=>p.significant)||doeD.interaction.pairs[0];
+        const respK=S.doeResp||"vol";
+        const cfg=buildDoeInteractionChartCfg(pick,(RESP[respK]&&RESP[respK].label)||respK,printPal2);
+        const url=renderOffscreenChart(cfg.type,cfg.data,cfg.options);
+        checkBreak(66);
+        const pInfo=pick.noTestReason?pick.noTestReason:`F=${f(pick.F,2)}, p=${pick.p<0.001?"<0.001":f(pick.p,3)}`;
+        printText(`DOE 雙因子交互作用圖（${FACT[pick.a].label} × ${FACT[pick.b].label} · ${pInfo}）`,14,curY,{size:8});
+        curY+=4;
+        doc.addImage(url,opts.lite?"JPEG":"PNG",14,curY,182,58);
+        curY+=62;
+      }
+    }catch(e){}
   }
 
   // 8. DFM 開孔建議
@@ -16677,7 +16966,7 @@ async function generateReportPdfBlob(opts={}){
     curY+=5;
     printText("4. 擴充統計模型：G 圖採 Benneyan 幾何分布精確界線；Laney U′ 圖以 σz 修正板間過度離散；板序自相關以 Ljung-Box Q 檢定；四象限採規格中點準度 Ca 與精密度 Cp 滿足 Cpk = Cp(1 − |Ca|/100)。",14,curY,{size:8.5});
     curY+=5;
-    printText("5. 變異與空間進階模型：變異數分解採群組去中心後之巢狀平方和分解；二維偏移採 95% 信賴橢圓（χ²₂=5.991）與雙變量 Hotelling T² 檢定行程背隙；板面 X／Y 剖面僅於具備實體座標時計算；開孔方向效應以 Welch t 檢定與 Cohen's d 比較 0° 平行與 90° 垂直刮刀。",14,curY,{size:8.5});
+    printText("5. 變異、空間與 DOE 進階模型：變異數分解採群組去中心後之巢狀平方和分解；二維偏移採 95% 信賴橢圓（χ²₂=5.991）與雙變量 Hotelling T² 檢定行程背隙；板面 X／Y 剖面僅於具備實體座標時計算；開孔方向效應以 Welch t 檢定與 Cohen's d 比較 0° 與 90°；DOE 交互作用採雙因子變異數分析（2-Way ANOVA F 檢定，缺格子或無重複樣本時僅供視覺判讀）。",14,curY,{size:8.5});
     curY+=5;
     if(missingGlyphs.size>0){
       printText(`6. 缺字檢核紀錄（已自動轉換為向量／點陣圖形嵌入，未產生豆腐塊）：${[...missingGlyphs].join("、")}`,14,curY,{size:8.5,color:[180,80,20]});
