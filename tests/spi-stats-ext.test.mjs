@@ -186,3 +186,30 @@ describe("Task 1: lib/spi-stats-ext.mjs 階段一純統計核心", () => {
     assert.equal(embedded, libSrc, "spi-spc.html 內嵌區塊須與 lib/spi-stats-ext.mjs 逐字一致");
   });
 });
+
+import { loadCore } from "./_load.js";
+
+describe("Task 2: analyze() 管制圖管線整合（Laney U′ 與 G 圖）", () => {
+  it("chart='u' 產出 A.uc 與 A.series（板序對齊）", () => {
+    const core = loadCore();
+    const rows = core.sampleData();
+    const st = { ...core.S, rows, metrics: ["volume", "height", "area", "offx", "offy"], metric: "volume", group: core.ALL_GRP, comp: null, chart: "u" };
+    const A = core.analyze(st);
+    assert.ok(A.uc && !A.uc.insufficient, "A.uc 應有效計算");
+    assert.equal(A.series.length, A.boards.length, "U′ 圖 series 長度須等於板數");
+    assert.ok(Number.isFinite(A.uc.uBarPer1k));
+  });
+
+  it("chart='g' 產出 A.gc 且 Nelson 僅保留 Rule 1、Rule 2–8 為 na", () => {
+    const core = loadCore();
+    const rows = core.sampleData();
+    const st = { ...core.S, rows, metrics: ["volume", "height", "area", "offx", "offy"], metric: "volume", group: core.ALL_GRP, comp: null, chart: "g" };
+    const A = core.analyze(st);
+    assert.ok(A.gc && !A.gc.insufficient, "A.gc 應有效計算");
+    const r1 = A.nel.rules.find((r) => r.id === 1);
+    const others = A.nel.rules.filter((r) => r.id !== 1);
+    assert.equal(Boolean(r1 && r1.na), false, "G 圖 Rule 1 應啟用");
+    assert.ok(others.every((r) => r.na === true), "G 圖 Rule 2–8 須標記 na: true");
+  });
+});
+

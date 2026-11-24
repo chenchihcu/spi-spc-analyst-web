@@ -1373,6 +1373,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
   <nav class="subtabs" aria-label="管制圖子視圖">
     <button type="button" class="subtab" data-subnav-control="uni" aria-current="page">單變量</button>
     <button type="button" class="subtab" data-subnav-control="multi">多變量</button>
+    <button type="button" class="subtab" data-subnav-control="acf">自相關</button>
   </nav>
   <div class="control-subviews stack-md">
     <div data-control-sub="uni">
@@ -1384,8 +1385,15 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
             <option value="xbarr">X̄-R（自訂小子群組 n=2–10）</option>
             <option value="imr">I-MR（單一焊墊跨板）</option>
             <option value="p">P′ 圖（每板不良率，Laney）</option>
+            <option value="u">U′ 圖</option>
+            <option value="g">G 圖</option>
             <option value="ewma">EWMA（小幅漂移）</option>
             <option value="cusum">CUSUM（累積偏移）</option>
+          </select></div>
+        <div class="field" id="gScaleField" data-scope="c" hidden><label for="selGScale">Y 軸尺度</label>
+          <select id="selGScale">
+            <option value="linear" selected>線性</option>
+            <option value="log">對數</option>
           </select></div>
         <div class="field" id="xrSizeField" data-scope="c" hidden><label for="selXrSize">子群組大小 n</label>
           <select id="selXrSize">
@@ -1434,6 +1442,23 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
     <div id="t2Msg" class="my-8"></div>
     <div class="chartbox"><canvas id="cHotellingT2" role="img" aria-label="Hotelling T2 管制圖"></canvas></div>
   </div>
+  </div>
+    <div data-control-sub="acf" hidden>
+      <div class="card" id="cardAcf">
+        <h3>板序自相關與偏自相關圖 <small id="acfSub"></small></h3>
+        <div id="acfMsg" class="my-8"></div>
+        <div class="grid2" id="acfGrid">
+          <div>
+            <div class="fact" style="margin-bottom:4px">自相關係數 ACF</div>
+            <div class="chartbox short"><canvas id="cAcf" role="img" aria-label="板序自相關圖"></canvas></div>
+          </div>
+          <div>
+            <div class="fact" style="margin-bottom:4px">偏自相關係數 PACF</div>
+            <div class="chartbox short"><canvas id="cPacf" role="img" aria-label="板序偏自相關圖"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -4824,16 +4849,29 @@ function analyzeView(st,B){
     imr.ucl=NaN;imr.lcl=NaN;imr.mrucl=NaN;imr.pts.forEach(p=>{p.ucl=NaN;p.lcl=NaN;p.z=0;});
   }
   // 判異規則：顯示用依所選管制圖與其適用規則；X̄ 圖與量測層的 nelX 相同
-  const RULES={xbars:null,xbarr:null,imr:null,p:[1,2,3,4],ewma:[1],cusum:[1]};
-  const series=st.chart==="imr"?imr.pts:st.chart==="p"?pc.pts:st.chart==="ewma"?ewma:st.chart==="cusum"?cuz:st.chart==="xbarr"?xr.pts:xs.pts;
-  const chartRejected=isZeroSd||(st.chart==="imr"?imr.rejected:st.chart==="xbarr"?xr.rejected:["p","ewma","cusum"].includes(st.chart)?boards.length<5:xs.rejected);
-  const chartReason=chartRejected?(isZeroSd?"製程變異為零":st.chart==="imr"?imr.reason:st.chart==="xbarr"?xr.reason:["p","ewma","cusum"].includes(st.chart)?"子群組（板數）不足（需 ≥5）":xs.reason):"";
+  const RULES={xbars:null,xbarr:null,imr:null,p:[1,2,3,4],u:[1,2,3,4],g:[1],ewma:[1],cusum:[1]};
+  const clsRow=r=>classify(r,st.specs,st);
+  const uc=st.chart==="u"?calcLaneyUChart(rows,clsRow,boards):null;
+  const gc=st.chart==="g"?calcGChart(rows,clsRow,boards):null;
+  const series=st.chart==="imr"?imr.pts:st.chart==="p"?pc.pts:st.chart==="u"?(uc?uc.pts:[]):st.chart==="g"?(gc?gc.pts:[]):st.chart==="ewma"?ewma:st.chart==="cusum"?cuz:st.chart==="xbarr"?xr.pts:xs.pts;
+  const chartRejected=st.chart==="g"?(!gc||gc.insufficient):st.chart==="u"?(!uc||uc.insufficient||boards.length<5):isZeroSd||(st.chart==="imr"?imr.rejected:st.chart==="xbarr"?xr.rejected:["p","ewma","cusum"].includes(st.chart)?boards.length<5:xs.rejected);
+  const chartReason=chartRejected?(st.chart==="g"?(gc&&gc.reason||"不良次數不足"):st.chart==="u"?(uc&&uc.insufficient?uc.reason:"子群組（板數）不足（需 ≥5）"):isZeroSd?"製程變異為零":st.chart==="imr"?imr.reason:st.chart==="xbarr"?xr.reason:["p","ewma","cusum"].includes(st.chart)?"子群組（板數）不足（需 ≥5）":xs.reason):"";
   let nel;
   if(st.chart==="xbars"||!RULES.hasOwnProperty(st.chart))nel=B.nelX;
+  else if(st.chart==="g"){
+    const base=nelson([],RULES.g);
+    if(!chartRejected&&gc&&gc.pts){
+      const idx=[];
+      for(let i=0;i<gc.pts.length;i++)if(gc.pts[i].belowLcl||gc.pts[i].aboveUcl||gc.pts[i].burst)idx.push(i);
+      const r1=base.rules.find(r=>r.id===1);
+      if(r1){r1.idx=idx;idx.forEach(i=>base.flag.add(i));}
+    }
+    nel=base;
+  }
   else{nel=chartRejected?nelZero():nelson(series.map(p=>p.z),RULES[st.chart]||null)}
   const mode=st.capDistMode||"auto",th=st.pauseThreshold||15,cap=Object.assign({},B.cap);
   lazy(cap,"nonNormal",()=>B.nonNormalOf(mode));
-  const A={m,sp:B.sp,rows,boards,byBoard:B.byBoard,N:B.N,gMean:B.gMean,overallSd:B.overallSd,sigmaW:B.sigmaW,sigmaLT:B.sigmaLT,mixed:B.mixed,nbar:B.nbar,xs,xr,imr,pc,ewma,cusum:B.cusum,series,nel,chartRejected,chartReason,nelX:B.nelX,stable:B.stable,cap,hasSpec:B.hasSpec,unitMismatch:B.unitMismatch,
+  const A={m,sp:B.sp,rows,boards,byBoard:B.byBoard,N:B.N,gMean:B.gMean,overallSd:B.overallSd,sigmaW:B.sigmaW,sigmaLT:B.sigmaLT,mixed:B.mixed,nbar:B.nbar,xs,xr,imr,pc,uc,gc,ewma,cusum:B.cusum,series,nel,chartRejected,chartReason,nelX:B.nelX,stable:B.stable,cap,hasSpec:B.hasSpec,unitMismatch:B.unitMismatch,
     ad:B.ad,sw:B.sw,sk:B.sk,groups:B.groups,eta2:B.eta2,pareto:B.pareto,defRows:B.defRows,rHA:B.rHA,msa:B.msa,rX:B.rX,rY:B.rY,coordN:B.coordN,coordLevel:B.coordLevel,xOut:B.xOut,pOut:B.pOut,worst:B.worst,pads,sqDir:st.sqDir==="X"?"X":"Y"};
   lazy(A,"nonNormal",()=>B.nonNormalOf(mode));lazy(A,"pauseDecay",()=>B.pauseOf(th));lazy(A,"printerCorr",B.printerOf);lazy(A,"spatialAutocorr",B.spatialOf);
   A.xv=B.xv||(B.xv=crossValidate(A));   // 交叉驗證只讀量測層欄位（管制狀態用 nelX），與所選管制圖無關
@@ -8199,7 +8237,19 @@ function detWorker(){if(detW!==null)return detW;try{const core=document.getEleme
 /* 開機後趁空檔先建立背景執行緒，載入大檔時不必再等它編譯 */
 (window.requestIdleCallback||(f=>setTimeout(f,1500)))(()=>{if(typeof Worker!=="undefined")detWorker()});
 /* 傳給背景執行緒的狀態：略過問題偵測用不到的大型欄位（未篩選的原始資料、GR&R、AI 回覆等），減少複製時間 */
-const DET_SKIP=new Set(["A","F","runs","ctx","issEnt","pmapSelection","_rawRows","grr","ai"]);
+const DET_SKIP=new Set(["A","F","runs","ctx","issEnt","pmapSelection","_rawRows","grr","ai","extStatsCache"]);
+const EXT_STATS_CACHE=new WeakMap();
+function getExtStats(kind,computeFn,extraKey=""){
+  if(!S.rows)return null;
+  let m=EXT_STATS_CACHE.get(S.rows);
+  if(!m){m=new Map();EXT_STATS_CACHE.set(S.rows,m);}
+  const k=kind+"|"+anKey(S)+(extraKey?"|"+extraKey:"");
+  if(m.has(k))return m.get(k);
+  const v=computeFn();
+  if(m.size>80)m.clear();
+  m.set(k,v);
+  return v;
+}
 function detState(){const st={};for(const k in S){if(DET_SKIP.has(k))continue;const v=S[k];if(typeof v!=="function")st[k]=v}return st}
 function detectSync(sig){S.F=perfSpan("detect(同步)",()=>detectIssues(S));S.F.rowsRef=S.rows;F_SIG=sig;ISS_OPEN.clear()} /* 問題編號會隨重新偵測改變，展開狀態一併清除 */
 function busy(on,msg){const b=$("#busy");if(!b)return;if(on){$("#busyMsg").textContent=msg||"計算中…";b.hidden=false}else b.hidden=true}
@@ -9004,7 +9054,7 @@ $("#diagnosticPanel").addEventListener("click",e=>{const b=e.target.closest("but
 $("#issList").addEventListener("click",e=>{const b=e.target.closest("[data-diag-issue]");if(!b)return;e.preventDefault();e.stopPropagation();const issue=S.F.find(x=>String(x.id)===b.dataset.diagIssue);if(issue)openDiagnostic(issue)});
 
 function renderIssuesPanel(){if(S.issuesSub==="cross"){renderCross();renderFM()}else if(S.issuesSub==="diagnostic")renderDiagnostic();else renderIssues()}
-function renderControlPanel(){if(S.controlSub==="multi")renderHotellingT2UI();else renderControl()}
+function renderControlPanel(){if(S.controlSub==="multi")renderHotellingT2UI();else if(S.controlSub==="acf")renderAcfUI();else renderControl()}
 function renderTabByName(k){const fn=({issues:renderIssuesPanel,overview:renderOverview,control:renderControlPanel,capability:renderCap,sim3d:render3D,deep:renderDeepPanel,improve:renderImprovePanel,ai:()=>{},report:renderReport,data:()=>{renderSpecTbl();renderZones();renderAperture();renderRuns()}})[k];if(fn)fn()} function renderTabInner(){if(S.duo&&S.duo.active){if(S.tab==="report"||S.duo.leftTab==="report"||S.duo.rightTab==="report"){renderTabByName("report");return}renderTabByName(S.duo.leftTab||S.tab);if(S.duo.rightTab&&S.duo.rightTab!==S.duo.leftTab)renderTabByName(S.duo.rightTab)}else renderTabByName(S.tab)}
 
 $("#selMetric").onchange=e=>{S.metric=e.target.value;syncControls();recompute()};
@@ -9060,11 +9110,12 @@ if($("#selParetoDim"))$("#selParetoDim").onchange=e=>{S.paretoDim=e.target.value
 $$(".tab").forEach(t=>{const p=$("#p-"+t.dataset.tab);t.id="tab-"+t.dataset.tab;t.setAttribute("aria-controls","p-"+t.dataset.tab);if(p)p.setAttribute("aria-labelledby",t.id);t.onclick=()=>setTab(t.dataset.tab)});
 $(".tabs").addEventListener("keydown",e=>{const T=$$(".tab"),i=T.findIndex(t=>t.dataset.tab===S.tab);let j=null;if(e.key==="ArrowRight")j=(i+1)%T.length;else if(e.key==="ArrowLeft")j=(i-1+T.length)%T.length;else if(e.key==="Home")j=0;else if(e.key==="End")j=T.length-1;if(j==null)return;e.preventDefault();setTab(T[j].dataset.tab);T[j].focus()});
 const AN_TABS=new Set(["overview","control","capability","sim3d","deep","ai"]);
-function isAnalysisScopeTab(){return AN_TABS.has(S.tab)||(S.tab==="control"&&S.controlSub==="uni")}
+function isAnalysisScopeTab(){return AN_TABS.has(S.tab)||(S.tab==="control"&&S.controlSub!=="multi")}
 function applyScope(){const analOn=isAnalysisScopeTab();const chartOn=S.tab==="control"&&S.controlSub==="uni";
 $$("[data-scope=a]").forEach(el=>{el.hidden=!analOn});
 $$("[data-scope=c]").forEach(el=>{
   if(el.id==="padField")el.hidden=!chartOn||S.chart!=="imr";
+  else if(el.id==="gScaleField")el.hidden=!chartOn||S.chart!=="g";
   else if(el.id==="xrSizeField"||el.id==="xrModeField")el.hidden=!chartOn||S.chart!=="xbarr";
   else el.hidden=!chartOn;
 });
@@ -9099,7 +9150,7 @@ function parseTabTarget(raw){
   if(!s)return{tab:"issues"};
   const parts=s.split("/"),root=parts[0],sub=parts[1]||null;
   if(root==="issues"){const issuesSub=sub&&["list","cross","diagnostic"].includes(sub)?sub:"list";return{tab:"issues",issuesSub}}
-  if(root==="control"){const controlSub=sub&&["uni","multi"].includes(sub)?sub:"uni";return{tab:"control",controlSub}}
+  if(root==="control"){const controlSub=sub&&["uni","multi","acf"].includes(sub)?sub:"uni";return{tab:"control",controlSub}}
   if(root==="deep"){if(sub==="cross")return{tab:"issues",issuesSub:"cross"};return{tab:"deep"}}
   if(root==="improve"){const improveSub=sub&&["compare","dfm","lab"].includes(sub)?sub:"compare";return{tab:"improve",improveSub}}
   if(LEGACY_ROOTS.has(root)){
@@ -9112,7 +9163,7 @@ function parseTabTarget(raw){
 }
 function tabHashFor(tab,issuesSub,controlSub,improveSub){
   if(tab==="issues")return issuesSub==="diagnostic"?"issues/diagnostic":issuesSub==="cross"?"issues/cross":"issues";
-  if(tab==="control")return controlSub==="multi"?"control/multi":"control";
+  if(tab==="control")return controlSub==="multi"?"control/multi":controlSub==="acf"?"control/acf":"control";
   if(tab==="improve")return"improve/"+(improveSub||"compare");
   if(tab==="deep")return"deep";
   return tab;
@@ -9202,13 +9253,13 @@ function renderOverview(){
   drawCtrl("cOvCtrl",true);drawPareto("cOvPareto");
 }
 
-function chartName(chart=S.chart){return{xbars:"X̄-S",xbarr:"X̄-R",imr:"I-MR",p:"P′ 圖",ewma:"EWMA",cusum:"CUSUM"}[chart]||"管制圖"}
+function chartName(chart=S.chart){return{xbars:"X̄-S",xbarr:"X̄-R",imr:"I-MR",p:"P′ 圖",u:"U′ 圖",g:"G 圖",ewma:"EWMA",cusum:"CUSUM"}[chart]||"管制圖"}
 function goBoard(b){if(!b)return;S.board=b;$("#selBoard").value=b;setTab("sim3d")}
 function goPad(p){S.chart="imr";S.pad=p;$("#selChart").value="imr";recompute(true);S.controlSub="uni";setTab("control");window.scrollTo({top:0,behavior:"smooth"})}
 const clickOpts=labs=>({onClick:(e,_,ch)=>{const el=ch.getElementsAtEventForMode(e,"index",{intersect:false},true)[0];if(el)goBoard(labs[el.index])},onHover:(e,els,ch)=>{ch.canvas.style.cursor="pointer"}});
 
 /* ---------- 管制圖 ---------- */
-function drawCtrl(id,mini,context=null){const A=context?.A||S.A,c=context?.chart||S.chart,ng=css("--ng"),acc=css("--accent"),ink=css("--muted"),s2=css("--series2");
+function drawCtrl(id,mini,context=null){const A=context?.A||S.A,c=context?.chart||S.chart,ng=css("--ng"),acc=css("--accent"),ink=css("--muted"),s2=css("--series2"),okc=css("--ok");
   const clicks=labs=>context?{onClick:(e,_,ch)=>{const hit=ch.getElementsAtEventForMode(e,"index",{intersect:false},true)[0];if(hit)context.onBoard(ch.data.labels[hit.index])}}:clickOpts(labs);
   const plot=cfg=>{
     if(context){
@@ -9229,6 +9280,49 @@ function drawCtrl(id,mini,context=null){const A=context?.A||S.A,c=context?.chart
     }
     mk(id,cfg);
   };
+  if(c==="g"){
+    const gc=A.gc;
+    if(!gc||gc.insufficient){
+      plot({type:"line",data:{labels:[],datasets:[]},options:baseOpts({plugins:{title:{display:true,text:gc?gc.reason:"範圍內不良次數少於 2 次，暫無法繪製間隔圖",color:ink}}})});
+      return;
+    }
+    const pts=gc.pts,useLog=($("#selGScale")&&$("#selGScale").value==="log");
+    const yVal=v=>useLog?Math.max(0.5,v):v;
+    const opts=baseOpts(withLimits({
+      ...clicks(pts.map(p=>p.board)),
+      scales:useLog?{y:{type:"logarithmic",min:0.5,grid:{color:css("--grid")},ticks:{color:ink}}}:undefined,
+      plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex===0,callbacks:{label:i=>{const p=pts[i.dataIndex];return`間隔 ${p.g} 焊墊 · 板 ${p.board}${p.burst?"（連續不良叢發）":p.belowLcl?"（低於 LCL）":p.aboveUcl?"（良率改善）":""}`}}}}
+    },[{n:"UCL",v:yVal(gc.ucl),c:okc},{n:"中位CL",v:yVal(gc.clMed),c:acc},{n:"LCL",v:yVal(gc.lcl),c:ng}],mini));
+    plot({type:"line",data:{labels:pts.map(p=>p.lab),datasets:[
+      {label:"不良間隔焊墊數",data:pts.map(p=>yVal(p.g)),borderColor:s2,borderWidth:1.6,tension:0,
+        pointRadius:pts.map(p=>(p.burst||p.belowLcl||p.aboveUcl)?(mini?4:5.5):(mini?2:3)),
+        pointBackgroundColor:pts.map(p=>(p.burst||p.belowLcl)?ng:p.aboveUcl?okc:s2),
+        pointBorderColor:pts.map(p=>(p.burst||p.belowLcl)?ng:p.aboveUcl?okc:s2)},
+      {label:"UCL",data:pts.map(()=>yVal(gc.ucl)),borderColor:okc,borderDash:[6,4],borderWidth:1.2,pointRadius:0},
+      {label:"中位 CL",data:pts.map(()=>yVal(gc.clMed)),borderColor:acc,borderWidth:1.2,pointRadius:0},
+      {label:"LCL",data:pts.map(()=>yVal(gc.lcl)),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0}
+    ]},options:opts});
+    return;
+  }
+  if(c==="u"){
+    const uc=A.uc;
+    if(!uc||uc.insufficient){
+      plot({type:"line",data:{labels:[],datasets:[]},options:baseOpts({plugins:{title:{display:true,text:uc?uc.reason:"U′ 圖無法計算",color:ink}}})});
+      return;
+    }
+    const pts=uc.pts,scale=1000,cl=uc.uBar,ucl=pts.map(p=>p.ucl),lcl=pts.map(p=>p.lcl);
+    const zones=mini?[]:[1,2].flatMap(k=>[1,-1].map(sgn=>({label:"",data:pts.map((p,i)=>Math.max(0,cl+sgn*k*((ucl[i]-cl)/3))*scale),borderColor:css("--grid"),borderWidth:1,pointRadius:0,stepped:"middle",borderDash:[2,3]})));
+    plot({type:"line",data:{labels:pts.map(p=>p.lab),datasets:[
+      {label:"每千焊墊缺點數",data:pts.map(p=>p.u*scale),borderColor:s2,borderWidth:1.6,tension:0,
+        pointRadius:pts.map((p,i)=>A.nel.flag.has(i)?(mini?4:5.5):(mini?2.5:3.5)),
+        pointBackgroundColor:pts.map((p,i)=>A.nel.flag.has(i)?ng:s2),
+        pointBorderColor:pts.map((p,i)=>A.nel.flag.has(i)?ng:s2)},
+      {label:"UCL",data:ucl.map(v=>v*scale),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0,stepped:"middle"},
+      {label:"LCL",data:lcl.map(v=>v*scale),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0,stepped:"middle"},
+      {label:"CL",data:pts.map(()=>cl*scale),borderColor:acc,borderWidth:1.2,pointRadius:0},...zones]},
+      options:baseOpts(withLimits({...clicks(pts.map(p=>p.lab)),plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex===0,callbacks:{label:i=>{const p=pts[i.dataIndex];return`${f(i.raw,2)} /千焊墊（${p.c} 缺點 / ${p.n} 焊墊） · z ${f(p.z,2)}`}}}}},[{n:"UCL",v:(ucl.at(-1)||0)*scale,c:ng},{n:"CL",v:cl*scale,c:acc},{n:"LCL",v:(lcl.at(-1)||0)*scale,c:ng}],mini))});
+    return;
+  }
   if(c==="xbarr"){
     const xr=A.xr;
     if(!xr||xr.rejected){
@@ -9283,21 +9377,26 @@ function renderControl(){
     xbarr:[`X̄ 圖（子群平均，n=${(A.xr&&A.xr.n)||S.xrSize||4}）`,`R 圖（子群全距，n=${(A.xr&&A.xr.n)||S.xrSize||4}）`],
     imr:[`I 圖（${A.imr.pad} 個別值）`,"MR 圖（移動全距）"],
     p:["P′ 圖（每板不良率 %，Laney）",""],
+    u:["U′ 圖（每千焊墊缺點數）",""],
+    g:["G 圖（不良間隔焊墊數）",""],
     ewma:["EWMA 圖（λ = 0.2，L = 3）",""],
     cusum:["CUSUM 圖（k = 0.5σ，h = 5σ）",""]}[c]||["管制圖",""];
-  $("#ctrlTitle").textContent=t[0]+` · ${METRICS[S.metric].label}`;$("#ctrl2Title").textContent=t[1];$("#ctrl2Card").hidden=!t[1];
+  $("#ctrlTitle").textContent=t[0]+((c==="p"||c==="u"||c==="g")?"":` · ${METRICS[S.metric].label}`);$("#ctrl2Title").textContent=t[1];$("#ctrl2Card").hidden=!t[1];
   const cl=c==="imr"?A.imr.cl:c==="p"?A.pc.cl*100:c==="xbarr"?(A.xr&&A.xr.cl):A.xs.cl;
-  const ewOut=A.ewma.filter(p=>p.v>p.ucl||p.v<p.lcl).map(p=>p.lab),cuOut=A.cusum.pts.filter(p=>p.cp>A.cusum.h||p.cm>A.cusum.h).map(p=>p.lab),cuStart=A.cusum.pts.findIndex(p=>p.cp>A.cusum.h||p.cm>A.cusum.h);
+  const ewOut=A.ewma.filter(p=>p.v>p.ucl||p.v<p.lcl).map(p=>p.lab),cuOut=A.cusum.pts.filter(p=>p.cp>A.cusum.h||p.cm>A.cusum.h).map(p=>p.lab);
   const warnText = A.xs.subgroupWarning ? " · " + A.xs.subgroupWarning : "";
   const rejText = A.xs.reason ? " · " + A.xs.reason : "";
   const sBStr = `σ̂(板平均) ${f(A.xs.sB,3)} ${u}（＝板平均 MR̄ ${f(A.xs.sB*1.128,3)} ÷ 1.128，三向法）`;
   $("#ctrlSub").textContent=c==="p"?`P' 圖（Laney）p̄ = ${f(cl,2)} %，σz = ${f(A.pc.sigZ,2)}${A.pc.sigZ>1?"（板間變異大於二項式，界限已放寬）":A.pc.sigZ<1?"（σz < 1：板間變異小於二項式預期，界限已收窄）":""}`
+    :c==="u"?(A.uc&&!A.uc.insufficient?`Laney U′ 圖 · ū = ${f(A.uc.uBarPer1k,2)} /千焊墊 · σz = ${f(A.uc.sigmaZ,2)} · 以全指標規格判定不良（同 P′ 圖）`:(A.uc&&A.uc.reason||"U′ 圖無法計算"))
+    :c==="g"?(A.gc&&!A.gc.insufficient?`良率 ${f(A.gc.yieldPct,2)} % · 平均間隔 ${f(A.gc.gMean,1)} 焊墊 · 中位 ${f(A.gc.gMedian,1)} · 叢發 ${A.gc.burstCount} 次 · 以全指標規格判定不良（同 P′ 圖）`:(A.gc&&A.gc.reason||"G 圖無法計算"))
     :c==="ewma"?`CL ${f(A.gMean,2)} ${u} · ${sBStr} · 越界 ${ewOut.length?ewOut.join("、"):"無"}${A.ewma.subgroupWarning?" · "+A.ewma.subgroupWarning:""}${A.ewma.reason?" · "+A.ewma.reason:""}`
     :c==="cusum"?`中心 ${A.cusum.centerType==="target"?"規格目標":"整批平均"} ${f(A.cusum.center,2)} ${u}${A.cusum.centerReason?"（"+A.cusum.centerReason+"）":""} · ${sBStr} · 訊號 ${cuOut.length?cuOut.join("、"):"無"}${A.cusum.subgroupWarning?" · "+A.cusum.subgroupWarning:""}${A.cusum.reason?" · "+A.cusum.reason:""}`
     :c==="xbarr"?`CL ${f(A.xr.cl,2)} ${u} · R̄ ${f(A.xr.rbar,2)} · σ̂ ${f(A.xr.sigmaHat,3)} · 子群數 k=${A.xr.k}（n=${A.xr.n}）${A.xr.reason?" · "+A.xr.reason:""}`
     :`CL ${f(cl,2)} ${u}`+(c==="xbars"?` · ${xbarSigTxt(A,3)}${warnText}${rejText}`:` · 焊墊 ${esc(A.imr.pad||"")} 的 MR̄ ${f(A.imr.mrbar,2)} ${u}${A.imr.subgroupWarning?" · "+A.imr.subgroupWarning:""}${A.imr.reason?" · "+A.imr.reason:""}`);
   $("#ctrlLegend").innerHTML=c==="cusum"?`<span><i style="border-color:${css("--series2")}"></i>C+ 向上累積</span><span><i class="dash" style="border-color:${css("--accent")}"></i>C− 向下累積</span><span><i class="dash" style="border-color:${css("--ng")}"></i>決策界限 ±h</span><span><i class="sq" style="background:${css("--ng")};border-radius:50%"></i>超過界限</span>`
     :c==="ewma"?`<span><i style="border-color:${css("--series2")}"></i>EWMA</span><span><i class="sq" style="background:${css("--muted")};border-radius:50%"></i>每板平均</span><span><i style="border-color:${css("--accent")}"></i>中心線</span><span><i class="dash" style="border-color:${css("--ng")}"></i>UCL / LCL</span>`
+    :c==="g"?`<span><i style="border-color:${css("--series2")}"></i>不良間隔焊墊數</span><span><i style="border-color:${css("--accent")}"></i>中位中心線</span><span><i class="dash" style="border-color:${css("--ok")}"></i>UCL（良率改善）</span><span><i class="dash" style="border-color:${css("--ng")}"></i>LCL / 叢發預警</span>`
     :`<span><i style="border-color:${css("--series2")}"></i>量測值</span><span><i style="border-color:${css("--accent")}"></i>中心線</span><span><i class="dash" style="border-color:${css("--ng")}"></i>UCL / LCL（${c==="xbars"?"±3σ̂板平均，三向法":"±3σ"}）</span><span><i class="dash" style="border-color:${css("--grid")}"></i>±1σ、±2σ 區</span><span><i class="sq" style="background:${css("--ng")};border-radius:50%"></i>判異點</span>`;
   drawCtrl("cCtrl1",false);
   if(t[1]){
@@ -9326,7 +9425,31 @@ function renderControl(){
         {data:uv,borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},{data:lv,borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},{data:c==="imr"?s.map(()=>clv):s.map(x=>x.cl),borderColor:css("--accent"),borderWidth:1.2,pointRadius:0}]},options:baseOpts(withLimits({},[{n:"UCL",v:uv.at(-1),c:ng},{n:"CL",v:c==="imr"?clv:s.at(-1)?.cl,c:css("--accent")},{n:"LCL",v:lv.at(-1),c:ng}]))})}
   }
   const pts=A.series;
-  $("#nelsonTbl").innerHTML=`<thead><tr><th>規則</th><th>狀態</th><th>觸發點</th><th>錫膏印刷常見對應原因</th></tr></thead><tbody>`+A.nel.rules.map(r=>`<tr><td>${r.name}</td><td>${r.na?'<span class="pill na">不適用</span>':A.chartRejected?'<span class="pill na">無法判定</span>':r.idx.length?(r.id===7?'<span class="pill warn">觸發</span>':'<span class="pill ng">觸發</span>'):'<span class="pill ok">通過</span>'}</td><td class="mono" style="font-size:var(--fs-caption)">${r.idx.length?r.idx.map(i=>pts[i].lab).join(" "):"—"}</td><td class="note">${r.na?"此管制圖不適用此規則（僅 X̄ / I-MR 使用全部 8 條；P' 圖用 1–4；EWMA / CUSUM 僅用 1）":A.chartRejected?esc(A.chartReason):r.hint}</td></tr>`).join("")+"</tbody>";
+  $("#nelsonTbl").innerHTML=`<thead><tr><th>規則</th><th>狀態</th><th>觸發點</th><th>錫膏印刷常見對應原因</th></tr></thead><tbody>`+A.nel.rules.map(r=>`<tr><td>${r.name}</td><td>${r.na?'<span class="pill na">不適用</span>':A.chartRejected?'<span class="pill na">無法判定</span>':r.idx.length?(r.id===7?'<span class="pill warn">觸發</span>':'<span class="pill ng">觸發</span>'):'<span class="pill ok">通過</span>'}</td><td class="mono" style="font-size:var(--fs-caption)">${r.idx.length?r.idx.map(i=>pts[i].lab).join(" "):"—"}</td><td class="note">${r.na?"此管制圖不適用此規則（僅 X̄ / I-MR 使用全部 8 條；P′ / U′ 圖用 1–4；G / EWMA / CUSUM 僅用 1）":A.chartRejected?esc(A.chartReason):r.hint}</td></tr>`).join("")+"</tbody>";
+}
+function renderAcfUI(){
+  const sub=$("#acfSub"),msg=$("#acfMsg"),grid=$("#acfGrid");
+  if(!hasData()||!S.A||!S.A.xs){
+    if(sub)sub.textContent="";if(msg)msg.textContent="尚未載入資料";if(grid)grid.hidden=true;return;
+  }
+  const res=getExtStats("acf",()=>calcAcfPacf(S.A.xs.pts.map(p=>p.v)));
+  if(!res||res.insufficient){
+    if(sub)sub.textContent=`${METRICS[S.A.m].label} · ${scopeLabel(S)}`;
+    if(msg){msg.className="empty-state my-8";msg.textContent=res&&res.reason||"板數不足，無法計算自相關";}
+    if(grid)grid.hidden=true;return;
+  }
+  if(grid)grid.hidden=false;
+  const sigTxt=res.sigLags.length?`顯著落後期：Lag ${res.sigLags.slice(0,5).join("、")}`:"各落後期均在 95% 信賴帶內";
+  if(sub)sub.textContent=`${METRICS[S.A.m].label} · ${scopeLabel(S)} · N=${res.n} 板 · Ljung-Box Q=${f(res.lbQ,2)} (p=${res.lbP<0.001?"<0.001":f(res.lbP,3)})`;
+  if(msg){msg.className="note my-8";msg.textContent=(res.lbP<0.01?"板序存在顯著自相關，Shewhart 獨立性假設可能受影響；":"板序未見顯著自相關；")+sigTxt;}
+  const labs=res.acf.map((_,i)=>`Lag ${i+1}`),ng=css("--ng"),s2=css("--series2"),acc=css("--accent");
+  const mkBar=(cid,vals,title)=>mk(cid,{type:"bar",data:{labels:labs,datasets:[
+    {label:title,data:vals,backgroundColor:vals.map(v=>Math.abs(v)>res.ci95?ng:s2),borderRadius:2},
+    {type:"line",label:"+95% CI",data:labs.map(()=>res.ci95),borderColor:acc,borderDash:[5,4],borderWidth:1.2,pointRadius:0},
+    {type:"line",label:"−95% CI",data:labs.map(()=>-res.ci95),borderColor:acc,borderDash:[5,4],borderWidth:1.2,pointRadius:0}
+  ]},options:baseOpts({scales:{y:{min:-1,max:1,grid:{color:css("--grid")},ticks:{color:css("--muted")}}},plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex===0,callbacks:{label:i=>`${title}: ${f(i.raw,3)}（±95% CI ±${f(res.ci95,3)}）`}}}})});
+  mkBar("cAcf",res.acf,"ACF");
+  mkBar("cPacf",res.pacf,"PACF");
 }
 
 /* ---------- 能力 ---------- */
@@ -12669,7 +12792,8 @@ function setupSubtabs(barSel,attr,onPick){
     if(j==null)return;e.preventDefault();onPick(btns[j].getAttribute(attr),btns[j]);btns[j].focus()});
 }
 setupSubtabs("#p-issues .subtabs","data-subnav-issues",v=>v==="diagnostic"?enterDiagnostic():setTab("issues/"+v));
-setupSubtabs("#p-control .subtabs","data-subnav-control",v=>setTab(v==="multi"?"control/multi":"control"));
+setupSubtabs("#p-control .subtabs","data-subnav-control",v=>setTab(v==="multi"?"control/multi":v==="acf"?"control/acf":"control"));
+if($("#selGScale"))$("#selGScale").onchange=()=>{if(S.tab==="control"&&S.chart==="g")renderControl()};
 setupSubtabs("#p-improve .subtabs","data-subnav-improve",v=>setTab("improve/"+v));
 function openAppSettings(section){
   const m=$("#appSettingsModal");if(!m)return;
@@ -14551,6 +14675,7 @@ function beforePrint(){
     ||($(`[data-mtab="${S.tab}"][data-mtab-sub="${S.improveSub||""}"]`)||{}).textContent?.trim()
     ||(S.tab==="issues"&&S.issuesSub==="cross"?"交叉驗證":null)
     ||(S.tab==="control"&&S.controlSub==="multi"?"多變量管制圖":null)
+    ||(S.tab==="control"&&S.controlSub==="acf"?"板序自相關分析":null)
     ||({share:"分享設定",shares:"我的分享",mail:"轉寄報告",deep:"製程跡象",improve:"回合比較",ai:"AI 診斷"}[S.tab])
     ||S.tab||"";
   const ph=$("#printHead");
