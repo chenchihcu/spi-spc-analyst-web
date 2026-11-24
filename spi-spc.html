@@ -6509,9 +6509,9 @@ const FOCUS_DOMAINS=[
 function focusDomainOf(x){
   const s=x&&x.sig,t=s&&s.t;
   if(t==="unit"||t==="msa")return"measurement";
-  if(t==="align"||((t==="board"||t==="local")&&s.off)||((t==="nelson"||t==="iso")&&(s.k==="offx"||s.k==="offy")))return"align";
-  if(t==="sys"||t==="pad"||t==="dfm"||t==="lowte"||t==="mcd"||t==="repeated")return"aperture";
-  if(t==="drift"||t==="wipe"||t==="pause"||(t==="nelson"&&s.ruleId!==1&&s.ruleId!==4))return"process";
+  if(t==="align"||t==="backlash"||((t==="board"||t==="local")&&s.off)||((t==="nelson"||t==="iso")&&(s.k==="offx"||s.k==="offy")))return"align";
+  if(t==="sys"||t==="pad"||t==="dfm"||t==="lowte"||t==="mcd"||t==="repeated"||t==="orient")return"aperture";
+  if(t==="drift"||t==="wipe"||t==="pause"||t==="acf"||(t==="nelson"&&s.ruleId!==1&&s.ruleId!==4))return"process";
   if(t==="stroke"||t==="grad"||t==="fig"||t==="spatial"||(t==="nelson"&&s.ruleId===4))return"squeegee";
   return"spike";
 }
@@ -7282,6 +7282,49 @@ function detectIssues(st,onStage){
     }
   }
 
+  // 5. 階段一正交規則：M-22 板序自相關（ACF）與 M-23 G 圖高良率不良叢發
+  const extCore={acf:{},gChart:null};
+  const acfAlpha=0.0005/Math.max(1,MS.length);
+  for(const k of MS){
+    const bm=boardMeans(k);
+    if(!bm||bm.length<15)continue;
+    const acfRes=calcAcfPacf(bm,Math.min(10,Math.floor(bm.length/4)));
+    extCore.acf[k]=acfRes;
+    if(F.some(x=>x.sig&&x.sig.t==="drift"&&x.sig.k===k))continue;
+    if(!acfRes.insufficient&&acfRes.lbP<acfAlpha&&(Math.abs(acfRes.acf[0])>=0.50||acfRes.maxAbsVal>=Math.max(0.58,3.4/Math.sqrt(acfRes.n)))){
+      const lagTxt=acfRes.sigLags.length?topList(acfRes.sigLags.map(l=>`Lag ${l}`),10):`Lag ${acfRes.maxAbsLag}`;
+      add({lv:"warn",cat:"趨勢漂移",sig:{t:"acf",k},
+        title:`${lab(k)}板序具顯著自相關（r₁ = ${f(acfRes.acf[0],2)}，最大峰 Lag ${acfRes.maxAbsLag}）`,
+        ents:[],score:2.3,
+        rule_id:"M-22 板序自相關",rule_name:"Ljung-Box Q 與 ACF 自相關檢定",metric:lab(k),
+        boards:"全部板",subboard:subOf(R),group:"ALL",refdes:"全部元件",
+        pads:`全板板平均序列（N = ${acfRes.n} 板）`,
+        observed:`Ljung-Box Q = ${f(acfRes.lbQ,2)}（p = ${acfRes.lbP<0.001?"<0.001":f(acfRes.lbP,4)}），r₁ = ${f(acfRes.acf[0],3)}，顯著落後期：${lagTxt}`,
+        limit:`Ljung-Box p ≥ ${acfAlpha.toExponential(1)} 且無顯著週期峰`,z:"不適用",p:acfRes.lbP<0.001?"<0.001":f(acfRes.lbP,4),
+        facts:[`${lab(k)}連續板平均存在顯著時間序列相依（${lagTxt}），違反標準 Shewhart 管制圖獨立性假設`],
+        cause:"錫膏滾動黏度緩慢變化、週期性鋼板擦拭未完全恢復，或治具／料架固定週期循環效應",conf:"中",
+        action:"至「管制圖 → 自相關」確認週期落後期，搭配 EWMA／CUSUM 監控並檢查擦拭週期與載具編號",
+        ev:evSeries(k,null,[],"各板平均值序列"),go:{tab:"control/acf"}});
+    }
+  }
+  const gcAll=calcGChart(R,r=>classify(r,st.specs,st),boards);
+  extCore.gChart=gcAll;
+  if(!gcAll.insufficient&&gcAll.yieldPct>=99&&gcAll.defectCount>=4&&gcAll.burstCount>=1&&gcAll.burstP<0.002){
+    const burstBoards=[...new Set(gcAll.pts.filter(p=>p.burst).map(p=>p.board))];
+    add({lv:"warn",cat:"高良率叢發",sig:{t:"gburst",boards:burstBoards},
+      title:`高良率產線出現連續不良叢發（良率 ${f(gcAll.yieldPct,2)}%，叢發 ${gcAll.burstCount} 次）`,
+      ents:burstBoards.map(b=>"b:"+b),score:2.4,
+      rule_id:"M-23 G 圖不良叢發",rule_name:"高良率幾何間隔連續叢發檢定",metric:"全指標規格",
+      boards:topList(burstBoards,10),subboard:subOf(R),group:"ALL",refdes:"全部元件",
+      pads:`總焊墊 ${gcAll.totalPads}、不良 ${gcAll.defectCount}，平均間隔 ${f(gcAll.gMean,1)} 焊墊`,
+      observed:`檢出 ${gcAll.burstCount} 次連續不良叢發（校正後 p = ${gcAll.burstP<0.001?"<0.001":f(gcAll.burstP,4)}）`,
+      limit:"高良率（≥ 99%）下連續不良叢發校正 p ≥ 0.002",z:"不適用",p:gcAll.burstP<0.001?"<0.001":f(gcAll.burstP,4),
+      facts:[`整體良率 ${f(gcAll.yieldPct,2)}% 時，不良並非隨機分散，而是在 ${topList(burstBoards,10)} 集中連續發生`],
+      cause:"局部鋼板堵孔、異物附著、單次印刷異常或特定連續焊墊脫模失效",conf:"高",
+      action:"切換至「管制圖 → G 圖」定位叢發板號與對應 3D 焊墊位置，檢查鋼板開孔清潔度",
+      ev:null,go:{tab:"control"}});
+  }
+
   stage(11,"佐證整理");
   // D-29 佐證與同一現象：只有來自不同證據族（FAMILY）且非衍生關係的發現才互相佐證；
   // 同期間、同量測項目的 Nelson 卡與趨勢／單板／孤立極端焊墊卡，或同族／衍生關係（MC.derived 為真時的 volume 與 hpct/area）列為 same_phenomenon
@@ -7356,7 +7399,7 @@ function detectIssues(st,onStage){
   // 多重比較揭露：單板異常每個「板 × 元件群組 × 量測項目」各做一次檢定；門檻已依板數校準（M-19），每次檢定誤報為 2(1−Φ(3.5))；全無異常時的預期誤報數（另有效果量與不良數門檻，實際更少）
   const alpha=ROBZ_A1;
   const problemCases=buildProblemCases(F,st);
-  F.meta={tests:nT1,hits:hits.length,alpha,expFA:nT1*alpha,verdict:{level:vLevel,label:verdictLabel,worstCap:wAll,reasons},modes:failureModes(st,F,{R,boards,groups,MS,MC,nb,boardMeans,idx,gIdx}),cases:problemCases};
+  F.meta={tests:nT1,hits:hits.length,alpha,expFA:nT1*alpha,verdict:{level:vLevel,label:verdictLabel,worstCap:wAll,reasons},modes:failureModes(st,F,{R,boards,groups,MS,MC,nb,boardMeans,idx,gIdx}),cases:problemCases,extCore};
   return F}
 /* ============ 失效模式交叉比對 ============
    錫膏印刷的失效通常是多因素的：每個候選失效模式列出「支持」與「矛盾」的證據，證據分屬六個獨立面向

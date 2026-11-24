@@ -213,3 +213,61 @@ describe("Task 2: analyze() 管制圖管線整合（Laney U′ 與 G 圖）", ()
   });
 });
 
+describe("Task 4: detectIssues 新增正交規則 M-22（ACF）與 M-23（G 圖高良率叢發）", () => {
+  it("M-22: AR(1) 強自相關板序觸發 M-22，歸類為 process 且不使用空間分布類別", () => {
+    const core = loadCore();
+    const rows = [];
+    // 24 片板、每板 10 個焊墊，volume 具強烈 AR(1) / 週期性波動
+    let prev = 0;
+    for (let bi = 0; bi < 24; bi++) {
+      prev = 0.9 * prev + Math.sin(bi * 0.45) * 4;
+      for (let pi = 0; pi < 10; pi++) {
+        rows.push({
+          board: `B${String(bi + 1).padStart(2, "0")}`,
+          comp: `R${pi + 1}`,
+          group: "0402",
+          pad: `R${pi + 1}-1`,
+          volume: 100 + prev + (pi % 3 - 1) * 0.5,
+          height: 120,
+          area: 100,
+        });
+      }
+    }
+    const st = { ...core.S, rows, metrics: ["volume", "height", "area"], metric: "volume", group: core.ALL_GRP, comp: null };
+    const F = core.detectIssues(st);
+    const acfCard = F.find((x) => x.sig && x.sig.t === "acf");
+    assert.ok(acfCard, "強自相關板序應觸發 M-22 卡片");
+    assert.equal(core.focusDomainOf(acfCard), "process");
+    assert.notEqual(acfCard.cat, "空間分布");
+    assert.ok(F.meta && F.meta.extCore && F.meta.extCore.acf, "F.meta.extCore 應附帶 ACF 結果");
+  });
+
+  it("M-23: 良率 ≥ 99% 且出現連續不良叢發觸發 M-23，歸類為 spike", () => {
+    const core = loadCore();
+    const rows = [];
+    // 10 片板 × 100 焊墊 = 1000 焊墊，在 B05 出現 3 個連續少錫不良 + B09 1 個少錫不良（良率 99.6%）
+    for (let bi = 0; bi < 10; bi++) {
+      for (let pi = 0; pi < 100; pi++) {
+        const isBad = (bi === 4 && (pi === 10 || pi === 11 || pi === 12)) || (bi === 8 && pi === 50);
+        rows.push({
+          board: `B${String(bi + 1).padStart(2, "0")}`,
+          comp: `C${pi + 1}`,
+          group: "0402",
+          pad: `C${pi + 1}-1`,
+          volume: isBad ? 55 : 100,
+          height: 120,
+          area: 100,
+        });
+      }
+    }
+    const st = { ...core.S, rows, metrics: ["volume", "height", "area"], metric: "volume", group: core.ALL_GRP, comp: null };
+    const F = core.detectIssues(st);
+    const gCard = F.find((x) => x.sig && x.sig.t === "gburst");
+    assert.ok(gCard, "高良率連續不良叢發應觸發 M-23 卡片");
+    assert.equal(core.focusDomainOf(gCard), "spike");
+    assert.notEqual(gCard.cat, "空間分布");
+    assert.ok(F.meta && F.meta.extCore && F.meta.extCore.gChart, "F.meta.extCore 應附帶 G 圖結果");
+  });
+});
+
+
