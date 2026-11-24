@@ -372,11 +372,11 @@ test("製程跡象三子頁與變異數分解／偏移靶心／板面剖面隨�
   assert.ok(fullNMatch && Number(fullNMatch[1]) > 0, "全板偏移靶心副標應含 n");
   const fullN = Number(fullNMatch[1]);
 
-  H.setComp(key("U2"));
+  H.setComp(key("U1"));
   H.setTab("deep/spatial");
-  const u2NMatch = d.querySelector("#offBullSub").textContent.match(/n=(\d+)/);
-  assert.ok(u2NMatch && Number(u2NMatch[1]) > 0 && Number(u2NMatch[1]) < fullN, "單一元件偏移靶心 n 應小於全板 n");
-  assert.ok(d.querySelector("#profSub").textContent.includes("U2"), "板面剖面副標應反映元件範圍");
+  const u1NMatch = d.querySelector("#offBullSub").textContent.match(/n=(\d+)/);
+  assert.ok(u1NMatch && Number(u1NMatch[1]) > 0 && Number(u1NMatch[1]) < fullN, "單一元件偏移靶心 n 應小於全板 n");
+  assert.ok(d.querySelector("#profSub").textContent.includes("U1"), "板面剖面副標應反映元件範圍");
 
   H.setTab("deep/var");
   assert.ok(!d.querySelector("#varSub").textContent.includes("元件群組間"), "單一元件變異數分解不應含元件群組間層");

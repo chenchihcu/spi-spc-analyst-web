@@ -1249,7 +1249,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
         <button role="menuitem" id="btnMyShares" hidden title="檢視與管理自己建立的分享連結">我的分享</button>
         <a role="menuitem" id="offlineLink" href="/download/offline" hidden title="下載單一 HTML 檔，不連網也能分析；資料不會存檔">下載離線版</a>
         <a role="menuitem" id="logoutLink" href="/__logout" hidden>登出</a>
-        <p class="menu-ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.39.0</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></p>
+        <p class="menu-ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.40.0</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></p>
       </div>
     </div>
   </div>
@@ -14081,11 +14081,17 @@ function extDiagnosticsSummary(A){
   const gc=getExtStats("gchart",()=>calcGChart(A.rows,r=>classify(r,S.specs,S),A.boards));
   const{keyFn,unitLbl}=caCpScopeSpec();
   const cacp=getExtStats("cacp",()=>calcCaCpQuadrant(A.rows,A.m,A.sp,keyFn),unitLbl);
+  const vc=getExtStats("variance",()=>calcVarianceComponents(A.rows,A.m));
+  const offE=getExtStats("offsetEllipse",()=>calcOffsetEllipse(A.rows,S.specs));
+  const ori=getExtStats("orient",()=>calcApertureOrientation(A.rows,A.m,S.sqDir==="X"?"X":"Y",{stencilUm:S.stencil||120}));
   const zMap={healthy:"健康",offCenter:"偏心可調",highVar:"變異大",both:"雙失控"};
   return{
     板序自相關:acf&&!acf.insufficient?{r1:+f(acf.acf[0],3),p:+f(acf.lbP,4),顯著落後期:acf.sigLags.slice(0,5)}:null,
     高良率間隔:gc&&!gc.insufficient?{良率:+f(gc.yieldPct,2),平均間隔:+f(gc.gMean,1),叢發次數:gc.burstCount}:null,
-    能力四象限重點:cacp&&!cacp.insufficient?cacp.pts.filter(p=>p.cpk!=null&&p.cpk<1.33).slice(0,5).map(p=>({名稱:p.key,Ca:+f(p.ca,1),Cp:+f(p.cp,2),Cpk:+f(p.cpk,2),歸類:zMap[p.zone]||""})):[]
+    能力四象限重點:cacp&&!cacp.insufficient?cacp.pts.filter(p=>p.cpk!=null&&p.cpk<1.33).slice(0,5).map(p=>({名稱:p.key,Ca:+f(p.ca,1),Cp:+f(p.cp,2),Cpk:+f(p.cpk,2),歸類:zMap[p.zone]||""})):[],
+    變異來源佔比:vc&&!vc.insufficient?{主導:vc.dominant.label,各層:vc.layers.map(l=>`${l.label}:${f(l.pct,1)}%`)}:null,
+    雙行程偏移背隙:offE&&!offE.insufficient&&offE.strokeSplit&&offE.strokeSplit.valid?{背隙um:+f(offE.strokeSplit.backlashUm,1),p:offE.strokeSplit.p!=null?+f(offE.strokeSplit.p,4):null}:null,
+    開孔方向差異:ori&&!ori.insufficient&&!ori.singleAxisOnly?{刮刀軸:ori.sqDir,差值:+f(ori.diff,2),d:+f(ori.cohenD,2),p:+f(ori.p,4)}:null
   };
 }
 function advSummary(A){const W=advAnalyze(S,A);return{EWMA越界:A.ewma.filter(p=>p.v>p.ucl||p.v<p.lcl).map(p=>p.lab),CUSUM訊號:A.cusum.pts.filter(p=>p.cp>A.cusum.h||p.cm>A.cusum.h).map(p=>p.lab),
@@ -16587,6 +16593,58 @@ async function generateReportPdfBlob(opts={}){
     }catch(e){}
     printText("失效模式交叉比對規則庫：整合 R001–R030 規則，需 ≥2 個獨立面向佐證始判定為可能",14,curY,{size:8,color:[100,100,100]});
     curY+=6;
+    const printPal2={ink:"#4A5568",grid:"#D8DCE2",ng:"#B8332A",ok:"#1F7A4C",warn:"#B5652B",acc:"#2B5A7A",s1:"#2B5A7A",s2:"#3E7CB1",s3:"#1F7A4C",s4:"#B5652B"};
+    const uRep=metricUnit(A.m,S);
+    try{
+      const vc=getExtStats("variance",()=>calcVarianceComponents(A.rows,A.m));
+      if(vc&&!vc.insufficient){
+        const cfg=buildVarianceChartCfg(vc,printPal2);
+        const url=renderOffscreenChart(cfg.type,cfg.data,cfg.options);
+        checkBreak(44);
+        printText(`變異數分解（${METRICS[A.m].label} · 主導：${vc.dominant.label} ${f(vc.dominant.pct,1)}%）`,14,curY,{size:8});
+        curY+=4;
+        doc.addImage(url,opts.lite?"JPEG":"PNG",14,curY,182,34);
+        curY+=38;
+      }
+    }catch(e){}
+    try{
+      const offE=getExtStats("offsetEllipse",()=>calcOffsetEllipse(A.rows,S.specs));
+      if(offE&&!offE.insufficient){
+        const cfg=buildOffsetBullseyeCfg(offE,printPal2);
+        const url=renderOffscreenChart(cfg.type,cfg.data,cfg.options);
+        checkBreak(66);
+        const bkInfo=offE.strokeSplit&&offE.strokeSplit.valid?` · 前／後背隙 ${f(offE.strokeSplit.backlashUm,1)} µm`:"";
+        printText(`二維偏移靶心圖與 95% 信賴橢圓（n=${offE.n}${bkInfo}）`,14,curY,{size:8});
+        curY+=4;
+        doc.addImage(url,opts.lite?"JPEG":"PNG",14,curY,182,58);
+        curY+=62;
+      }
+    }catch(e){}
+    try{
+      const prof=getExtStats("profileXY",()=>calcBoardProfileXY(A.rows,A.m,{bins:10}),"b10");
+      if(prof&&!prof.insufficient){
+        const cfgX=buildBoardProfileCfg(prof.xAxis,"X 座標 (mm)",uRep,false,printPal2);
+        const cfgY=buildBoardProfileCfg(prof.yAxis,"Y 座標 (mm)",uRep,false,printPal2);
+        const uX=renderOffscreenChart(cfgX.type,cfgX.data,cfgX.options);
+        const uY=renderOffscreenChart(cfgY.type,cfgY.data,cfgY.options);
+        checkBreak(56);
+        printText(`板面 X／Y 邊際剖面梯度（來源：${prof.coordLevel==="pad"?"實體焊墊":"元件中心"}）`,14,curY,{size:8});
+        curY+=4;
+        doc.addImage(uX,opts.lite?"JPEG":"PNG",14,curY,88,46);
+        doc.addImage(uY,opts.lite?"JPEG":"PNG",108,curY,88,46);
+        curY+=50;
+      }
+    }catch(e){}
+    try{
+      const ori=getExtStats("orient",()=>calcApertureOrientation(A.rows,A.m,S.sqDir==="X"?"X":"Y",{stencilUm:S.stencil||120}));
+      if(ori&&!ori.insufficient&&!ori.singleAxisOnly){
+        drawTable(["開孔方向","樣本數","均值","標準差","95% CI"],[
+          ["0° 平行刮刀",String(ori.parallel.n),`${f(ori.parallel.mean,2)} ${uRep}`,f(ori.parallel.sd,2),`±${f(ori.parallel.ciHalf,2)}`],
+          ["90° 垂直刮刀",String(ori.perpendicular.n),`${f(ori.perpendicular.mean,2)} ${uRep}`,f(ori.perpendicular.sd,2),`±${f(ori.perpendicular.ciHalf,2)}`],
+          ["檢定摘要",`刮刀 ${ori.sqDir} 軸`,`差值 ${ori.diff>=0?"+":""}${f(ori.diff,2)} ${uRep}`,`d=${f(ori.cohenD,2)}`,`p=${ori.p<0.001?"<0.001":f(ori.p,3)}`]
+        ],[42,26,38,38,38]);
+      }
+    }catch(e){}
   }
 
   // 8. DFM 開孔建議
@@ -16619,10 +16677,12 @@ async function generateReportPdfBlob(opts={}){
     curY+=5;
     printText("4. 擴充統計模型：G 圖採 Benneyan 幾何分布精確界線；Laney U′ 圖以 σz 修正板間過度離散；板序自相關以 Ljung-Box Q 檢定；四象限採規格中點準度 Ca 與精密度 Cp 滿足 Cpk = Cp(1 − |Ca|/100)。",14,curY,{size:8.5});
     curY+=5;
+    printText("5. 變異與空間進階模型：變異數分解採群組去中心後之巢狀平方和分解；二維偏移採 95% 信賴橢圓（χ²₂=5.991）與雙變量 Hotelling T² 檢定行程背隙；板面 X／Y 剖面僅於具備實體座標時計算；開孔方向效應以 Welch t 檢定與 Cohen's d 比較 0° 平行與 90° 垂直刮刀。",14,curY,{size:8.5});
+    curY+=5;
     if(missingGlyphs.size>0){
-      printText(`5. 缺字檢核紀錄（已自動轉換為向量／點陣圖形嵌入，未產生豆腐塊）：${[...missingGlyphs].join("、")}`,14,curY,{size:8.5,color:[180,80,20]});
+      printText(`6. 缺字檢核紀錄（已自動轉換為向量／點陣圖形嵌入，未產生豆腐塊）：${[...missingGlyphs].join("、")}`,14,curY,{size:8.5,color:[180,80,20]});
     }else{
-      printText("5. 缺字檢核紀錄：全文字元皆符合 Noto Sans TC 嵌入字型，無缺字。",14,curY,{size:8.5,color:[40,140,60]});
+      printText("6. 缺字檢核紀錄：全文字元皆符合 Noto Sans TC 嵌入字型，無缺字。",14,curY,{size:8.5,color:[40,140,60]});
     }
     curY+=6;
   }
