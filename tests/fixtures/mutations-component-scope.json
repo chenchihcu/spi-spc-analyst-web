@@ -135,6 +135,11 @@
       "name": "四象限圖粒度未隨元件範圍切換",
       "from": "const keyFn=S.comp?(r=>r.pad||r.pin||\"焊墊\"):(!isAllGrp(S.group)?(r=>compKeyOf(r)):(r=>r.group));",
       "to": "const keyFn=r=>r.group;"
+    },
+    {
+      "name": "製程跡象進階圖表沒篩元件範圍",
+      "from": "function deepScopeRows(){return S.A&&Array.isArray(S.A.rows)?S.A.rows:[]}",
+      "to": "function deepScopeRows(){return S.rows||[]}"
     }
   ]
 }

@@ -1577,87 +1577,144 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
 </section>
 
 <section class="panel" id="p-deep" role="tabpanel" hidden>
-  <div class="deep-body" style="display:grid;gap:12px;grid-template-columns:minmax(0,1fr);min-width:0">
-<div class="card">
-    <h3>面積比 × 轉移效率 <small id="arSub"></small></h3>
+  <nav class="subtabs" aria-label="製程跡象子視圖">
+    <button type="button" class="subtab" data-subnav-deep="var" aria-current="page">變異與開孔</button>
+    <button type="button" class="subtab" data-subnav-deep="spatial">空間與偏移</button>
+    <button type="button" class="subtab" data-subnav-deep="morph">形貌與異常</button>
+  </nav>
+  <div class="deep-subviews stack-md">
+    <div data-deep-sub="var" class="stack-md">
+      <div class="card" id="cardVariance">
+        <h3>變異數分解與多變異圖 <small id="varSub"></small></h3>
+        <div id="varMsg" class="note my-8" hidden></div>
+        <div class="chartbox" style="height:120px"><canvas id="cVarPct" role="img" aria-label="變異數分解百分比圖"></canvas></div>
+        <div class="chartbox" style="margin-top:10px"><canvas id="cMultiVari" role="img" aria-label="多變異圖"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>面積比 × 轉移效率 <small id="arSub"></small></h3>
         <div class="legend" id="arLeg"></div>
-    <p id="arNote" hidden style="margin:6px 0"></p>
-    <div class="chartbox tall"><canvas id="cAR" role="img" aria-label="面積比與轉移效率散佈圖"></canvas></div>
-    <div class="tbl" style="margin-top:10px"><table id="arTbl"></table></div>
-  </div>
-  
-    
-  <div class="card"><h3>量測項目相關矩陣 <small id="corrSub"></small></h3>
-            <div class="tbl"><table class="corr" id="corrTbl"></table></div></div>
-  <div class="card" id="cardAlign">
-    <h3>對位分解 </h3>
-        <div class="toolbar" id="alignToolbar"><div class="field"><label for="selAlignBoard">板號</label><select id="selAlignBoard"></select></div><div class="field" id="alignVecField"><label for="inVec">箭頭放大 <span class="num" id="vecOut">40×</span></label><input type="range" id="inVec" min="10" max="150" value="40" step="5"></div></div>
-    <div id="alignEmpty" style="margin:8px 0" hidden></div>
-    <div class="grid2" id="alignGrid" style="margin-top:10px;align-items:start">
-      <div id="alignVecWrap">
-        <canvas class="vec" id="vecCv" width="900" height="600" role="img" aria-label="偏移向量圖"></canvas>
-        <div id="alignVecEmpty" class="empty-state" style="padding:24px 16px" hidden></div>
+        <p id="arNote" hidden style="margin:6px 0"></p>
+        <div class="chartbox tall"><canvas id="cAR" role="img" aria-label="面積比與轉移效率散佈圖"></canvas></div>
+        <div class="tbl" style="margin-top:10px"><table id="arTbl"></table></div>
       </div>
-      <div class="tbl" style="max-height:380px;overflow:auto"><table id="alignTbl"></table></div>
+      <div class="card" id="cardOrient">
+        <h3>開孔方向效應圖 <small id="orientSub"></small></h3>
+        <div class="toolbar" style="margin-bottom:6px">
+          <div class="field"><label for="selOrientMode">分層方式</label>
+            <select id="selOrientMode">
+              <option value="all" selected>全體比較</option>
+              <option value="ar">按面積比區間分層</option>
+            </select>
+          </div>
+        </div>
+        <div id="orientMsg" class="note my-8" hidden></div>
+        <div class="chartbox short"><canvas id="cOrient" role="img" aria-label="開孔方向效應圖"></canvas></div>
+      </div>
+      <div class="grid2">
+        <div class="card"><h3>刮刀前 / 後行程比較 <small id="strokeSub"></small></h3>
+          <div class="chartbox short"><canvas id="cStroke" role="img" aria-label="刮刀前後比較"></canvas></div><p id="strokeTxt" style="margin:8px 0 0"></p></div>
+        <div class="card"><h3>鋼板擦拭週期 <small id="wipeSub"></small></h3>
+          <div class="row" style="margin-top:8px;align-items:center;flex-wrap:wrap;gap:8px">
+            <span class="lbl">每幾片擦拭一次</span>
+            <span id="wipeDisplay" class="num" aria-live="polite"></span>
+            <button type="button" class="linkbtn" id="btnGoWipeSpec">前往設定</button>
+          </div>
+          <div class="chartbox short" style="margin-top:8px"><canvas id="cWipe" role="img" aria-label="擦拭週期分析"></canvas></div><p id="wipeTxt" style="margin:8px 0 0"></p></div>
+      </div>
     </div>
-  </div>
-  <div class="grid2">
-    <div class="card"><h3>刮刀前 / 後行程比較 <small id="strokeSub"></small></h3>
-            <div class="chartbox short"><canvas id="cStroke" role="img" aria-label="刮刀前後比較"></canvas></div><p id="strokeTxt" style="margin:8px 0 0"></p></div>
-    <div class="card"><h3>鋼板擦拭週期 <small id="wipeSub"></small></h3>
-            <div class="row" style="margin-top:8px;align-items:center;flex-wrap:wrap;gap:8px">
-              <span class="lbl">每幾片擦拭一次</span>
-              <span id="wipeDisplay" class="num" aria-live="polite"></span>
-              <button type="button" class="linkbtn" id="btnGoWipeSpec">前往設定</button>
-            </div>
-            <div class="chartbox short" style="margin-top:8px"><canvas id="cWipe" role="img" aria-label="擦拭週期分析"></canvas></div><p id="wipeTxt" style="margin:8px 0 0"></p></div></div>
-  <div class="card" id="cardMorph">
-    <h3>形貌指標 <small id="morphSub"></small></h3>
-    <p class="note scope-board-note" hidden>全板分析，不隨元件範圍變動</p>
-        <div class="kpis" id="morphKpis" style="margin-top:10px"></div>
-    <div class="tbl" style="margin-top:10px;max-height:280px;overflow:auto"><table id="morphTbl"></table></div>
-  </div>
 
-  <div class="grid2" id="advPauseLisaGrid" style="align-items:start">
-    <div class="card" id="cardPause">
-      <h3>停線時效與鋼板壽命衰退 <small id="pauseSub"></small></h3>
-            <div id="pauseMsg" style="margin:8px 0"></div>
-      <div class="tbl" id="pauseTblWrap" style="max-height:260px;overflow:auto"><table id="pauseTbl"></table></div>
-    </div>
-    <div class="card" id="cardLISA">
-      <h3>空間自相關與局部聚類 <small id="lisaSub"></small></h3>
-            <div id="lisaMsg" style="margin:8px 0"></div>
-      <div class="legend" id="lisaLeg">
-        <span><i class="sq" style="background:var(--lisa-hh)"></i>HH 熱點</span>
-        <span><i class="sq" style="background:var(--lisa-ll)"></i>LL 冷點</span>
-        <span><i class="sq" style="background:var(--lisa-lh)"></i>LH 空間離群</span>
-        <span><i class="sq" style="background:var(--lisa-hl)"></i>HL 空間離群</span>
-        <span><i class="sq" style="background:var(--lisa-ns)"></i>NS 無顯著</span>
+    <div data-deep-sub="spatial" class="stack-md" hidden>
+      <div class="card" id="cardOffsetBullseye">
+        <h3>二維偏移靶心圖 <small id="offBullSub"></small></h3>
+        <div id="offBullMsg" class="note my-8" hidden></div>
+        <div class="chartbox tall"><canvas id="cOffBull" role="img" aria-label="二維偏移靶心圖"></canvas></div>
       </div>
-      <div class="chartbox" id="lisaChartBox" style="height:320px;position:relative"><canvas id="cLISA" role="img" aria-label="LISA 空間聚類分佈圖" style="display:block;width:100%;height:100%"></canvas></div>
+      <div class="card" id="cardBoardProfile">
+        <h3>板面 X / Y 邊際剖面梯度圖 <small id="profSub"></small></h3>
+        <div class="toolbar" style="margin-bottom:6px;flex-wrap:wrap">
+          <div class="field"><label for="selProfBins">區帶數</label>
+            <select id="selProfBins">
+              <option value="8">8 區帶</option>
+              <option value="10" selected>10 區帶</option>
+              <option value="15">15 區帶</option>
+            </select>
+          </div>
+          <label class="chk" for="chkProfStroke"><input type="checkbox" id="chkProfStroke"> 依前／後行程分線</label>
+        </div>
+        <div id="profMsg" class="note my-8" hidden></div>
+        <div class="grid2" id="profGrid">
+          <div>
+            <div class="fact" style="margin-bottom:4px">沿 X 軸剖面（左 → 右）</div>
+            <div class="chartbox short"><canvas id="cProfX" role="img" aria-label="沿 X 軸邊際剖面圖"></canvas></div>
+          </div>
+          <div>
+            <div class="fact" style="margin-bottom:4px">沿 Y 軸剖面（前 → 後）</div>
+            <div class="chartbox short"><canvas id="cProfY" role="img" aria-label="沿 Y 軸邊際剖面圖"></canvas></div>
+          </div>
+        </div>
+      </div>
+      <div class="card" id="cardAlign">
+        <h3>對位分解 </h3>
+        <div class="toolbar" id="alignToolbar"><div class="field"><label for="selAlignBoard">板號</label><select id="selAlignBoard"></select></div><div class="field" id="alignVecField"><label for="inVec">箭頭放大 <span class="num" id="vecOut">40×</span></label><input type="range" id="inVec" min="10" max="150" value="40" step="5"></div></div>
+        <div id="alignEmpty" style="margin:8px 0" hidden></div>
+        <div class="grid2" id="alignGrid" style="margin-top:10px;align-items:start">
+          <div id="alignVecWrap">
+            <canvas class="vec" id="vecCv" width="900" height="600" role="img" aria-label="偏移向量圖"></canvas>
+            <div id="alignVecEmpty" class="empty-state" style="padding:24px 16px" hidden></div>
+          </div>
+          <div class="tbl" style="max-height:380px;overflow:auto"><table id="alignTbl"></table></div>
+        </div>
+      </div>
+      <div class="card" id="cardLISA">
+        <h3>空間自相關與局部聚類 <small id="lisaSub"></small></h3>
+        <div id="lisaMsg" style="margin:8px 0"></div>
+        <div class="legend" id="lisaLeg">
+          <span><i class="sq" style="background:var(--lisa-hh)"></i>HH 熱點</span>
+          <span><i class="sq" style="background:var(--lisa-ll)"></i>LL 冷點</span>
+          <span><i class="sq" style="background:var(--lisa-lh)"></i>LH 空間離群</span>
+          <span><i class="sq" style="background:var(--lisa-hl)"></i>HL 空間離群</span>
+          <span><i class="sq" style="background:var(--lisa-ns)"></i>NS 無顯著</span>
+        </div>
+        <div class="chartbox" id="lisaChartBox" style="height:320px;position:relative"><canvas id="cLISA" role="img" aria-label="LISA 空間聚類分佈圖" style="display:block;width:100%;height:100%"></canvas></div>
+      </div>
     </div>
-  </div>
-  <div class="card" id="cardRelChart">
-    <h3>關係圖 <small id="relChartSub"></small></h3>
-    <div class="toolbar"><div class="field"><label for="selRelChart">圖種</label>
-      <select id="selRelChart"><option value="specScatter">規格散點（體積 × 高度）</option><option value="parallel">平行座標</option><option value="radar">Radar（體積／面積／高度）</option></select></div></div>
-    <div id="relChartMsg" class="note" style="margin:8px 0"></div>
-    <div id="relChartEmpty" class="empty-state" style="padding:24px 16px" hidden></div>
-    <div class="chartbox tall" id="relChartBox"><canvas id="cRelChart" role="img" aria-label="關係圖"></canvas></div>
-  </div>
-<div class="card">
-    <h3>統計異常點集中清單 <small id="statsSub"></small></h3>
-    <div class="tbl" style="max-height:420px;overflow:auto">
-      <table id="statsTbl"></table>
-    </div>
-  </div>
-  <div class="card" id="cardMatrix">
-    <h3>板號 × 元件群組 不良品矩陣 <small id="matrixSub"></small></h3>
-    <p class="note scope-board-note" hidden>全板分析，不隨元件範圍變動</p>
+
+    <div data-deep-sub="morph" class="stack-md" hidden>
+      <div class="card" id="cardMorph">
+        <h3>形貌指標 <small id="morphSub"></small></h3>
+        <p class="note scope-board-note" hidden>全板分析，不隨元件範圍變動</p>
+        <div class="kpis" id="morphKpis" style="margin-top:10px"></div>
+        <div class="tbl" style="margin-top:10px;max-height:280px;overflow:auto"><table id="morphTbl"></table></div>
+      </div>
+      <div class="card" id="cardPause">
+        <h3>停線時效與鋼板壽命衰退 <small id="pauseSub"></small></h3>
+        <div id="pauseMsg" style="margin:8px 0"></div>
+        <div class="tbl" id="pauseTblWrap" style="max-height:260px;overflow:auto"><table id="pauseTbl"></table></div>
+      </div>
+      <div class="card"><h3>量測項目相關矩陣 <small id="corrSub"></small></h3>
+        <div class="tbl"><table class="corr" id="corrTbl"></table></div></div>
+      <div class="card" id="cardRelChart">
+        <h3>關係圖 <small id="relChartSub"></small></h3>
+        <div class="toolbar"><div class="field"><label for="selRelChart">圖種</label>
+          <select id="selRelChart"><option value="specScatter">規格散點（體積 × 高度）</option><option value="parallel">平行座標</option><option value="radar">Radar（體積／面積／高度）</option></select></div></div>
+        <div id="relChartMsg" class="note" style="margin:8px 0"></div>
+        <div id="relChartEmpty" class="empty-state" style="padding:24px 16px" hidden></div>
+        <div class="chartbox tall" id="relChartBox"><canvas id="cRelChart" role="img" aria-label="關係圖"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>統計異常點集中清單 <small id="statsSub"></small></h3>
         <div class="tbl" style="max-height:420px;overflow:auto">
-      <table id="matrixTbl"></table>
+          <table id="statsTbl"></table>
+        </div>
+      </div>
+      <div class="card" id="cardMatrix">
+        <h3>板號 × 元件群組 不良品矩陣 <small id="matrixSub"></small></h3>
+        <p class="note scope-board-note" hidden>全板分析，不隨元件範圍變動</p>
+        <div class="tbl" style="max-height:420px;overflow:auto">
+          <table id="matrixTbl"></table>
+        </div>
+      </div>
     </div>
-  </div>
   </div>
 </section>
 
@@ -5068,7 +5125,7 @@ function buildSpatialPoints(rows,metricKey,preRows){
   }
   return{coordRows,coordLevel,pts};
 }
-const S={rows:[],metrics:[],metric:"volume",group:ALL_GRP,comp:null,chart:"xbars",relChart:"specScatter",pad:null,board:null,specSrc:"sample",partSpec:null,specDraft:null,specsG:null,sqDir:"Y",specs:JSON.parse(JSON.stringify(DEF_SPECS)),stencil:120,heightUnit:"um",htol:{lo:75,hi:125},step:{on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]},selZone:1,wipe:5,aperture:{groups:{}},geometryPads:null,padCoverage:null,pendingVerify:false,runVendor:"generic",ovCapSnap:null,ovCapSnapKey:"",source:"範例資料",tab:"issues",sub:"import",issuesSub:"list",controlSub:"uni",improveSub:"compare",F:[],issLv:"all",issEnt:null,pmapSelection:null,ctx:null,colorMode:"status",heatMode:"avg",sim3dMode:"real",comp3dMode:"off",exag:20,ghost:true,bridgeWarn:true,csAxis:"X",selectedPad:null,A:null,ai:"",aiModel:"",duo:{active:false,posture:"folded",mode:"master-detail",leftTab:"issues",rightTab:"sim3d",thumbSide:"right",pinnedPad:null,dockOpen:false}};
+const S={rows:[],metrics:[],metric:"volume",group:ALL_GRP,comp:null,chart:"xbars",relChart:"specScatter",pad:null,board:null,specSrc:"sample",partSpec:null,specDraft:null,specsG:null,sqDir:"Y",specs:JSON.parse(JSON.stringify(DEF_SPECS)),stencil:120,heightUnit:"um",htol:{lo:75,hi:125},step:{on:false,zones:[{id:1,name:"BGA 減薄區",mode:"group",group:"U2 BGA",x0:36,y0:8,x1:48,y1:20,t:100}]},selZone:1,wipe:5,aperture:{groups:{}},geometryPads:null,padCoverage:null,pendingVerify:false,runVendor:"generic",ovCapSnap:null,ovCapSnapKey:"",source:"範例資料",tab:"issues",sub:"import",issuesSub:"list",controlSub:"uni",deepSub:"var",improveSub:"compare",F:[],issLv:"all",issEnt:null,pmapSelection:null,ctx:null,colorMode:"status",heatMode:"avg",sim3dMode:"real",comp3dMode:"off",exag:20,ghost:true,bridgeWarn:true,csAxis:"X",selectedPad:null,A:null,ai:"",aiModel:"",duo:{active:false,posture:"folded",mode:"master-detail",leftTab:"issues",rightTab:"sim3d",thumbSide:"right",pinnedPad:null,dockOpen:false}};
 function metricUnit(k,st=S){return k==="height"&&st&&st.heightUnit==="unknown"?"單位未知":(METRICS[k]&&METRICS[k].unit)||""}
 loadSpiKbRules();
 
@@ -9643,7 +9700,7 @@ function renderGate(){const part=runPart();$("#gateMsg").textContent=part
 $("#btnGateSpec").onclick=()=>{setTab("data");gotoSpecCard();const el=$("#btnSpecSave");if(el&&!el.disabled)el.focus({preventScroll:true})};
 $("#btnGateRuns").onclick=()=>{setTab("data");setSub("runs")};
 function renderTab(){if(RENDER_HOLD)return;if(typeof syncScopeUI==="function")syncScopeUI();if(showPanels(S.tab))return;perfSpan("render:"+S.tab,renderTabInner);nextFrame(enhancePanel)}
-function renderDeepPanel(){renderAdv();renderStats()}
+function renderDeepPanel(){const sub=S.deepSub||"var";if(sub==="var"){renderVarianceUI();renderOrientationUI();renderAdv();}else if(sub==="spatial"){renderOffsetBullseyeUI();renderBoardProfileXYUI();renderAdv();}else{renderAdv();renderStats();}}
 function renderImprovePanel(){if(S.improveSub==="compare")renderCompare();else if(S.improveSub==="dfm")renderDfm();else renderLab()}
 const DIAG={rows:null,run:null,findings:null,source:null,board:null,entity:null,metric:null,page:0,boardPage:0,boxPage:0,factorPage:0,detailPage:0,matrixBy:"comp",boxBy:"group",factor:"pressure",back:null,cache:null,analysis:null};
 function syncDiagnostic(){
@@ -9843,21 +9900,21 @@ function parseTabTarget(raw){
   const parts=s.split("/"),root=parts[0],sub=parts[1]||null;
   if(root==="issues"){const issuesSub=sub&&["list","cross","diagnostic"].includes(sub)?sub:"list";return{tab:"issues",issuesSub}}
   if(root==="control"){const controlSub=sub&&["uni","multi","acf"].includes(sub)?sub:"uni";return{tab:"control",controlSub}}
-  if(root==="deep"){if(sub==="cross")return{tab:"issues",issuesSub:"cross"};return{tab:"deep"}}
+  if(root==="deep"){if(sub==="cross")return{tab:"issues",issuesSub:"cross"};const deepSub=sub&&["var","spatial","morph"].includes(sub)?sub:"var";return{tab:"deep",deepSub}}
   if(root==="improve"){const improveSub=sub&&["compare","dfm","lab"].includes(sub)?sub:"compare";return{tab:"improve",improveSub}}
   if(LEGACY_ROOTS.has(root)){
     if(root==="cross")return{tab:"issues",issuesSub:"cross"};
     if(root==="compare"||root==="dfm"||root==="lab")return{tab:"improve",improveSub:root};
-    return{tab:root==="adv"||root==="stats"?"deep":"issues",issuesSub:"list"};
+    return{tab:root==="adv"||root==="stats"?"deep":"issues",issuesSub:"list",deepSub:root==="stats"?"morph":"var"};
   }
   if(!ALL_TABS.includes(root))return{tab:"issues"};
   return{tab:root}
 }
-function tabHashFor(tab,issuesSub,controlSub,improveSub){
+function tabHashFor(tab,issuesSub,controlSub,improveSub,deepSub){
   if(tab==="issues")return issuesSub==="diagnostic"?"issues/diagnostic":issuesSub==="cross"?"issues/cross":"issues";
   if(tab==="control")return controlSub==="multi"?"control/multi":controlSub==="acf"?"control/acf":"control";
   if(tab==="improve")return"improve/"+(improveSub||"compare");
-  if(tab==="deep")return"deep";
+  if(tab==="deep")return deepSub&&deepSub!=="var"?"deep/"+deepSub:"deep";
   return tab;
 }
 function duoPanelId(tab){
@@ -9871,6 +9928,7 @@ function applyIssuesControlImproveSubnav(){
   const syncBar=(barSel,attr,val)=>{$$(`${barSel} [${attr}]`).forEach(b=>{const on=b.getAttribute(attr)===val;b.tabIndex=on?0:-1;if(on)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")})};
   if(S.tab==="issues"){$$("#p-issues [data-issues-sub]").forEach(el=>{el.hidden=el.dataset.issuesSub!==(S.issuesSub||"list")});syncBar("#p-issues .subtabs","data-subnav-issues",S.issuesSub||"list")}
   if(S.tab==="control"){$$("#p-control [data-control-sub]").forEach(el=>{el.hidden=el.dataset.controlSub!==(S.controlSub||"uni")});syncBar("#p-control .subtabs","data-subnav-control",S.controlSub||"uni")}
+  if(S.tab==="deep"){$$("#p-deep [data-deep-sub]").forEach(el=>{el.hidden=el.dataset.deepSub!==(S.deepSub||"var")});syncBar("#p-deep .subtabs","data-subnav-deep",S.deepSub||"var")}
   if(S.tab==="improve"){$$("#p-improve [data-subview]").forEach(el=>{el.hidden=el.dataset.subview!==(S.improveSub||"compare")});syncBar("#p-improve .subtabs","data-subnav-improve",S.improveSub||"compare")}
 }
 function applyDeepImproveSubnav(){applyIssuesControlImproveSubnav()}
@@ -9879,12 +9937,14 @@ function setTab(t,fromHistory=false){
   let tab=parsed.tab;
   if(parsed.issuesSub)S.issuesSub=parsed.issuesSub;
   if(parsed.controlSub)S.controlSub=parsed.controlSub;
+  if(parsed.deepSub)S.deepSub=parsed.deepSub;
   if(parsed.improveSub)S.improveSub=parsed.improveSub;
   if(tab==="issues"&&!parsed.issuesSub)S.issuesSub=S.issuesSub||"list";
   if(tab==="control"&&!parsed.controlSub)S.controlSub=S.controlSub||"uni";
+  if(tab==="deep"&&!parsed.deepSub)S.deepSub=S.deepSub||"var";
   if(tab==="improve"&&!parsed.improveSub)S.improveSub=S.improveSub||"compare";
   if(S.tab&&S.tab!==tab)SCROLL[S.tab]=scrollY;
-  const changed=S.tab!==tab||(tab==="issues"&&parsed.issuesSub)||(tab==="control"&&parsed.controlSub)||(tab==="improve"&&parsed.improveSub);
+  const changed=S.tab!==tab||(tab==="issues"&&parsed.issuesSub)||(tab==="control"&&parsed.controlSub)||(tab==="deep"&&parsed.deepSub)||(tab==="improve"&&parsed.improveSub);
   S.tab=tab;
   $$(".tab").forEach(x=>{const sel=x.dataset.tab===tab;x.setAttribute("aria-selected",sel);x.tabIndex=sel?0:-1});
   applyDeepImproveSubnav();
@@ -9901,7 +9961,7 @@ function setTab(t,fromHistory=false){
   else if(tab==="ai")initAiPage();
   else renderTab();
   if(changed)scrollTo(0,Math.min(SCROLL[tab]||0,document.documentElement.scrollHeight));
-  if(!fromHistory){const h=tabHashFor(tab,S.issuesSub,S.controlSub,S.improveSub);try{if(location.hash!=="#"+h){history.pushState({tab:h}, "", "#"+h);location.hash="#"+h}}catch(e){}}
+  if(!fromHistory){const h=tabHashFor(tab,S.issuesSub,S.controlSub,S.improveSub,S.deepSub);try{if(location.hash!=="#"+h){history.pushState({tab:h}, "", "#"+h);location.hash="#"+h}}catch(e){}}
 }
 
 /* ---------- 總覽 ---------- */
@@ -10552,6 +10612,327 @@ $("#heat").addEventListener("click",e=>{const A=S.A;if(!A||!hasValidSpatialXY(A.
 $("#heat").style.cursor="pointer";
 
 /* ---------- 進階分析 ---------- */
+function deepScopeRows(){return S.A&&Array.isArray(S.A.rows)?S.A.rows:[]}
+function extPal(){
+  return{
+    ink:css("--muted"),grid:css("--grid"),ng:css("--ng"),ok:css("--ok"),
+    warn:css("--warn"),acc:css("--accent"),s1:css("--series1")||css("--accent"),
+    s2:css("--series2"),s3:css("--series3")||css("--ok"),s4:css("--series4")||css("--warn")
+  };
+}
+function buildVarianceChartCfg(vc,pal){
+  const cols={group:pal.s1,board:pal.s2,figure:pal.warn,within:pal.s3};
+  return{
+    type:"bar",
+    data:{
+      labels:["變異佔比"],
+      datasets:vc.layers.map(l=>({
+        label:`${l.label} ${f(l.pct,1)}%`,
+        data:[Number(l.pct.toFixed(2))],
+        backgroundColor:cols[l.key]||pal.s2,
+        borderWidth:0,
+        barThickness:28
+      }))
+    },
+    options:baseOpts({
+      indexAxis:"y",
+      scales:{
+        x:{stacked:true,min:0,max:100,ticks:{color:pal.ink,callback:v=>v+"%"},grid:{color:pal.grid}},
+        y:{stacked:true,ticks:{display:false},grid:{display:false}}
+      },
+      plugins:{
+        legend:{display:true,position:"bottom",labels:{color:pal.ink,boxWidth:10,font:{size:chartCaptionFontPx()}}},
+        tooltip:{callbacks:{label:i=>`${i.dataset.label}`}}
+      }
+    })
+  };
+}
+function buildMultiVariChartCfg(mv,unit,pal){
+  const palette=[pal.s1,pal.s2,pal.warn,pal.s3,pal.ng,pal.acc];
+  const datasets=[];
+  mv.strata.forEach((st,idx)=>{
+    const col=palette[idx%palette.length];
+    datasets.push({
+      type:"bar",
+      label:`${st.key}（P10–P90）`,
+      data:st.pts.map(p=>p.p10!=null&&p.p90!=null?[p.p10,p.p90]:null),
+      backgroundColor:col+"44",
+      borderColor:col,
+      borderWidth:1,
+      barPercentage:0.65
+    });
+    datasets.push({
+      type:"line",
+      label:`${st.key} 均值`,
+      data:st.pts.map(p=>p.mean),
+      borderColor:col,
+      backgroundColor:col,
+      borderWidth:1.6,
+      pointRadius:2.5,
+      spanGaps:true
+    });
+  });
+  return{
+    type:"bar",
+    data:{labels:mv.boards,datasets},
+    options:baseOpts({
+      scales:{
+        x:{ticks:{color:pal.ink,maxRotation:45,autoSkip:true},grid:{display:false}},
+        y:{ticks:{color:pal.ink},grid:{color:pal.grid},title:{display:!!unit,text:unit,color:pal.ink,font:{size:chartCaptionFontPx()}}}
+      },
+      plugins:{
+        legend:{display:true,position:"bottom",labels:{color:pal.ink,boxWidth:10,font:{size:chartCaptionFontPx()}}},
+        tooltip:{callbacks:{label:i=>Array.isArray(i.raw)?`${i.dataset.label}: ${f(i.raw[0],2)} – ${f(i.raw[1],2)} ${unit}`:`${i.dataset.label}: ${f(i.raw,2)} ${unit}`}}
+      }
+    })
+  };
+}
+function renderVarianceUI(){
+  const sub=$("#varSub"),msg=$("#varMsg"),c1=$("#cVarPct"),c2=$("#cMultiVari");
+  if(!hasData()||!S.A){
+    if(sub)sub.textContent="";
+    if(msg){msg.hidden=false;msg.className="empty-state my-8";msg.textContent="尚未載入量測資料。";}
+    if(c1&&c1.parentElement)c1.parentElement.hidden=true;
+    if(c2&&c2.parentElement)c2.parentElement.hidden=true;
+    return;
+  }
+  const rows=deepScopeRows(),m=S.A.m,u=metricUnit(m,S),pal=extPal();
+  const vc=getExtStats("variance",()=>calcVarianceComponents(rows,m));
+  const mv=getExtStats("multivari",()=>calcMultiVari(rows,m,S.A.boards,30));
+  if(!vc||vc.insufficient){
+    if(sub)sub.textContent=`${METRICS[m].label} · ${scopeLabel(S)}`;
+    if(msg){msg.hidden=false;msg.className="empty-state my-8";msg.textContent=(vc&&vc.reason)||"樣本不足，無法計算變異數分解";}
+    if(c1&&c1.parentElement)c1.parentElement.hidden=true;
+    if(c2&&c2.parentElement)c2.parentElement.hidden=true;
+    return;
+  }
+  if(msg)msg.hidden=true;
+  if(c1&&c1.parentElement)c1.parentElement.hidden=false;
+  const subNote=mv&&mv.subsampled?` · 多變異圖等距顯示 ${mv.boards.length}/${mv.totalBoards} 板`:"";
+  if(sub)sub.textContent=`${METRICS[m].label} · ${scopeLabel(S)} · 主導變異：${vc.dominant.label}（${f(vc.dominant.pct,1)}%）${subNote}`;
+  mk("cVarPct",buildVarianceChartCfg(vc,pal));
+  if(!mv||mv.insufficient){
+    if(c2&&c2.parentElement)c2.parentElement.hidden=true;
+  }else{
+    if(c2&&c2.parentElement)c2.parentElement.hidden=false;
+    mk("cMultiVari",buildMultiVariChartCfg(mv,u,pal));
+  }
+}
+function buildOrientationChartCfg(oRes,mode,unit,pal){
+  if(mode==="ar"&&oRes.arBuckets&&oRes.arBuckets.length){
+    return{
+      type:"bar",
+      data:{
+        labels:oRes.arBuckets.map(b=>b.label),
+        datasets:[
+          {label:"0° 平行刮刀",data:oRes.arBuckets.map(b=>b.parallel.mean),backgroundColor:pal.s1,borderRadius:3},
+          {label:"90° 垂直刮刀",data:oRes.arBuckets.map(b=>b.perpendicular.mean),backgroundColor:pal.s2,borderRadius:3}
+        ]
+      },
+      options:baseOpts({
+        scales:{
+          x:{ticks:{color:pal.ink},grid:{display:false}},
+          y:{ticks:{color:pal.ink},grid:{color:pal.grid},title:{display:!!unit,text:unit,color:pal.ink,font:{size:chartCaptionFontPx()}}}
+        },
+        plugins:{
+          legend:{display:true,position:"bottom",labels:{color:pal.ink,boxWidth:10}},
+          tooltip:{callbacks:{label:i=>{
+            const bk=oRes.arBuckets[i.dataIndex],st=i.datasetIndex===0?bk.parallel:bk.perpendicular;
+            return st&&st.n?`${i.dataset.label}: ${f(st.mean,2)} ± ${f(st.ciHalf,2)} ${unit} (n=${st.n})`:`${i.dataset.label}: —`;
+          }}}
+        }
+      })
+    };
+  }
+  const items=[
+    {lab:`0° 平行刮刀 (n=${oRes.parallel.n})`,st:oRes.parallel,col:pal.s1},
+    {lab:`90° 垂直刮刀 (n=${oRes.perpendicular.n})`,st:oRes.perpendicular,col:pal.s2}
+  ];
+  if(oRes.square&&oRes.square.n>0)items.push({lab:`方形開孔 (n=${oRes.square.n})`,st:oRes.square,col:pal.s3});
+  return{
+    type:"bar",
+    data:{
+      labels:items.map(x=>x.lab),
+      datasets:[{label:"平均值",data:items.map(x=>x.st.mean),backgroundColor:items.map(x=>x.col),borderRadius:4,maxBarThickness:64}]
+    },
+    options:baseOpts({
+      scales:{
+        x:{ticks:{color:pal.ink},grid:{display:false}},
+        y:{ticks:{color:pal.ink},grid:{color:pal.grid},title:{display:!!unit,text:unit,color:pal.ink,font:{size:chartCaptionFontPx()}}}
+      },
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:i=>{
+          const st=items[i.dataIndex].st;
+          return`均值 ${f(st.mean,2)} ± ${f(st.ciHalf,2)} ${unit}（SD ${f(st.sd,2)}，n=${st.n}）`;
+        }}}
+      }
+    })
+  };
+}
+function renderOrientationUI(){
+  const sub=$("#orientSub"),msg=$("#orientMsg"),cv=$("#cOrient"),sel=$("#selOrientMode");
+  if(!hasData()||!S.A){
+    if(sub)sub.textContent="";
+    if(msg){msg.hidden=false;msg.className="empty-state my-8";msg.textContent="尚未載入量測資料。";}
+    if(cv&&cv.parentElement)cv.parentElement.hidden=true;
+    return;
+  }
+  const rows=deepScopeRows(),m=S.A.m,u=metricUnit(m,S),sqDir=S.sqDir==="X"?"X":"Y",pal=extPal();
+  const oRes=getExtStats("orient",()=>calcApertureOrientation(rows,m,sqDir,{stencilUm:S.stencil||120}));
+  if(!oRes||oRes.insufficient){
+    if(sub)sub.textContent=`${METRICS[m].label} · ${scopeLabel(S)}`;
+    if(msg){msg.hidden=false;msg.className="empty-state my-8";msg.textContent=(oRes&&oRes.reason)||"缺少開孔長寬尺寸，無法分析開孔方向效應";}
+    if(cv&&cv.parentElement)cv.parentElement.hidden=true;
+    return;
+  }
+  if(oRes.singleAxisOnly){
+    if(sub)sub.textContent=`${METRICS[m].label} · ${scopeLabel(S)} · 來源：${oRes.dimSource}`;
+    if(msg){msg.hidden=false;msg.className="note my-8";msg.textContent=oRes.message;}
+    if(cv&&cv.parentElement)cv.parentElement.hidden=true;
+    return;
+  }
+  if(msg)msg.hidden=true;
+  if(cv&&cv.parentElement)cv.parentElement.hidden=false;
+  const pTxt=oRes.p<0.001?"<0.001":f(oRes.p,3);
+  if(sub)sub.textContent=`${METRICS[m].label} · ${scopeLabel(S)} · 刮刀 ${oRes.sqDir} 軸 · 0°−90° = ${oRes.diff>=0?"+":""}${f(oRes.diff,2)} ${u} · p=${pTxt} · d=${f(oRes.cohenD,2)}`;
+  const mode=(sel&&sel.value)||"all";
+  mk("cOrient",buildOrientationChartCfg(oRes,mode,u,pal));
+}
+function buildOffsetBullseyeCfg(oRes,pal){
+  let maxAbs=20;
+  const bump=(x,y)=>{if(Number.isFinite(x))maxAbs=Math.max(maxAbs,Math.abs(x));if(Number.isFinite(y))maxAbs=Math.max(maxAbs,Math.abs(y));};
+  if(oRes.specBox){bump(oRes.specBox.x0,oRes.specBox.y0);bump(oRes.specBox.x1,oRes.specBox.y1);}
+  for(const p of oRes.scatter)bump(p.x,p.y);
+  if(oRes.overall&&oRes.overall.ellipse)for(const p of oRes.overall.ellipse)bump(p.x,p.y);
+  if(oRes.strokeSplit&&oRes.strokeSplit.valid){
+    if(oRes.strokeSplit.fwd&&oRes.strokeSplit.fwd.ellipse)for(const p of oRes.strokeSplit.fwd.ellipse)bump(p.x,p.y);
+    if(oRes.strokeSplit.rev&&oRes.strokeSplit.rev.ellipse)for(const p of oRes.strokeSplit.rev.ellipse)bump(p.x,p.y);
+  }
+  const lim=Math.ceil(maxAbs*1.12);
+  const datasets=[];
+  if(oRes.specBox){
+    const b=oRes.specBox;
+    datasets.push({
+      label:"規格框",
+      type:"line",
+      data:[{x:b.x0,y:b.y0},{x:b.x1,y:b.y0},{x:b.x1,y:b.y1},{x:b.x0,y:b.y1},{x:b.x0,y:b.y0}],
+      borderColor:pal.ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0,fill:false,order:1
+    });
+  }
+  if(oRes.strokeSplit&&oRes.strokeSplit.valid){
+    const fwdPts=oRes.scatter.filter(p=>p.s==="F"),revPts=oRes.scatter.filter(p=>p.s==="R");
+    datasets.push({label:"前行程散點",data:fwdPts,backgroundColor:pal.s1+"40",pointRadius:2,order:4});
+    datasets.push({label:"後行程散點",data:revPts,backgroundColor:pal.warn+"40",pointRadius:2,order:4});
+    if(oRes.strokeSplit.fwd&&oRes.strokeSplit.fwd.ellipse.length){
+      datasets.push({label:"前行程 95% 橢圓",type:"line",data:oRes.strokeSplit.fwd.ellipse,borderColor:pal.s1,borderWidth:1.8,pointRadius:0,fill:false,order:2});
+    }
+    if(oRes.strokeSplit.rev&&oRes.strokeSplit.rev.ellipse.length){
+      datasets.push({label:"後行程 95% 橢圓",type:"line",data:oRes.strokeSplit.rev.ellipse,borderColor:pal.warn,borderWidth:1.8,pointRadius:0,fill:false,order:2});
+    }
+    datasets.push({label:"前行程質心",data:[{x:oRes.strokeSplit.fwd.mx,y:oRes.strokeSplit.fwd.my}],backgroundColor:pal.s1,borderColor:"#fff",borderWidth:1.5,pointRadius:6,pointStyle:"crossRot",order:0});
+    datasets.push({label:"後行程質心",data:[{x:oRes.strokeSplit.rev.mx,y:oRes.strokeSplit.rev.my}],backgroundColor:pal.warn,borderColor:"#fff",borderWidth:1.5,pointRadius:6,pointStyle:"crossRot",order:0});
+  }else{
+    datasets.push({label:"偏移散點",data:oRes.scatter,backgroundColor:pal.s1+"44",pointRadius:2,order:4});
+    if(oRes.overall&&oRes.overall.ellipse.length){
+      datasets.push({label:"95% 信賴橢圓",type:"line",data:oRes.overall.ellipse,borderColor:pal.s1,borderWidth:2,pointRadius:0,fill:false,order:2});
+    }
+    if(oRes.overall){
+      datasets.push({label:"整體質心",data:[{x:oRes.overall.mx,y:oRes.overall.my}],backgroundColor:pal.ng,borderColor:"#fff",borderWidth:1.5,pointRadius:6,pointStyle:"crossRot",order:0});
+    }
+  }
+  return{
+    type:"scatter",
+    data:{datasets},
+    options:baseOpts({
+      aspectRatio:1,
+      scales:{
+        x:{type:"linear",min:-lim,max:lim,ticks:{color:pal.ink},grid:{color:pal.grid},title:{display:true,text:"X 偏移 (µm)",color:pal.ink,font:{size:chartCaptionFontPx()}}},
+        y:{type:"linear",min:-lim,max:lim,ticks:{color:pal.ink},grid:{color:pal.grid},title:{display:true,text:"Y 偏移 (µm)",color:pal.ink,font:{size:chartCaptionFontPx()}}}
+      },
+      plugins:{
+        legend:{display:true,position:"bottom",labels:{color:pal.ink,boxWidth:10,font:{size:chartCaptionFontPx()}}},
+        tooltip:{callbacks:{label:i=>`${i.dataset.label}: (${f(i.raw.x,1)}, ${f(i.raw.y,1)}) µm`}}
+      }
+    })
+  };
+}
+function renderOffsetBullseyeUI(){
+  const sub=$("#offBullSub"),msg=$("#offBullMsg"),cv=$("#cOffBull");
+  if(!hasData()||!S.A){
+    if(sub)sub.textContent="";
+    if(msg){msg.hidden=false;msg.className="empty-state my-8";msg.textContent="尚未載入量測資料。";}
+    if(cv&&cv.parentElement)cv.parentElement.hidden=true;
+    return;
+  }
+  const rows=deepScopeRows(),pal=extPal();
+  const oRes=getExtStats("offsetEllipse",()=>calcOffsetEllipse(rows,S.specs));
+  if(!oRes||oRes.insufficient){
+    if(sub)sub.textContent=scopeLabel(S);
+    if(msg){msg.hidden=false;msg.className="empty-state my-8";msg.textContent=(oRes&&oRes.reason)||"無有效 X／Y 偏移資料";}
+    if(cv&&cv.parentElement)cv.parentElement.hidden=true;
+    return;
+  }
+  if(msg)msg.hidden=true;
+  if(cv&&cv.parentElement)cv.parentElement.hidden=false;
+  const sampTxt=oRes.sampled?`（散點抽樣 ${oRes.shownCount} 點，橢圓為全量計算）`:"";
+  const bkTxt=oRes.strokeSplit&&oRes.strokeSplit.valid
+    ?` · 前／後背隙 ${f(oRes.strokeSplit.backlashUm,1)} µm (p=${oRes.strokeSplit.p!=null?(oRes.strokeSplit.p<0.001?"<0.001":f(oRes.strokeSplit.p,3)):"—"})`
+    :` · 質心 (${f(oRes.overall.mx,1)}, ${f(oRes.overall.my,1)}) µm`;
+  if(sub)sub.textContent=`${scopeLabel(S)} · n=${oRes.n}${sampTxt}${bkTxt}`;
+  mk("cOffBull",buildOffsetBullseyeCfg(oRes,pal));
+}
+function buildBoardProfileCfg(axisRes,axisLabel,unit,showStroke,pal){
+  const labels=axisRes.bins.map(b=>f(b.center,1)+" mm");
+  const datasets=[
+    {label:"95% CI 上界",data:axisRes.bins.map(b=>b.ciHi),borderColor:pal.s1+"66",borderDash:[4,4],borderWidth:1,pointRadius:0,spanGaps:true},
+    {label:"95% CI 下界",data:axisRes.bins.map(b=>b.ciLo),borderColor:pal.s1+"66",borderDash:[4,4],borderWidth:1,pointRadius:0,spanGaps:true},
+    {label:"區帶均值",data:axisRes.bins.map(b=>b.mean),borderColor:pal.s1,backgroundColor:pal.s1,borderWidth:2,pointRadius:3,spanGaps:true}
+  ];
+  if(showStroke){
+    datasets.push({label:"前行程",data:axisRes.bins.map(b=>b.fwdMean),borderColor:pal.s2,borderWidth:1.5,borderDash:[5,3],pointRadius:2,spanGaps:true});
+    datasets.push({label:"後行程",data:axisRes.bins.map(b=>b.revMean),borderColor:pal.warn,borderWidth:1.5,borderDash:[2,2],pointRadius:2,spanGaps:true});
+  }
+  return{
+    type:"line",
+    data:{labels,datasets},
+    options:baseOpts({
+      scales:{
+        x:{ticks:{color:pal.ink,maxRotation:45,autoSkip:true},grid:{display:false},title:{display:true,text:axisLabel,color:pal.ink,font:{size:chartCaptionFontPx()}}},
+        y:{ticks:{color:pal.ink},grid:{color:pal.grid},title:{display:!!unit,text:unit,color:pal.ink,font:{size:chartCaptionFontPx()}}}
+      },
+      plugins:{
+        legend:{display:true,position:"bottom",labels:{color:pal.ink,boxWidth:10,font:{size:chartCaptionFontPx()}}},
+        tooltip:{callbacks:{label:i=>`${i.dataset.label}: ${f(i.raw,2)} ${unit}`}}
+      }
+    })
+  };
+}
+function renderBoardProfileXYUI(){
+  const sub=$("#profSub"),msg=$("#profMsg"),grid=$("#profGrid"),selBins=$("#selProfBins"),chkStroke=$("#chkProfStroke");
+  if(!hasData()||!S.A){
+    if(sub)sub.textContent="";
+    if(msg){msg.hidden=false;msg.className="empty-state my-8";msg.textContent="尚未載入量測資料。";}
+    if(grid)grid.hidden=true;
+    return;
+  }
+  const rows=deepScopeRows(),m=S.A.m,u=metricUnit(m,S),pal=extPal();
+  const bins=Math.max(4,Math.min(20,Number(selBins&&selBins.value)||10));
+  const prof=getExtStats("profileXY",()=>calcBoardProfileXY(rows,m,{bins}),"b"+bins);
+  if(!prof||prof.insufficient){
+    if(sub)sub.textContent=`${METRICS[m].label} · ${scopeLabel(S)}`;
+    if(msg){msg.hidden=false;msg.className="empty-state my-8";msg.textContent=(prof&&prof.message)||"無實際物理座標，無法計算板面 X／Y 邊際梯度";}
+    if(grid)grid.hidden=true;
+    return;
+  }
+  if(msg)msg.hidden=true;
+  if(grid)grid.hidden=false;
+  const fmtSl=ax=>ax.degenerate?"—":`${ax.slopePer100mm>=0?"+":""}${f(ax.slopePer100mm,2)} ${u}/100mm (p=${ax.p<0.001?"<0.001":f(ax.p,3)})`;
+  if(sub)sub.textContent=`${METRICS[m].label} · ${scopeLabel(S)} · 座標：${prof.coordLevel==="pad"?"實體焊墊":"元件中心"} · X 斜率 ${fmtSl(prof.xAxis)} · Y 斜率 ${fmtSl(prof.yAxis)}`;
+  const showStroke=Boolean(chkStroke&&chkStroke.checked&&prof.hasStroke);
+  mk("cProfX",buildBoardProfileCfg(prof.xAxis,"X 座標 (mm)",u,showStroke,pal));
+  mk("cProfY",buildBoardProfileCfg(prof.yAxis,"Y 座標 (mm)",u,showStroke,pal));
+}
 let V=null;
 function renderAdv(){
   if(!hasData()){
@@ -13585,6 +13966,10 @@ function setupSubtabs(barSel,attr,onPick){
 setupSubtabs("#p-issues .subtabs","data-subnav-issues",v=>v==="diagnostic"?enterDiagnostic():setTab("issues/"+v));
 setupSubtabs("#p-control .subtabs","data-subnav-control",v=>setTab(v==="multi"?"control/multi":v==="acf"?"control/acf":"control"));
 if($("#selGScale"))$("#selGScale").onchange=()=>{if(S.tab==="control"&&S.chart==="g")renderControl()};
+setupSubtabs("#p-deep .subtabs","data-subnav-deep",v=>setTab("deep/"+v));
+if($("#selOrientMode"))$("#selOrientMode").onchange=()=>{if(S.tab==="deep")renderOrientationUI()};
+if($("#selProfBins"))$("#selProfBins").onchange=()=>{if(S.tab==="deep")renderBoardProfileXYUI()};
+if($("#chkProfStroke"))$("#chkProfStroke").onchange=()=>{if(S.tab==="deep")renderBoardProfileXYUI()};
 setupSubtabs("#p-improve .subtabs","data-subnav-improve",v=>setTab("improve/"+v));
 function openAppSettings(section){
   const m=$("#appSettingsModal");if(!m)return;
@@ -15481,6 +15866,8 @@ function beforePrint(){
     ||(S.tab==="issues"&&S.issuesSub==="cross"?"交叉驗證":null)
     ||(S.tab==="control"&&S.controlSub==="multi"?"多變量管制圖":null)
     ||(S.tab==="control"&&S.controlSub==="acf"?"板序自相關分析":null)
+    ||(S.tab==="deep"&&S.deepSub==="spatial"?"空間與偏移":null)
+    ||(S.tab==="deep"&&S.deepSub==="morph"?"形貌與異常":null)
     ||({share:"分享設定",shares:"我的分享",mail:"轉寄報告",deep:"製程跡象",improve:"回合比較",ai:"AI 診斷"}[S.tab])
     ||S.tab||"";
   const ph=$("#printHead");
