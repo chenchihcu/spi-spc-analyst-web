@@ -10,6 +10,11 @@ import {
   calcAcfPacf,
   calcCaCpQuadrant,
   calcRollingCpk,
+  calcVarianceComponents,
+  calcMultiVari,
+  calcOffsetEllipse,
+  calcBoardProfileXY,
+  calcApertureOrientation,
 } from "../lib/spi-stats-ext.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -269,5 +274,108 @@ describe("Task 4: detectIssues 新增正交規則 M-22（ACF）與 M-23（G 圖�
     assert.ok(F.meta && F.meta.extCore && F.meta.extCore.gChart, "F.meta.extCore 應附帶 G 圖結果");
   });
 });
+
+describe("Phase 2 Task 1: lib/spi-stats-ext.mjs 變異／偏移／空間剖面／開孔方向純統計核心", () => {
+  it("calcVarianceComponents & calcMultiVari: 混合交叉/巢狀分解百分比總和 100% 且正確辨識主因", () => {
+    // 構造強「群組間」差異 + 中等「板間」差異 + 小殘差，且每板含 2 子板（交叉因子）
+    const rows = [];
+    for (let bi = 0; bi < 6; bi++) {
+      const bEff = (bi - 2.5) * 2.0;
+      for (let fi = 1; fi <= 2; fi++) {
+        const fEff = fi === 1 ? -0.5 : 0.5;
+        for (const [g, gEff] of [["0402", -8], ["BGA", 8]]) {
+          for (let pi = 0; pi < 5; pi++) {
+            rows.push({ board: `B${bi + 1}`, figure: String(fi), group: g, volume: 100 + gEff + bEff + fEff + (pi - 2) * 0.2 });
+          }
+        }
+      }
+    }
+    const vc = calcVarianceComponents(rows, "volume");
+    assert.equal(vc.insufficient, false);
+    const sumPct = vc.layers.reduce((s, l) => s + l.pct, 0);
+    assert.ok(Math.abs(sumPct - 100) < 0.2, `變異佔比總和應為 100%，實際 ${sumPct}`);
+    assert.equal(vc.dominant.key, "group", "最大變異來源應為元件群組間");
+
+    // 單一群組範圍自動省略 group 層，改以板間為主因
+    const vcSingle = calcVarianceComponents(rows.filter((r) => r.group === "0402"), "volume");
+    assert.equal(vcSingle.layers.some((l) => l.key === "group"), false);
+    assert.equal(vcSingle.dominant.key, "board");
+
+    const mv = calcMultiVari(rows, "volume", ["B1", "B2", "B3", "B4", "B5", "B6"]);
+    assert.equal(mv.insufficient, false);
+    assert.equal(mv.boards.length, 6);
+    assert.ok(mv.strata.length >= 2);
+  });
+
+  it("calcOffsetEllipse: 計算 95% 信賴橢圓、前/後行程背隙 Hotelling T² 與奇異矩陣防呆", () => {
+    const rows = [];
+    for (let i = 0; i < 40; i++) {
+      const fwd = i < 20;
+      const dx = (i % 5 - 2) * 2.1 + (fwd ? 12 : -12);
+      const dy = (Math.floor(i / 5) % 4 - 1.5) * 1.8 + (fwd ? 6 : -6);
+      rows.push({ offx: dx, offy: dy, stroke: fwd ? "F" : "R" });
+    }
+    const res = calcOffsetEllipse(rows, { offx: { lsl: -75, usl: 75 }, offy: { lsl: -75, usl: 75 } });
+    assert.equal(res.insufficient, false);
+    assert.equal(res.overall.ellipse.length, 65);
+    assert.ok(res.strokeSplit && res.strokeSplit.valid);
+    assert.ok(res.strokeSplit.backlashUm > 20, `背隙應 > 20 µm，實際 ${res.strokeSplit.backlashUm}`);
+    assert.ok(res.strokeSplit.p < 0.001, `Hotelling T² p 應 < 0.001，實際 ${res.strokeSplit.p}`);
+
+    // coreOnly 模式跳過 65 點橢圓多邊形生成
+    const fast = calcOffsetEllipse(rows, { offx: { lsl: -75, usl: 75 }, offy: { lsl: -75, usl: 75 } }, { coreOnly: true });
+    assert.equal(fast.overall.ellipse.length, 0);
+    assert.ok(fast.strokeSplit.p < 0.001);
+
+    // 奇異共線矩陣防呆（offx === offy）不產生 NaN
+    const collin = Array.from({ length: 20 }, (_, i) => ({ offx: i, offy: i, stroke: i < 10 ? "F" : "R" }));
+    const sRes = calcOffsetEllipse(collin, {});
+    assert.equal(sRes.overall.singular, true);
+    assert.ok(sRes.strokeSplit.p === null || Number.isFinite(sRes.strokeSplit.p));
+  });
+
+  it("calcBoardProfileXY: 虛擬網格 fail-visible、單線座標防呆與真實斜率檢出", () => {
+    // 1. 純虛擬網格（無 x/y 且無 componentX/Y）必須回傳 reason: "virtual_grid"
+    const vRes = calcBoardProfileXY([{ volume: 100 }, { volume: 102 }], "volume");
+    assert.equal(vRes.insufficient, true);
+    assert.equal(vRes.reason, "virtual_grid");
+
+    // 2. 真實物理座標具明顯 X 方向線性梯度（每 100mm +10%）與單線 Y 防呆
+    const rows = Array.from({ length: 100 }, (_, i) => ({
+      x: i,
+      y: 50, // 單線共線 Y
+      volume: 95 + 0.1 * i + ((i % 3) - 1) * 0.1,
+    }));
+    const pRes = calcBoardProfileXY(rows, "volume", { bins: 10 });
+    assert.equal(pRes.insufficient, false);
+    assert.equal(pRes.xAxis.bins.length, 10);
+    assert.ok(Math.abs(pRes.xAxis.slopePer100mm - 10) < 0.5, `X 斜率應接近 +10/100mm，實際 ${pRes.xAxis.slopePer100mm}`);
+    assert.ok(pRes.xAxis.p < 0.001);
+    assert.equal(pRes.yAxis.degenerate, true, "單線 Y 軸應標記 degenerate 並不除以 0");
+    assert.equal(pRes.yAxis.slopePer100mm, null);
+  });
+
+  it("calcApertureOrientation: 0° 平行 vs 90° 垂直刮刀比較與無方向性欄位防呆", () => {
+    const rows = [];
+    for (let i = 0; i < 30; i++) {
+      // sqDir = "Y": Y 長邊（apw > apl）為平行刮刀 0°，X 長邊（apl > apw）為垂直刮刀 90°
+      rows.push({ apl: 0.3, apw: 0.6, volume: 104 + (i % 3 - 1) * 0.5 }); // 0° 平行
+      rows.push({ apl: 0.6, apw: 0.3, volume: 96 + (i % 3 - 1) * 0.5 });  // 90° 垂直
+      rows.push({ apl: 0.5, apw: 0.5, volume: 100 });                     // 方形
+    }
+    const oRes = calcApertureOrientation(rows, "volume", "Y");
+    assert.equal(oRes.insufficient, false);
+    assert.equal(oRes.singleAxisOnly, false);
+    assert.ok(oRes.diff > 7, `0° - 90° 應約 +8%，實際 ${oRes.diff}`);
+    assert.ok(oRes.p < 0.001);
+    assert.ok(Math.abs(oRes.cohenD) > 2);
+
+    // 無方向性欄位（全體 apl > apw）回傳 singleAxisOnly: true
+    const uni = Array.from({ length: 30 }, () => ({ apl: 0.6, apw: 0.3, volume: 100 }));
+    const uRes = calcApertureOrientation(uni, "volume", "Y");
+    assert.equal(uRes.singleAxisOnly, true);
+  });
+});
+
 
 
