@@ -10,6 +10,11 @@
 - **正交偵測規則與穩定製程校準**：新增 `M-22`（板序自相關 ACF，歸入 `"process"` 並與既有階躍 `drift` 卡正交去重）與 `M-23`（高良率 ≥ 99% G 圖不良叢發，歸入 `"spike"`，5 萬筆零配置預篩）；通過 `npm run test:slow` 800 seed 校準（穩定製程 0/400 零誤報）。
 - **分析報告與 AI 診斷整合**：`lib/analyze-core.mjs` 白名單新增 `"進階統計診斷"`；PDF 分析報告 Ch.4 補入 G／U′／ACF 統計摘要、Ch.5 離屏嵌入 Ca×Cp 與滑動 Cpk 圖、Ch.10 補齊公式附錄。
 
+## v10.38.15 — 2026-11-23（焦點問題邊界補齊：全板區分頁跳轉、空範圍篩選重設與列印工具狀態）
+
+- **全板問題區分頁跳轉與空範圍篩選**：`flashIssue()` 在主清單找不到目標 ID 時接續搜尋 `issueBoardList("all")` 並自動翻頁至 `#issBoardScope` 內的目標卡片；`renderIssues()` 於窄範圍無歸屬問題（`focusedAll.length === 0`）時自動重設 `S.issLv = "all"`，避免隱藏篩選列後 `#issBoardScope` 仍被舊嚴重度遮蔽。
+- **列印還原與回歸測試**：`afterPrint()` 還原折疊與卡片開合後同步更新 `issToolsState()`；新增 `reportMd`／`renderReport` 摘要段排序與 0 筆不輸出測試、`.iss-ev-fold` 列印展開還原測試。
+
 ## v10.38.14 — 2026-11-23（焦點問題證據折疊列 CJK 雙字重合規修正）
 
 - **CJK 雙字重標準修正**：將 `.iss-ev-fold>summary`（統計證據折疊標題列）字重由 `600` 修正為 `700`，符合全站 CJK 雙字重（僅使用 `400` 與 `700`）排版規範與 `tests/type-scale.test.mjs` 檢查。
