@@ -7304,12 +7304,38 @@ function detectIssues(st,onStage){
         facts:[`${lab(k)}連續板平均存在顯著時間序列相依（${lagTxt}），違反標準 Shewhart 管制圖獨立性假設`],
         cause:"錫膏滾動黏度緩慢變化、週期性鋼板擦拭未完全恢復，或治具／料架固定週期循環效應",conf:"中",
         action:"至「管制圖 → 自相關」確認週期落後期，搭配 EWMA／CUSUM 監控並檢查擦拭週期與載具編號",
-        ev:evSeries(k,null,[],"各板平均值序列"),go:{tab:"control/acf"}});
+        ev:{type:"series",title:"各板平均值序列",labels:boards.slice(),values:bm.map(v=>+f(v,2)),mark:[],unit:METRICS[k]?METRICS[k].unit:""},go:{tab:"control/acf"}});
     }
   }
-  const gcAll=calcGChart(R,r=>classify(r,st.specs,st),boards);
+  // M-23 高良率不良叢發：先以既有 idx 與規格邊界零配置預篩，僅於良率 ≥ 99% 且不良 ≥ 4 時呼叫 calcGChart
+  const maxDefForM23=Math.floor(R.length*0.01);
+  let fastDef=0,overM23=false;
+  const spCacheM23={};
+  for(const g of groups){
+    const arr=[];
+    for(const k of MS){const sp=specOfGroup(st,g,k);if(sp&&(sp.lsl!=null||sp.usl!=null))arr.push([k,sp.lsl,sp.usl]);}
+    spCacheM23[g]=arr;
+  }
+  outerM23:for(let bi=0;bi<nb;bi++){
+    const bg=idx[boards[bi]];if(!bg)continue;
+    for(let gi=0;gi<groups.length;gi++){
+      const g=groups[gi],rs=bg[g],sps=spCacheM23[g];
+      if(!rs||!sps||!sps.length)continue;
+      for(let j=0;j<rs.length;j++){
+        const r=rs[j];
+        for(let si=0;si<sps.length;si++){
+          const s=sps[si],v=r[s[0]];
+          if(v!=null&&((s[1]!=null&&v<s[1])||(s[2]!=null&&v>s[2]))){
+            if(++fastDef>maxDefForM23){overM23=true;break outerM23;}
+            break;
+          }
+        }
+      }
+    }
+  }
+  const gcAll=(!overM23&&fastDef>=4)?calcGChart(R,r=>classify(r,st.specs,st),boards):null;
   extCore.gChart=gcAll;
-  if(!gcAll.insufficient&&gcAll.yieldPct>=99&&gcAll.defectCount>=4&&gcAll.burstCount>=1&&gcAll.burstP<0.002){
+  if(gcAll&&!gcAll.insufficient&&gcAll.yieldPct>=99&&gcAll.defectCount>=4&&gcAll.burstCount>=1&&gcAll.burstP<0.002){
     const burstBoards=[...new Set(gcAll.pts.filter(p=>p.burst).map(p=>p.board))];
     add({lv:"warn",cat:"高良率叢發",sig:{t:"gburst",boards:burstBoards},
       title:`高良率產線出現連續不良叢發（良率 ${f(gcAll.yieldPct,2)}%，叢發 ${gcAll.burstCount} 次）`,
