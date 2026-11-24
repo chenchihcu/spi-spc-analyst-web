@@ -67,7 +67,7 @@ test("關係圖：specScatter / parallel / radar 皆有繪製且切換即時重�
   const { w, errs, charts } = open();
   await ready(w);
   const d = w.document;
-  w.SPI_TEST_HOOK.setTab("deep/adv");
+  w.SPI_TEST_HOOK.setTab("deep/morph");
 
   const relCharts = () => charts.filter((x) => x.id === "cRelChart").map((x) => x.cfg);
   assert.equal(d.querySelector("#relChartBox").hidden, false);
@@ -101,7 +101,7 @@ test("關係圖：特徵完全共線時拒絕繪製並隱藏圖框（FR-8）", {
   const S = w.SPI_TEST_HOOK.S;
   S.rows = S.rows.slice(0, 60).map((r) => ({ ...r, volume: 100, area: 100, height: 120 }));
   w.SPI_TEST_HOOK.recompute();
-  w.SPI_TEST_HOOK.setTab("deep/adv");
+  w.SPI_TEST_HOOK.setTab("deep/morph");
   charts.length = 0;
 
   change(d.querySelector("#selRelChart"), "radar");
