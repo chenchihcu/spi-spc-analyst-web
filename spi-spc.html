@@ -1495,6 +1495,34 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
     <div class="kpis" id="sidedPpmKpis"></div>
     <p class="note" id="sidedPpmNote" style="margin:8px 0 0"></p>
   </div>
+  <div class="grid2" style="margin-top:12px">
+    <div class="card" id="cardCaCp">
+      <h3>製程能力四象限圖 <small id="cacpSub"></small></h3>
+      <div class="legend">
+        <span><i class="sq" style="background:var(--ok);border-radius:50%"></i>健康製程</span>
+        <span><i class="sq" style="background:var(--warn);border-radius:50%"></i>偏心可調回</span>
+        <span><i class="sq" style="background:var(--accent);border-radius:50%"></i>變異過大</span>
+        <span><i class="sq" style="background:var(--ng);border-radius:50%"></i>雙重失控</span>
+      </div>
+      <div id="cacpMsg" class="note my-8" hidden></div>
+      <div class="chartbox tall"><canvas id="cCaCp" role="img" aria-label="製程能力四象限圖"></canvas></div>
+    </div>
+    <div class="card" id="cardRollCpk">
+      <h3>滑動視窗 Cpk 趨勢圖 <small id="rollCpkSub"></small></h3>
+      <div class="toolbar" style="margin-bottom:6px">
+        <div class="field"><label for="selRollWin">視窗板數</label>
+          <select id="selRollWin">
+            <option value="3">3 板</option>
+            <option value="5" selected>5 板</option>
+            <option value="10">10 板</option>
+            <option value="20">20 板</option>
+          </select>
+        </div>
+      </div>
+      <div id="rollCpkMsg" class="note my-8" hidden></div>
+      <div class="chartbox tall"><canvas id="cRollCpk" role="img" aria-label="滑動視窗 Cpk 趨勢圖"></canvas></div>
+    </div>
+  </div>
 </section>
 
 <section class="panel" id="p-sim3d" role="tabpanel" hidden>
@@ -9584,7 +9612,106 @@ function renderCap(){
     options:baseOpts({plugins:{legend:{display:false},vlines:{},tooltip:{callbacks:{label:i=>{const b=B[i.dataIndex];return`中位 ${f(b.med,1)}  Q1 ${f(b.q1,1)}  Q3 ${f(b.q3,1)}  範圍 ${f(b.min,1)}–${f(b.max,1)}`}}}}})});
   renderPadCpkRank();
   renderSidedPpmBlock();
+  renderCaCpQuadrant();
+  renderRollingCpk();
 }
+function buildCaCpChartCfg(res,colors){
+  const colMap={healthy:colors.ok,offCenter:colors.warn,highVar:colors.acc,both:colors.ng};
+  const valid=res.pts.filter(p=>!p.zeroVar&&p.cp!=null);
+  const yMax=res.softYMax||3.5;
+  const maxAbsCa=Math.max(40,...valid.map(p=>Math.abs(p.ca)));
+  const xLim=Math.min(150,Math.ceil(maxAbsCa/10)*10);
+  // Cpk = 1.33 等值曲線：Cp = 1.33 / (1 - |Ca|/100)
+  const isoPts=[];
+  for(let ca=-Math.min(95,xLim);ca<=Math.min(95,xLim);ca+=5){
+    const cp=1.33/(1-Math.abs(ca)/100);
+    if(cp<=yMax*1.05)isoPts.push({x:ca,y:Math.min(yMax,cp)});
+  }
+  return{
+    type:"scatter",
+    data:{datasets:[
+      {label:"分組",data:valid.map(p=>({x:Math.max(-xLim,Math.min(xLim,p.ca)),y:Math.min(yMax,p.cp),meta:p})),
+        pointRadius:valid.map(p=>Math.max(4,Math.min(10,3+Math.log10(Math.max(10,p.n))*2))),
+        pointStyle:valid.map(p=>p.capped?"triangle":"circle"),
+        backgroundColor:valid.map(p=>colMap[p.zone]||colors.s2),
+        borderColor:valid.map(p=>colMap[p.zone]||colors.s2)},
+      {type:"line",label:"Cpk = 1.33 等值線",data:isoPts,borderColor:colors.ok,borderDash:[6,4],borderWidth:1.3,pointRadius:0,tension:0},
+      {type:"line",label:"Cp = 1.33",data:[{x:-xLim,y:1.33},{x:xLim,y:1.33}],borderColor:colors.grid,borderDash:[3,3],borderWidth:1,pointRadius:0},
+      {type:"line",label:"Ca = −25%",data:[{x:-25,y:0},{x:-25,y:yMax}],borderColor:colors.grid,borderDash:[3,3],borderWidth:1,pointRadius:0},
+      {type:"line",label:"Ca = +25%",data:[{x:25,y:0},{x:25,y:yMax}],borderColor:colors.grid,borderDash:[3,3],borderWidth:1,pointRadius:0}
+    ]},
+    options:baseOpts({
+      scales:{
+        x:{min:-xLim,max:xLim,title:{display:true,text:"準度偏移 Ca (%)",color:colors.muted},grid:{color:colors.grid},ticks:{color:colors.muted}},
+        y:{min:0,max:yMax,title:{display:true,text:"精密度 Cp",color:colors.muted},grid:{color:colors.grid},ticks:{color:colors.muted}}
+      },
+      plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex===0,callbacks:{label:i=>{
+        const p=i.raw&&i.raw.meta;if(!p)return"";
+        const zLbl={healthy:"健康製程",offCenter:"偏心可調回",highVar:"變異過大",both:"雙重失控"}[p.zone]||"";
+        return`${p.key} (n=${p.n}) · Ca ${f(p.ca,1)}% · Cp ${f(p.cp,2)}${p.capped?"（超過軟上限）":""} · Cpk ${f(p.cpk,2)} · ${zLbl}`;
+      }}}}
+    })
+  };
+}
+function renderCaCpQuadrant(){
+  if(!$("#cCaCp")||!hasData()||!S.A)return;
+  const A=S.A,sub=$("#cacpSub"),msg=$("#cacpMsg");
+  const keyFn=S.comp?(r=>r.pad||r.pin||"焊墊"):(!isAllGrp(S.group)?(r=>compKeyOf(r)):(r=>r.group));
+  const unitLbl=S.comp?"焊墊":(!isAllGrp(S.group)?"元件":"群組");
+  const res=getExtStats("cacp",()=>calcCaCpQuadrant(A.rows,A.m,A.sp,keyFn),unitLbl);
+  if(!res||res.insufficient){
+    if(sub)sub.textContent=`${METRICS[A.m].short} · ${scopeLabel(S)}`;
+    if(msg){msg.hidden=false;msg.textContent=res&&res.reason||"無法繪製四象限圖";}
+    mk("cCaCp",{type:"scatter",data:{datasets:[]},options:baseOpts()});
+    return;
+  }
+  const c=res.counts;
+  const asymNote=res.asymmetricTarget?" · Ca 以規格中點計算，與 Cpk 嚴格對應":"";
+  const capNote=res.pts.some(p=>p.capped)?` · 縱軸軟上限 ${f(res.softYMax,1)}`:"";
+  if(sub)sub.textContent=`${METRICS[A.m].short} · ${res.pts.length} 個${unitLbl}（健康 ${c.healthy} · 偏心 ${c.offCenter} · 變異大 ${c.highVar} · 雙失控 ${c.both}）${asymNote}${capNote}`;
+  if(msg){msg.hidden=!c.zeroVar;if(c.zeroVar)msg.textContent=`另有 ${c.zeroVar} 個${unitLbl}變異為零，未繪製於 Cp 軸。`;}
+  const colors={ok:css("--ok"),warn:css("--warn"),acc:css("--accent"),ng:css("--ng"),s2:css("--series2"),grid:css("--grid"),muted:css("--muted")};
+  mk("cCaCp",buildCaCpChartCfg(res,colors));
+}
+function buildRollingCpkChartCfg(res,colors){
+  const labs=res.pts.map(p=>p.lab);
+  return{
+    type:"line",
+    data:{labels:labs,datasets:[
+      {label:"Cpk",data:res.pts.map(p=>p.cpk),borderColor:colors.s2,borderWidth:2,pointRadius:3,tension:0.15,spanGaps:true},
+      {label:"Cp",data:res.pts.map(p=>p.cp),borderColor:colors.acc,borderDash:[5,3],borderWidth:1.4,pointRadius:2,tension:0.15,spanGaps:true},
+      {label:"1.33 合格",data:labs.map(()=>1.33),borderColor:colors.ok,borderDash:[6,4],borderWidth:1.2,pointRadius:0},
+      {label:"1.00 警戒",data:labs.map(()=>1.0),borderColor:colors.ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0}
+    ]},
+    options:baseOpts({
+      scales:{y:{min:0,grid:{color:colors.grid},ticks:{color:colors.muted}}},
+      plugins:{legend:{display:true,labels:{color:colors.muted,boxWidth:12}},tooltip:{callbacks:{label:i=>`${i.dataset.label}: ${i.raw==null?"—":f(i.raw,2)}`}}}
+    })
+  };
+}
+function renderRollingCpk(){
+  if(!$("#cRollCpk")||!hasData()||!S.A)return;
+  const A=S.A,sub=$("#rollCpkSub"),msg=$("#rollCpkMsg");
+  const wSel=+$("#selRollWin")?.value||5;
+  const res=getExtStats("rollcpk",()=>{
+    const byB=new Map();
+    for(const r of A.rows){let l=byB.get(r.board);if(!l){l=[];byB.set(r.board,l)}l.push(r[A.m])}
+    return calcRollingCpk(A.boards.map(b=>({lab:b,vals:byB.get(b)||[]})),A.sp,wSel);
+  },String(wSel));
+  if(!res||res.insufficient){
+    if(sub)sub.textContent=`${METRICS[A.m].short} · ${scopeLabel(S)}`;
+    if(msg){msg.hidden=false;msg.textContent=res&&res.reason||"板數不足，無法計算滑動 Cpk";}
+    mk("cRollCpk",{type:"line",data:{labels:[],datasets:[]},options:baseOpts()});
+    return;
+  }
+  const slopeTxt=res.slope!=null?(res.slope<-0.02?` · 衰退斜率 ${f(res.slope,3)}/板`:res.slope>0.02?` · 上升斜率 +${f(res.slope,3)}/板`:" · 趨勢平穩"):"";
+  const normNote=(S.capDistMode&&S.capDistMode!=="normal")?" · 滑動趨勢採常態估算":"";
+  if(sub)sub.textContent=`${METRICS[A.m].short} · ${scopeLabel(S)} · 視窗 ${res.windowSize} 板${slopeTxt}${normNote}`;
+  if(msg){msg.hidden=!res.downgraded;if(res.downgraded)msg.textContent=`總板數少於所選視窗，已自動調整為 ${res.windowSize} 板。`;}
+  const colors={ok:css("--ok"),ng:css("--ng"),acc:css("--accent"),s2:css("--series2"),grid:css("--grid"),muted:css("--muted")};
+  mk("cRollCpk",buildRollingCpkChartCfg(res,colors));
+}
+if($("#selRollWin"))$("#selRollWin").onchange=()=>{if(S.tab==="capability")renderRollingCpk()};
 
 function renderPadCpkRank(){
   if(!$("#cPadCpk")||!hasData())return;

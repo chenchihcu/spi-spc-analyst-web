@@ -342,3 +342,19 @@ test("捷徑選到其他群組的元件時，先改到該元件的群組", { ski
 });
 
 test("診斷所有讀取端共用元件範圍",()=>{const rows=core.sampleData(),st=baseState(core,{rows,group:"ALL",comp:key("U2")}),M=core.buildDiagnosticModel(st);assert.ok(M.rows.length>0);assert.ok(M.rows.every(r=>r.comp==="U2"));assert.ok(M.details.every(d=>d.row.comp==="U2"));});
+
+test("製程能力四象限與滑動 Cpk 依元件範圍篩選且不混入範圍外群組", { skip: !JSDOM && "未安裝 jsdom" }, async () => {
+  const { d, H } = await openPage();
+  d.querySelector('.tab[data-tab=capability]').click();
+  assert.ok(d.querySelector("#cCaCp"), "應存在 Ca×Cp 四象限圖畫布");
+  assert.ok(d.querySelector("#cRollCpk"), "應存在滑動視窗 Cpk 畫布");
+  const allSub = d.querySelector("#cacpSub").textContent;
+  assert.ok(allSub.length > 0, "全板四象限副標應有統計摘要");
+
+  H.setComp(key("U2"));
+  d.querySelector('.tab[data-tab=capability]').click();
+  const u2Sub = d.querySelector("#cacpSub").textContent;
+  assert.match(u2Sub, /(?:[2-9]|\d{2,})\s*個焊墊/, "單一元件範圍下四象限粒度應自動下鑽為多個焊墊");
+  assert.match(d.querySelector("#rollCpkSub").textContent, /U2/, "滑動 Cpk 副標應反映元件範圍");
+});
+

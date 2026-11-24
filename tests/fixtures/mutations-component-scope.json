@@ -130,6 +130,11 @@
       "name": "焦點問題標題計數沒篩元件範圍",
       "from": "focusedAll=buildFocusedProblems(F)",
       "to": "focusedAll=buildFocusedProblems(F0)"
+    },
+    {
+      "name": "四象限圖粒度未隨元件範圍切換",
+      "from": "const keyFn=S.comp?(r=>r.pad||r.pin||\"焊墊\"):(!isAllGrp(S.group)?(r=>compKeyOf(r)):(r=>r.group));",
+      "to": "const keyFn=r=>r.group;"
     }
   ]
 }
