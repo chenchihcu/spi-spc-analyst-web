@@ -7931,8 +7931,8 @@ function detectIssues(st,onStage){
     }
   }
 
-  // 5. 階段一正交規則：M-22 板序自相關（ACF）與 M-23 G 圖高良率不良叢發
-  const extCore={acf:{},gChart:null};
+  // 5. 階段一／二正交規則：M-22 板序自相關（ACF）、M-23 G 圖高良率不良叢發、M-24 雙行程偏移背隙、M-25 開孔方向效應
+  const extCore={acf:{},gChart:null,offsetEllipse:null,orientation:null};
   const acfAlpha=0.0005/Math.max(1,MS.length);
   for(const k of MS){
     const bm=boardMeans(k);
@@ -7998,6 +7998,70 @@ function detectIssues(st,onStage){
       cause:"局部鋼板堵孔、異物附著、單次印刷異常或特定連續焊墊脫模失效",conf:"高",
       action:"切換至「管制圖 → G 圖」定位叢發板號與對應 3D 焊墊位置，檢查鋼板開孔清潔度",
       ev:null,go:{tab:"control"}});
+  }
+  // M-24 雙行程偏移背隙：快速預篩雙行程 X/Y 偏移皆 ≥ 15 筆後，以雙變量 Hotelling T² 檢定
+  if(MS.includes("offx")&&MS.includes("offy")){
+    let m24F=0,m24R=0;
+    for(let i=0;i<R.length;i++){
+      const r=R[i];
+      if(r.offx==null||r.offy==null||!Number.isFinite(r.offx)||!Number.isFinite(r.offy))continue;
+      const stN=_extStrokeNorm(r);
+      if(stN==="F")m24F++;else if(stN==="R")m24R++;
+      if(m24F>=15&&m24R>=15)break;
+    }
+    if(m24F>=15&&m24R>=15){
+      const offRes=calcOffsetEllipse(R,st.specs,{coreOnly:true});
+      extCore.offsetEllipse=offRes;
+      if(offRes&&!offRes.insufficient&&offRes.strokeSplit&&offRes.strokeSplit.valid&&offRes.strokeSplit.p!=null){
+        const spX=st.specs&&st.specs.offx,spY=st.specs&&st.specs.offy;
+        const hwX=spX&&spX.usl!=null&&spX.lsl!=null?Math.abs(spX.usl-spX.lsl)/2:null;
+        const hwY=spY&&spY.usl!=null&&spY.lsl!=null?Math.abs(spY.usl-spY.lsl)/2:null;
+        const halfW=hwX&&hwY?Math.min(hwX,hwY):(hwX||hwY);
+        const thr=halfW?Math.max(8,halfW*0.20):15;
+        if(offRes.strokeSplit.p<0.005&&offRes.strokeSplit.backlashUm>=thr){
+          const ss=offRes.strokeSplit;
+          add({lv:"warn",cat:"對位偏移",sig:{t:"backlash"},
+            title:`前／後行程二維偏移具顯著背隙（Δ = ${f(ss.backlashUm,1)} µm）`,
+            ents:[],score:2.5,
+            rule_id:"M-24 雙行程偏移背隙",rule_name:"雙變量 Hotelling T² 行程背隙檢定",metric:"X／Y 偏移",
+            boards:"全部板",subboard:subOf(R),group:"ALL",refdes:"全部元件",
+            pads:`前行程 ${ss.fwd.n} 筆、後行程 ${ss.rev.n} 筆`,
+            observed:`質心距離 ${f(ss.backlashUm,1)} µm（ΔX = ${f(ss.dx,1)} µm，ΔY = ${f(ss.dy,1)} µm，Hotelling T² = ${f(ss.t2,1)}，p = ${ss.p<0.001?"<0.001":f(ss.p,4)}）`,
+            limit:`背隙 < ${f(thr,1)} µm 或雙變量檢定 p ≥ 0.005`,z:"不適用",p:ss.p<0.001?"<0.001":f(ss.p,4),
+            facts:[`前行程質心 (${f(ss.fwd.mx,1)}, ${f(ss.fwd.my,1)}) µm 與後行程質心 (${f(ss.rev.mx,1)}, ${f(ss.rev.my,1)}) µm 顯著分離`],
+            cause:"鋼板夾持鬆動、網框張力衰退、PCB 夾板背隙或刮刀前後行程機構偏移",conf:"高",
+            action:"至「製程跡象 → 空間與偏移」檢視二維偏移靶心圖，檢查鋼板夾具與 PCB 支撐頂針",
+            ev:null,go:{tab:"deep/spatial"}});
+        }
+      }
+    }
+  }
+  // M-25 開孔方向效應（0° 平行 vs 90° 垂直刮刀）：快速預篩是否具開孔／焊墊長寬
+  if(MS.includes("volume")){
+    let hasDim=false;
+    for(let i=0;i<R.length;i++){
+      const r=R[i];
+      if((r.apl>0&&r.apw>0)||(r.padl>0&&r.padw>0)){hasDim=true;break;}
+    }
+    if(hasDim){
+      const oriRes=calcApertureOrientation(R,"volume",st.sqDir==="X"?"X":"Y",{stencilUm:st.stencil||120});
+      extCore.orientation=oriRes;
+      if(oriRes&&!oriRes.insufficient&&!oriRes.singleAxisOnly&&oriRes.parallel.n>=20&&oriRes.perpendicular.n>=20&&oriRes.p!=null&&oriRes.p<0.005&&Math.abs(oriRes.diff)>=3&&Math.abs(oriRes.cohenD)>=0.4){
+        const dirWord=oriRes.diff>0?"平行（0°）高於垂直（90°）":"垂直（90°）高於平行（0°）";
+        add({lv:"warn",cat:"開孔方向",sig:{t:"orient",k:"volume"},
+          title:`開孔方向效應顯著：${dirWord} ${f(Math.abs(oriRes.diff),1)}%`,
+          ents:[],score:2.3,
+          rule_id:"M-25 開孔方向效應",rule_name:"0° 平行 vs 90° 垂直刮刀 Welch t 檢定",metric:lab("volume"),
+          boards:"全部板",subboard:subOf(R),group:"ALL",refdes:"全部元件",
+          pads:`0° 平行 ${oriRes.parallel.n} 筆、90° 垂直 ${oriRes.perpendicular.n} 筆（來源：${oriRes.dimSource}）`,
+          observed:`0° 平均 ${f(oriRes.parallel.mean,1)}%、90° 平均 ${f(oriRes.perpendicular.mean,1)}%（差值 ${oriRes.diff>=0?"+":""}${f(oriRes.diff,2)}%，Cohen's d = ${f(oriRes.cohenD,2)}，p = ${oriRes.p<0.001?"<0.001":f(oriRes.p,4)}）`,
+          limit:"方向差值 < 3% 或 |d| < 0.4 或 p ≥ 0.005",z:"不適用",p:oriRes.p<0.001?"<0.001":f(oriRes.p,4),
+          facts:[`刮刀沿 ${oriRes.sqDir} 軸印刷時，長軸平行與垂直開孔的體積轉移率出現顯著差異`],
+          cause:"刮刀刃口挖錫效應（scooping）、刮刀壓力或角度偏高、開孔長邊方向受印刷壓力不均",conf:"中",
+          action:"至「製程跡象 → 變異與開孔」檢視開孔方向效應圖與面積比分層，調整刮刀角度／壓力或評估開孔寬度補償",
+          ev:null,go:{tab:"deep/var"}});
+      }
+    }
   }
 
   stage(11,"佐證整理");

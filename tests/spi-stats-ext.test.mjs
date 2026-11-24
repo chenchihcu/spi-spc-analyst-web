@@ -377,5 +377,76 @@ describe("Phase 2 Task 1: lib/spi-stats-ext.mjs 變異／偏移／空間剖面�
   });
 });
 
+describe("Phase 2 Task 3: detectIssues 正交規則 M-24（雙行程偏移背隙）與 M-25（開孔方向效應）", () => {
+  it("M-24: 前／後行程偏移存在顯著雙變量背隙時觸發 M-24，歸類為 align 且不使用空間分布類別", () => {
+    const core = loadCore();
+    const rows = [];
+    for (let bi = 0; bi < 6; bi++) {
+      const stroke = bi % 2 === 0 ? "F" : "R";
+      const shift = stroke === "F" ? 18 : -18;
+      for (let pi = 0; pi < 20; pi++) {
+        rows.push({
+          board: `B${String(bi + 1).padStart(2, "0")}`,
+          comp: `U${pi + 1}`,
+          group: "0402",
+          pad: `U${pi + 1}-1`,
+          stroke,
+          volume: 100 + ((pi % 3) - 1),
+          height: 120,
+          area: 100,
+          offx: shift + Math.sin(pi) * 2,
+          offy: (stroke === "F" ? 6 : -6) + Math.cos(pi) * 2,
+        });
+      }
+    }
+    const st = { ...core.S, rows, metrics: ["volume", "height", "area", "offx", "offy"], metric: "volume", group: core.ALL_GRP, comp: null };
+    const F = core.detectIssues(st);
+    const card = F.find((x) => x.sig && x.sig.t === "backlash");
+    assert.ok(card, "顯著雙行程偏移背隙應觸發 M-24 卡片");
+    assert.equal(core.focusDomainOf(card), "align");
+    assert.notEqual(card.cat, "空間分布");
+    assert.ok(F.meta && F.meta.extCore && F.meta.extCore.offsetEllipse, "F.meta.extCore 應附帶 offsetEllipse");
+  });
+
+  it("M-25: 0° 平行與 90° 垂直刮刀開孔體積存在顯著差異時觸發 M-25，歸類為 aperture", () => {
+    const core = loadCore();
+    const rows = [];
+    for (let bi = 0; bi < 4; bi++) {
+      for (let pi = 0; pi < 25; pi++) {
+        rows.push({
+          board: `B${String(bi + 1).padStart(2, "0")}`,
+          comp: `R${pi + 1}`,
+          group: "0402",
+          pad: `R${pi + 1}-1`,
+          apl: 0.3,
+          apw: 0.6,
+          volume: 105 + ((pi % 3) - 1) * 1.2,
+          height: 120,
+          area: 100,
+        });
+        rows.push({
+          board: `B${String(bi + 1).padStart(2, "0")}`,
+          comp: `C${pi + 1}`,
+          group: "0402",
+          pad: `C${pi + 1}-1`,
+          apl: 0.6,
+          apw: 0.3,
+          volume: 95 + ((pi % 3) - 1) * 1.2,
+          height: 120,
+          area: 100,
+        });
+      }
+    }
+    const st = { ...core.S, rows, metrics: ["volume", "height", "area"], metric: "volume", group: core.ALL_GRP, comp: null, sqDir: "Y" };
+    const F = core.detectIssues(st);
+    const card = F.find((x) => x.sig && x.sig.t === "orient");
+    assert.ok(card, "顯著開孔方向體積差異應觸發 M-25 卡片");
+    assert.equal(core.focusDomainOf(card), "aperture");
+    assert.notEqual(card.cat, "空間分布");
+    assert.ok(F.meta && F.meta.extCore && F.meta.extCore.orientation, "F.meta.extCore 應附帶 orientation");
+  });
+});
+
+
 
 
