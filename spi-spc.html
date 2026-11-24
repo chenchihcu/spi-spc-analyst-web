@@ -1249,7 +1249,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
         <button role="menuitem" id="btnMyShares" hidden title="檢視與管理自己建立的分享連結">我的分享</button>
         <a role="menuitem" id="offlineLink" href="/download/offline" hidden title="下載單一 HTML 檔，不連網也能分析；資料不會存檔">下載離線版</a>
         <a role="menuitem" id="logoutLink" href="/__logout" hidden>登出</a>
-        <p class="menu-ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.38.15</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></p>
+        <p class="menu-ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.39.0</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></p>
       </div>
     </div>
   </div>
@@ -1373,6 +1373,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
   <nav class="subtabs" aria-label="管制圖子視圖">
     <button type="button" class="subtab" data-subnav-control="uni" aria-current="page">單變量</button>
     <button type="button" class="subtab" data-subnav-control="multi">多變量</button>
+    <button type="button" class="subtab" data-subnav-control="acf">自相關</button>
   </nav>
   <div class="control-subviews stack-md">
     <div data-control-sub="uni">
@@ -1384,8 +1385,15 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
             <option value="xbarr">X̄-R（自訂小子群組 n=2–10）</option>
             <option value="imr">I-MR（單一焊墊跨板）</option>
             <option value="p">P′ 圖（每板不良率，Laney）</option>
+            <option value="u">U′ 圖</option>
+            <option value="g">G 圖</option>
             <option value="ewma">EWMA（小幅漂移）</option>
             <option value="cusum">CUSUM（累積偏移）</option>
+          </select></div>
+        <div class="field" id="gScaleField" data-scope="c" hidden><label for="selGScale">Y 軸尺度</label>
+          <select id="selGScale">
+            <option value="linear" selected>線性</option>
+            <option value="log">對數</option>
           </select></div>
         <div class="field" id="xrSizeField" data-scope="c" hidden><label for="selXrSize">子群組大小 n</label>
           <select id="selXrSize">
@@ -1435,6 +1443,23 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
     <div class="chartbox"><canvas id="cHotellingT2" role="img" aria-label="Hotelling T2 管制圖"></canvas></div>
   </div>
   </div>
+    <div data-control-sub="acf" hidden>
+      <div class="card" id="cardAcf">
+        <h3>板序自相關與偏自相關圖 <small id="acfSub"></small></h3>
+        <div id="acfMsg" class="my-8"></div>
+        <div class="grid2" id="acfGrid">
+          <div>
+            <div class="fact" style="margin-bottom:4px">自相關係數 ACF</div>
+            <div class="chartbox short"><canvas id="cAcf" role="img" aria-label="板序自相關圖"></canvas></div>
+          </div>
+          <div>
+            <div class="fact" style="margin-bottom:4px">偏自相關係數 PACF</div>
+            <div class="chartbox short"><canvas id="cPacf" role="img" aria-label="板序偏自相關圖"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section class="panel" id="p-capability" role="tabpanel" hidden>
@@ -1469,6 +1494,34 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
     <h3>雙邊規格分側 PPM / DPMO <small id="sidedPpmSub"></small></h3>
     <div class="kpis" id="sidedPpmKpis"></div>
     <p class="note" id="sidedPpmNote" style="margin:8px 0 0"></p>
+  </div>
+  <div class="grid2" style="margin-top:12px">
+    <div class="card" id="cardCaCp">
+      <h3>製程能力四象限圖 <small id="cacpSub"></small></h3>
+      <div class="legend">
+        <span><i class="sq" style="background:var(--ok);border-radius:50%"></i>健康製程</span>
+        <span><i class="sq" style="background:var(--warn);border-radius:50%"></i>偏心可調回</span>
+        <span><i class="sq" style="background:var(--accent);border-radius:50%"></i>變異過大</span>
+        <span><i class="sq" style="background:var(--ng);border-radius:50%"></i>雙重失控</span>
+      </div>
+      <div id="cacpMsg" class="note my-8" hidden></div>
+      <div class="chartbox tall"><canvas id="cCaCp" role="img" aria-label="製程能力四象限圖"></canvas></div>
+    </div>
+    <div class="card" id="cardRollCpk">
+      <h3>滑動視窗 Cpk 趨勢圖 <small id="rollCpkSub"></small></h3>
+      <div class="toolbar" style="margin-bottom:6px">
+        <div class="field"><label for="selRollWin">視窗板數</label>
+          <select id="selRollWin">
+            <option value="3">3 板</option>
+            <option value="5" selected>5 板</option>
+            <option value="10">10 板</option>
+            <option value="20">20 板</option>
+          </select>
+        </div>
+      </div>
+      <div id="rollCpkMsg" class="note my-8" hidden></div>
+      <div class="chartbox tall"><canvas id="cRollCpk" role="img" aria-label="滑動視窗 Cpk 趨勢圖"></canvas></div>
+    </div>
   </div>
 </section>
 
@@ -3160,6 +3213,510 @@ function formatSidedPpmBlock(block, fmt = (v) => String(Math.round(v))) {
   };
 }
 /* @windows-parity END */
+/* @spi-stats-ext START */
+/**
+ * SPI 進階統計分析擴充引擎 — 純函式（無 DOM / window 相依）。
+ * 瀏覽器端由 tools/sync-spi-stats-ext.mjs 同步內嵌於 spi-spc.html 核心腳本區塊。
+ */
+
+function _extLogGamma(z) {
+  const c = [
+    76.18009172947146, -86.50532032941677, 24.01409824083091,
+    -1.231739572450155, 0.001208650973866179, -0.000005395239384953,
+  ];
+  let x = z, y = z, tmp = x + 5.5;
+  tmp -= (x + 0.5) * Math.log(tmp);
+  let ser = 1.000000000190015;
+  for (let j = 0; j < 6; j++) ser += c[j] / ++y;
+  return -tmp + Math.log(2.5066282746310005 * ser / x);
+}
+
+function _extGammaQ(a, x) {
+  if (x <= 0) return 1;
+  if (a <= 0) return 0;
+  const gln = _extLogGamma(a);
+  if (x < a + 1) {
+    let ap = a, sum = 1 / a, del = sum;
+    for (let n = 1; n <= 200; n++) {
+      ap += 1;
+      del *= x / ap;
+      sum += del;
+      if (Math.abs(del) < Math.abs(sum) * 1e-12) break;
+    }
+    const p = sum * Math.exp(-x + a * Math.log(x) - gln);
+    return Math.max(0, Math.min(1, 1 - p));
+  }
+  let b = x + 1 - a, c = 1 / 1e-30, d = 1 / b, h = d;
+  for (let i = 1; i <= 200; i++) {
+    const an = -i * (i - a);
+    b += 2;
+    d = an * d + b;
+    if (Math.abs(d) < 1e-30) d = 1e-30;
+    c = b + an / c;
+    if (Math.abs(c) < 1e-30) c = 1e-30;
+    d = 1 / d;
+    const del = d * c;
+    h *= del;
+    if (Math.abs(del - 1) < 1e-12) break;
+  }
+  return Math.max(0, Math.min(1, Math.exp(-x + a * Math.log(x) - gln) * h));
+}
+
+function _extChi2UpperP(x, df) {
+  if (!Number.isFinite(x) || x <= 0 || df <= 0) return 1;
+  return _extGammaQ(df / 2, x / 2);
+}
+
+function _extOrderRowsByBoards(rows, boardOrder) {
+  if (!Array.isArray(rows) || !rows.length) return [];
+  const byBoard = new Map();
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i];
+    const b = r && r.board != null ? r.board : "";
+    let list = byBoard.get(b);
+    if (!list) { list = []; byBoard.set(b, list); }
+    list.push(r);
+  }
+  const order = Array.isArray(boardOrder) && boardOrder.length ? boardOrder : [...byBoard.keys()];
+  const seen = new Set();
+  const out = [];
+  for (let i = 0; i < order.length; i++) {
+    const b = order[i];
+    const list = byBoard.get(b);
+    if (!list) continue;
+    seen.add(b);
+    for (let j = 0; j < list.length; j++) out.push(list[j]);
+  }
+  for (const [b, list] of byBoard.entries()) {
+    if (seen.has(b)) continue;
+    for (let j = 0; j < list.length; j++) out.push(list[j]);
+  }
+  return out;
+}
+
+/**
+ * 1.1 G 圖（稀有事件間隔管制圖 — Benneyan 幾何分布精確界線）
+ */
+function calcGChart(rows, classifyFn, boardOrder) {
+  const ordered = _extOrderRowsByBoards(rows, boardOrder);
+  const totalPads = ordered.length;
+  if (!totalPads) return { insufficient: true, reason: "範圍內無有效量測資料", totalPads: 0, defectCount: 0, pts: [] };
+
+  const defPos = [];
+  for (let i = 0; i < totalPads; i++) {
+    const r = ordered[i];
+    const d = classifyFn(r);
+    if (d && d.length > 0) defPos.push({ idx: i, board: r.board });
+  }
+  const defectCount = defPos.length;
+  const yieldPct = ((totalPads - defectCount) / totalPads) * 100;
+  if (defectCount < 2) {
+    return {
+      insufficient: true,
+      reason: "範圍內不良次數少於 2 次，暫無法繪製間隔圖",
+      totalPads,
+      defectCount,
+      yieldPct,
+      pts: [],
+    };
+  }
+
+  const m = defectCount - 1;
+  const gs = new Array(m);
+  let sumG = 0;
+  for (let i = 0; i < m; i++) {
+    const g = defPos[i + 1].idx - defPos[i].idx - 1;
+    gs[i] = g;
+    sumG += g;
+  }
+  const gMean = sumG / m;
+  const sortedG = gs.slice().sort((a, b) => a - b);
+  const gMedian = m % 2 ? sortedG[(m - 1) >> 1] : (sortedG[(m >> 1) - 1] + sortedG[m >> 1]) / 2;
+
+  const pHat = Math.min(1 - 1e-9, Math.max(1e-9, 1 / (gMean + 1)));
+  const lnQ = Math.log(1 - pHat);
+  const alphaHalf = 0.00135;
+  const clMean = gMean;
+  const clMed = Math.max(0, Math.log(0.5) / lnQ - 1);
+  const ucl = Math.max(0, Math.ceil(Math.log(alphaHalf) / lnQ - 1));
+  const lcl = Math.max(0, Math.floor(Math.log(1 - alphaHalf) / lnQ - 1));
+
+  // 標記越界與高良率連續不良叢發（LCL >= 1 時 g <= LCL；LCL == 0 時連續 >= 2 次 g == 0）
+  const pts = new Array(m);
+  let zeroRun = 0;
+  let lclRun = 0;
+  let burstCount = 0;
+  const burstIndices = [];
+  let maxZeroRun = 0;
+  let maxLclRun = 0;
+  for (let i = 0; i < m; i++) {
+    const g = gs[i];
+    const aboveUcl = g > ucl;
+    const belowLcl = lcl >= 1 && g <= lcl;
+    if (g === 0) zeroRun++; else zeroRun = 0;
+    if (belowLcl) lclRun++; else lclRun = 0;
+    if (zeroRun > maxZeroRun) maxZeroRun = zeroRun;
+    if (lclRun > maxLclRun) maxLclRun = lclRun;
+
+    const isZeroBurst = lcl === 0 && zeroRun >= 2;
+    const isLclBurst = lcl >= 1 && lclRun >= 2;
+    const burst = isZeroBurst || isLclBurst;
+    if (burst) {
+      burstCount++;
+      burstIndices.push(i);
+      if (i > 0 && !pts[i - 1].burst && ((lcl === 0 && zeroRun === 2) || (lcl >= 1 && lclRun === 2))) {
+        pts[i - 1].burst = true;
+      }
+    }
+    pts[i] = {
+      idx: i + 1,
+      lab: `#${i + 1}`,
+      board: defPos[i + 1].board,
+      g,
+      belowLcl,
+      aboveUcl,
+      burst,
+    };
+  }
+
+  // Bonferroni 校正叢發機率（供 M-23 規則使用）
+  const burstP = lcl === 0 && maxZeroRun >= 2
+    ? Math.min(1, Math.max(1, m - maxZeroRun + 1) * Math.pow(pHat, maxZeroRun))
+    : lcl >= 1 && maxLclRun >= 2
+      ? Math.min(1, Math.max(1, m - maxLclRun + 1) * Math.pow(1 - Math.pow(1 - pHat, lcl + 1), maxLclRun))
+      : 1;
+
+  return {
+    insufficient: false,
+    totalPads,
+    defectCount,
+    yieldPct,
+    gMean,
+    gMedian,
+    pHat,
+    clMean,
+    clMed,
+    ucl,
+    lcl,
+    burstCount,
+    burstIndices,
+    maxZeroRun,
+    maxLclRun,
+    burstP,
+    pts,
+  };
+}
+
+/**
+ * 1.2 Laney U′ 圖（每板單位缺點數，含過度離散係數 σz 與零不良防呆）
+ */
+function calcLaneyUChart(rows, classifyFn, boardOrder) {
+  if (!Array.isArray(rows) || !rows.length) {
+    return { insufficient: true, reason: "範圍內無有效量測資料", uBar: 0, uBarPer1k: 0, sigmaZ: 1, pts: [] };
+  }
+  const byBoard = new Map();
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i];
+    const b = r && r.board != null ? r.board : "";
+    let rec = byBoard.get(b);
+    if (!rec) { rec = { n: 0, c: 0 }; byBoard.set(b, rec); }
+    rec.n += 1;
+    const d = classifyFn(r);
+    if (d && d.length > 0) rec.c += d.length;
+  }
+  const order = Array.isArray(boardOrder) && boardOrder.length
+    ? boardOrder.filter((b) => byBoard.has(b))
+    : [...byBoard.keys()];
+  for (const b of byBoard.keys()) if (!order.includes(b)) order.push(b);
+  if (!order.length) {
+    return { insufficient: true, reason: "無有效板序資料", uBar: 0, uBarPer1k: 0, sigmaZ: 1, pts: [] };
+  }
+
+  let totC = 0, totN = 0;
+  for (let i = 0; i < order.length; i++) {
+    const rec = byBoard.get(order[i]);
+    totC += rec.c;
+    totN += rec.n;
+  }
+  const uBar = totN > 0 ? totC / totN : 0;
+  if (uBar <= 0) {
+    const pts = order.map((lab) => {
+      const rec = byBoard.get(lab);
+      return { lab, n: rec.n, c: 0, u: 0, uPer1k: 0, v: 0, cl: 0, ucl: 0, lcl: 0, z: 0, ooc: false };
+    });
+    return { insufficient: false, uBar: 0, uBarPer1k: 0, sigmaZ: 1, cl: 0, sigZ: 1, pts };
+  }
+
+  const zs = new Array(order.length);
+  const sigUs = new Array(order.length);
+  for (let i = 0; i < order.length; i++) {
+    const rec = byBoard.get(order[i]);
+    const u = rec.c / rec.n;
+    const su = Math.sqrt(uBar / rec.n);
+    sigUs[i] = su;
+    zs[i] = su > 0 ? (u - uBar) / su : 0;
+  }
+  let mrSum = 0;
+  for (let i = 1; i < zs.length; i++) mrSum += Math.abs(zs[i] - zs[i - 1]);
+  const sigmaZ = zs.length >= 2 ? (mrSum / (zs.length - 1)) / 1.128 : 1;
+  const effSigZ = Number.isFinite(sigmaZ) && sigmaZ > 0 ? sigmaZ : 1;
+
+  const pts = order.map((lab, i) => {
+    const rec = byBoard.get(lab);
+    const u = rec.c / rec.n;
+    const ucl = uBar + 3 * sigUs[i] * effSigZ;
+    const lcl = Math.max(0, uBar - 3 * sigUs[i] * effSigZ);
+    const z = (sigUs[i] * effSigZ) > 0 ? (u - uBar) / (sigUs[i] * effSigZ) : 0;
+    return {
+      lab,
+      n: rec.n,
+      c: rec.c,
+      u,
+      uPer1k: u * 1000,
+      v: u,
+      cl: uBar,
+      ucl,
+      lcl,
+      z,
+      ooc: u > ucl || u < lcl,
+    };
+  });
+
+  return {
+    insufficient: false,
+    uBar,
+    uBarPer1k: uBar * 1000,
+    sigmaZ: effSigZ,
+    cl: uBar,
+    sigZ: effSigZ,
+    pts,
+  };
+}
+
+/**
+ * 1.3 板序自相關與偏自相關（ACF / PACF + Ljung-Box Q 檢定）
+ */
+function calcAcfPacf(boardMeans, maxLagOpt) {
+  const xs = Array.isArray(boardMeans) ? boardMeans.filter((v) => v != null && Number.isFinite(v)) : [];
+  const n = xs.length;
+  if (n < 6) {
+    return { insufficient: true, reason: "有效板數少於 6 片，無法計算板序自相關", n, acf: [], pacf: [], sigLags: [] };
+  }
+  let sum = 0;
+  for (let i = 0; i < n; i++) sum += xs[i];
+  const mu = sum / n;
+  let denom = 0;
+  for (let i = 0; i < n; i++) {
+    const d = xs[i] - mu;
+    denom += d * d;
+  }
+  if (denom <= 1e-12) {
+    return { insufficient: true, reason: "各板平均值無變異，無法計算自相關", n, acf: [], pacf: [], sigLags: [] };
+  }
+
+  const maxLag = Math.max(1, Math.min(maxLagOpt || 20, Math.floor(n / 3)));
+  const acf = new Array(maxLag);
+  for (let k = 1; k <= maxLag; k++) {
+    let num = 0;
+    for (let t = k; t < n; t++) num += (xs[t] - mu) * (xs[t - k] - mu);
+    acf[k - 1] = num / denom;
+  }
+
+  // Durbin-Levinson 遞迴求 PACF
+  const pacf = new Array(maxLag);
+  let prevPhi = [];
+  let v = 1;
+  for (let k = 1; k <= maxLag; k++) {
+    let num = acf[k - 1];
+    for (let j = 1; j < k; j++) num -= prevPhi[j - 1] * acf[k - j - 1];
+    const phiKK = Math.abs(v) > 1e-12 ? Math.max(-1, Math.min(1, num / v)) : 0;
+    const curPhi = new Array(k);
+    for (let j = 1; j < k; j++) curPhi[j - 1] = prevPhi[j - 1] - phiKK * prevPhi[k - j - 1];
+    curPhi[k - 1] = phiKK;
+    pacf[k - 1] = phiKK;
+    v = v * (1 - phiKK * phiKK);
+    prevPhi = curPhi;
+  }
+
+  const ci95 = 1.96 / Math.sqrt(n);
+  let qSum = 0;
+  let maxAbsVal = 0;
+  let maxAbsLag = 1;
+  const sigLags = [];
+  for (let k = 1; k <= maxLag; k++) {
+    const rk = acf[k - 1];
+    qSum += (rk * rk) / (n - k);
+    if (Math.abs(rk) > maxAbsVal) { maxAbsVal = Math.abs(rk); maxAbsLag = k; }
+    if (Math.abs(rk) > ci95) sigLags.push(k);
+  }
+  const lbQ = n * (n + 2) * qSum;
+  const lbP = _extChi2UpperP(lbQ, maxLag);
+
+  return {
+    insufficient: false,
+    n,
+    maxLag,
+    ci95,
+    acf,
+    pacf,
+    lbQ,
+    lbP,
+    maxAbsLag,
+    maxAbsVal,
+    sigLags,
+  };
+}
+
+/**
+ * 1.4 製程能力四象限（Ca 規格中點偏移 % × Cp 精密度）
+ */
+function calcCaCpQuadrant(rows, metric, spec, keyFn) {
+  if (!spec || spec.lsl == null || spec.usl == null || !Number.isFinite(spec.lsl) || !Number.isFinite(spec.usl) || spec.usl <= spec.lsl) {
+    return { insufficient: true, reason: "此量測項目缺少雙邊規格上下限，無法繪製四象限圖", pts: [], counts: { healthy: 0, offCenter: 0, highVar: 0, both: 0 } };
+  }
+  const midpoint = (spec.lsl + spec.usl) / 2;
+  const halfTol = (spec.usl - spec.lsl) / 2;
+  const asymmetricTarget = spec.tgt != null && Number.isFinite(spec.tgt) && Math.abs(spec.tgt - midpoint) > 1e-6;
+
+  const buckets = new Map();
+  for (let i = 0; i < (rows ? rows.length : 0); i++) {
+    const r = rows[i];
+    const v = r && r[metric];
+    if (v == null || !Number.isFinite(v)) continue;
+    const k = String(keyFn(r) ?? "").trim() || "未分類";
+    let b = buckets.get(k);
+    if (!b) { b = { n: 0, sum: 0, sum2: 0 }; buckets.set(k, b); }
+    b.n += 1;
+    b.sum += v;
+    b.sum2 += v * v;
+  }
+
+  const pts = [];
+  const counts = { healthy: 0, offCenter: 0, highVar: 0, both: 0, zeroVar: 0 };
+  const finiteCps = [];
+  for (const [key, b] of buckets.entries()) {
+    if (b.n < 5) continue;
+    const mean = b.sum / b.n;
+    const variance = Math.max(0, (b.sum2 - (b.sum * b.sum) / b.n) / (b.n - 1));
+    const sd = Math.sqrt(variance);
+    const ca = ((mean - midpoint) / halfTol) * 100;
+    if (sd <= 1e-12) {
+      counts.zeroVar += 1;
+      pts.push({ key, n: b.n, mean, sd: 0, ca, cp: null, cpk: null, zone: "zeroVar", zeroVar: true, capped: false });
+      continue;
+    }
+    const cp = (spec.usl - spec.lsl) / (6 * sd);
+    const cpk = cp * (1 - Math.abs(ca) / 100);
+    let zone = "both";
+    if (cpk >= 1.33) { zone = "healthy"; counts.healthy += 1; }
+    else if (cp >= 1.33) { zone = "offCenter"; counts.offCenter += 1; }
+    else if (Math.abs(ca) <= 25) { zone = "highVar"; counts.highVar += 1; }
+    else { zone = "both"; counts.both += 1; }
+    finiteCps.push(cp);
+    pts.push({ key, n: b.n, mean, sd, ca, cp, cpk, zone, zeroVar: false, capped: false });
+  }
+
+  if (!pts.length) {
+    return { insufficient: true, reason: "範圍內各分組有效樣本均少於 5 筆，無法計算四象限能力", midpoint, asymmetricTarget, pts: [], counts };
+  }
+
+  // 極端高 Cp 動態軟上限（避免單一超高 Cp 點壓扁 0.5–2.5 主區間）
+  finiteCps.sort((a, b) => a - b);
+  const p95 = finiteCps.length ? finiteCps[Math.min(finiteCps.length - 1, Math.floor((finiteCps.length - 1) * 0.95))] : 3.5;
+  const maxCp = finiteCps.length ? finiteCps[finiteCps.length - 1] : 3.5;
+  const softYMax = maxCp > 5 ? Math.min(maxCp, Math.max(3.5, Math.min(6, p95 * 1.25))) : Math.max(2.5, maxCp * 1.15);
+  for (let i = 0; i < pts.length; i++) {
+    if (pts[i].cp != null && pts[i].cp > softYMax) pts[i].capped = true;
+  }
+
+  // 依 Cpk 由低到高排序（方便取前 5 大失衡群組給 AI 摘要）
+  pts.sort((a, b) => (a.cpk ?? Infinity) - (b.cpk ?? Infinity));
+
+  return {
+    insufficient: false,
+    midpoint,
+    asymmetricTarget,
+    softYMax,
+    counts,
+    pts,
+  };
+}
+
+/**
+ * 1.5 滑動視窗 Cpk 趨勢（單趟滑動累加 O(N)，標準常態估算）
+ */
+function calcRollingCpk(boardGroups, spec, windowSize = 5) {
+  if (!spec || spec.lsl == null || spec.usl == null || !Number.isFinite(spec.lsl) || !Number.isFinite(spec.usl) || spec.usl <= spec.lsl) {
+    return { insufficient: true, reason: "缺少雙邊規格上下限，無法計算滑動 Cpk", windowSize, slope: null, pts: [] };
+  }
+  const B = Array.isArray(boardGroups) ? boardGroups : [];
+  if (B.length < 3) {
+    return { insufficient: true, reason: "有效板數少於 3 片，無法計算滑動 Cpk 趨勢", windowSize, slope: null, pts: [] };
+  }
+  const W = Math.max(2, Math.min(Math.floor(windowSize) || 5, B.length));
+
+  // 預先計算每片的 n, sum, sum2
+  const stats = B.map((bg) => {
+    const vals = bg && Array.isArray(bg.vals) ? bg.vals : [];
+    let n = 0, sum = 0, sum2 = 0;
+    for (let i = 0; i < vals.length; i++) {
+      const v = vals[i];
+      if (v != null && Number.isFinite(v)) { n++; sum += v; sum2 += v * v; }
+    }
+    return { lab: bg.lab, n, sum, sum2 };
+  });
+
+  let winN = 0, winSum = 0, winSum2 = 0;
+  const pts = [];
+  for (let i = 0; i < stats.length; i++) {
+    winN += stats[i].n;
+    winSum += stats[i].sum;
+    winSum2 += stats[i].sum2;
+    if (i >= W) {
+      winN -= stats[i - W].n;
+      winSum -= stats[i - W].sum;
+      winSum2 -= stats[i - W].sum2;
+    }
+    if (i >= W - 1) {
+      let cp = null, cpk = null;
+      if (winN >= 2) {
+        const mu = winSum / winN;
+        const vr = Math.max(0, (winSum2 - (winSum * winSum) / winN) / (winN - 1));
+        const s = Math.sqrt(vr);
+        if (s > 1e-12) {
+          cp = (spec.usl - spec.lsl) / (6 * s);
+          cpk = Math.min((spec.usl - mu) / (3 * s), (mu - spec.lsl) / (3 * s));
+        }
+      }
+      pts.push({ lab: stats[i].lab, cp, cpk, n: winN });
+    }
+  }
+
+  // 線性斜率（每片板 Cpk 變化量）
+  const valid = pts.map((p, idx) => (p.cpk != null && Number.isFinite(p.cpk) ? { x: idx, y: p.cpk } : null)).filter(Boolean);
+  let slope = null;
+  if (valid.length >= 2) {
+    let sx = 0, sy = 0;
+    for (let i = 0; i < valid.length; i++) { sx += valid[i].x; sy += valid[i].y; }
+    const mx = sx / valid.length, my = sy / valid.length;
+    let num = 0, den = 0;
+    for (let i = 0; i < valid.length; i++) {
+      const dx = valid[i].x - mx;
+      num += dx * (valid[i].y - my);
+      den += dx * dx;
+    }
+    slope = den > 0 ? num / den : 0;
+  }
+
+  return {
+    insufficient: false,
+    windowSize: W,
+    downgraded: W < (Math.floor(windowSize) || 5),
+    slope,
+    pts,
+  };
+}
+/* @spi-stats-ext END */
 /* @gerber-pads START */
 const GERBER=(()=>{
 /** Gerber RS-274X（含 X2 屬性）焊墊解析 — 單一正本。
@@ -4320,16 +4877,29 @@ function analyzeView(st,B){
     imr.ucl=NaN;imr.lcl=NaN;imr.mrucl=NaN;imr.pts.forEach(p=>{p.ucl=NaN;p.lcl=NaN;p.z=0;});
   }
   // 判異規則：顯示用依所選管制圖與其適用規則；X̄ 圖與量測層的 nelX 相同
-  const RULES={xbars:null,xbarr:null,imr:null,p:[1,2,3,4],ewma:[1],cusum:[1]};
-  const series=st.chart==="imr"?imr.pts:st.chart==="p"?pc.pts:st.chart==="ewma"?ewma:st.chart==="cusum"?cuz:st.chart==="xbarr"?xr.pts:xs.pts;
-  const chartRejected=isZeroSd||(st.chart==="imr"?imr.rejected:st.chart==="xbarr"?xr.rejected:["p","ewma","cusum"].includes(st.chart)?boards.length<5:xs.rejected);
-  const chartReason=chartRejected?(isZeroSd?"製程變異為零":st.chart==="imr"?imr.reason:st.chart==="xbarr"?xr.reason:["p","ewma","cusum"].includes(st.chart)?"子群組（板數）不足（需 ≥5）":xs.reason):"";
+  const RULES={xbars:null,xbarr:null,imr:null,p:[1,2,3,4],u:[1,2,3,4],g:[1],ewma:[1],cusum:[1]};
+  const clsRow=r=>classify(r,st.specs,st);
+  const uc=st.chart==="u"?calcLaneyUChart(rows,clsRow,boards):null;
+  const gc=st.chart==="g"?calcGChart(rows,clsRow,boards):null;
+  const series=st.chart==="imr"?imr.pts:st.chart==="p"?pc.pts:st.chart==="u"?(uc?uc.pts:[]):st.chart==="g"?(gc?gc.pts:[]):st.chart==="ewma"?ewma:st.chart==="cusum"?cuz:st.chart==="xbarr"?xr.pts:xs.pts;
+  const chartRejected=st.chart==="g"?(!gc||gc.insufficient):st.chart==="u"?(!uc||uc.insufficient||boards.length<5):isZeroSd||(st.chart==="imr"?imr.rejected:st.chart==="xbarr"?xr.rejected:["p","ewma","cusum"].includes(st.chart)?boards.length<5:xs.rejected);
+  const chartReason=chartRejected?(st.chart==="g"?(gc&&gc.reason||"不良次數不足"):st.chart==="u"?(uc&&uc.insufficient?uc.reason:"子群組（板數）不足（需 ≥5）"):isZeroSd?"製程變異為零":st.chart==="imr"?imr.reason:st.chart==="xbarr"?xr.reason:["p","ewma","cusum"].includes(st.chart)?"子群組（板數）不足（需 ≥5）":xs.reason):"";
   let nel;
   if(st.chart==="xbars"||!RULES.hasOwnProperty(st.chart))nel=B.nelX;
+  else if(st.chart==="g"){
+    const base=nelson([],RULES.g);
+    if(!chartRejected&&gc&&gc.pts){
+      const idx=[];
+      for(let i=0;i<gc.pts.length;i++)if(gc.pts[i].belowLcl||gc.pts[i].aboveUcl||gc.pts[i].burst)idx.push(i);
+      const r1=base.rules.find(r=>r.id===1);
+      if(r1){r1.idx=idx;idx.forEach(i=>base.flag.add(i));}
+    }
+    nel=base;
+  }
   else{nel=chartRejected?nelZero():nelson(series.map(p=>p.z),RULES[st.chart]||null)}
   const mode=st.capDistMode||"auto",th=st.pauseThreshold||15,cap=Object.assign({},B.cap);
   lazy(cap,"nonNormal",()=>B.nonNormalOf(mode));
-  const A={m,sp:B.sp,rows,boards,byBoard:B.byBoard,N:B.N,gMean:B.gMean,overallSd:B.overallSd,sigmaW:B.sigmaW,sigmaLT:B.sigmaLT,mixed:B.mixed,nbar:B.nbar,xs,xr,imr,pc,ewma,cusum:B.cusum,series,nel,chartRejected,chartReason,nelX:B.nelX,stable:B.stable,cap,hasSpec:B.hasSpec,unitMismatch:B.unitMismatch,
+  const A={m,sp:B.sp,rows,boards,byBoard:B.byBoard,N:B.N,gMean:B.gMean,overallSd:B.overallSd,sigmaW:B.sigmaW,sigmaLT:B.sigmaLT,mixed:B.mixed,nbar:B.nbar,xs,xr,imr,pc,uc,gc,ewma,cusum:B.cusum,series,nel,chartRejected,chartReason,nelX:B.nelX,stable:B.stable,cap,hasSpec:B.hasSpec,unitMismatch:B.unitMismatch,
     ad:B.ad,sw:B.sw,sk:B.sk,groups:B.groups,eta2:B.eta2,pareto:B.pareto,defRows:B.defRows,rHA:B.rHA,msa:B.msa,rX:B.rX,rY:B.rY,coordN:B.coordN,coordLevel:B.coordLevel,xOut:B.xOut,pOut:B.pOut,worst:B.worst,pads,sqDir:st.sqDir==="X"?"X":"Y"};
   lazy(A,"nonNormal",()=>B.nonNormalOf(mode));lazy(A,"pauseDecay",()=>B.pauseOf(th));lazy(A,"printerCorr",B.printerOf);lazy(A,"spatialAutocorr",B.spatialOf);
   A.xv=B.xv||(B.xv=crossValidate(A));   // 交叉驗證只讀量測層欄位（管制狀態用 nelX），與所選管制圖無關
@@ -5939,9 +6509,9 @@ const FOCUS_DOMAINS=[
 function focusDomainOf(x){
   const s=x&&x.sig,t=s&&s.t;
   if(t==="unit"||t==="msa")return"measurement";
-  if(t==="align"||((t==="board"||t==="local")&&s.off)||((t==="nelson"||t==="iso")&&(s.k==="offx"||s.k==="offy")))return"align";
-  if(t==="sys"||t==="pad"||t==="dfm"||t==="lowte"||t==="mcd"||t==="repeated")return"aperture";
-  if(t==="drift"||t==="wipe"||t==="pause"||(t==="nelson"&&s.ruleId!==1&&s.ruleId!==4))return"process";
+  if(t==="align"||t==="backlash"||((t==="board"||t==="local")&&s.off)||((t==="nelson"||t==="iso")&&(s.k==="offx"||s.k==="offy")))return"align";
+  if(t==="sys"||t==="pad"||t==="dfm"||t==="lowte"||t==="mcd"||t==="repeated"||t==="orient")return"aperture";
+  if(t==="drift"||t==="wipe"||t==="pause"||t==="acf"||(t==="nelson"&&s.ruleId!==1&&s.ruleId!==4))return"process";
   if(t==="stroke"||t==="grad"||t==="fig"||t==="spatial"||(t==="nelson"&&s.ruleId===4))return"squeegee";
   return"spike";
 }
@@ -6712,6 +7282,75 @@ function detectIssues(st,onStage){
     }
   }
 
+  // 5. 階段一正交規則：M-22 板序自相關（ACF）與 M-23 G 圖高良率不良叢發
+  const extCore={acf:{},gChart:null};
+  const acfAlpha=0.0005/Math.max(1,MS.length);
+  for(const k of MS){
+    const bm=boardMeans(k);
+    if(!bm||bm.length<15)continue;
+    const acfRes=calcAcfPacf(bm,Math.min(10,Math.floor(bm.length/4)));
+    extCore.acf[k]=acfRes;
+    if(F.some(x=>x.sig&&x.sig.t==="drift"&&x.sig.k===k))continue;
+    if(!acfRes.insufficient&&acfRes.lbP<acfAlpha&&(Math.abs(acfRes.acf[0])>=0.50||acfRes.maxAbsVal>=Math.max(0.58,3.4/Math.sqrt(acfRes.n)))){
+      const lagTxt=acfRes.sigLags.length?topList(acfRes.sigLags.map(l=>`Lag ${l}`),10):`Lag ${acfRes.maxAbsLag}`;
+      add({lv:"warn",cat:"趨勢漂移",sig:{t:"acf",k},
+        title:`${lab(k)}板序具顯著自相關（r₁ = ${f(acfRes.acf[0],2)}，最大峰 Lag ${acfRes.maxAbsLag}）`,
+        ents:[],score:2.3,
+        rule_id:"M-22 板序自相關",rule_name:"Ljung-Box Q 與 ACF 自相關檢定",metric:lab(k),
+        boards:"全部板",subboard:subOf(R),group:"ALL",refdes:"全部元件",
+        pads:`全板板平均序列（N = ${acfRes.n} 板）`,
+        observed:`Ljung-Box Q = ${f(acfRes.lbQ,2)}（p = ${acfRes.lbP<0.001?"<0.001":f(acfRes.lbP,4)}），r₁ = ${f(acfRes.acf[0],3)}，顯著落後期：${lagTxt}`,
+        limit:`Ljung-Box p ≥ ${acfAlpha.toExponential(1)} 且無顯著週期峰`,z:"不適用",p:acfRes.lbP<0.001?"<0.001":f(acfRes.lbP,4),
+        facts:[`${lab(k)}連續板平均存在顯著時間序列相依（${lagTxt}），違反標準 Shewhart 管制圖獨立性假設`],
+        cause:"錫膏滾動黏度緩慢變化、週期性鋼板擦拭未完全恢復，或治具／料架固定週期循環效應",conf:"中",
+        action:"至「管制圖 → 自相關」確認週期落後期，搭配 EWMA／CUSUM 監控並檢查擦拭週期與載具編號",
+        ev:{type:"series",title:"各板平均值序列",labels:boards.slice(),values:bm.map(v=>+f(v,2)),mark:[],unit:METRICS[k]?METRICS[k].unit:""},go:{tab:"control/acf"}});
+    }
+  }
+  // M-23 高良率不良叢發：先以既有 idx 與規格邊界零配置預篩，僅於良率 ≥ 99% 且不良 ≥ 4 時呼叫 calcGChart
+  const maxDefForM23=Math.floor(R.length*0.01);
+  let fastDef=0,overM23=false;
+  const spCacheM23={};
+  for(const g of groups){
+    const arr=[];
+    for(const k of MS){const sp=specOfGroup(st,g,k);if(sp&&(sp.lsl!=null||sp.usl!=null))arr.push([k,sp.lsl,sp.usl]);}
+    spCacheM23[g]=arr;
+  }
+  outerM23:for(let bi=0;bi<nb;bi++){
+    const bg=idx[boards[bi]];if(!bg)continue;
+    for(let gi=0;gi<groups.length;gi++){
+      const g=groups[gi],rs=bg[g],sps=spCacheM23[g];
+      if(!rs||!sps||!sps.length)continue;
+      for(let j=0;j<rs.length;j++){
+        const r=rs[j];
+        for(let si=0;si<sps.length;si++){
+          const s=sps[si],v=r[s[0]];
+          if(v!=null&&((s[1]!=null&&v<s[1])||(s[2]!=null&&v>s[2]))){
+            if(++fastDef>maxDefForM23){overM23=true;break outerM23;}
+            break;
+          }
+        }
+      }
+    }
+  }
+  const gcAll=(!overM23&&fastDef>=4)?calcGChart(R,r=>classify(r,st.specs,st),boards):null;
+  extCore.gChart=gcAll;
+  if(gcAll&&!gcAll.insufficient&&gcAll.yieldPct>=99&&gcAll.defectCount>=4&&gcAll.burstCount>=1&&gcAll.burstP<0.002){
+    const burstBoards=[...new Set(gcAll.pts.filter(p=>p.burst).map(p=>p.board))];
+    add({lv:"warn",cat:"高良率叢發",sig:{t:"gburst",boards:burstBoards},
+      title:`高良率產線出現連續不良叢發（良率 ${f(gcAll.yieldPct,2)}%，叢發 ${gcAll.burstCount} 次）`,
+      ents:burstBoards.map(b=>"b:"+b),score:2.4,
+      rule_id:"M-23 G 圖不良叢發",rule_name:"高良率幾何間隔連續叢發檢定",metric:"全指標規格",
+      boards:topList(burstBoards,10),subboard:subOf(R),group:"ALL",refdes:"全部元件",
+      pads:`總焊墊 ${gcAll.totalPads}、不良 ${gcAll.defectCount}，平均間隔 ${f(gcAll.gMean,1)} 焊墊`,
+      observed:`檢出 ${gcAll.burstCount} 次連續不良叢發（校正後 p = ${gcAll.burstP<0.001?"<0.001":f(gcAll.burstP,4)}）`,
+      limit:"高良率（≥ 99%）下連續不良叢發校正 p ≥ 0.002",z:"不適用",p:gcAll.burstP<0.001?"<0.001":f(gcAll.burstP,4),
+      facts:[`整體良率 ${f(gcAll.yieldPct,2)}% 時，不良並非隨機分散，而是在 ${topList(burstBoards,10)} 集中連續發生`],
+      cause:"局部鋼板堵孔、異物附著、單次印刷異常或特定連續焊墊脫模失效",conf:"高",
+      action:"切換至「管制圖 → G 圖」定位叢發板號與對應 3D 焊墊位置，檢查鋼板開孔清潔度",
+      ev:null,go:{tab:"control"}});
+  }
+
   stage(11,"佐證整理");
   // D-29 佐證與同一現象：只有來自不同證據族（FAMILY）且非衍生關係的發現才互相佐證；
   // 同期間、同量測項目的 Nelson 卡與趨勢／單板／孤立極端焊墊卡，或同族／衍生關係（MC.derived 為真時的 volume 與 hpct/area）列為 same_phenomenon
@@ -6786,7 +7425,7 @@ function detectIssues(st,onStage){
   // 多重比較揭露：單板異常每個「板 × 元件群組 × 量測項目」各做一次檢定；門檻已依板數校準（M-19），每次檢定誤報為 2(1−Φ(3.5))；全無異常時的預期誤報數（另有效果量與不良數門檻，實際更少）
   const alpha=ROBZ_A1;
   const problemCases=buildProblemCases(F,st);
-  F.meta={tests:nT1,hits:hits.length,alpha,expFA:nT1*alpha,verdict:{level:vLevel,label:verdictLabel,worstCap:wAll,reasons},modes:failureModes(st,F,{R,boards,groups,MS,MC,nb,boardMeans,idx,gIdx}),cases:problemCases};
+  F.meta={tests:nT1,hits:hits.length,alpha,expFA:nT1*alpha,verdict:{level:vLevel,label:verdictLabel,worstCap:wAll,reasons},modes:failureModes(st,F,{R,boards,groups,MS,MC,nb,boardMeans,idx,gIdx}),cases:problemCases,extCore};
   return F}
 /* ============ 失效模式交叉比對 ============
    錫膏印刷的失效通常是多因素的：每個候選失效模式列出「支持」與「矛盾」的證據，證據分屬六個獨立面向
@@ -7462,7 +8101,7 @@ function computeLocalOosDensity(rows,coordGetter,clsFn){
   }
   return out;
 }
-if(typeof module!=="undefined")module.exports={specFor,buildDiagnosticModel,diagnosticSource,diagnosticMatch,diagRowClass,compKeyOf,compKeyParse,scopeFilter,scopeParts,scopePart,scopeSpecGroup,scopeLabel,normalizeScope,scopeIsNarrow,SCOPE_PANELS,SCOPE_BOARD_CARDS,SCOPE_BOARD_NOTE,issuesMd,fmMd,rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,adSample,adSampleHash,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,geomAssumed,areaRatio,aspectRatio,maxThkForAR,apVolNL,detectIssues,buildProblemCases,issueCaseCounts,focusDomainOf,buildFocusedProblems,focusedProblemsMd,overallVerdict,compareRuns,dfmTable,scopedDfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,groupBasisOfRow,groupBasisForRows,groupBasisLabel,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,withScopeCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,GERBER,layoutPartsFromRows,layoutPadSet,buildLayoutInfo,layoutStatusText};
+if(typeof module!=="undefined")module.exports={specFor,buildDiagnosticModel,diagnosticSource,diagnosticMatch,diagRowClass,compKeyOf,compKeyParse,scopeFilter,scopeParts,scopePart,scopeSpecGroup,scopeLabel,normalizeScope,scopeIsNarrow,SCOPE_PANELS,SCOPE_BOARD_CARDS,SCOPE_BOARD_NOTE,issuesMd,fmMd,rescaleHpct,sampleData,analyze,rowsFingerprint,anKey,anHas,anPutKey,anWork,anUnpack,clsSig,S,nelson,specOfGroup,stepHpct,buildPartSpecsG,partSpecToState,stateToPartSpec,specReady,specClassify,wipeScan,msaCheck,failureModes,crossValidate,Phi,andersonDarling,adSample,adSampleHash,c4,parseCSV,DEF_SPECS,padThk,classify,advAnalyze,alignFit,welch,tP,aperture,geomAssumed,areaRatio,aspectRatio,maxThkForAR,apVolNL,detectIssues,buildProblemCases,issueCaseCounts,focusDomainOf,buildFocusedProblems,focusedProblemsMd,overallVerdict,compareRuns,dfmTable,scopedDfmTable,parseAOI,sampleAOI,aoiCorr,doeAnalyze,parseGRR,sampleGRR,grrAnalyze,samplePhmeCSV,csvTable,autoMap,guessOpts,buildRows,groupBasisOfRow,groupBasisForRows,groupBasisLabel,strokeOf,realXY,ALL_GRP,isAllGrp,FIELDS,NUMF,normH,resolutionOf,isoStat,isoScan,poissonSf,strokeCalP,wipeCalP,GEN_TABLE,genRow,issuesCsv,ISS_CSV_COLS,fastMcd2D,mcdThr,MCD_THR_N,MCD_THR,MCD_CHI2,passFailMatrix,buildStatsData,statsDataCsv,withScopeCsv,hotellingT2,shapiroWilk,computeXbarR,AIAG_CONSTANTS,SPI_PROCESS_KB_RULES,SPI_KB_RULES_VERSION,validateKbRulesPayload,EVIDENCE_KINDS,spatialChartUnavailableText,hasValidSpatialXY,issueFactsEvidenceKind,issueInferenceEvidenceKind,crossEvidenceKind,scatterDisplayDisclosure,overviewCpkSnapshotKey,computePadCoverage,parseGeometryPadListCsv,paretoGroupKey,aggregateParetoByVendor,computeSidedPpmBlock,formatSidedPpmBlock,relChartDuplicateReason,PENDING_VERIFY_LABEL,fmtNowUtc8,formatUtc8Date,issuesXlsx,createZipStored,partSpecCheck,partSpecCanon,partSpecEncode,partSpecBodyCheck,PART_SPEC_SCHEMA,PART_SPEC_METRICS,fitBoxCox,fitJohnson,fitIsoPercentile,calcNonNormalCapability,analyzePauseDecay,calcMoranAndLISA,calcPrinterCorrection,mean,sd,wipeStat,wipeStatBuf,selMed,robust,ROBZ_A,ROBZ_N,ROBZ_Q,robZThr,robZBig,robZp,nelson1Level,fmKbHeadHtml,fmKbDetailsHtml,HIGH_DENSITY_3D_THRESHOLD,computeLocalOosDensity,densityColor,GERBER,layoutPartsFromRows,layoutPadSet,buildLayoutInfo,layoutStatusText,calcGChart,calcLaneyUChart,calcAcfPacf,calcCaCpQuadrant,calcRollingCpk};
 </script>
 <script>
 
@@ -7695,7 +8334,19 @@ function detWorker(){if(detW!==null)return detW;try{const core=document.getEleme
 /* 開機後趁空檔先建立背景執行緒，載入大檔時不必再等它編譯 */
 (window.requestIdleCallback||(f=>setTimeout(f,1500)))(()=>{if(typeof Worker!=="undefined")detWorker()});
 /* 傳給背景執行緒的狀態：略過問題偵測用不到的大型欄位（未篩選的原始資料、GR&R、AI 回覆等），減少複製時間 */
-const DET_SKIP=new Set(["A","F","runs","ctx","issEnt","pmapSelection","_rawRows","grr","ai"]);
+const DET_SKIP=new Set(["A","F","runs","ctx","issEnt","pmapSelection","_rawRows","grr","ai","extStatsCache"]);
+const EXT_STATS_CACHE=new WeakMap();
+function getExtStats(kind,computeFn,extraKey=""){
+  if(!S.rows)return null;
+  let m=EXT_STATS_CACHE.get(S.rows);
+  if(!m){m=new Map();EXT_STATS_CACHE.set(S.rows,m);}
+  const k=kind+"|"+anKey(S)+(extraKey?"|"+extraKey:"");
+  if(m.has(k))return m.get(k);
+  const v=computeFn();
+  if(m.size>80)m.clear();
+  m.set(k,v);
+  return v;
+}
 function detState(){const st={};for(const k in S){if(DET_SKIP.has(k))continue;const v=S[k];if(typeof v!=="function")st[k]=v}return st}
 function detectSync(sig){S.F=perfSpan("detect(同步)",()=>detectIssues(S));S.F.rowsRef=S.rows;F_SIG=sig;ISS_OPEN.clear()} /* 問題編號會隨重新偵測改變，展開狀態一併清除 */
 function busy(on,msg){const b=$("#busy");if(!b)return;if(on){$("#busyMsg").textContent=msg||"計算中…";b.hidden=false}else b.hidden=true}
@@ -8503,7 +9154,7 @@ $("#diagnosticPanel").addEventListener("click",e=>{const b=e.target.closest("but
 $("#issList").addEventListener("click",e=>{const b=e.target.closest("[data-diag-issue]");if(!b)return;e.preventDefault();e.stopPropagation();const issue=S.F.find(x=>String(x.id)===b.dataset.diagIssue);if(issue)openDiagnostic(issue)});
 
 function renderIssuesPanel(){if(S.issuesSub==="cross"){renderCross();renderFM()}else if(S.issuesSub==="diagnostic")renderDiagnostic();else renderIssues()}
-function renderControlPanel(){if(S.controlSub==="multi")renderHotellingT2UI();else renderControl()}
+function renderControlPanel(){if(S.controlSub==="multi")renderHotellingT2UI();else if(S.controlSub==="acf")renderAcfUI();else renderControl()}
 function renderTabByName(k){const fn=({issues:renderIssuesPanel,overview:renderOverview,control:renderControlPanel,capability:renderCap,sim3d:render3D,deep:renderDeepPanel,improve:renderImprovePanel,ai:()=>{},report:renderReport,data:()=>{renderSpecTbl();renderZones();renderAperture();renderRuns()}})[k];if(fn)fn()} function renderTabInner(){if(S.duo&&S.duo.active){if(S.tab==="report"||S.duo.leftTab==="report"||S.duo.rightTab==="report"){renderTabByName("report");return}renderTabByName(S.duo.leftTab||S.tab);if(S.duo.rightTab&&S.duo.rightTab!==S.duo.leftTab)renderTabByName(S.duo.rightTab)}else renderTabByName(S.tab)}
 
 $("#selMetric").onchange=e=>{S.metric=e.target.value;syncControls();recompute()};
@@ -8559,11 +9210,12 @@ if($("#selParetoDim"))$("#selParetoDim").onchange=e=>{S.paretoDim=e.target.value
 $$(".tab").forEach(t=>{const p=$("#p-"+t.dataset.tab);t.id="tab-"+t.dataset.tab;t.setAttribute("aria-controls","p-"+t.dataset.tab);if(p)p.setAttribute("aria-labelledby",t.id);t.onclick=()=>setTab(t.dataset.tab)});
 $(".tabs").addEventListener("keydown",e=>{const T=$$(".tab"),i=T.findIndex(t=>t.dataset.tab===S.tab);let j=null;if(e.key==="ArrowRight")j=(i+1)%T.length;else if(e.key==="ArrowLeft")j=(i-1+T.length)%T.length;else if(e.key==="Home")j=0;else if(e.key==="End")j=T.length-1;if(j==null)return;e.preventDefault();setTab(T[j].dataset.tab);T[j].focus()});
 const AN_TABS=new Set(["overview","control","capability","sim3d","deep","ai"]);
-function isAnalysisScopeTab(){return AN_TABS.has(S.tab)||(S.tab==="control"&&S.controlSub==="uni")}
+function isAnalysisScopeTab(){return AN_TABS.has(S.tab)||(S.tab==="control"&&S.controlSub!=="multi")}
 function applyScope(){const analOn=isAnalysisScopeTab();const chartOn=S.tab==="control"&&S.controlSub==="uni";
 $$("[data-scope=a]").forEach(el=>{el.hidden=!analOn});
 $$("[data-scope=c]").forEach(el=>{
   if(el.id==="padField")el.hidden=!chartOn||S.chart!=="imr";
+  else if(el.id==="gScaleField")el.hidden=!chartOn||S.chart!=="g";
   else if(el.id==="xrSizeField"||el.id==="xrModeField")el.hidden=!chartOn||S.chart!=="xbarr";
   else el.hidden=!chartOn;
 });
@@ -8598,7 +9250,7 @@ function parseTabTarget(raw){
   if(!s)return{tab:"issues"};
   const parts=s.split("/"),root=parts[0],sub=parts[1]||null;
   if(root==="issues"){const issuesSub=sub&&["list","cross","diagnostic"].includes(sub)?sub:"list";return{tab:"issues",issuesSub}}
-  if(root==="control"){const controlSub=sub&&["uni","multi"].includes(sub)?sub:"uni";return{tab:"control",controlSub}}
+  if(root==="control"){const controlSub=sub&&["uni","multi","acf"].includes(sub)?sub:"uni";return{tab:"control",controlSub}}
   if(root==="deep"){if(sub==="cross")return{tab:"issues",issuesSub:"cross"};return{tab:"deep"}}
   if(root==="improve"){const improveSub=sub&&["compare","dfm","lab"].includes(sub)?sub:"compare";return{tab:"improve",improveSub}}
   if(LEGACY_ROOTS.has(root)){
@@ -8611,7 +9263,7 @@ function parseTabTarget(raw){
 }
 function tabHashFor(tab,issuesSub,controlSub,improveSub){
   if(tab==="issues")return issuesSub==="diagnostic"?"issues/diagnostic":issuesSub==="cross"?"issues/cross":"issues";
-  if(tab==="control")return controlSub==="multi"?"control/multi":"control";
+  if(tab==="control")return controlSub==="multi"?"control/multi":controlSub==="acf"?"control/acf":"control";
   if(tab==="improve")return"improve/"+(improveSub||"compare");
   if(tab==="deep")return"deep";
   return tab;
@@ -8701,13 +9353,13 @@ function renderOverview(){
   drawCtrl("cOvCtrl",true);drawPareto("cOvPareto");
 }
 
-function chartName(chart=S.chart){return{xbars:"X̄-S",xbarr:"X̄-R",imr:"I-MR",p:"P′ 圖",ewma:"EWMA",cusum:"CUSUM"}[chart]||"管制圖"}
+function chartName(chart=S.chart){return{xbars:"X̄-S",xbarr:"X̄-R",imr:"I-MR",p:"P′ 圖",u:"U′ 圖",g:"G 圖",ewma:"EWMA",cusum:"CUSUM"}[chart]||"管制圖"}
 function goBoard(b){if(!b)return;S.board=b;$("#selBoard").value=b;setTab("sim3d")}
 function goPad(p){S.chart="imr";S.pad=p;$("#selChart").value="imr";recompute(true);S.controlSub="uni";setTab("control");window.scrollTo({top:0,behavior:"smooth"})}
 const clickOpts=labs=>({onClick:(e,_,ch)=>{const el=ch.getElementsAtEventForMode(e,"index",{intersect:false},true)[0];if(el)goBoard(labs[el.index])},onHover:(e,els,ch)=>{ch.canvas.style.cursor="pointer"}});
 
 /* ---------- 管制圖 ---------- */
-function drawCtrl(id,mini,context=null){const A=context?.A||S.A,c=context?.chart||S.chart,ng=css("--ng"),acc=css("--accent"),ink=css("--muted"),s2=css("--series2");
+function drawCtrl(id,mini,context=null){const A=context?.A||S.A,c=context?.chart||S.chart,ng=css("--ng"),acc=css("--accent"),ink=css("--muted"),s2=css("--series2"),okc=css("--ok");
   const clicks=labs=>context?{onClick:(e,_,ch)=>{const hit=ch.getElementsAtEventForMode(e,"index",{intersect:false},true)[0];if(hit)context.onBoard(ch.data.labels[hit.index])}}:clickOpts(labs);
   const plot=cfg=>{
     if(context){
@@ -8728,6 +9380,49 @@ function drawCtrl(id,mini,context=null){const A=context?.A||S.A,c=context?.chart
     }
     mk(id,cfg);
   };
+  if(c==="g"){
+    const gc=A.gc;
+    if(!gc||gc.insufficient){
+      plot({type:"line",data:{labels:[],datasets:[]},options:baseOpts({plugins:{title:{display:true,text:gc?gc.reason:"範圍內不良次數少於 2 次，暫無法繪製間隔圖",color:ink}}})});
+      return;
+    }
+    const pts=gc.pts,useLog=($("#selGScale")&&$("#selGScale").value==="log");
+    const yVal=v=>useLog?Math.max(0.5,v):v;
+    const opts=baseOpts(withLimits({
+      ...clicks(pts.map(p=>p.board)),
+      scales:useLog?{y:{type:"logarithmic",min:0.5,grid:{color:css("--grid")},ticks:{color:ink}}}:undefined,
+      plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex===0,callbacks:{label:i=>{const p=pts[i.dataIndex];return`間隔 ${p.g} 焊墊 · 板 ${p.board}${p.burst?"（連續不良叢發）":p.belowLcl?"（低於 LCL）":p.aboveUcl?"（良率改善）":""}`}}}}
+    },[{n:"UCL",v:yVal(gc.ucl),c:okc},{n:"中位CL",v:yVal(gc.clMed),c:acc},{n:"LCL",v:yVal(gc.lcl),c:ng}],mini));
+    plot({type:"line",data:{labels:pts.map(p=>p.lab),datasets:[
+      {label:"不良間隔焊墊數",data:pts.map(p=>yVal(p.g)),borderColor:s2,borderWidth:1.6,tension:0,
+        pointRadius:pts.map(p=>(p.burst||p.belowLcl||p.aboveUcl)?(mini?4:5.5):(mini?2:3)),
+        pointBackgroundColor:pts.map(p=>(p.burst||p.belowLcl)?ng:p.aboveUcl?okc:s2),
+        pointBorderColor:pts.map(p=>(p.burst||p.belowLcl)?ng:p.aboveUcl?okc:s2)},
+      {label:"UCL",data:pts.map(()=>yVal(gc.ucl)),borderColor:okc,borderDash:[6,4],borderWidth:1.2,pointRadius:0},
+      {label:"中位 CL",data:pts.map(()=>yVal(gc.clMed)),borderColor:acc,borderWidth:1.2,pointRadius:0},
+      {label:"LCL",data:pts.map(()=>yVal(gc.lcl)),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0}
+    ]},options:opts});
+    return;
+  }
+  if(c==="u"){
+    const uc=A.uc;
+    if(!uc||uc.insufficient){
+      plot({type:"line",data:{labels:[],datasets:[]},options:baseOpts({plugins:{title:{display:true,text:uc?uc.reason:"U′ 圖無法計算",color:ink}}})});
+      return;
+    }
+    const pts=uc.pts,scale=1000,cl=uc.uBar,ucl=pts.map(p=>p.ucl),lcl=pts.map(p=>p.lcl);
+    const zones=mini?[]:[1,2].flatMap(k=>[1,-1].map(sgn=>({label:"",data:pts.map((p,i)=>Math.max(0,cl+sgn*k*((ucl[i]-cl)/3))*scale),borderColor:css("--grid"),borderWidth:1,pointRadius:0,stepped:"middle",borderDash:[2,3]})));
+    plot({type:"line",data:{labels:pts.map(p=>p.lab),datasets:[
+      {label:"每千焊墊缺點數",data:pts.map(p=>p.u*scale),borderColor:s2,borderWidth:1.6,tension:0,
+        pointRadius:pts.map((p,i)=>A.nel.flag.has(i)?(mini?4:5.5):(mini?2.5:3.5)),
+        pointBackgroundColor:pts.map((p,i)=>A.nel.flag.has(i)?ng:s2),
+        pointBorderColor:pts.map((p,i)=>A.nel.flag.has(i)?ng:s2)},
+      {label:"UCL",data:ucl.map(v=>v*scale),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0,stepped:"middle"},
+      {label:"LCL",data:lcl.map(v=>v*scale),borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0,stepped:"middle"},
+      {label:"CL",data:pts.map(()=>cl*scale),borderColor:acc,borderWidth:1.2,pointRadius:0},...zones]},
+      options:baseOpts(withLimits({...clicks(pts.map(p=>p.lab)),plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex===0,callbacks:{label:i=>{const p=pts[i.dataIndex];return`${f(i.raw,2)} /千焊墊（${p.c} 缺點 / ${p.n} 焊墊） · z ${f(p.z,2)}`}}}}},[{n:"UCL",v:(ucl.at(-1)||0)*scale,c:ng},{n:"CL",v:cl*scale,c:acc},{n:"LCL",v:(lcl.at(-1)||0)*scale,c:ng}],mini))});
+    return;
+  }
   if(c==="xbarr"){
     const xr=A.xr;
     if(!xr||xr.rejected){
@@ -8782,21 +9477,26 @@ function renderControl(){
     xbarr:[`X̄ 圖（子群平均，n=${(A.xr&&A.xr.n)||S.xrSize||4}）`,`R 圖（子群全距，n=${(A.xr&&A.xr.n)||S.xrSize||4}）`],
     imr:[`I 圖（${A.imr.pad} 個別值）`,"MR 圖（移動全距）"],
     p:["P′ 圖（每板不良率 %，Laney）",""],
+    u:["U′ 圖（每千焊墊缺點數）",""],
+    g:["G 圖（不良間隔焊墊數）",""],
     ewma:["EWMA 圖（λ = 0.2，L = 3）",""],
     cusum:["CUSUM 圖（k = 0.5σ，h = 5σ）",""]}[c]||["管制圖",""];
-  $("#ctrlTitle").textContent=t[0]+` · ${METRICS[S.metric].label}`;$("#ctrl2Title").textContent=t[1];$("#ctrl2Card").hidden=!t[1];
+  $("#ctrlTitle").textContent=t[0]+((c==="p"||c==="u"||c==="g")?"":` · ${METRICS[S.metric].label}`);$("#ctrl2Title").textContent=t[1];$("#ctrl2Card").hidden=!t[1];
   const cl=c==="imr"?A.imr.cl:c==="p"?A.pc.cl*100:c==="xbarr"?(A.xr&&A.xr.cl):A.xs.cl;
-  const ewOut=A.ewma.filter(p=>p.v>p.ucl||p.v<p.lcl).map(p=>p.lab),cuOut=A.cusum.pts.filter(p=>p.cp>A.cusum.h||p.cm>A.cusum.h).map(p=>p.lab),cuStart=A.cusum.pts.findIndex(p=>p.cp>A.cusum.h||p.cm>A.cusum.h);
+  const ewOut=A.ewma.filter(p=>p.v>p.ucl||p.v<p.lcl).map(p=>p.lab),cuOut=A.cusum.pts.filter(p=>p.cp>A.cusum.h||p.cm>A.cusum.h).map(p=>p.lab);
   const warnText = A.xs.subgroupWarning ? " · " + A.xs.subgroupWarning : "";
   const rejText = A.xs.reason ? " · " + A.xs.reason : "";
   const sBStr = `σ̂(板平均) ${f(A.xs.sB,3)} ${u}（＝板平均 MR̄ ${f(A.xs.sB*1.128,3)} ÷ 1.128，三向法）`;
   $("#ctrlSub").textContent=c==="p"?`P' 圖（Laney）p̄ = ${f(cl,2)} %，σz = ${f(A.pc.sigZ,2)}${A.pc.sigZ>1?"（板間變異大於二項式，界限已放寬）":A.pc.sigZ<1?"（σz < 1：板間變異小於二項式預期，界限已收窄）":""}`
+    :c==="u"?(A.uc&&!A.uc.insufficient?`Laney U′ 圖 · ū = ${f(A.uc.uBarPer1k,2)} /千焊墊 · σz = ${f(A.uc.sigmaZ,2)} · 以全指標規格判定不良（同 P′ 圖）`:(A.uc&&A.uc.reason||"U′ 圖無法計算"))
+    :c==="g"?(A.gc&&!A.gc.insufficient?`良率 ${f(A.gc.yieldPct,2)} % · 平均間隔 ${f(A.gc.gMean,1)} 焊墊 · 中位 ${f(A.gc.gMedian,1)} · 叢發 ${A.gc.burstCount} 次 · 以全指標規格判定不良（同 P′ 圖）`:(A.gc&&A.gc.reason||"G 圖無法計算"))
     :c==="ewma"?`CL ${f(A.gMean,2)} ${u} · ${sBStr} · 越界 ${ewOut.length?ewOut.join("、"):"無"}${A.ewma.subgroupWarning?" · "+A.ewma.subgroupWarning:""}${A.ewma.reason?" · "+A.ewma.reason:""}`
     :c==="cusum"?`中心 ${A.cusum.centerType==="target"?"規格目標":"整批平均"} ${f(A.cusum.center,2)} ${u}${A.cusum.centerReason?"（"+A.cusum.centerReason+"）":""} · ${sBStr} · 訊號 ${cuOut.length?cuOut.join("、"):"無"}${A.cusum.subgroupWarning?" · "+A.cusum.subgroupWarning:""}${A.cusum.reason?" · "+A.cusum.reason:""}`
     :c==="xbarr"?`CL ${f(A.xr.cl,2)} ${u} · R̄ ${f(A.xr.rbar,2)} · σ̂ ${f(A.xr.sigmaHat,3)} · 子群數 k=${A.xr.k}（n=${A.xr.n}）${A.xr.reason?" · "+A.xr.reason:""}`
     :`CL ${f(cl,2)} ${u}`+(c==="xbars"?` · ${xbarSigTxt(A,3)}${warnText}${rejText}`:` · 焊墊 ${esc(A.imr.pad||"")} 的 MR̄ ${f(A.imr.mrbar,2)} ${u}${A.imr.subgroupWarning?" · "+A.imr.subgroupWarning:""}${A.imr.reason?" · "+A.imr.reason:""}`);
   $("#ctrlLegend").innerHTML=c==="cusum"?`<span><i style="border-color:${css("--series2")}"></i>C+ 向上累積</span><span><i class="dash" style="border-color:${css("--accent")}"></i>C− 向下累積</span><span><i class="dash" style="border-color:${css("--ng")}"></i>決策界限 ±h</span><span><i class="sq" style="background:${css("--ng")};border-radius:50%"></i>超過界限</span>`
     :c==="ewma"?`<span><i style="border-color:${css("--series2")}"></i>EWMA</span><span><i class="sq" style="background:${css("--muted")};border-radius:50%"></i>每板平均</span><span><i style="border-color:${css("--accent")}"></i>中心線</span><span><i class="dash" style="border-color:${css("--ng")}"></i>UCL / LCL</span>`
+    :c==="g"?`<span><i style="border-color:${css("--series2")}"></i>不良間隔焊墊數</span><span><i style="border-color:${css("--accent")}"></i>中位中心線</span><span><i class="dash" style="border-color:${css("--ok")}"></i>UCL（良率改善）</span><span><i class="dash" style="border-color:${css("--ng")}"></i>LCL / 叢發預警</span>`
     :`<span><i style="border-color:${css("--series2")}"></i>量測值</span><span><i style="border-color:${css("--accent")}"></i>中心線</span><span><i class="dash" style="border-color:${css("--ng")}"></i>UCL / LCL（${c==="xbars"?"±3σ̂板平均，三向法":"±3σ"}）</span><span><i class="dash" style="border-color:${css("--grid")}"></i>±1σ、±2σ 區</span><span><i class="sq" style="background:${css("--ng")};border-radius:50%"></i>判異點</span>`;
   drawCtrl("cCtrl1",false);
   if(t[1]){
@@ -8825,7 +9525,31 @@ function renderControl(){
         {data:uv,borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},{data:lv,borderColor:ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0},{data:c==="imr"?s.map(()=>clv):s.map(x=>x.cl),borderColor:css("--accent"),borderWidth:1.2,pointRadius:0}]},options:baseOpts(withLimits({},[{n:"UCL",v:uv.at(-1),c:ng},{n:"CL",v:c==="imr"?clv:s.at(-1)?.cl,c:css("--accent")},{n:"LCL",v:lv.at(-1),c:ng}]))})}
   }
   const pts=A.series;
-  $("#nelsonTbl").innerHTML=`<thead><tr><th>規則</th><th>狀態</th><th>觸發點</th><th>錫膏印刷常見對應原因</th></tr></thead><tbody>`+A.nel.rules.map(r=>`<tr><td>${r.name}</td><td>${r.na?'<span class="pill na">不適用</span>':A.chartRejected?'<span class="pill na">無法判定</span>':r.idx.length?(r.id===7?'<span class="pill warn">觸發</span>':'<span class="pill ng">觸發</span>'):'<span class="pill ok">通過</span>'}</td><td class="mono" style="font-size:var(--fs-caption)">${r.idx.length?r.idx.map(i=>pts[i].lab).join(" "):"—"}</td><td class="note">${r.na?"此管制圖不適用此規則（僅 X̄ / I-MR 使用全部 8 條；P' 圖用 1–4；EWMA / CUSUM 僅用 1）":A.chartRejected?esc(A.chartReason):r.hint}</td></tr>`).join("")+"</tbody>";
+  $("#nelsonTbl").innerHTML=`<thead><tr><th>規則</th><th>狀態</th><th>觸發點</th><th>錫膏印刷常見對應原因</th></tr></thead><tbody>`+A.nel.rules.map(r=>`<tr><td>${r.name}</td><td>${r.na?'<span class="pill na">不適用</span>':A.chartRejected?'<span class="pill na">無法判定</span>':r.idx.length?(r.id===7?'<span class="pill warn">觸發</span>':'<span class="pill ng">觸發</span>'):'<span class="pill ok">通過</span>'}</td><td class="mono" style="font-size:var(--fs-caption)">${r.idx.length?r.idx.map(i=>pts[i].lab).join(" "):"—"}</td><td class="note">${r.na?"此管制圖不適用此規則（僅 X̄ / I-MR 使用全部 8 條；P′ / U′ 圖用 1–4；G / EWMA / CUSUM 僅用 1）":A.chartRejected?esc(A.chartReason):r.hint}</td></tr>`).join("")+"</tbody>";
+}
+function renderAcfUI(){
+  const sub=$("#acfSub"),msg=$("#acfMsg"),grid=$("#acfGrid");
+  if(!hasData()||!S.A||!S.A.xs){
+    if(sub)sub.textContent="";if(msg)msg.textContent="尚未載入資料";if(grid)grid.hidden=true;return;
+  }
+  const res=getExtStats("acf",()=>calcAcfPacf(S.A.xs.pts.map(p=>p.v)));
+  if(!res||res.insufficient){
+    if(sub)sub.textContent=`${METRICS[S.A.m].label} · ${scopeLabel(S)}`;
+    if(msg){msg.className="empty-state my-8";msg.textContent=res&&res.reason||"板數不足，無法計算自相關";}
+    if(grid)grid.hidden=true;return;
+  }
+  if(grid)grid.hidden=false;
+  const sigTxt=res.sigLags.length?`顯著落後期：Lag ${res.sigLags.slice(0,5).join("、")}`:"各落後期均在 95% 信賴帶內";
+  if(sub)sub.textContent=`${METRICS[S.A.m].label} · ${scopeLabel(S)} · N=${res.n} 板 · Ljung-Box Q=${f(res.lbQ,2)} (p=${res.lbP<0.001?"<0.001":f(res.lbP,3)})`;
+  if(msg){msg.className="note my-8";msg.textContent=(res.lbP<0.01?"板序存在顯著自相關，Shewhart 獨立性假設可能受影響；":"板序未見顯著自相關；")+sigTxt;}
+  const labs=res.acf.map((_,i)=>`Lag ${i+1}`),ng=css("--ng"),s2=css("--series2"),acc=css("--accent");
+  const mkBar=(cid,vals,title)=>mk(cid,{type:"bar",data:{labels:labs,datasets:[
+    {label:title,data:vals,backgroundColor:vals.map(v=>Math.abs(v)>res.ci95?ng:s2),borderRadius:2},
+    {type:"line",label:"+95% CI",data:labs.map(()=>res.ci95),borderColor:acc,borderDash:[5,4],borderWidth:1.2,pointRadius:0},
+    {type:"line",label:"−95% CI",data:labs.map(()=>-res.ci95),borderColor:acc,borderDash:[5,4],borderWidth:1.2,pointRadius:0}
+  ]},options:baseOpts({scales:{y:{min:-1,max:1,grid:{color:css("--grid")},ticks:{color:css("--muted")}}},plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex===0,callbacks:{label:i=>`${title}: ${f(i.raw,3)}（±95% CI ±${f(res.ci95,3)}）`}}}})});
+  mkBar("cAcf",res.acf,"ACF");
+  mkBar("cPacf",res.pacf,"PACF");
 }
 
 /* ---------- 能力 ---------- */
@@ -8960,7 +9684,106 @@ function renderCap(){
     options:baseOpts({plugins:{legend:{display:false},vlines:{},tooltip:{callbacks:{label:i=>{const b=B[i.dataIndex];return`中位 ${f(b.med,1)}  Q1 ${f(b.q1,1)}  Q3 ${f(b.q3,1)}  範圍 ${f(b.min,1)}–${f(b.max,1)}`}}}}})});
   renderPadCpkRank();
   renderSidedPpmBlock();
+  renderCaCpQuadrant();
+  renderRollingCpk();
 }
+function buildCaCpChartCfg(res,colors){
+  const colMap={healthy:colors.ok,offCenter:colors.warn,highVar:colors.acc,both:colors.ng};
+  const valid=res.pts.filter(p=>!p.zeroVar&&p.cp!=null);
+  const yMax=res.softYMax||3.5;
+  const maxAbsCa=Math.max(40,...valid.map(p=>Math.abs(p.ca)));
+  const xLim=Math.min(150,Math.ceil(maxAbsCa/10)*10);
+  // Cpk = 1.33 等值曲線：Cp = 1.33 / (1 - |Ca|/100)
+  const isoPts=[];
+  for(let ca=-Math.min(95,xLim);ca<=Math.min(95,xLim);ca+=5){
+    const cp=1.33/(1-Math.abs(ca)/100);
+    if(cp<=yMax*1.05)isoPts.push({x:ca,y:Math.min(yMax,cp)});
+  }
+  return{
+    type:"scatter",
+    data:{datasets:[
+      {label:"分組",data:valid.map(p=>({x:Math.max(-xLim,Math.min(xLim,p.ca)),y:Math.min(yMax,p.cp),meta:p})),
+        pointRadius:valid.map(p=>Math.max(4,Math.min(10,3+Math.log10(Math.max(10,p.n))*2))),
+        pointStyle:valid.map(p=>p.capped?"triangle":"circle"),
+        backgroundColor:valid.map(p=>colMap[p.zone]||colors.s2),
+        borderColor:valid.map(p=>colMap[p.zone]||colors.s2)},
+      {type:"line",label:"Cpk = 1.33 等值線",data:isoPts,borderColor:colors.ok,borderDash:[6,4],borderWidth:1.3,pointRadius:0,tension:0},
+      {type:"line",label:"Cp = 1.33",data:[{x:-xLim,y:1.33},{x:xLim,y:1.33}],borderColor:colors.grid,borderDash:[3,3],borderWidth:1,pointRadius:0},
+      {type:"line",label:"Ca = −25%",data:[{x:-25,y:0},{x:-25,y:yMax}],borderColor:colors.grid,borderDash:[3,3],borderWidth:1,pointRadius:0},
+      {type:"line",label:"Ca = +25%",data:[{x:25,y:0},{x:25,y:yMax}],borderColor:colors.grid,borderDash:[3,3],borderWidth:1,pointRadius:0}
+    ]},
+    options:baseOpts({
+      scales:{
+        x:{min:-xLim,max:xLim,title:{display:true,text:"準度偏移 Ca (%)",color:colors.muted},grid:{color:colors.grid},ticks:{color:colors.muted}},
+        y:{min:0,max:yMax,title:{display:true,text:"精密度 Cp",color:colors.muted},grid:{color:colors.grid},ticks:{color:colors.muted}}
+      },
+      plugins:{legend:{display:false},tooltip:{filter:i=>i.datasetIndex===0,callbacks:{label:i=>{
+        const p=i.raw&&i.raw.meta;if(!p)return"";
+        const zLbl={healthy:"健康製程",offCenter:"偏心可調回",highVar:"變異過大",both:"雙重失控"}[p.zone]||"";
+        return`${p.key} (n=${p.n}) · Ca ${f(p.ca,1)}% · Cp ${f(p.cp,2)}${p.capped?"（超過軟上限）":""} · Cpk ${f(p.cpk,2)} · ${zLbl}`;
+      }}}}
+    })
+  };
+}
+function caCpScopeSpec(){const keyFn=S.comp?(r=>r.pad||r.pin||"焊墊"):(!isAllGrp(S.group)?(r=>compKeyOf(r)):(r=>r.group));const unitLbl=S.comp?"焊墊":(!isAllGrp(S.group)?"元件":"群組");return{keyFn,unitLbl};}
+function renderCaCpQuadrant(){
+  if(!$("#cCaCp")||!hasData()||!S.A)return;
+  const A=S.A,sub=$("#cacpSub"),msg=$("#cacpMsg");
+  const{keyFn,unitLbl}=caCpScopeSpec();
+  const res=getExtStats("cacp",()=>calcCaCpQuadrant(A.rows,A.m,A.sp,keyFn),unitLbl);
+  if(!res||res.insufficient){
+    if(sub)sub.textContent=`${METRICS[A.m].short} · ${scopeLabel(S)}`;
+    if(msg){msg.hidden=false;msg.textContent=res&&res.reason||"無法繪製四象限圖";}
+    mk("cCaCp",{type:"scatter",data:{datasets:[]},options:baseOpts()});
+    return;
+  }
+  const c=res.counts;
+  const asymNote=res.asymmetricTarget?" · Ca 以規格中點計算，與 Cpk 嚴格對應":"";
+  const capNote=res.pts.some(p=>p.capped)?` · 縱軸軟上限 ${f(res.softYMax,1)}`:"";
+  if(sub)sub.textContent=`${METRICS[A.m].short} · ${res.pts.length} 個${unitLbl}（健康 ${c.healthy} · 偏心 ${c.offCenter} · 變異大 ${c.highVar} · 雙失控 ${c.both}）${asymNote}${capNote}`;
+  if(msg){msg.hidden=!c.zeroVar;if(c.zeroVar)msg.textContent=`另有 ${c.zeroVar} 個${unitLbl}變異為零，未繪製於 Cp 軸。`;}
+  const colors={ok:css("--ok"),warn:css("--warn"),acc:css("--accent"),ng:css("--ng"),s2:css("--series2"),grid:css("--grid"),muted:css("--muted")};
+  mk("cCaCp",buildCaCpChartCfg(res,colors));
+}
+function buildRollingCpkChartCfg(res,colors){
+  const labs=res.pts.map(p=>p.lab);
+  return{
+    type:"line",
+    data:{labels:labs,datasets:[
+      {label:"Cpk",data:res.pts.map(p=>p.cpk),borderColor:colors.s2,borderWidth:2,pointRadius:3,tension:0.15,spanGaps:true},
+      {label:"Cp",data:res.pts.map(p=>p.cp),borderColor:colors.acc,borderDash:[5,3],borderWidth:1.4,pointRadius:2,tension:0.15,spanGaps:true},
+      {label:"1.33 合格",data:labs.map(()=>1.33),borderColor:colors.ok,borderDash:[6,4],borderWidth:1.2,pointRadius:0},
+      {label:"1.00 警戒",data:labs.map(()=>1.0),borderColor:colors.ng,borderDash:[6,4],borderWidth:1.2,pointRadius:0}
+    ]},
+    options:baseOpts({
+      scales:{y:{min:0,grid:{color:colors.grid},ticks:{color:colors.muted}}},
+      plugins:{legend:{display:true,labels:{color:colors.muted,boxWidth:12}},tooltip:{callbacks:{label:i=>`${i.dataset.label}: ${i.raw==null?"—":f(i.raw,2)}`}}}
+    })
+  };
+}
+function renderRollingCpk(){
+  if(!$("#cRollCpk")||!hasData()||!S.A)return;
+  const A=S.A,sub=$("#rollCpkSub"),msg=$("#rollCpkMsg");
+  const wSel=+$("#selRollWin")?.value||5;
+  const res=getExtStats("rollcpk",()=>{
+    const byB=new Map();
+    for(const r of A.rows){let l=byB.get(r.board);if(!l){l=[];byB.set(r.board,l)}l.push(r[A.m])}
+    return calcRollingCpk(A.boards.map(b=>({lab:b,vals:byB.get(b)||[]})),A.sp,wSel);
+  },String(wSel));
+  if(!res||res.insufficient){
+    if(sub)sub.textContent=`${METRICS[A.m].short} · ${scopeLabel(S)}`;
+    if(msg){msg.hidden=false;msg.textContent=res&&res.reason||"板數不足，無法計算滑動 Cpk";}
+    mk("cRollCpk",{type:"line",data:{labels:[],datasets:[]},options:baseOpts()});
+    return;
+  }
+  const slopeTxt=res.slope!=null?(res.slope<-0.02?` · 衰退斜率 ${f(res.slope,3)}/板`:res.slope>0.02?` · 上升斜率 +${f(res.slope,3)}/板`:" · 趨勢平穩"):"";
+  const normNote=(S.capDistMode&&S.capDistMode!=="normal")?" · 滑動趨勢採常態估算":"";
+  if(sub)sub.textContent=`${METRICS[A.m].short} · ${scopeLabel(S)} · 視窗 ${res.windowSize} 板${slopeTxt}${normNote}`;
+  if(msg){msg.hidden=!res.downgraded;if(res.downgraded)msg.textContent=`總板數少於所選視窗，已自動調整為 ${res.windowSize} 板。`;}
+  const colors={ok:css("--ok"),ng:css("--ng"),acc:css("--accent"),s2:css("--series2"),grid:css("--grid"),muted:css("--muted")};
+  mk("cRollCpk",buildRollingCpkChartCfg(res,colors));
+}
+if($("#selRollWin"))$("#selRollWin").onchange=()=>{if(S.tab==="capability")renderRollingCpk()};
 
 function renderPadCpkRank(){
   if(!$("#cPadCpk")||!hasData())return;
@@ -12168,7 +12991,8 @@ function setupSubtabs(barSel,attr,onPick){
     if(j==null)return;e.preventDefault();onPick(btns[j].getAttribute(attr),btns[j]);btns[j].focus()});
 }
 setupSubtabs("#p-issues .subtabs","data-subnav-issues",v=>v==="diagnostic"?enterDiagnostic():setTab("issues/"+v));
-setupSubtabs("#p-control .subtabs","data-subnav-control",v=>setTab(v==="multi"?"control/multi":"control"));
+setupSubtabs("#p-control .subtabs","data-subnav-control",v=>setTab(v==="multi"?"control/multi":v==="acf"?"control/acf":"control"));
+if($("#selGScale"))$("#selGScale").onchange=()=>{if(S.tab==="control"&&S.chart==="g")renderControl()};
 setupSubtabs("#p-improve .subtabs","data-subnav-improve",v=>setTab("improve/"+v));
 function openAppSettings(section){
   const m=$("#appSettingsModal");if(!m)return;
@@ -12209,7 +13033,20 @@ function aiPayload(){const A=S.A;return{試產回合:curRun()?curRun().name:"",�
   不良柏拉圖:Object.fromEntries(Object.entries(A.pareto).map(([k,v])=>[DEFECTS[k],v])),交叉驗證:A.xv.rows.map(x=>({面向:x.k,判定:x.st,依據:x.ev})),
   系統偵測問題清單:scopedFindings().slice(0,15).map(x=>({編號:x.id,嚴重度:LVL[x.lv],面向:x.cat,量測項目:x.metric||"",問題:x.title,事實:x.aiFacts||x.facts.slice(0,3),系統推論:x.cause,信心:x.conf,佐證:x.corrob})),
   前15不良焊墊:A.defRows.slice(0,15).map(r=>({板:r.board,焊墊:r.pad,體積:r.volume,高度:r.height,面積:r.area,偏移X:r.offx,偏移Y:r.offy,判定:r.codes.map(c=>DEFECTS[c])})),
-  進階:advSummary(A)}}
+  進階:advSummary(A),進階統計診斷:extDiagnosticsSummary(A)}}
+function extDiagnosticsSummary(A){
+  if(!A||!A.rows||!A.rows.length)return null;
+  const acf=getExtStats("acf",()=>calcAcfPacf(A.xs.pts.map(p=>p.v)));
+  const gc=getExtStats("gchart",()=>calcGChart(A.rows,r=>classify(r,S.specs,S),A.boards));
+  const{keyFn,unitLbl}=caCpScopeSpec();
+  const cacp=getExtStats("cacp",()=>calcCaCpQuadrant(A.rows,A.m,A.sp,keyFn),unitLbl);
+  const zMap={healthy:"健康",offCenter:"偏心可調",highVar:"變異大",both:"雙失控"};
+  return{
+    板序自相關:acf&&!acf.insufficient?{r1:+f(acf.acf[0],3),p:+f(acf.lbP,4),顯著落後期:acf.sigLags.slice(0,5)}:null,
+    高良率間隔:gc&&!gc.insufficient?{良率:+f(gc.yieldPct,2),平均間隔:+f(gc.gMean,1),叢發次數:gc.burstCount}:null,
+    能力四象限重點:cacp&&!cacp.insufficient?cacp.pts.filter(p=>p.cpk!=null&&p.cpk<1.33).slice(0,5).map(p=>({名稱:p.key,Ca:+f(p.ca,1),Cp:+f(p.cp,2),Cpk:+f(p.cpk,2),歸類:zMap[p.zone]||""})):[]
+  };
+}
 function advSummary(A){const W=advAnalyze(S,A);return{EWMA越界:A.ewma.filter(p=>p.v>p.ucl||p.v<p.lcl).map(p=>p.lab),CUSUM訊號:A.cusum.pts.filter(p=>p.cp>A.cusum.h||p.cm>A.cusum.h).map(p=>p.lab),
   面積比:W.arGroups.map(g=>({群組:g.g,開孔mm:g.allAssumed?"未提供":g.shape==="round"?"Ø"+f(g.apL,3):f(g.apL,3)+"×"+f(g.apW,3),開孔來源:g.src,鋼板µm:g.thk,AR:+f(g.ar,2),寬厚比:+f(g.asp,2),AR達066最大厚度µm:+f(g.tmax,0),轉移效率:+f(g.te,1),CV:+f(g.cv,1)})),最差焊墊Cpk:W.padCpk.slice(0,5).map(p=>({焊墊:p.pad,Cpk:+f(p.cpk)})),
   面積比尺寸:(()=>{const a=W.arGroups.filter(g=>g.assumed).map(g=>g.g);return !a.length?"資料提供":a.length===W.arGroups.length?"全部焊墊尺寸未提供，面積比無法判定":`${a.slice(0,10).join("、")}${a.length>10?` 等 ${a.length} 群組`:""} 部分焊墊尺寸未提供，未納入面積比`})(),
@@ -14051,6 +14888,7 @@ function beforePrint(){
     ||($(`[data-mtab="${S.tab}"][data-mtab-sub="${S.improveSub||""}"]`)||{}).textContent?.trim()
     ||(S.tab==="issues"&&S.issuesSub==="cross"?"交叉驗證":null)
     ||(S.tab==="control"&&S.controlSub==="multi"?"多變量管制圖":null)
+    ||(S.tab==="control"&&S.controlSub==="acf"?"板序自相關分析":null)
     ||({share:"分享設定",shares:"我的分享",mail:"轉寄報告",deep:"製程跡象",improve:"回合比較",ai:"AI 診斷"}[S.tab])
     ||S.tab||"";
   const ph=$("#printHead");
@@ -14599,6 +15437,17 @@ async function generateReportPdfBlob(opts={}){
     }catch(e){}
     const nRows=(A.nelX||A.nel).rules.map(r=>[`Rule ${r.id}`,r.name,String(r.idx?r.idx.length:0),r.idx&&r.idx.length?r.idx.map(i=>A.boards[i]||i).join("、"):"無"]);
     drawTable(["規則","條件說明","觸發點數","觸發板號"],nRows,[20,70,22,70]);
+    try{
+      const acf=getExtStats("acf",()=>calcAcfPacf(A.xs.pts.map(p=>p.v)));
+      const gc=getExtStats("gchart",()=>calcGChart(A.rows,r=>classify(r,S.specs,S),A.boards));
+      const uc=getExtStats("uchart",()=>calcLaneyUChart(A.rows,r=>classify(r,S.specs,S),A.boards));
+      const extRows=[
+        ["G 圖（高良率間隔）",gc&&!gc.insufficient?`良率 ${f(gc.yieldPct,2)}%，平均間隔 ${f(gc.gMean,1)} 焊墊，叢發 ${gc.burstCount} 次`:"不良次數 < 2，不適用"],
+        ["Laney U′ 圖",uc&&!uc.insufficient?`平均 ${f(uc.uBarPer1k,2)} 缺點／千焊墊，過度離散 σz = ${f(uc.sigmaZ,2)}`:"無有效板序資料"],
+        ["板序 ACF 獨立性",acf&&!acf.insufficient?`r₁ = ${f(acf.acf[0],3)}，Ljung-Box Q = ${f(acf.lbQ,2)}（p = ${acf.lbP<0.001?"<0.001":f(acf.lbP,3)}）`:"板數不足 6 片，不適用"]
+      ];
+      drawTable(["擴充管制診斷","統計摘要"],extRows,[46,136]);
+    }catch(e){}
   }
 
   // 5. 製程能力
@@ -14612,6 +15461,37 @@ async function generateReportPdfBlob(opts={}){
       checkBreak(65);
       doc.addImage(histUrl,opts.lite?"JPEG":"PNG",14,curY,182,58);
       curY+=62;
+    }catch(e){}
+    const printPal={ok:"#1F7A4C",warn:"#B5652B",acc:"#2B5A7A",ng:"#B8332A",s2:"#2B5A7A",grid:"#D8DCE2",muted:"#4A5568"};
+    try{
+      const{keyFn,unitLbl}=caCpScopeSpec();
+      const cacp=getExtStats("cacp",()=>calcCaCpQuadrant(A.rows,A.m,A.sp,keyFn),unitLbl);
+      if(cacp&&!cacp.insufficient){
+        const cfg=buildCaCpChartCfg(cacp,printPal);
+        const url=renderOffscreenChart(cfg.type,cfg.data,cfg.options);
+        checkBreak(66);
+        printText(`製程能力四象限圖（${unitLbl}：健康 ${cacp.counts.healthy}、偏心 ${cacp.counts.offCenter}、變異大 ${cacp.counts.highVar}、雙失控 ${cacp.counts.both}）`,14,curY,{size:8});
+        curY+=4;
+        doc.addImage(url,opts.lite?"JPEG":"PNG",14,curY,182,58);
+        curY+=62;
+      }
+    }catch(e){}
+    try{
+      const wSel=+$("#selRollWin")?.value||5;
+      const roll=getExtStats("rollcpk",()=>{
+        const byB=new Map();
+        for(const r of A.rows){let l=byB.get(r.board);if(!l){l=[];byB.set(r.board,l)}l.push(r[A.m])}
+        return calcRollingCpk(A.boards.map(b=>({lab:b,vals:byB.get(b)||[]})),A.sp,wSel);
+      },String(wSel));
+      if(roll&&!roll.insufficient){
+        const cfg=buildRollingCpkChartCfg(roll,printPal);
+        const url=renderOffscreenChart(cfg.type,cfg.data,cfg.options);
+        checkBreak(66);
+        printText(`滑動視窗 Cpk 趨勢圖（視窗 ${roll.windowSize} 板${roll.slope!=null?`，斜率 ${f(roll.slope,3)}/板`:""}）`,14,curY,{size:8});
+        curY+=4;
+        doc.addImage(url,opts.lite?"JPEG":"PNG",14,curY,182,58);
+        curY+=62;
+      }
     }catch(e){}
     const normPdf=`常態性檢定：Anderson-Darling p ${A.ad.p<.001?"< 0.001":"= "+f(A.ad.p,3)}（${adVerdict(A.ad)}）${A.sw&&A.sw.valid?`；Shapiro-Wilk W = ${f(A.sw.w,4)}，p ${A.sw.p<.001?"< 0.001":"= "+f(A.sw.p,3)}`:""}`;
     printText(normPdf,14,curY,{size:8,color:[100,100,100]});
@@ -14694,10 +15574,12 @@ async function generateReportPdfBlob(opts={}){
     curY+=5;
     printText("3. 兩類 PPM 定義：預估 PPM 假設常態分佈由 Z 值積分計算；超規 PPM 為實際超規焊墊數除以總焊墊數之實測比率。",14,curY,{size:8.5});
     curY+=5;
+    printText("4. 擴充統計模型：G 圖採 Benneyan 幾何分布精確界線；Laney U′ 圖以 σz 修正板間過度離散；板序自相關以 Ljung-Box Q 檢定；四象限採規格中點準度 Ca 與精密度 Cp 滿足 Cpk = Cp(1 − |Ca|/100)。",14,curY,{size:8.5});
+    curY+=5;
     if(missingGlyphs.size>0){
-      printText(`4. 缺字檢核紀錄（已自動轉換為向量／點陣圖形嵌入，未產生豆腐塊）：${[...missingGlyphs].join("、")}`,14,curY,{size:8.5,color:[180,80,20]});
+      printText(`5. 缺字檢核紀錄（已自動轉換為向量／點陣圖形嵌入，未產生豆腐塊）：${[...missingGlyphs].join("、")}`,14,curY,{size:8.5,color:[180,80,20]});
     }else{
-      printText("4. 缺字檢核紀錄：全文字元皆符合 Noto Sans TC 嵌入字型，無缺字。",14,curY,{size:8.5,color:[40,140,60]});
+      printText("5. 缺字檢核紀錄：全文字元皆符合 Noto Sans TC 嵌入字型，無缺字。",14,curY,{size:8.5,color:[40,140,60]});
     }
     curY+=6;
   }

@@ -110,3 +110,23 @@ test("AI 分析失敗訊息只在狀態列顯示一次", { skip: !JSDOM && "未�
   assert.doesNotMatch(st, /[［］]/);
   assert.equal(d.querySelector("#aiOut").textContent.trim(), "", "結果區不應重複顯示失敗訊息");
 });
+
+test("validatePayload 白名單保留「進階統計診斷」並丟棄未授權英文鍵", () => {
+  const raw = JSON.stringify({
+    payload: {
+      系統偵測問題清單: [{ 問題: "測試" }],
+      進階統計診斷: {
+        板序自相關: { r1: 0.42, p: 0.012, 顯著落後期: [1, 3] },
+        高良率間隔: { 良率: 99.6, 平均間隔: 180, 叢發次數: 1 },
+        能力四象限重點: [{ 名稱: "U2 BGA", Ca: 32.5, Cp: 1.45, Cpk: 0.98, 歸類: "偏心可調回" }],
+      },
+      diagnosticsPlus: { shouldDrop: true },
+    },
+  });
+  const clean = validatePayload(raw);
+  assert.ok(clean["進階統計診斷"], "白名單應保留「進階統計診斷」");
+  assert.equal(clean["進階統計診斷"]["板序自相關"].r1, 0.42);
+  assert.equal(clean["進階統計診斷"]["高良率間隔"]["叢發次數"], 1);
+  assert.equal(clean["diagnosticsPlus"], undefined, "未列白名單之鍵應被丟棄");
+});
+
