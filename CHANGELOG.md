@@ -2,6 +2,12 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.41.0 — 2026-11-24（SPI 進階統計圖表階段三：DOE 雙因子交互作用圖與全系統報告／AI 收尾）
+
+- **DOE 雙因子交互作用引擎（`lib/spi-stats-ext.mjs`）**：新增 `calcDoeInteraction`（`2-Way ANOVA` 交互作用 `F` 檢定與精確不完全 Beta 上尾 `p` 值），內建 `dfErr <= 0` 無重複樣本與缺格子防呆（「僅供視覺判讀」，絕不除以 0 產生 `NaN`），並整合至 `doeAnalyze()`。
+- **改善 → 實驗驗證（`improve/lab`）圖表擴充**：於「印刷參數 DOE」卡片下方新增 `#doeInterSection` 自動繪製 1–3 組雙因子交互作用折線圖，標題同步標註 `F`、`p` 值與是否顯著交互。
+- **分析報告與 AI 診斷完整收尾**：`extDiagnosticsSummary(A)` 補齊 `"DOE交互作用"`（維持 AI payload 精簡）；PDF 分析報告 Ch.7 於含 DOE 參數時自動離屏嵌入代表性雙因子交互作用圖，Ch.10 補齊 2-Way ANOVA 交互作用公式附錄。
+
 ## v10.40.0 — 2026-11-24（SPI 進階統計圖表階段二：變異數分解與多變異圖、二維偏移靶心圖、板面 X／Y 邊際剖面、開孔方向效應）
 
 - **純統計核心擴充（`lib/spi-stats-ext.mjs`）**：新增 `calcVarianceComponents`（群組去中心後巢狀平方和分解，百分比總和 100%）、`calcMultiVari`（板內分層均值與 P10–P90 跨度，超過 30 板等距取樣揭露）、`calcOffsetEllipse`（2D 偏移 95% 信賴橢圓、前／後行程雙橢圓與精確 `F(2, df-1)` Hotelling T² 背隙檢定）、`calcBoardProfileXY`（實體座標優先、虛擬網格 fail-visible 阻斷與單線座標防呆）與 `calcApertureOrientation`（0° 平行 vs 90° 垂直刮刀 Welch t 檢定、Cohen's d、AR 分層與無方向性欄位防呆）。

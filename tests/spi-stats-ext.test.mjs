@@ -15,6 +15,7 @@ import {
   calcOffsetEllipse,
   calcBoardProfileXY,
   calcApertureOrientation,
+  calcDoeInteraction,
 } from "../lib/spi-stats-ext.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -446,6 +447,75 @@ describe("Phase 2 Task 3: detectIssues 正交規則 M-24（雙行程偏移背隙
     assert.ok(F.meta && F.meta.extCore && F.meta.extCore.orientation, "F.meta.extCore 應附帶 orientation");
   });
 });
+
+describe("Phase 3: calcDoeInteraction 雙因子交互作用圖與 2-Way ANOVA", () => {
+  it("顯著交叉交互作用（p < 0.05）vs 平行線無交互（p > 0.05）", () => {
+    const crossBoards = [];
+    // pressure (4, 6) × speed (25, 50), 3 replicates per cell = 12 boards
+    const reps = [-0.4, 0, 0.4];
+    for (const r of reps) {
+      crossBoards.push({ fv: { pressure: 4, speed: 25 }, y: { vol: 95 + r } });
+      crossBoards.push({ fv: { pressure: 4, speed: 50 }, y: { vol: 105 + r } });
+      crossBoards.push({ fv: { pressure: 6, speed: 25 }, y: { vol: 106 + r } });
+      crossBoards.push({ fv: { pressure: 6, speed: 50 }, y: { vol: 96 + r } });
+    }
+    const cRes = calcDoeInteraction(crossBoards, "vol", ["pressure", "speed"]);
+    assert.equal(cRes.insufficient, false);
+    assert.equal(cRes.pairs.length, 1);
+    assert.equal(cRes.pairs[0].significant, true, "交叉折線應檢出顯著交互");
+    assert.ok(cRes.pairs[0].p < 0.001, `p 應遠小於 0.001，實際 ${cRes.pairs[0].p}`);
+
+    // 平行線：無交互
+    const parBoards = [];
+    for (const r of reps) {
+      parBoards.push({ fv: { pressure: 4, speed: 25 }, y: { vol: 95 + r } });
+      parBoards.push({ fv: { pressure: 4, speed: 50 }, y: { vol: 100 + r } });
+      parBoards.push({ fv: { pressure: 6, speed: 25 }, y: { vol: 101 + r } });
+      parBoards.push({ fv: { pressure: 6, speed: 50 }, y: { vol: 106 + r } });
+    }
+    const pRes = calcDoeInteraction(parBoards, "vol", ["pressure", "speed"]);
+    assert.equal(pRes.pairs[0].significant, false, "平行線不應觸發顯著交互");
+    assert.ok(pRes.pairs[0].p > 0.5, `p 應大於 0.5，實際 ${pRes.pairs[0].p}`);
+  });
+
+  it("無重複樣本（dfErr <= 0）、缺格子與不足 2 因子防呆（無 NaN）", () => {
+    const unrep = [
+      { fv: { pressure: 4, speed: 25 }, y: { vol: 96 } },
+      { fv: { pressure: 4, speed: 50 }, y: { vol: 104 } },
+      { fv: { pressure: 6, speed: 25 }, y: { vol: 103 } },
+      { fv: { pressure: 6, speed: 50 }, y: { vol: 97 } },
+    ];
+    const uRes = calcDoeInteraction(unrep, "vol", ["pressure", "speed"]);
+    assert.equal(uRes.insufficient, false);
+    assert.equal(uRes.pairs[0].F, null);
+    assert.equal(uRes.pairs[0].p, null);
+    assert.match(uRes.pairs[0].noTestReason, /無重複樣本/);
+
+    const missing = [
+      { fv: { pressure: 4, speed: 25 }, y: { vol: 96 } },
+      { fv: { pressure: 4, speed: 25 }, y: { vol: 97 } },
+      { fv: { pressure: 4, speed: 50 }, y: { vol: 104 } },
+      { fv: { pressure: 6, speed: 25 }, y: { vol: 103 } },
+    ];
+    const mRes = calcDoeInteraction(missing, "vol", ["pressure", "speed"]);
+    assert.equal(mRes.pairs[0].hasMissingCells, true);
+    assert.equal(mRes.pairs[0].p, null);
+    assert.match(mRes.pairs[0].noTestReason, /缺資料/);
+
+    const oneFac = [{ fv: { pressure: 4 }, y: { vol: 100 } }, { fv: { pressure: 6 }, y: { vol: 102 } }];
+    assert.equal(calcDoeInteraction(oneFac, "vol", ["pressure", "speed"]).insufficient, true);
+  });
+
+  it("doeAnalyze() 整合：DOE 範例資料產出 3 組雙因子配對交互作用", () => {
+    const core = loadCore();
+    const rows = core.sampleData({ variant: "DOE" });
+    const st = { ...core.S, rows, metrics: ["volume", "height", "area", "offx", "offy"] };
+    const D = core.doeAnalyze(st, "vol");
+    assert.ok(D && D.interaction && !D.interaction.insufficient, "DOE 範例應產出 interaction");
+    assert.equal(D.interaction.pairs.length, 3, "3 個因子應產出 C(3,2)=3 組配對");
+  });
+});
+
 
 
 
