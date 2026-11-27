@@ -68,6 +68,14 @@ node .agents/skills/debug-loop/scripts/gates.mjs status          # 目前內容�
 - 巡檢模式：第一輪用 `gates.mjs run --level V3` 建立基準，再做下方「巡檢清單」。乾淨的工作樹上關卡多半全綠，綠燈只代表現有測試沒抓到東西，巡檢的價值在找測試沒覆蓋的地方。
 - 依 Institution 01 定級：碰到 `cloudflare/migrations/`、`auth`、`.github/workflows/`、規則檔（AGENTS.md、CLAUDE.md）或改動超過 5 個檔，屬 L3，先把規格與影響給使用者看，核准後才改。
 
+**PR hygiene（DIRTY）**（與 `docs/spec-pr-merge-auto-resolve-rfc.md` 一致）：
+
+1. `git fetch origin main`；PR `mergeStateStatus` 為 `DIRTY`、merge 失敗，或使用者要求 fix-merge-conflicts 時進入。
+2. `node tools/pr-merge-sync.mjs --dry-run` → 讀 JSON：`canAutoSync` 僅當全部為 docs 勾選 hunk。
+3. `canAutoSync` → `npm run pr:merge-sync`（或 `--sync`），再依腳本內驗證階梯；成功才 `git push`。
+4. 否則 `BLOCKED`：列黑名單檔與 unified diff 摘要，**不 push**。
+5. `gates.mjs run` 遇 `UU` 應先完成上述步驟，避免在合併中途跑 V3。
+
 ### 1 發現
 
 依本輪的變更挑節點，不要每輪都把所有技能跑一遍：第一輪範圍最大，之後只看「上一輪改到的地方和它的直接使用者」。

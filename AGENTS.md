@@ -32,6 +32,7 @@ iPhone／行動版 Web UI/UX 標準見 `APPLE_IPHONE_WEB_UI_UX_STANDARD.md`（`G
   - `--match-head-commit` 一律用 `gh pr view --json headRefOid` 的完整 40 碼 SHA（短 SHA 會被 GraphQL 拒絕）。
   - 遠端已合併、只有本機收尾失敗（worktree 刪除 Permission denied、main 被其他 worktree 佔用、本機分支刪不掉）：以 `gh pr view --json state` 確認 `MERGED` 後繼續部署驗證，收尾失敗只在報告列出殘留路徑。
   - 重試前先確認 `git status` 沒有 `UU`；不在未解決的合併上再開新的合併。
+  - **PR hygiene（DIRTY／fix-merge-conflicts）**：`git fetch origin main` 後先 `node tools/pr-merge-sync.mjs --dry-run`；僅 `docs/**/*.md` 勾選型衝突可 `node tools/pr-merge-sync.mjs --sync` 自癒。版本檔、`spi-spc.html`、`CHANGELOG.md`、`cloudflare/migrations/`、`lib/auth*`、`.github/workflows/` 衝突為黑名單，**不得**自動 push，僅報告 diff。白／黑名單與驗收見 `docs/spec-pr-merge-auto-resolve-rfc.md`。合併解完至少 `node --test tests/merge-conflict-resolve.test.mjs` 與 `tests/release-check.test.js`；`ui-gate-run --check` 若 `triggered` 再跑 `npm run verify:ui`。
   - 停止條件：衝突落在邏輯程式碼且解法會改變已審查的行為時，解完把差異給使用者看並重新取得核准；auto mode 分類器或使用者拒絕合併屬授權問題，不改寫指令繞過，回報待執行的指令；同一錯誤修正後重現且沒有新證據時停止。
   - 檢查：報告寫明失敗類型、採取的修正與重試結果，或停在哪一個停止條件。
   - 出處：#40–#46、#51、#55 的合併紀錄（2026-10-22～25，5 個 session）：版本檔衝突、短 SHA、worktree 刪除失敗，每次都停下來，直到使用者主動要求修正；這些修正事後都通過原有驗證，證明本可自行完成。
