@@ -1249,7 +1249,7 @@ input[type=checkbox],input[type=radio],input[type=range],progress{accent-color:v
         <button role="menuitem" id="btnMyShares" hidden title="檢視與管理自己建立的分享連結">我的分享</button>
         <a role="menuitem" id="offlineLink" href="/download/offline" hidden title="下載單一 HTML 檔，不連網也能分析；資料不會存檔">下載離線版</a>
         <a role="menuitem" id="logoutLink" href="/__logout" hidden>登出</a>
-        <p class="menu-ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.41.0</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></p>
+        <p class="menu-ver" title="系統版本與最後更新時間（UTC+8）"><b class="num" id="appVer">v10.41.1</b> · <b class="num" id="appBuilt">0000-00-00 00:00:00</b></p>
       </div>
     </div>
   </div>
@@ -6603,9 +6603,10 @@ function statsRows(st,R){const out=[];
     }
   }
   for(const r of R){
+    const gRow=grpStats[r.group];
     for(const k of METS){
       const x=r[k];if(x==null||!isFinite(x))continue;
-      const sp=specFor(r,k,st),gs=grpStats[r.group]&&grpStats[r.group][k];
+      const sp=specFor(r,k,st),gs=gRow&&gRow[k];
       const m=gs?gs.m:NaN,sg=gs?gs.sg:NaN,z=isFinite(sg)&&sg>0?(x-m)/sg:NaN;
       // 規格內但 |z|≥4 先標「離群值」，其餘超規或 |z|>3 才標 OOC（舊順序下 |z|≥4 必先命中 |z|>3，離群值分支永遠到不了）
       const outSpec=Boolean(sp&&((hasLsl(sp)&&x<sp.lsl)||(hasUsl(sp)&&x>sp.usl)));
@@ -7528,7 +7529,8 @@ function detectIssues(st,onStage){
   for(const k of MS)for(const g of groups){const rs=(gIdx[g]||[]).filter(r=>r[k]!=null&&isFinite(r[k]));if(rs.length<10)continue;
     const sp=capSp(g,k);if(!sp||!hasAnySpec(sp)||(hasTwoSpec(sp)&&!(sp.usl>sp.lsl)))continue;
     const v=rs.map(r=>r[k]),mu=mean(v);let ss=0,df=0;
-    for(const b of boards){const rows=(idx[b]&&idx[b][g])||null;if(!rows||rows.length<=1)continue;let cnt=0,sum=0;for(let i=0;i<rows.length;i++){const val=rows[i][k];if(val!=null){cnt++;sum+=val}}if(cnt>1){const m2=sum/cnt;for(let i=0;i<rows.length;i++){const val=rows[i][k];if(val!=null)ss+=(val-m2)**2}df+=cnt-1;}}
+    const cellVals=new Map();for(let ri=0;ri<rs.length;ri++){const r=rs[ri],val=r[k];let a=cellVals.get(r.board);if(!a)cellVals.set(r.board,a=[]);a.push(val)}
+    for(const a of cellVals.values()){if(a.length<=1)continue;let sum=0;for(let i=0;i<a.length;i++)sum+=a[i];const m2=sum/a.length,cnt=a.length;for(let i=0;i<cnt;i++)ss+=(a[i]-m2)**2;df+=cnt-1;}
     const sw=df>0?Math.sqrt(ss/df):NaN;if(!(sw>0))continue;const cpk=calcCpkVal(mu,sw,sp);
     capCells.push({k,g,n:rs.length,mu,sw,cpk,_v:v})}
   const worstCap=k=>capCells.filter(c=>!k||c.k===k).reduce((w,c)=>!w||c.cpk<w.cpk?c:w,null);
@@ -9330,7 +9332,7 @@ function recompute(noRender){normalizeScope(S);if(!specReady(S)){S.A=null;S.F=[]
     w=S.rows.length>WORKER_MIN&&detWorker();if(w)startWorkerDetect(w,sig)}   // 先送出背景偵測，與下面主執行緒的圖表分析同時進行
   S.A=perfSpan("analyze",()=>analyze(S));
   updatePadCoverageState();
-  if(need){if(!w)detectSync(sig);else for(const r of S.rows)if(r.height!=null)r.hpct=hpctOf(r.height,padThk(r,S))}
+  if(need&&!w)detectSync(sig); /* 背景偵測時 analyze 已寫入 hpct；同步路徑由 detectIssues 再算 */
   fillSelect($("#selPad"),S.A.pads.map(p=>[p,p]),S.A.imr.pad);S.pad=S.A.imr.pad;applyScope();
   const bDef=new Map(S.A.byBoard.map(x=>[x.board,x.defects]));
   fillSelect($("#selBoard"),S.A.boards.map(b=>[b,b+(bDef.get(b)?"  ·  不良 "+bDef.get(b):"")]),S.board);

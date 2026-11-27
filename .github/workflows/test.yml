@@ -28,8 +28,13 @@ jobs:
         id: ui_gate
         shell: bash
         run: |
+          # --check exits 1 when triggered && no valid .ui-gate/result.json yet; still emit JSON for the probe.
+          set +e
           json=$(node tools/ui-gate-run.mjs --check --json)
+          probe_ec=$?
+          set -e
           echo "$json"
+          node -e "JSON.parse(process.argv[1])" "$json" || exit "${probe_ec:-1}"
           triggered=$(node -e "const j=JSON.parse(process.argv[1]); process.stdout.write(j.triggered?'true':'false')" "$json")
           echo "triggered=$triggered" >> "$GITHUB_OUTPUT"
 
