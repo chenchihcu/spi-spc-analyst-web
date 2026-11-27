@@ -19,6 +19,9 @@ function run(args, { testFailure = false, secret = false, htmlOverride = null } 
       if (name === 'fs') return fakeFs;
       if (name === 'path') return path;
       if (name === 'child_process') return { execSync(command) {
+        if (command === 'node tools/ui-gate-run.mjs --check --json') {
+          return JSON.stringify({ gated: true, triggered: false, valid: true, reason: 'no watched change vs base' });
+        }
         if (command.startsWith('node --test ')) {
           tests++;
           if (testFailure) throw Object.assign(new Error('test failure'), { status: 1, stdout: '# fail 1\nnot ok 1 - sentinel' });
@@ -43,7 +46,7 @@ test('release scans do not launch tests or claim release readiness', () => {
   assert.equal(r.result.checks.tests.status, 'not-run');
   assert.equal(r.result.overall, 'SCAN ONLY');
   assert.equal(r.exit, 0);
-  assert.deepEqual(Object.keys(r.result.checks).sort(), ['a11y', 'changelog', 'debug', 'deps', 'docs', 'secrets', 'tests', 'version']);
+  assert.deepEqual(Object.keys(r.result.checks).sort(), ['a11y', 'changelog', 'debug', 'deps', 'docs', 'secrets', 'tests', 'ui-gate', 'version']);
 });
 
 test('release scan allows only the four reviewed runtime diagnostics', () => {
@@ -63,6 +66,41 @@ test('scan-only mode still blocks detected secrets', () => {
   assert.equal(r.result.checks.secrets.status, 'fail');
   assert.equal(r.result.overall, 'BLOCKED');
   assert.equal(r.exit, 1);
+});
+
+test('release check warns when ui-gate is triggered but invalid', () => {
+  const origExec = fs.readFileSync;
+  const fakeFs = Object.create(fs);
+  fakeFs.readFileSync = (file, ...rest) => origExec(file, ...rest);
+  let result, exit;
+  vm.runInNewContext(source, {
+    __dirname: path.join(root, 'tools'),
+    require(name) {
+      if (name === 'fs') return fakeFs;
+      if (name === 'path') return path;
+      if (name === 'child_process') return { execSync(command) {
+        if (command === 'node tools/ui-gate-run.mjs --check --json') {
+          return JSON.stringify({
+            gated: true,
+            triggered: true,
+            valid: false,
+            reason: 'no gate result yet',
+            failing: ['G6'],
+            rerun: 'node tools/ui-gate-run.mjs --repo /tmp',
+          });
+        }
+        if (command.startsWith('node --test ')) return '# pass 1\n';
+        return '';
+      } };
+      throw new Error(`Unexpected module ${name}`);
+    },
+    console: { log: s => { result = JSON.parse(s); }, error() {} },
+    process: { argv: ['node', 'release-check.js', '--json', '--scans-only'], exit: n => { exit = n; } }
+  });
+  assert.equal(result.checks['ui-gate'].status, 'warn');
+  assert.ok(result.checks['ui-gate'].messages.some((m) => /verify:ui|ui-gate-run/.test(m)));
+  assert.equal(result.overall, 'SCAN ONLY');
+  assert.equal(exit, 0);
 });
 
 test('default release check launches tests once and propagates failure', () => {
