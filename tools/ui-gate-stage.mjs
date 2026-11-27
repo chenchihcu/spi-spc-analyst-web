@@ -48,7 +48,14 @@ async function main() {
       binding: 'ASSETS',
       run_worker_first: ['/*', '!/vendor/*'],
     },
-    ratelimits: source.ratelimits,
+    // UI gate 同一 IP 連跑 6 viewport × 2 flow 登入（12 POST）；正式站維持 10/60
+    ratelimits: [
+      {
+        name: 'LOGIN_LIMIT',
+        namespace_id: source.ratelimits?.[0]?.namespace_id || '1001',
+        simple: { limit: 500, period: 60 },
+      },
+    ],
     name: 'spi-spc-ui-gate',
     vars: { AUTH_KDF_ITER: String(iter), AI_ENABLED: 'false' },
     d1_databases: [{ binding: 'DB', database_name: 'spi-spc', database_id: randomUUID(), migrations_dir: 'cloudflare/migrations' }],
