@@ -43,4 +43,4 @@ Gate 腳本正本：`~/.agents/skills/validate-web-ui/scripts/ui-gate.mjs`（雲
 
 ## 驗收紀錄（2026-11-27 台北時間）
 
-`npm run verify:ui:core` → G0–G3、G5 **PASS**（約 23 s；6 viewport 中 duo-landscape flow 為 intentional skip）。報告：`.ui-gate/report/2026-11-27T05-36-02-943Z/`。
+`npm run verify:ui` → G0–G5 **PASS**（約 18 s；含 duo-landscape AC-1 與 AC-3）。
