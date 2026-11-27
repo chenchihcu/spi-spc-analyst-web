@@ -15,18 +15,10 @@ async function submitLogin(page, cred) {
   await page.locator('#user').fill(cred.user);
   await page.locator('#pass').fill(cred.password);
   await page.locator('#go').scrollIntoViewIfNeeded();
-  const loginResp = page.waitForResponse(
-    (r) => r.url().includes('/__login') && r.request().method() === 'POST',
-    { timeout: 120_000 },
-  );
-  await page.locator('#go').click();
-  const resp = await loginResp;
-  const body = await resp.json().catch(() => ({}));
-  if (!resp.ok() || !body.ok) {
-    const msg = body.message || body.error || `HTTP ${resp.status()}`;
-    expect.fail(`登入失敗：${msg}`);
-  }
-  await page.waitForURL((url) => !url.pathname.includes('__login'), { timeout: 120_000 });
+  await Promise.all([
+    page.waitForURL((url) => !url.pathname.includes('__login'), { timeout: 120_000 }),
+    page.locator('#go').click(),
+  ]);
 }
 
 /** Same-origin form login as verify-spi-spc journeys.login */

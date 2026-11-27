@@ -38,6 +38,7 @@ Gate 腳本正本：`~/.agents/skills/validate-web-ui/scripts/ui-gate.mjs`（雲
 
 - [x] 登入頁 G4 baseline 已建立：`tests/ui-baseline/login.{mobile,tablet,desktop,narrow,phone,duo-landscape}.png`（2026-11-27）；入口 `npm run verify:ui:baseline`（僅缺圖時寫入）
 - [x] `release-check` 已加入 `ui-gate` 掃描：`watch` 有變更且無有效 `.ui-gate/result.json` 時 **warn** 並提示 `npm run verify:ui`
+- [x] GitHub Actions：`watch` 相對 merge-base 有變更時安裝 Chromium 並執行 `npm run verify:ui`（早於 `release-check`，使同 job 內 gate 結果可被掃描）；runner 已 vendored 至 `tools/validate-web-ui/scripts/`（刻意不在 `vendor/**` watch 內）
 - [ ] 第二階段：更多 `tests/flows/*.flow.spec.mjs` 對應 AC 與 14 分頁（可逐步從 verify journeys 移植）
 - [x] **duo-landscape（852×393）**：根因為 gate 內 12 次登入觸發 `LOGIN_LIMIT` 10/60（duo 為第 11–12 次）；gate stage 放寬至 500/60，並新增 `tests/flows/duo-landscape.flow.spec.mjs`（AC-3）
 
