@@ -15,9 +15,12 @@
     "release-check": "node tools/release-check.js",
     "release-check:scans": "node tools/release-check.js --scans-only",
     "build:cloudflare": "node tools/build-cloudflare.mjs",
-    "build:offline": "node tools/build-offline.mjs"
+    "build:offline": "node tools/build-offline.mjs",
+    "verify:ui": "node tools/ui-gate-run.mjs",
+    "verify:ui:core": "node tools/ui-gate-run.mjs --only G0,G1,G2,G3,G5 --all-flows"
   },
   "devDependencies": {
+    "@playwright/test": "1.56.1",
     "fake-indexeddb": "6.2.4",
     "jsdom": "24.1.3",
     "wrangler": "4.151.0"
