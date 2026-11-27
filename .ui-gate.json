@@ -1,0 +1,64 @@
+{
+  "watch": [
+    "spi-spc.html",
+    "vendor/**",
+    "lib/auth-handler.mjs"
+  ],
+  "build": {
+    "command": "npm run build:cloudflare",
+    "outDir": "dist"
+  },
+  "serve": {
+    "prepare": [
+      "node tools/ui-gate-stage.mjs"
+    ],
+    "command": "node node_modules/wrangler/bin/wrangler.js dev --config .ui-gate/run/stage/wrangler.json --local --persist-to \"$STATE_DIR\" --ip 127.0.0.1 --port $PORT",
+    "readyPath": "/__login"
+  },
+  "viewports": [
+    { "name": "narrow", "width": 320, "height": 568, "isMobile": true, "hasTouch": true },
+    { "name": "phone", "width": 390, "height": 844, "isMobile": true, "hasTouch": true },
+    { "name": "duo-landscape", "width": 852, "height": 393, "isMobile": true, "hasTouch": true }
+  ],
+  "pages": [
+    {
+      "name": "login",
+      "path": "/__login",
+      "ready": "#loginForm",
+      "routes": []
+    }
+  ],
+  "mask": [".ver", "#appBuilt", "#appVer"],
+  "allowConsole": [
+    {
+      "pattern": "^Failed to load resource: net::ERR",
+      "reason": "Wrangler local may abort in-flight assets during first paint; G2 already ignores ERR_ABORTED on requests"
+    }
+  ],
+  "allowRequests": [],
+  "layoutIgnore": [
+    {
+      "selector": "span.field:has(#pass)",
+      "rules": ["L4"],
+      "reason": "登入密碼欄內嵌顯示切換鈕為刻意堆疊，與 verify 登入表單一致"
+    }
+  ],
+  "timeouts": { "testMs": 180000 },
+  "workers": 1,
+  "visual": { "maxDiffPixelRatio": 0.001, "threshold": 0.2 },
+  "baselineDir": "tests/ui-baseline",
+  "features": [
+    {
+      "name": "app-shell",
+      "paths": ["spi-spc.html", "vendor/**"],
+      "flows": ["tests/flows/app-tabs.flow.spec.mjs"],
+      "persists": false
+    },
+    {
+      "name": "login-page",
+      "paths": ["lib/auth-handler.mjs"],
+      "flows": ["tests/flows/login.flow.spec.mjs"],
+      "persists": false
+    }
+  ]
+}

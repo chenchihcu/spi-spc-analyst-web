@@ -8,20 +8,6 @@ const enc = new TextEncoder();
 const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 const toB64Url = (bytes) => Buffer.from(bytes).toString("base64url");
 
-const rl = createInterface({ input: process.stdin, output: process.stdout, terminal: process.stdin.isTTY });
-const lines = rl[Symbol.asyncIterator]();
-let mute = false;
-rl._writeToOutput = (s) => { if (!mute) process.stdout.write(s); };
-
-async function ask(q, hidden = false) {
-  process.stdout.write(q);
-  mute = hidden;
-  const { value = "" } = await lines.next();
-  mute = false;
-  if (hidden) process.stdout.write("\n");
-  return value;
-}
-
 export async function deriveClientD(user, pass, iter = 600000) {
   const normUser = String(user || "").trim().toLowerCase();
   const normPass = String(pass || "").normalize("NFC");
@@ -39,6 +25,19 @@ export async function hashPasswordRecord(d, pepper, iter = 600000) {
 }
 
 async function main() {
+  const rl = createInterface({ input: process.stdin, output: process.stdout, terminal: process.stdin.isTTY });
+  const lines = rl[Symbol.asyncIterator]();
+  let mute = false;
+  rl._writeToOutput = (s) => { if (!mute) process.stdout.write(s); };
+  async function ask(q, hidden = false) {
+    process.stdout.write(q);
+    mute = hidden;
+    const { value = "" } = await lines.next();
+    mute = false;
+    if (hidden) process.stdout.write("\n");
+    return value;
+  }
+
   const pepper = process.env.AUTH_PEPPER || await ask("AUTH_PEPPER 金鑰（至少 32 字元）：", true);
   if (!pepper || pepper.length < 32) {
     console.error("AUTH_PEPPER 必須至少 32 字元");

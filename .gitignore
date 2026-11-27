@@ -1,3 +1,4 @@
+.ui-gate/
 node_modules/
 *.log
 .DS_Store
