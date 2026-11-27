@@ -18,6 +18,13 @@ if (!gate) {
   process.exit(1);
 }
 
-const args = ['--repo', root, ...process.argv.slice(2)];
-const r = spawnSync(process.execPath, [gate, ...args], { stdio: 'inherit' });
+const forward = process.argv.slice(2);
+const args = ['--repo', root, ...forward];
+const jsonMode = forward.includes('--json');
+const r = spawnSync(process.execPath, [gate, ...args], {
+  encoding: jsonMode ? 'utf8' : undefined,
+  stdio: jsonMode ? ['ignore', 'pipe', 'pipe'] : 'inherit',
+});
+if (jsonMode && r.stdout) process.stdout.write(r.stdout);
+if (jsonMode && r.stderr) process.stderr.write(r.stderr);
 process.exit(r.status ?? 1);
