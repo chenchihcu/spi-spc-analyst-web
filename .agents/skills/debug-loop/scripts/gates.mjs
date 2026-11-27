@@ -95,6 +95,7 @@ const RULES = [
   { id: "migration", why: "D1 migration 需先備份、本機演練、使用者核准", files: /^cloudflare\/migrations\//, gates: ["migration"], level: "V3" },
   { id: "mutation-tool", why: "mutation 工具或 fixture 變更", files: /^(tools\/mutation-check\.mjs|tests\/fixtures\/mutations-)/, gates: ["mutation"], level: "V2" },
   { id: "deploy-verify", why: "部署判讀工具", files: /^tools\/deploy-verify\.mjs$/, tests: ["tests/deploy-verify.test.mjs"], level: "V1" },
+  { id: "merge-conflict", why: "PR merge 分類與 docs 自癒", files: /^tools\/(merge-conflict|pr-merge)/, tests: ["tests/merge-conflict-resolve.test.mjs"], level: "V0" },
   { id: "global", why: "相依、建置、CI 或 Worker 設定：影響面廣", files: /^(package(-lock)?\.json|wrangler[^/]*\.jsonc?|tools\/(build-cloudflare|release-check)[^/]*|\.github\/|tests\/_load\.js|tests\/_cloud-harness\.mjs|vendor\/)/, level: "V3" },
 ];
 
@@ -226,6 +227,17 @@ function tail(s, n = 25) {
 }
 
 // ---------- 指令 ----------
+const unmerged = (git("diff", "--name-only", "--diff-filter=U") || "").split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+if (unmerged.length && cmd === "run") {
+  const msg = `未解決的 merge 衝突（UU，${unmerged.length} 檔）。先 node tools/pr-merge-sync.mjs --dry-run 或 --sync`;
+  if (opt.json) console.log(JSON.stringify({ overall: "INCOMPLETE", blocked: "pr-merge-clean", unmerged }, null, 2));
+  else {
+    console.error(msg);
+    for (const f of unmerged) console.error(`  · ${f}`);
+  }
+  process.exit(3);
+}
+
 if (cmd === "status") {
   const l = loadLedger(), fp = fingerprint();
   const cur = l.runs.filter((r) => r.fingerprint === fp);
