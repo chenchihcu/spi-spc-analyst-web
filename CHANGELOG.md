@@ -2,6 +2,12 @@
 
 版本號與更新時間（UTC+8）同步顯示於系統主頁標題右側。v1–v5 未記錄確切時間，只列日期。
 
+## v10.41.1 — 2026-11-27（大檔效能：`capCells` 單趟分板、`recompute` 略過多餘 hpct）
+
+- **問題偵測 `capCells`（M-02）**：組內 σ 改由已篩選群組列一次分板累加，少板多筆時不再對每塊空板重掃 `idx`。
+- **`recompute` 背景路徑**：Worker 偵測時略過主執行緒第二輪 `hpct`（`analyze` 已寫入）。
+- **`statsRows`**：列內重用 `grpStats[group]` 參照，減少雜湊查找。
+
 ## v10.41.0 — 2026-11-24（SPI 進階統計圖表階段三：DOE 雙因子交互作用圖與全系統報告／AI 收尾）
 
 - **DOE 雙因子交互作用引擎（`lib/spi-stats-ext.mjs`）**：新增 `calcDoeInteraction`（`2-Way ANOVA` 交互作用 `F` 檢定與精確不完全 Beta 上尾 `p` 值），內建 `dfErr <= 0` 無重複樣本與缺格子防呆（「僅供視覺判讀」，絕不除以 0 產生 `NaN`），並整合至 `doeAnalyze()`。
