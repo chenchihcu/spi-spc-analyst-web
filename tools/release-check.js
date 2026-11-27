@@ -176,6 +176,29 @@ if (scansOnly) {
   const bad = ctr.filter(([, , a]) => { const id = (a.match(/id="([^"]+)"/) || [])[1]; return !/aria-label/.test(a) && !/type="(radio|checkbox|file)"/.test(a) && !(id && labels.has(id)); }).map(([, , a]) => (a.match(/id="([^"]+)"/) || [])[1] || a.trim());
   put("a11y", bad.length ? "warn" : "pass", bad.length ? [`FACT: ${bad.length} 個控制項缺少標籤：${bad.join("、")}`] : [`FACT: ${ctr.length} 個靜態控制項皆有標籤或包在 label 內`]);
 }
+// 8. Web UI gate（.ui-gate.json watch 有變更時須有效之 .ui-gate/result.json）
+{
+  if (!read(".ui-gate.json")) {
+    put("ui-gate", "pass", ["FACT: 未設定 .ui-gate.json，略過"]);
+  } else {
+    try {
+      const raw = execSync("node tools/ui-gate-run.mjs --check --json", { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+      const gate = JSON.parse(String(raw).trim());
+      const msgs = [`FACT: ${gate.reason || "ui-gate"}`];
+      if (gate.rerun) msgs.push(`NEXT: ${gate.rerun}`);
+      else if (gate.gated && gate.triggered && !gate.valid) msgs.push("NEXT: npm run verify:ui");
+      if (Array.isArray(gate.changed) && gate.changed.length) msgs.push(`FACT: watch 變更：${gate.changed.slice(0, 5).join("、")}${gate.changed.length > 5 ? "…" : ""}`);
+      if (Array.isArray(gate.failing) && gate.failing.length) msgs.push(`FACT: 未通過關卡：${gate.failing.join("、")}`);
+      if (!gate.gated) put("ui-gate", "pass", msgs);
+      else if (!gate.triggered) put("ui-gate", "pass", msgs);
+      else if (gate.valid) put("ui-gate", "pass", msgs);
+      else put("ui-gate", "warn", msgs);
+    } catch (e) {
+      const detail = String(e.stdout || e.stderr || e.message || "").trim().split("\n")[0].slice(0, 200);
+      put("ui-gate", "warn", ["FACT: UI gate 檢查失敗", detail ? `FACT: ${detail}` : "FACT: 無輸出", "NEXT: npm run verify:ui"]);
+    }
+  }
+}
 
 const overall = Object.values(out).some((x) => x.status === "fail") ? "BLOCKED" : scansOnly ? "SCAN ONLY" : Object.values(out).some((x) => x.status === "warn") ? "NEEDS REVIEW" : "READY";
 if (process.argv.includes("--json")) console.log(JSON.stringify({ overall, checks: out }, null, 2));
