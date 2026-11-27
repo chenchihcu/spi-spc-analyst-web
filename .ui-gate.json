@@ -51,7 +51,10 @@
     {
       "name": "app-shell",
       "paths": ["spi-spc.html", "vendor/**"],
-      "flows": ["tests/flows/app-tabs.flow.spec.mjs"],
+      "flows": [
+        "tests/flows/app-tabs.flow.spec.mjs",
+        "tests/flows/duo-landscape.flow.spec.mjs"
+      ],
       "persists": false
     },
     {
