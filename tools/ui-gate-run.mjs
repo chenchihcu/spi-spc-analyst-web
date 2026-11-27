@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const candidates = [
   process.env.UI_GATE_SCRIPT,
+  join(root, 'tools/validate-web-ui/scripts/ui-gate.mjs'),
   '/cursor/stores/user/skills/validate-web-ui/scripts/ui-gate.mjs',
   join(homedir(), '.agents/skills/validate-web-ui/scripts/ui-gate.mjs'),
 ].filter(Boolean);

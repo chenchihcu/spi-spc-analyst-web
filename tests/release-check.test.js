@@ -123,4 +123,8 @@ test('CI invokes the full release gate once without a second full suite', () => 
   assert.ok(!commands.includes('npm run release-check:scans'));
   assert.ok(commands.includes('npm run build:cloudflare'));
   assert.ok(commands.includes('npx wrangler deploy --dry-run'));
+  assert.equal(commands.filter((c) => c === 'npm run verify:ui').length, 1,
+    'workflow must run verify:ui once when UI gate watch paths change');
+  assert.equal(commands.filter((c) => c === 'npx playwright install chromium').length, 1);
+  assert.ok(yaml.includes('steps.ui_gate.outputs.triggered'));
 });
