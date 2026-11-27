@@ -146,15 +146,29 @@ export function check(repo, opts = {}) {
 }
 
 // ---------- process helpers ----------
+function shellSpawn(cmd, opts) {
+  if (process.platform === 'win32') {
+    const bash = 'C:\\Program Files\\Git\\bin\\bash.exe';
+    if (fs.existsSync(bash)) return spawn(bash, ['-c', cmd], opts);
+    return spawn(cmd, [], { ...opts, shell: true, windowsHide: true });
+  }
+  return spawn('/bin/sh', ['-c', cmd], opts);
+}
+function killShellChild(child) {
+  try {
+    if (process.platform === 'win32') child.kill();
+    else process.kill(-child.pid, 'SIGKILL');
+  } catch {}
+}
 function sh(cmd, { cwd, env, timeoutMs, logFile }) {
   return new Promise((resolve) => {
-    const child = spawn('/bin/sh', ['-c', cmd], { cwd, env: { ...process.env, ...env }, detached: true });
+    const child = shellSpawn(cmd, { cwd, env: { ...process.env, ...env }, detached: process.platform !== 'win32' });
     const log = logFile ? fs.createWriteStream(logFile, { flags: 'a' }) : null;
     let tail = '';
     const onData = (d) => { log?.write(d); tail = (tail + d.toString()).slice(-4000); };
     child.stdout.on('data', onData);
     child.stderr.on('data', onData);
-    const timer = setTimeout(() => { try { process.kill(-child.pid, 'SIGKILL'); } catch {} resolve({ code: 'timeout', tail }); }, timeoutMs);
+    const timer = setTimeout(() => { killShellChild(child); resolve({ code: 'timeout', tail }); }, timeoutMs);
     child.on('exit', (code) => { clearTimeout(timer); log?.end(); resolve({ code, tail }); });
   });
 }
@@ -210,7 +224,7 @@ async function run(args) {
       const p = await sh(cmd, { cwd: repo, env: serveEnv, timeoutMs: 180_000, logFile: path.join(reportDir, 'prepare.log') });
       if (p.code !== 0) { fail('G1', { rule: 'prepare', detail: `${cmd}: exit ${p.code}: ${p.tail.slice(-400)}` }); throw new Error('stop'); }
     }
-    server = spawn('/bin/sh', ['-c', cfg.serve.command], { cwd: repo, env: { ...process.env, ...serveEnv }, detached: true, stdio: ['ignore', fs.openSync(path.join(reportDir, 'server.log'), 'a'), fs.openSync(path.join(reportDir, 'server.log'), 'a')] });
+    server = shellSpawn(cfg.serve.command, { cwd: repo, env: { ...process.env, ...serveEnv }, detached: process.platform !== 'win32', stdio: ['ignore', fs.openSync(path.join(reportDir, 'server.log'), 'a'), fs.openSync(path.join(reportDir, 'server.log'), 'a')] });
     const deadline = Date.now() + 60_000;
     let status = 0;
     while (Date.now() < deadline && server.exitCode === null) { status = await answers(origin + cfg.serve.readyPath); if (status === 200) break; await new Promise((r) => setTimeout(r, 500)); }

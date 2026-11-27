@@ -7,6 +7,7 @@
 - **問題偵測 `capCells`（M-02）**：組內 σ 改由已篩選群組列一次分板累加，少板多筆時不再對每塊空板重掃 `idx`。
 - **`recompute` 背景路徑**：Worker 偵測時略過主執行緒第二輪 `hpct`（`analyze` 已寫入）。
 - **`statsRows`**：列內重用 `grpStats[group]` 參照，減少雜湊查找。
+- **CI Web UI gate**：Windows runner 改以 Git Bash 執行 shell 命令（修正 `spawn /bin/sh ENOENT`）。
 
 ## v10.41.0 — 2026-11-24（SPI 進階統計圖表階段三：DOE 雙因子交互作用圖與全系統報告／AI 收尾）
 
