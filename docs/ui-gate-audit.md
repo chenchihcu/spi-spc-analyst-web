@@ -36,7 +36,7 @@ Gate 腳本正本：`~/.agents/skills/validate-web-ui/scripts/ui-gate.mjs`（雲
 
 ## 待辦（需人決策）
 
-- [ ] 使用者核准後執行 `--init-baseline` 建立 `tests/ui-baseline/login.*.png`
+- [x] 登入頁 G4 baseline 已建立：`tests/ui-baseline/login.{mobile,tablet,desktop,narrow,phone,duo-landscape}.png`（2026-11-27）；入口 `npm run verify:ui:baseline`（僅缺圖時寫入）
 - [ ] 是否將 `.ui-gate/result.json` 納入 release-check（建議：watch 有變更時 CLI 提示 `npm run verify:ui`）
 - [ ] 第二階段：更多 `tests/flows/*.flow.spec.mjs` 對應 AC 與 14 分頁（可逐步從 verify journeys 移植）
 - [ ] **duo-landscape（852×393）**：目前登入後 `#appVer` 未出現，flow 以 `test.skip` 標記；需對照 `docs/spec-iphone-duo-rfc.md` 補專用 flow 或修登入橫向版面

@@ -17,7 +17,8 @@
     "build:cloudflare": "node tools/build-cloudflare.mjs",
     "build:offline": "node tools/build-offline.mjs",
     "verify:ui": "node tools/ui-gate-run.mjs",
-    "verify:ui:core": "node tools/ui-gate-run.mjs --only G0,G1,G2,G3,G5 --all-flows"
+    "verify:ui:core": "node tools/ui-gate-run.mjs --only G0,G1,G2,G3,G5 --all-flows",
+    "verify:ui:baseline": "node tools/ui-gate-run.mjs --init-baseline"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1",
